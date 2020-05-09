@@ -28,9 +28,25 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
-                <configuration>
-                    <mainClass>EditorMain</mainClass>
-                </configuration>
+                <executions>
+                    <execution>
+                        <!-- Default configuration for running -->
+                        <id>default-cli</id>
+                        <configuration>
+                            <mainClass>EditorMain</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Configuration for debugging -->
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</option>
+                            </options>
+                            <mainClass>EditorMain</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
