@@ -4,6 +4,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import model.Layer;
 
 class LayersStage extends Stage{
     private static final int INIT_WIDTH = 200;
@@ -49,13 +50,11 @@ class LayersStage extends Stage{
     }
 
     private void addLayer() {
-        Layer layer = new Layer();
-        layer.setName("new layer");
-        layer.setVisible(true);
+        Layer layer = new Layer("new layer");
         table.add(layer);
     }
 
     private void removeLayer() {
-        table.removeLayer();
+        table.remove();
     }
 }
