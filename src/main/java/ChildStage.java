@@ -4,7 +4,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 class ChildStage extends Stage {
-
     ChildStage(Stage parent, String title) {
         super(StageStyle.UTILITY);
         StackPane root = new StackPane();

@@ -33,7 +33,7 @@
                         <!-- Default configuration for running -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>EditorMain</mainClass>
+                            <mainClass>Main</mainClass>
                         </configuration>
                     </execution>
                     <execution>
@@ -43,7 +43,7 @@
                             <options>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</option>
                             </options>
-                            <mainClass>EditorMain</mainClass>
+                            <mainClass>Main</mainClass>
                         </configuration>
                     </execution>
                 </executions>

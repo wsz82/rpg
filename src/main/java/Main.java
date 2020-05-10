@@ -1,11 +1,11 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class EditorMain extends Application {
+public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        EditorMainView view = new EditorMainView(stage);
+        MainView view = new MainView(stage);
         view.show();
     }
 
