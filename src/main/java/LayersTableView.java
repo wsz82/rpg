@@ -1,5 +1,6 @@
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -14,6 +15,8 @@ class LayersTableView extends TableView<Layer> {
 
     private void initTable() {
         this.setItems(layers);
+
+        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         TableColumn<Layer, Integer> levelCol = new TableColumn<>("Level");
         levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
@@ -35,7 +38,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     void removeLayer() {
-        Layer layer = this.getSelectionModel().getSelectedItem();
-        layers.remove(layer);
+        ObservableList<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
+        layers.removeAll(layersToRemove);
     }
 }
