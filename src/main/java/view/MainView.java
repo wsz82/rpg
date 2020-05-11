@@ -20,7 +20,7 @@ class MainView {
     private static final int INIT_HEIGHT = 600;
     private final Stage stage;
     private ChildStage toolsWindow;
-    private ChildStage contentsWindow;
+    private ContentStage contentsWindow;
     private LayersStage layersWindow;
     private ChildStage assetsWindow;
     private double screenHeight;
@@ -96,7 +96,7 @@ class MainView {
     }
 
     private void createContentsWindow() {
-        contentsWindow = new ChildStage(stage, "Contents");
+        contentsWindow = new ContentStage(stage);
         contentsWindow.setX(screenWidth / 10);
         contentsWindow.setY((double) 7/10 * screenHeight);
         contentsWindow.show();

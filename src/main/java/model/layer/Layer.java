@@ -1,8 +1,12 @@
-package model;
+package model.layer;
 
 import javafx.beans.property.*;
 
-public class Layer {
+import java.util.HashSet;
+import java.util.Set;
+
+public class Layer implements LevelValueObservable {
+    private Set<LevelValueListener> levelValueListeners = new HashSet<>();
     private final IntegerProperty level;
     private final StringProperty name;
     private final BooleanProperty visible;
@@ -48,5 +52,20 @@ public class Layer {
 
     public BooleanProperty getVisibleProperty() {
         return visible;
+    }
+
+    @Override
+    public void attach(LevelValueListener listener) {
+        levelValueListeners.add(listener);
+    }
+
+    @Override
+    public void remove(LevelValueListener listener) {
+        levelValueListeners.remove(listener);
+    }
+
+    @Override
+    public void notify(int oldValue, int newValue) {
+        levelValueListeners.forEach(listener -> listener.onLevelValueChanged(oldValue, newValue));
     }
 }

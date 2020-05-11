@@ -6,19 +6,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import model.layer.Layer;
-import model.layer.LayersList;
 
-class LayersStage extends Stage{
-    private static final String LAYERS = "Layers";
+class ContentStage extends Stage {
+    private static final String CONTENT = "Content";
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem addLayer = new MenuItem("Add layer");
-    private final MenuItem removeLayer = new MenuItem("Remove layers");
+    private final MenuItem removeItems = new MenuItem("Remove items");
     private final Stage parent;
-    private final LayersTableView table = new LayersTableView();
+    private final ContentTableView table = new ContentTableView();
 
-    LayersStage(Stage parent) {
+    ContentStage(Stage parent) {
         super(StageStyle.UTILITY);
         this.parent = parent;
         initWindow();
@@ -27,7 +24,7 @@ class LayersStage extends Stage{
     private void initWindow() {
         Scene scene = new Scene(root);
         this.initOwner(parent);
-        this.setTitle(LAYERS);
+        this.setTitle(CONTENT);
         this.setAlwaysOnTop(true);
         this.setScene(scene);
 
@@ -42,20 +39,14 @@ class LayersStage extends Stage{
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
-        addLayer.setOnAction(event -> addLayer());
-        removeLayer.setOnAction(event -> removeLayer());
+        removeItems.setOnAction(event -> removeItems());
     }
 
     private void fillContextMenu() {
-        contextMenu.getItems().addAll(addLayer, removeLayer);
+        contextMenu.getItems().addAll(removeItems);
     }
 
-    private void addLayer() {
-        Layer layer = new Layer("new layer");
-        LayersList.get().add(layer);
-    }
-
-    private void removeLayer() {
-        table.removeLayers();
+    private void removeItems() {
+        table.removeContents();
     }
 }

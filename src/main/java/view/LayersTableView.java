@@ -7,8 +7,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import model.Layer;
-import model.LayersList;
+import model.layer.Layer;
+import model.layer.LayersList;
 
 class LayersTableView extends TableView<Layer> {
 
@@ -28,16 +28,16 @@ class LayersTableView extends TableView<Layer> {
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
-                        Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
-                        int newValue = t.getNewValue();
-                        if (isLevelUnique(newValue)) {
-                            layer.setLevel(newValue);
-                        } else {
-                            layer.setLevel(t.getOldValue());
-                        }
-                        levelCol.setVisible(false);
-                        levelCol.setVisible(true);
-                });
+            Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            int newValue = t.getNewValue();
+            if (isLevelUnique(newValue)) {
+                layer.setLevel(newValue);
+            } else {
+                layer.setLevel(t.getOldValue());
+            }
+            levelCol.setVisible(false);
+            levelCol.setVisible(true);
+        });
 
         TableColumn<Layer, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -76,7 +76,7 @@ class LayersTableView extends TableView<Layer> {
                 .noneMatch(layer -> layer.getLevel() == newValue);
     }
 
-    void remove() {
+    void removeLayers() {
         ObservableList<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
         LayersList.get().removeAll(layersToRemove);
     }
