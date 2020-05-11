@@ -37,17 +37,12 @@ class LayersStage extends Stage{
     }
 
     private void setUpContextMenu() {
-        fillContextMenu();
-
+        addLayer.setOnAction(event -> addLayer());
+        removeLayer.setOnAction(event -> removeLayer());
+        contextMenu.getItems().addAll(addLayer, removeLayer);
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
-        addLayer.setOnAction(event -> addLayer());
-        removeLayer.setOnAction(event -> removeLayer());
-    }
-
-    private void fillContextMenu() {
-        contextMenu.getItems().addAll(addLayer, removeLayer);
     }
 
     private void addLayer() {

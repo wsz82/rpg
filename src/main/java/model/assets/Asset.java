@@ -8,20 +8,20 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import model.items.ItemType;
 
-public class Assets {
+public class Asset {
     private final StringProperty name;
     private final ObjectProperty<ItemType> type;
     private final StringProperty url;
     private final ObjectProperty<Image> image;
 
-    public Assets() {
+    public Asset() {
         this.name = new SimpleStringProperty(this, "name");
         this.type = new SimpleObjectProperty<>(this, "type");
         this.url = new SimpleStringProperty(this, "url");
         this.image = new SimpleObjectProperty<>(this, "image");
     }
 
-    public Assets(String name, ItemType type, String url) {
+    public Asset(String name, ItemType type, String url) {
         this.name = new SimpleStringProperty(this, "name");
         setName(name);
         this.type = new SimpleObjectProperty<>(this, "type");

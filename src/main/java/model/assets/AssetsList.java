@@ -4,9 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class AssetsList {
-    private static ObservableList<Assets> assets;
+    private static ObservableList<Asset> assets;
 
-    public static ObservableList<Assets> get() {
+    public static ObservableList<Asset> get() {
         if (assets == null) {
             assets = FXCollections.observableArrayList();
         }
