@@ -14,7 +14,7 @@ class LayersStage extends Stage{
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
     private final MenuItem addLayer = new MenuItem("Add layer");
-    private final MenuItem removeLayer = new MenuItem("Remove layer");
+    private final MenuItem removeLayer = new MenuItem("Remove layers");
     private final Stage parent;
     private final LayersTableView table = new LayersTableView();
 

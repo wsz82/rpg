@@ -27,17 +27,33 @@ class LayersTableView extends TableView<Layer> {
         levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
-        levelCol.setOnEditCommit(t -> (t.getTableView().getItems().get(t.getTablePosition().getRow()))
-                .setLevel(t.getNewValue())
-        );
+        levelCol.setOnEditCommit(t -> {
+                        Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
+                        int newValue = t.getNewValue();
+                        if (isLevelUnique(newValue)) {
+                            layer.setLevel(newValue);
+                        } else {
+                            layer.setLevel(t.getOldValue());
+                        }
+                        levelCol.setVisible(false);
+                        levelCol.setVisible(true);
+                });
 
         TableColumn<Layer, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        nameCol.setOnEditCommit(t -> (t.getTableView().getItems().get(t.getTablePosition().getRow()))
-                        .setName(t.getNewValue())
-        );
+        nameCol.setOnEditCommit(t -> {
+            Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            String newValue = t.getNewValue();
+            if (isNameUnique(newValue)) {
+                layer.setName(newValue);
+            } else {
+                layer.setName(t.getOldValue());
+            }
+            nameCol.setVisible(false);
+            nameCol.setVisible(true);
+        });
 
         TableColumn<Layer, Boolean> visibleCol = new TableColumn<>("Visibility");
         visibleCol.setCellValueFactory(param -> param.getValue().getVisibleProperty());
@@ -48,6 +64,16 @@ class LayersTableView extends TableView<Layer> {
         columns.add(0, levelCol);
         columns.add(1, nameCol);
         columns.add(2, visibleCol);
+    }
+
+    private boolean isNameUnique(String newValue) {
+        return this.getItems().stream()
+                .noneMatch(layer -> layer.getName().equals(newValue));
+    }
+
+    private boolean isLevelUnique(int newValue) {
+        return this.getItems().stream()
+                .noneMatch(layer -> layer.getLevel() == newValue);
     }
 
     void remove() {
