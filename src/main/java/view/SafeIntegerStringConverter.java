@@ -1,4 +1,5 @@
-import javafx.util.StringConverter;
+package view;
+
 import javafx.util.converter.IntegerStringConverter;
 
 public class SafeIntegerStringConverter extends IntegerStringConverter {

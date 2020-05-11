@@ -1,18 +1,16 @@
-import javafx.collections.FXCollections;
+package view;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseButton;
 import model.Layer;
+import model.LayersList;
 
 class LayersTableView extends TableView<Layer> {
-    private final ObservableList<Layer> layers = FXCollections.observableArrayList();
 
     LayersTableView() {
         super();
@@ -20,7 +18,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void initTable() {
-        this.setItems(layers);
+        this.setItems(LayersList.get());
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.setEditable(true);
@@ -52,12 +50,8 @@ class LayersTableView extends TableView<Layer> {
         columns.add(2, visibleCol);
     }
 
-    void add(Layer layer) {
-        layers.add(layer);
-    }
-
     void remove() {
         ObservableList<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
-        layers.removeAll(layersToRemove);
+        LayersList.get().removeAll(layersToRemove);
     }
 }

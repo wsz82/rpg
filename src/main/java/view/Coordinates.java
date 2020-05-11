@@ -1,3 +1,5 @@
+package view;
+
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 

@@ -1,3 +1,5 @@
+package view;
+
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -5,10 +7,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.Layer;
+import model.LayersList;
 
 class LayersStage extends Stage{
-    private static final int INIT_WIDTH = 200;
-    private static final int INIT_HEIGHT = 300;
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
@@ -51,7 +52,7 @@ class LayersStage extends Stage{
 
     private void addLayer() {
         Layer layer = new Layer("new layer");
-        table.add(layer);
+        LayersList.get().add(layer);
     }
 
     private void removeLayer() {
