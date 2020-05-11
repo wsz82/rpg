@@ -12,17 +12,15 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 class MainView {
-    private static final String TOOLS = "Tools";
     private static final String CONTENTS = "Contents";
     private static final String LAYERS = "Layers";
     private static final String ASSETS = "Assets";
     private static final int INIT_WIDTH = 800;
     private static final int INIT_HEIGHT = 600;
     private final Stage stage;
-    private ChildStage toolsWindow;
     private ContentStage contentsWindow;
     private LayersStage layersWindow;
-    private ChildStage assetsWindow;
+    private AssetsStage assetsWindow;
     private double screenHeight;
     private double screenWidth;
 
@@ -50,7 +48,6 @@ class MainView {
         Rectangle2D screenBound = Screen.getPrimary().getBounds();
         screenHeight = (int) screenBound.getMaxY();
         screenWidth = (int) screenBound.getMaxX();
-        createToolsWindow();
         createContentsWindow();
         createLayersWindow();
         createAssetsWindow();
@@ -68,13 +65,9 @@ class MainView {
 
     private MenuBar getMenuBar() {
         Menu view = new Menu("View");
-        MenuItem tools = new MenuItem(TOOLS);
         MenuItem contents = new MenuItem(CONTENTS);
         MenuItem layers = new MenuItem(LAYERS);
         MenuItem assets = new MenuItem(ASSETS);
-        tools.setOnAction(event ->
-            showOrHide(toolsWindow)
-            );
         contents.setOnAction(event ->
                 showOrHide(contentsWindow)
         );
@@ -84,35 +77,28 @@ class MainView {
         assets.setOnAction(event ->
                 showOrHide(assetsWindow)
         );
-        view.getItems().addAll(tools, contents, layers, assets);
+        view.getItems().addAll(contents, layers, assets);
         return new MenuBar(view);
-    }
-
-    private void createToolsWindow() {
-        toolsWindow = new ChildStage(stage, "Tools");
-        toolsWindow.setX(screenWidth / 10);
-        toolsWindow.setY(screenHeight / 10);
-        toolsWindow.show();
     }
 
     private void createContentsWindow() {
         contentsWindow = new ContentStage(stage);
-        contentsWindow.setX(screenWidth / 10);
-        contentsWindow.setY((double) 7/10 * screenHeight);
+        contentsWindow.setX(0);
+        contentsWindow.setY((double) 5/10 * screenHeight);
         contentsWindow.show();
     }
 
     private void createLayersWindow() {
         layersWindow = new LayersStage(stage);
-        layersWindow.setX(screenWidth / 10);
-        layersWindow.setY((double) 3/10 * screenHeight);
+        layersWindow.setX(0);
+        layersWindow.setY(0);
         layersWindow.show();
     }
 
     private void createAssetsWindow() {
-        assetsWindow = new ChildStage(stage, "Assets");
-        assetsWindow.setX((double) 8/10 * screenWidth);
-        assetsWindow.setY((double) 7/10 * screenHeight);
+        assetsWindow = new AssetsStage(stage);
+        assetsWindow.setX((double) 15/20 * screenWidth);
+        assetsWindow.setY((double) 5/10 * screenHeight);
         assetsWindow.show();
     }
 

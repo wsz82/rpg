@@ -30,10 +30,11 @@ public class Content {
         this.type = new SimpleObjectProperty<>(this, "type");
         this.type.set(item.getType());
         this.level = new SimpleIntegerProperty(this, "level");
-        this.level.set(item.getLevel());
+        setLevel(item.getLevel());
         this.visible = new SimpleBooleanProperty(this, "visible");
+        setVisible(true);
         this.coords = new SimpleObjectProperty<>(this, "coords");
-        this.coords.set(item.getCoords());
+        setCoords(item.getCoords());
     }
 
     public Item getItem() {

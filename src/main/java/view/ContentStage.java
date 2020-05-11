@@ -12,8 +12,8 @@ class ContentStage extends Stage {
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
     private final MenuItem removeItems = new MenuItem("Remove items");
-    private final Stage parent;
     private final ContentTableView table = new ContentTableView();
+    private final Stage parent;
 
     ContentStage(Stage parent) {
         super(StageStyle.UTILITY);
