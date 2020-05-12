@@ -14,6 +14,7 @@ import model.layer.LayersList;
 import model.stage.CurrentLayer;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class LayersTableView extends TableView<Layer> implements LevelValueObservable, VisibleValueObservable {
@@ -101,8 +102,15 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
     }
 
     void removeLayers() {
-        ObservableList<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
+        List<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
         LayersList.get().removeAll(layersToRemove);
+    }
+
+    public void changeVisibility() {
+        List<Layer> layersToChange = this.getSelectionModel().getSelectedItems();
+        for (Layer layer : layersToChange) {
+            layer.setVisible(!layer.getVisible());
+        }
     }
 
     @Override

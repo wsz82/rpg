@@ -15,8 +15,6 @@ public class LayersStage extends Stage{
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem addLayer = new MenuItem("Add layer");
-    private final MenuItem removeLayer = new MenuItem("Remove layers");
     private final Stage parent;
     private final LayersTableView table = new LayersTableView();
 
@@ -38,12 +36,20 @@ public class LayersStage extends Stage{
     }
 
     private void setUpContextMenu() {
+        final MenuItem addLayer = new MenuItem("Add layer");
+        final MenuItem removeLayer = new MenuItem("Remove layer/s");
+        final MenuItem changeVisibility = new MenuItem("Change visibility");
         addLayer.setOnAction(event -> addLayer());
         removeLayer.setOnAction(event -> removeLayer());
-        contextMenu.getItems().addAll(addLayer, removeLayer);
+        changeVisibility.setOnAction(event -> changeVisibility());
+        contextMenu.getItems().addAll(addLayer, removeLayer, changeVisibility);
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
+    }
+
+    private void changeVisibility() {
+        table.changeVisibility();
     }
 
     private void addLayer() {
