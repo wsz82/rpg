@@ -13,6 +13,7 @@ import model.layer.Layer;
 import model.layer.LayersList;
 import model.layer.LevelValueListener;
 import model.layer.LevelValueObservable;
+import model.stage.CurrentLayer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +44,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable {
 
             if (isLevelUnique(newValue)) {
                 layer.setLevel(newValue);
+                CurrentLayer.setCurrentLayer(newValue);
             } else {
                 layer.setLevel(t.getOldValue());
             }
@@ -77,6 +79,11 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable {
         columns.add(2, visibleCol);
 
         this.attach(ContentList.getInstance());
+        this.getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
+            if (newSel != null) {
+                CurrentLayer.setCurrentLayer(newSel.getLevel());
+            }
+        });
     }
 
     private boolean isNameUnique(String newValue) {

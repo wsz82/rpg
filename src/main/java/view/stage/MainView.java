@@ -7,6 +7,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -48,12 +49,16 @@ class MainView {
         stage.setScene(scene);
         stage.show();
 
-        Rectangle2D screenBound = Screen.getPrimary().getBounds();
-        screenHeight = (int) screenBound.getMaxY();
-        screenWidth = (int) screenBound.getMaxX();
+        getScreenDimensions();
         createContentsWindow();
         createLayersWindow();
         createAssetsWindow();
+    }
+
+    private void getScreenDimensions() {
+        Rectangle2D screenBound = Screen.getPrimary().getBounds();
+        screenHeight = (int) screenBound.getMaxY();
+        screenWidth = (int) screenBound.getMaxX();
     }
 
     private void setTopContent(VBox upperBar) {
@@ -61,9 +66,13 @@ class MainView {
         upperBar.getChildren().addAll(menuBar);
     }
 
-    private void setBottomContent(ScrollPane center, VBox downBar) {
+    private void setBottomContent(ScrollPane center, VBox bottom) {
+        HBox bottomHorizontalBar = new HBox();
+        bottomHorizontalBar.setSpacing(10);
         CoordinatesBox coordinatesBox = new CoordinatesBox(center);
-        downBar.getChildren().addAll(coordinatesBox);
+        CurrentLayerBox currentLayerBox = new CurrentLayerBox();
+        bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLayerBox);
+        bottom.getChildren().addAll(bottomHorizontalBar);
     }
 
     private MenuBar getMenuBar() {
