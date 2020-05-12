@@ -24,7 +24,6 @@ public class AssetsStage extends Stage {
         Scene scene = new Scene(root);
         this.initOwner(parent);
         this.setTitle(ASSETS);
-        this.setAlwaysOnTop(true);
         this.setScene(scene);
 
         createTabs();

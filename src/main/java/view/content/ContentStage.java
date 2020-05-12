@@ -25,7 +25,6 @@ public class ContentStage extends Stage {
         Scene scene = new Scene(root);
         this.initOwner(parent);
         this.setTitle(CONTENT);
-        this.setAlwaysOnTop(true);
         this.setScene(scene);
 
         setUpContextMenu();

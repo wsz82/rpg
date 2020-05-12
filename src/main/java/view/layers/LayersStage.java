@@ -30,7 +30,6 @@ public class LayersStage extends Stage{
         Scene scene = new Scene(root);
         this.initOwner(parent);
         this.setTitle(LAYERS);
-        this.setAlwaysOnTop(true);
         this.setScene(scene);
 
         setUpContextMenu();

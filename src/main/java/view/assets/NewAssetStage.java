@@ -1,7 +1,9 @@
 package view.assets;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
@@ -15,6 +17,7 @@ import model.items.ItemType;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.List;
 
 class NewAssetStage extends Stage {
     private static final String TITLE = "New asset";
@@ -46,7 +49,7 @@ class NewAssetStage extends Stage {
         createCancel.setSpacing(10);
         flowPane.setVgap(8);
         flowPane.setHgap(4);
-        nameInput.setPromptText("Name");
+        nameInput.setPromptText("Id");
         flowPane.getChildren().addAll(nameInput, imageButton);
         AnchorPane.setTopAnchor(flowPane, 10.0);
         AnchorPane.setLeftAnchor(flowPane, 10.0);
@@ -69,17 +72,31 @@ class NewAssetStage extends Stage {
                 }
             }
         });
-
         cancel.setOnAction(event -> this.close());
         create.setOnAction(event -> {
-            boolean inputNameIsEmpty = nameInput.getText().equals("");
+            String name = nameInput.getText();
+            boolean inputNameIsEmpty = name.equals("");
             boolean inputFileIsEmpty = path == null || path.isEmpty();
             if (inputNameIsEmpty || inputFileIsEmpty) {
+                return;
+            }
+            List<Asset> assets = AssetsList.get();
+            boolean assetIdAlreadyExists = assets.stream()
+                    .anyMatch(a -> a.getName().equals(name));
+            if (assetIdAlreadyExists) {
+                alertNameExists();
                 return;
             }
             addNewAsset();
             this.close();
         });
+    }
+
+    private void alertNameExists() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.CANCEL)
+                .ifPresent(r -> this.close());
     }
 
     private void addNewAsset() {
