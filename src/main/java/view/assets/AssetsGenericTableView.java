@@ -1,4 +1,4 @@
-package view;
+package view.assets;
 
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;

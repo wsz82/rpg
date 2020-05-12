@@ -1,4 +1,4 @@
-package view;
+package view.stage;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

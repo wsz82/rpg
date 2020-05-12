@@ -1,4 +1,4 @@
-package view;
+package view.assets;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -6,19 +6,22 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import model.assets.Asset;
 import model.assets.AssetsList;
 import model.items.ItemType;
 
-public class AssetsTableView extends AssetsGenericTableView {
+class AssetsTableView extends AssetsGenericTableView {
     private final ContextMenu contextMenu = new ContextMenu();
     private final MenuItem addAsset = new MenuItem("Add asset");
     private final MenuItem removeAsset = new MenuItem("Remove assets");
     private final ItemType itemType;
+    private final Stage parent;
 
-    AssetsTableView(ItemType itemType) {
+    AssetsTableView(Stage parent, ItemType itemType) {
         super();
         this.itemType = itemType;
+        this.parent = parent;
         initTable();
         setFilteredItems();
         setUpContextMenu();
@@ -49,8 +52,8 @@ public class AssetsTableView extends AssetsGenericTableView {
     }
 
     void addAsset() {
-        Asset asset = new Asset("Name", itemType, "D:");
-        AssetsList.get().add(asset);
+        NewAssetStage newAssetStage = new NewAssetStage(parent, itemType);
+        newAssetStage.show();
     }
 
     void removeAssets() {

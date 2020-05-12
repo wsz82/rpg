@@ -1,4 +1,4 @@
-package view;
+package view.layers;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -6,16 +6,19 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import model.layer.Layer;
+import model.layer.LayersList;
 
-class ContentStage extends Stage {
-    private static final String CONTENT = "Content";
+public class LayersStage extends Stage{
+    private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
     private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem removeItems = new MenuItem("Remove items");
-    private final ContentTableView table = new ContentTableView();
+    private final MenuItem addLayer = new MenuItem("Add layer");
+    private final MenuItem removeLayer = new MenuItem("Remove layers");
     private final Stage parent;
+    private final LayersTableView table = new LayersTableView();
 
-    ContentStage(Stage parent) {
+    public LayersStage(Stage parent) {
         super(StageStyle.UTILITY);
         this.parent = parent;
         initWindow();
@@ -24,7 +27,7 @@ class ContentStage extends Stage {
     private void initWindow() {
         Scene scene = new Scene(root);
         this.initOwner(parent);
-        this.setTitle(CONTENT);
+        this.setTitle(LAYERS);
         this.setAlwaysOnTop(true);
         this.setScene(scene);
 
@@ -34,19 +37,20 @@ class ContentStage extends Stage {
     }
 
     private void setUpContextMenu() {
-        fillContextMenu();
-
+        addLayer.setOnAction(event -> addLayer());
+        removeLayer.setOnAction(event -> removeLayer());
+        contextMenu.getItems().addAll(addLayer, removeLayer);
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
-        removeItems.setOnAction(event -> removeItems());
     }
 
-    private void fillContextMenu() {
-        contextMenu.getItems().addAll(removeItems);
+    private void addLayer() {
+        Layer layer = new Layer("new layer");
+        LayersList.get().add(layer);
     }
 
-    private void removeItems() {
-        table.removeContents();
+    private void removeLayer() {
+        table.removeLayers();
     }
 }

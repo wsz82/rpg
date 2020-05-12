@@ -1,4 +1,4 @@
-package view;
+package view.assets;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -14,7 +14,7 @@ public class AssetsStage extends Stage {
     private final TabPane tabPane = new TabPane();
     private final Stage parent;
 
-    AssetsStage(Stage parent) {
+    public AssetsStage(Stage parent) {
         super(StageStyle.UTILITY);
         this.parent = parent;
         initWindow();
@@ -36,7 +36,7 @@ public class AssetsStage extends Stage {
 
         for (ItemType itemType:
              itemTypes) {
-            AssetsTableView table = new AssetsTableView(itemType);
+            AssetsTableView table = new AssetsTableView(this, itemType);
             String tabName = itemType.toString();
             Tab tab = new Tab();
             tab.setText(tabName);

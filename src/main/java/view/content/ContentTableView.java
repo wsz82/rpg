@@ -1,4 +1,4 @@
-package view;
+package view.content;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -7,10 +7,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import model.SafeIntegerStringConverter;
 import model.content.Content;
 import model.content.ContentList;
 
-public class ContentTableView extends TableView<Content> {
+class ContentTableView extends TableView<Content> {
 
     ContentTableView() {
         super();

@@ -1,4 +1,4 @@
-package view;
+package view.stage;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -10,6 +10,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import view.assets.AssetsStage;
+import view.content.ContentStage;
+import view.layers.LayersStage;
 
 class MainView {
     private static final String CONTENTS = "Contents";
