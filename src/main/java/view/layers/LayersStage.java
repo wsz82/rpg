@@ -9,6 +9,8 @@ import javafx.stage.StageStyle;
 import model.layer.Layer;
 import model.layer.LayersList;
 
+import java.util.List;
+
 public class LayersStage extends Stage{
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
@@ -47,7 +49,25 @@ public class LayersStage extends Stage{
 
     private void addLayer() {
         Layer layer = new Layer("new layer");
-        LayersList.get().add(layer);
+        Layer uniqueLayer = getUniqueLayer(layer);
+        LayersList.get().add(uniqueLayer);
+    }
+
+    private Layer getUniqueLayer(Layer layer) {
+        List<Layer> layers = LayersList.get();
+        boolean levelExists = layers.stream()
+                .anyMatch(l -> l.getLevel() == layer.getLevel());
+        boolean nameExists = layers.stream()
+                .anyMatch(l -> l.getName().equals(layer.getName()));
+        if (levelExists) {
+            layer.setLevel(layer.getLevel() - 1);
+            return getUniqueLayer(layer);
+        } else if (nameExists) {
+            layer.setName(layer.getName() + 1);
+            return getUniqueLayer(layer);
+        }else {
+            return layer;
+        }
     }
 
     private void removeLayer() {
