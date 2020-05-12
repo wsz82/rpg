@@ -3,6 +3,7 @@ package model.assets;
 import model.content.Content;
 import model.items.Landscape;
 import model.stage.Coordinates;
+import model.stage.CurrentLayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class AssetToContentConverter {
 
     private static Content convertToLandscape(Asset asset) {
         Landscape landscape = new Landscape(
-                asset.getName(), asset.getType(), new Coordinates(0, 0), 0, asset.getImage());
+                asset.getName(), asset.getType(), new Coordinates(0, 0), CurrentLayer.getCurrentLayer(), asset.getImage());
         return new Content(landscape);
     }
 }
