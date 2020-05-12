@@ -19,7 +19,7 @@ class ContentTableView extends TableView<Content> {
     }
 
     private void initTable() {
-        this.setItems(ContentList.get());
+        this.setItems(ContentList.getInstance().get());
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.setEditable(true);
 
@@ -58,6 +58,6 @@ class ContentTableView extends TableView<Content> {
 
     void removeContents() {
         ObservableList<Content> contentsToRemove = this.getSelectionModel().getSelectedItems();
-        ContentList.get().removeAll(contentsToRemove);
+        ContentList.getInstance().get().removeAll(contentsToRemove);
     }
 }

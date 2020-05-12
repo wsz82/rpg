@@ -8,10 +8,17 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import model.SafeIntegerStringConverter;
+import model.content.ContentList;
 import model.layer.Layer;
 import model.layer.LayersList;
+import model.layer.LevelValueListener;
+import model.layer.LevelValueObservable;
 
-class LayersTableView extends TableView<Layer> {
+import java.util.HashSet;
+import java.util.Set;
+
+class LayersTableView extends TableView<Layer> implements LevelValueObservable {
+    private final Set<LevelValueListener> levelValueListeners = new HashSet<>();
 
     LayersTableView() {
         super();
@@ -31,6 +38,9 @@ class LayersTableView extends TableView<Layer> {
         levelCol.setOnEditCommit(t -> {
             Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
             int newValue = t.getNewValue();
+
+            notify(t.getOldValue(), t.getNewValue());
+
             if (isLevelUnique(newValue)) {
                 layer.setLevel(newValue);
             } else {
@@ -65,6 +75,8 @@ class LayersTableView extends TableView<Layer> {
         columns.add(0, levelCol);
         columns.add(1, nameCol);
         columns.add(2, visibleCol);
+
+        this.attach(ContentList.getInstance());
     }
 
     private boolean isNameUnique(String newValue) {
@@ -80,5 +92,20 @@ class LayersTableView extends TableView<Layer> {
     void removeLayers() {
         ObservableList<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
         LayersList.get().removeAll(layersToRemove);
+    }
+
+    @Override
+    public void attach(LevelValueListener listener) {
+        levelValueListeners.add(listener);
+    }
+
+    @Override
+    public void remove(LevelValueListener listener) {
+        levelValueListeners.remove(listener);
+    }
+
+    @Override
+    public void notify(int oldValue, int newValue) {
+        levelValueListeners.forEach(listener -> listener.onLevelValueChanged(oldValue, newValue));
     }
 }

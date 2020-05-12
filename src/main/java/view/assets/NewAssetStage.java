@@ -14,6 +14,7 @@ import model.assets.AssetsList;
 import model.items.ItemType;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 class NewAssetStage extends Stage {
     private static final String TITLE = "New asset";
@@ -61,7 +62,11 @@ class NewAssetStage extends Stage {
             );
             File selectedFile = fileChooser.showOpenDialog(this);
             if (selectedFile != null && selectedFile.isFile()) {
-                path = selectedFile.toURI().getPath();
+                try {
+                    path = selectedFile.toURI().toURL().toString();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

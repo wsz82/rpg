@@ -5,9 +5,17 @@ import javafx.collections.ObservableList;
 import model.layer.LevelValueListener;
 
 public class ContentList implements LevelValueListener {
-    private static ObservableList<Content> contents;
+    private ObservableList<Content> contents;
+    private static ContentList contentList;
 
-    public static ObservableList<Content> get() {
+    public static ContentList getInstance() {
+        if (contentList == null) {
+            contentList = new ContentList();
+        }
+        return contentList;
+    }
+
+    public ObservableList<Content> get() {
         if (contents == null) {
             contents = FXCollections.observableArrayList();
         }

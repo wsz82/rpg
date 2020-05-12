@@ -8,26 +8,28 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import model.items.ItemType;
 
+import java.util.NoSuchElementException;
+
 public class Asset {
     private final StringProperty name;
     private final ObjectProperty<ItemType> type;
-    private final StringProperty url;
+    private final StringProperty path;
     private final ObjectProperty<Image> image;
 
     public Asset() {
         this.name = new SimpleStringProperty(this, "name");
         this.type = new SimpleObjectProperty<>(this, "type");
-        this.url = new SimpleStringProperty(this, "url");
+        this.path = new SimpleStringProperty(this, "url");
         this.image = new SimpleObjectProperty<>(this, "image");
     }
 
-    public Asset(String name, ItemType type, String url) {
+    public Asset(String name, ItemType type, String path) {
         this.name = new SimpleStringProperty(this, "name");
         setName(name);
         this.type = new SimpleObjectProperty<>(this, "type");
         setType(type);
-        this.url = new SimpleStringProperty(this, "url");
-        setUrl(url);
+        this.path = new SimpleStringProperty(this, "url");
+        setPath(path);
         this.image = new SimpleObjectProperty<>(this, "image");
     }
 
@@ -55,16 +57,16 @@ public class Asset {
         this.type.set(type);
     }
 
-    public String getUrl() {
-        return url.get();
+    public String getPath() {
+        return path.get();
     }
 
-    public StringProperty urlProperty() {
-        return url;
+    public StringProperty pathProperty() {
+        return path;
     }
 
-    public void setUrl(String url) {
-        this.url.set(url);
+    public void setPath(String path) {
+        this.path.set(path);
     }
 
     public Image getImage() {
@@ -75,7 +77,17 @@ public class Asset {
         return image;
     }
 
-    public void setImage(Image image) {
-        this.image.set(image);
+    public void setImageFromPath() {
+        if (this.getImage() == null) {
+            this.image.set(loadImageFromPath());
+        }
+    }
+
+    private Image loadImageFromPath() {
+        if (getPath() == null || getPath().isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        return new Image(getPath());
     }
 }

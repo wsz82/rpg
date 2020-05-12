@@ -8,13 +8,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.assets.Asset;
+import model.assets.AssetToContentConverter;
 import model.assets.AssetsList;
+import model.content.Content;
+import model.content.ContentList;
 import model.items.ItemType;
+
+import java.util.List;
 
 class AssetsTableView extends AssetsGenericTableView {
     private final ContextMenu contextMenu = new ContextMenu();
     private final MenuItem addAsset = new MenuItem("Add asset");
-    private final MenuItem removeAsset = new MenuItem("Remove assets");
+    private final MenuItem removeAsset = new MenuItem("Remove asset/s");
+    private final MenuItem addItemToStage = new MenuItem("Add item/s to stage");
     private final ItemType itemType;
     private final Stage parent;
 
@@ -45,10 +51,17 @@ class AssetsTableView extends AssetsGenericTableView {
     private void setUpContextMenu() {
         addAsset.setOnAction(event -> addAsset());
         removeAsset.setOnAction(event -> removeAssets());
-        contextMenu.getItems().addAll(addAsset, removeAsset);
+        addItemToStage.setOnAction(event -> addItemToStage());
+        contextMenu.getItems().addAll(addAsset, removeAsset, addItemToStage);
         this.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
+    }
+
+    void addItemToStage() {
+        List<Asset> selectedAssets = this.getSelectionModel().getSelectedItems();
+        List<Content> contents = AssetToContentConverter.convert(selectedAssets);
+        ContentList.getInstance().get().addAll(contents);
     }
 
     void addAsset() {
