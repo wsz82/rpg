@@ -14,7 +14,6 @@ import java.util.List;
 public class LayersStage extends Stage{
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
-    private final ContextMenu contextMenu = new ContextMenu();
     private final Stage parent;
     private final LayersTableView table = new LayersTableView();
 
@@ -36,6 +35,7 @@ public class LayersStage extends Stage{
     }
 
     private void setUpContextMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
         final MenuItem addLayer = new MenuItem("Add layer");
         final MenuItem removeLayer = new MenuItem("Remove layer/s");
         final MenuItem changeVisibility = new MenuItem("Change visibility");

@@ -11,6 +11,8 @@ import model.SafeIntegerStringConverter;
 import model.content.Content;
 import model.content.ContentList;
 
+import java.util.List;
+
 class ContentTableView extends TableView<Content> {
 
     ContentTableView() {
@@ -59,5 +61,12 @@ class ContentTableView extends TableView<Content> {
     void removeContents() {
         ObservableList<Content> contentsToRemove = this.getSelectionModel().getSelectedItems();
         ContentList.getInstance().get().removeAll(contentsToRemove);
+    }
+
+    public void changeVisibility() {
+        List<Content> contentsToChange = this.getSelectionModel().getSelectedItems();
+        for (Content content : contentsToChange) {
+            content.setVisible(!content.isVisible());
+        }
     }
 }

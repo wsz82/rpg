@@ -10,8 +10,6 @@ import javafx.stage.StageStyle;
 public class ContentStage extends Stage {
     private static final String CONTENT = "Content";
     private final StackPane root = new StackPane();
-    private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem removeItems = new MenuItem("Remove items");
     private final ContentTableView table = new ContentTableView();
     private final Stage parent;
 
@@ -33,16 +31,19 @@ public class ContentStage extends Stage {
     }
 
     private void setUpContextMenu() {
-        fillContextMenu();
-
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem removeItems = new MenuItem("Remove items");
+        final MenuItem changeVisibility = new MenuItem("Change visibility");
+        contextMenu.getItems().addAll(removeItems, changeVisibility);
+        removeItems.setOnAction(event -> removeItems());
+        changeVisibility.setOnAction(event -> changeVisibility());
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
-        removeItems.setOnAction(event -> removeItems());
     }
 
-    private void fillContextMenu() {
-        contextMenu.getItems().addAll(removeItems);
+    private void changeVisibility() {
+        table.changeVisibility();
     }
 
     private void removeItems() {
