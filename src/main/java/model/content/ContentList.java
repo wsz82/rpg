@@ -2,9 +2,10 @@ package model.content;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import model.layer.LevelValueListener;
+import view.layers.LevelValueListener;
+import view.layers.VisibleValueListener;
 
-public class ContentList implements LevelValueListener {
+public class ContentList implements LevelValueListener, VisibleValueListener {
     private ObservableList<Content> contents;
     private static ContentList contentList;
 
@@ -31,6 +32,16 @@ public class ContentList implements LevelValueListener {
                 contents) {
             if (content.getLevel() == oldValue) {
                 content.setLevel(newValue);
+            }
+        }
+    }
+
+    @Override
+    public void onVisibleValueChanged(int level, boolean newValue) {
+        for (Content content:
+                contents) {
+            if (content.getLevel() == level) {
+                content.setVisible(newValue);
             }
         }
     }
