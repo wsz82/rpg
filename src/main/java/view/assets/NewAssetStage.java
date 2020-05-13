@@ -72,7 +72,9 @@ class NewAssetStage extends Stage {
                 }
             }
         });
+        cancel.cancelButtonProperty().set(true);
         cancel.setOnAction(event -> this.close());
+        create.defaultButtonProperty().set(true);
         create.setOnAction(event -> {
             String name = nameInput.getText();
             boolean inputNameIsEmpty = name.equals("");
@@ -84,7 +86,7 @@ class NewAssetStage extends Stage {
             boolean assetIdAlreadyExists = assets.stream()
                     .anyMatch(a -> a.getName().equals(name));
             if (assetIdAlreadyExists) {
-                alertNameExists();
+                alertOfNameExisting();
                 return;
             }
             addNewAsset();
@@ -92,7 +94,7 @@ class NewAssetStage extends Stage {
         });
     }
 
-    private void alertNameExists() {
+    private void alertOfNameExisting() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)

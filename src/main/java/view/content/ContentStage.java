@@ -5,17 +5,15 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import view.stage.ChildStage;
 
-public class ContentStage extends Stage {
+public class ContentStage extends ChildStage {
     private static final String CONTENT = "Content";
     private final StackPane root = new StackPane();
     private final ContentTableView table = new ContentTableView();
-    private final Stage parent;
 
     public ContentStage(Stage parent) {
-        super(StageStyle.UTILITY);
-        this.parent = parent;
+        super(parent);
         initWindow();
     }
 

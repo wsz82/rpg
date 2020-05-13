@@ -5,18 +5,16 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import model.items.ItemType;
+import view.stage.ChildStage;
 
-public class AssetsStage extends Stage {
+public class AssetsStage extends ChildStage {
     private static final String ASSETS = "Assets";
     private final StackPane root = new StackPane();
     private final TabPane tabPane = new TabPane();
-    private final Stage parent;
 
     public AssetsStage(Stage parent) {
-        super(StageStyle.UTILITY);
-        this.parent = parent;
+        super(parent);
         initWindow();
     }
 

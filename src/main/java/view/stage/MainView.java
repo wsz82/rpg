@@ -2,10 +2,7 @@ package view.stage;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,19 +27,22 @@ class MainView {
 
     MainView(Stage stage) {
         this.stage = stage;
+        contentsWindow = new ContentStage(stage);
+        layersWindow = new LayersStage(stage);
+        assetsWindow = new AssetsStage(stage);
     }
 
     void show() {
         BorderPane borderPane = new BorderPane();
-        VBox upperBar = new VBox();
+        VBox topBar = new VBox();
         ScrollPane center = new ScrollPane();
         VBox downBar = new VBox();
 
-        borderPane.setTop(upperBar);
+        borderPane.setTop(topBar);
         borderPane.setCenter(center);
         borderPane.setBottom(downBar);
 
-        setTopContent(upperBar);
+        setTopContent(topBar);
         setBottomContent(center, downBar);
 
         Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
@@ -61,9 +61,10 @@ class MainView {
         screenWidth = (int) screenBound.getMaxX();
     }
 
-    private void setTopContent(VBox upperBar) {
+    private void setTopContent(VBox topBar) {
         MenuBar menuBar = getMenuBar();
-        upperBar.getChildren().addAll(menuBar);
+        ToolBar toolBar = new EditorToolBar();
+        topBar.getChildren().addAll(menuBar, toolBar);
     }
 
     private void setBottomContent(ScrollPane center, VBox bottom) {
@@ -77,45 +78,46 @@ class MainView {
 
     private MenuBar getMenuBar() {
         Menu view = new Menu("View");
-        MenuItem contents = new MenuItem(CONTENTS);
-        MenuItem layers = new MenuItem(LAYERS);
-        MenuItem assets = new MenuItem(ASSETS);
-        contents.setOnAction(event ->
-                showOrHide(contentsWindow)
-        );
-        layers.setOnAction(event ->
-                showOrHide(layersWindow)
-        );
-        assets.setOnAction(event ->
-                showOrHide(assetsWindow)
-        );
+        CheckMenuItem contents = new CheckMenuItem(CONTENTS);
+        CheckMenuItem layers = new CheckMenuItem(LAYERS);
+        CheckMenuItem assets = new CheckMenuItem(ASSETS);
+
+        setViewItemOnAction(contentsWindow, contents);
+        setViewItemOnAction(layersWindow, layers);
+        setViewItemOnAction(assetsWindow, assets);
+
         view.getItems().addAll(contents, layers, assets);
         return new MenuBar(view);
     }
 
+    private void setViewItemOnAction(Stage stage, CheckMenuItem menuItem) {
+        menuItem.setSelected(true);
+        stage.setOnCloseRequest(event -> menuItem.setSelected(false));
+        menuItem.setOnAction(event ->
+                showOrHide(stage, menuItem.isSelected())
+        );
+    }
+
     private void createContentsWindow() {
-        contentsWindow = new ContentStage(stage);
         contentsWindow.setX(0);
         contentsWindow.setY((double) 5/10 * screenHeight);
         contentsWindow.show();
     }
 
     private void createLayersWindow() {
-        layersWindow = new LayersStage(stage);
         layersWindow.setX(0);
         layersWindow.setY(0);
         layersWindow.show();
     }
 
     private void createAssetsWindow() {
-        assetsWindow = new AssetsStage(stage);
         assetsWindow.setX((double) 15/20 * screenWidth);
         assetsWindow.setY((double) 5/10 * screenHeight);
         assetsWindow.show();
     }
 
-    private void showOrHide(Stage stage) {
-        if (stage.isShowing()) {
+    private void showOrHide(Stage stage, boolean isSelected) {
+        if (!isSelected) {
             stage.hide();
         } else {
             stage.show();

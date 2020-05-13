@@ -5,21 +5,19 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import model.layer.Layer;
 import model.layer.LayersList;
+import view.stage.ChildStage;
 
 import java.util.List;
 
-public class LayersStage extends Stage{
+public class LayersStage extends ChildStage {
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
-    private final Stage parent;
     private final LayersTableView table = new LayersTableView();
 
     public LayersStage(Stage parent) {
-        super(StageStyle.UTILITY);
-        this.parent = parent;
+        super(parent);
         initWindow();
     }
 
@@ -78,4 +76,6 @@ public class LayersStage extends Stage{
     private void removeLayer() {
         table.removeLayers();
     }
+
+
 }
