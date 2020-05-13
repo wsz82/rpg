@@ -13,6 +13,8 @@ import model.assets.AssetsList;
 import model.content.Content;
 import model.content.ContentList;
 import model.items.ItemType;
+import model.stage.Coordinates;
+import model.stage.Pointer;
 
 import java.util.List;
 
@@ -20,7 +22,7 @@ class AssetsTableView extends AssetsGenericTableView {
     private final ContextMenu contextMenu = new ContextMenu();
     private final MenuItem addAsset = new MenuItem("Add asset");
     private final MenuItem removeAsset = new MenuItem("Remove asset/s");
-    private final MenuItem addItemToStage = new MenuItem("Add item/s to stage");
+    private final MenuItem addItemsToStage = new MenuItem("Add item/s to stage");
     private final ItemType itemType;
     private final Stage parent;
 
@@ -51,16 +53,19 @@ class AssetsTableView extends AssetsGenericTableView {
     private void setUpContextMenu() {
         addAsset.setOnAction(event -> addAsset());
         removeAsset.setOnAction(event -> removeAssets());
-        addItemToStage.setOnAction(event -> addItemToStage());
-        contextMenu.getItems().addAll(addAsset, removeAsset, addItemToStage);
+        addItemsToStage.setOnAction(event -> {
+            Coordinates pointerCoordinates = Pointer.getMark();
+            addItemsToStageAndContents(pointerCoordinates);
+        });
+        contextMenu.getItems().addAll(addAsset, removeAsset, addItemsToStage);
         this.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 
-    void addItemToStage() {
+    void addItemsToStageAndContents(Coordinates pos) {
         List<Asset> selectedAssets = this.getSelectionModel().getSelectedItems();
-        List<Content> contents = AssetToContentConverter.convert(selectedAssets);
+        List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
         ContentList.getInstance().get().addAll(contents);
     }
 

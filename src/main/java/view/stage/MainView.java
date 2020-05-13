@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -12,12 +13,13 @@ import view.assets.AssetsStage;
 import view.content.ContentStage;
 import view.layers.LayersStage;
 
-class MainView {
+public class MainView {
     private static final String CONTENTS = "Contents";
     private static final String LAYERS = "Layers";
     private static final String ASSETS = "Assets";
     private static final int INIT_WIDTH = 800;
     private static final int INIT_HEIGHT = 600;
+    private static final ScrollPane center = new ScrollPane();
     private final Stage stage;
     private ContentStage contentsWindow;
     private LayersStage layersWindow;
@@ -35,7 +37,6 @@ class MainView {
     void show() {
         BorderPane borderPane = new BorderPane();
         VBox topBar = new VBox();
-        ScrollPane center = new ScrollPane();
         VBox downBar = new VBox();
 
         borderPane.setTop(topBar);
@@ -63,7 +64,7 @@ class MainView {
 
     private void setTopContent(VBox topBar) {
         MenuBar menuBar = getMenuBar();
-        ToolBar toolBar = new EditorToolBar();
+        ToolBar toolBar = new EditorToolBar(stage);
         topBar.getChildren().addAll(menuBar, toolBar);
     }
 
@@ -122,5 +123,9 @@ class MainView {
         } else {
             stage.show();
         }
+    }
+
+    public static Region getCenter() {
+        return center;
     }
 }
