@@ -4,7 +4,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -20,6 +19,7 @@ import java.util.function.UnaryOperator;
 public class LocationStage extends ChildStage {
     private final AnchorPane root = new AnchorPane();
     private final ChoiceBox<Location> locationChoiceBox = new ChoiceBox<>();
+    private final TextField inputChangeName = new TextField();
     private final TextField inputName = new TextField();
     private final TextField inputWidth = new TextField();
     private final TextField inputHeight = new TextField();
@@ -37,13 +37,17 @@ public class LocationStage extends ChildStage {
         this.setTitle("Parameters");
         this.setScene(scene);
 
+        HBox changeNameWithLabel = new HBox(10);
+        Label changeNameLabel = new Label("Change name to");
+        changeNameWithLabel.getChildren().addAll(changeNameLabel, inputChangeName);
+
         HBox currentLocationWithLabel = new HBox(10);
-        Label currentLocationLabel = new Label("Current");
+        Label currentLocationLabel = new Label("Current location");
         currentLocationWithLabel.getChildren().addAll(currentLocationLabel, locationChoiceBox);
         setUpLocationChoiceBox();
 
         HBox nameWithLabel = new HBox(10);
-        Label nameLabel = new Label("New location");
+        Label nameLabel = new Label("Create new location");
         nameWithLabel.getChildren().addAll(nameLabel, inputName);
 
         HBox widthWithLabel = new HBox(10);
@@ -51,34 +55,40 @@ public class LocationStage extends ChildStage {
         widthWithLabel.getChildren().addAll(widthLabel, inputWidth);
         filterTextFieldForPositiveNumber(inputWidth);
         inputWidth.setText("" + CurrentLocation.get().getLocation().getWidth());
+        inputWidth.setPrefWidth(80);
 
         HBox heightWithLabel = new HBox(10);
         Label heightLabel = new Label("Height");
         heightWithLabel.getChildren().addAll(heightLabel, inputHeight);
         filterTextFieldForPositiveNumber(inputHeight);
         inputHeight.setText("" + CurrentLocation.get().getLocation().getHeight());
+        inputHeight.setPrefWidth(80);
 
-        VBox widthWithHeight = new VBox(10);
-        widthWithHeight.getChildren().addAll(widthWithLabel, heightWithLabel);
+        VBox allParameters = new VBox(10);
+        allParameters.getChildren().addAll(
+                changeNameWithLabel, currentLocationWithLabel, nameWithLabel, widthWithLabel, heightWithLabel);
 
         HBox acceptCancel = new HBox();
         acceptCancel.getChildren().addAll(accept, cancel);
         acceptCancel.setSpacing(10);
 
-        FlowPane flowPane = new FlowPane(8, 4);
-        flowPane.getChildren().addAll(currentLocationWithLabel, nameWithLabel, widthWithHeight);
-
-        AnchorPane.setTopAnchor(flowPane, 10.0);
-        AnchorPane.setLeftAnchor(flowPane, 10.0);
+        AnchorPane.setTopAnchor(allParameters, 10.0);
+        AnchorPane.setLeftAnchor(allParameters, 10.0);
         AnchorPane.setBottomAnchor(acceptCancel, 10.0);
         AnchorPane.setRightAnchor(acceptCancel, 10.0);
-        root.getChildren().addAll(flowPane, acceptCancel);
+        root.getChildren().addAll(allParameters, acceptCancel);
 
         cancel.cancelButtonProperty().set(true);
         cancel.setOnAction(event -> this.close());
 
         accept.defaultButtonProperty().set(true);
         accept.setOnAction(event -> {
+            String changedName = inputChangeName.getText();
+            boolean changeNameInputExists = !changedName.isEmpty();
+            if (changeNameInputExists) {
+                changeLocationName(changedName);
+            }
+
             String name = inputName.getText();
             int width = Integer.parseInt(inputWidth.getText());
             int height = Integer.parseInt(inputHeight.getText());
@@ -90,6 +100,12 @@ public class LocationStage extends ChildStage {
             }
             this.close();
         });
+    }
+
+    private void changeLocationName(String changedName) {
+        Location location;
+        location = CurrentLocation.get().getLocation();
+        location.setName(changedName);
     }
 
     private void tryToAddNewLocation(String name, int width, int height) {

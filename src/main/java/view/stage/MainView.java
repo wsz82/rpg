@@ -91,12 +91,12 @@ public class MainView {
         view.getItems().addAll(contents, layers, assets);
 
         Menu location = new Menu("Location");
-        MenuItem properties = new MenuItem("Properties");
-        properties.setOnAction(event -> {
+        MenuItem parameters = new MenuItem("Parameters");
+        parameters.setOnAction(event -> {
             LocationStage locationStage = new LocationStage(stage);
             locationStage.show();
         });
-        location.getItems().addAll(properties);
+        location.getItems().addAll(parameters);
 
         return new MenuBar(view, location);
     }
