@@ -4,7 +4,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import view.stage.MainView;
 
 public class Pointer {
@@ -12,36 +11,34 @@ public class Pointer {
         @Override
         public void handle(MouseEvent event) {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                mark = new Coordinates(MainView.getCenter(), event);
+                mark = new Coordinates(MainView.getBoard(), event);
             }
         }
     };
-    private final Stage parent;
     private static Coordinates mark;
     private static Pointer pointer;
     private static boolean active;
 
-    public static Pointer getInstance(Stage parent) {
+    public static Pointer getInstance() {
         if (pointer == null) {
-            pointer = new Pointer(parent);
+            pointer = new Pointer();
         }
         return pointer;
     }
 
-    private Pointer(Stage parent) {
-        this.parent = parent;
+    private Pointer() {
     }
 
     public void activate() {
         active = true;
-        MainView.getCenter().setCursor(Cursor.CROSSHAIR);
-        MainView.getCenter().setOnMouseClicked(clickEvent);
+        MainView.getBoard().setCursor(Cursor.CROSSHAIR);
+        MainView.getBoard().setOnMouseClicked(clickEvent);
     }
 
     public void deactivate() {
         active = false;
-        MainView.getCenter().setCursor(Cursor.DEFAULT);
-        MainView.getCenter().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
+        MainView.getBoard().setCursor(Cursor.DEFAULT);
+        MainView.getBoard().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
     }
 
     public static Coordinates getMark() {

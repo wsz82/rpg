@@ -8,9 +8,8 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import model.SafeIntegerStringConverter;
-import model.content.ContentList;
 import model.layer.Layer;
-import model.layer.LayersList;
+import model.location.CurrentLocation;
 import model.stage.CurrentLayer;
 
 import java.util.HashSet;
@@ -27,7 +26,12 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
     }
 
     private void initTable() {
-        this.setItems(LayersList.get());
+        this.setItems(CurrentLocation.get().getLayers());
+        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.getName().equals(oldValue.getName())) {
+                this.setItems(CurrentLocation.get().getLayers());
+            }
+        });
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.setEditable(true);
@@ -82,8 +86,8 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         columns.add(1, nameCol);
         columns.add(2, visibleCol);
 
-        this.attachLevelValueListener(ContentList.getInstance());
-        this.attachVisibleValueListener(ContentList.getInstance());
+        this.attachLevelValueListener(CurrentLocation.get().getContentList());
+        this.attachVisibleValueListener(CurrentLocation.get().getContentList());
         this.getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
                 CurrentLayer.setCurrentLayer(newSel.getLevel());
@@ -103,7 +107,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
 
     void removeLayers() {
         List<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
-        LayersList.get().removeAll(layersToRemove);
+        CurrentLocation.get().getLayers().removeAll(layersToRemove);
     }
 
     public void changeVisibility() {

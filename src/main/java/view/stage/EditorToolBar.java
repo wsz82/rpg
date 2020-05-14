@@ -19,9 +19,9 @@ class EditorToolBar extends ToolBar {
         pointerButton.setGraphic(new ImageView(getPointerIcon()));
         pointerButton.setOnAction(event -> {
             if (pointerButton.isSelected()) {
-                Pointer.getInstance(parent).activate();
+                Pointer.getInstance().activate();
             } else {
-                Pointer.getInstance(parent).deactivate();
+                Pointer.getInstance().deactivate();
             }
         });
 

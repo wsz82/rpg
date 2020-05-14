@@ -10,29 +10,27 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import model.assets.Asset;
 import model.assets.AssetsList;
 import model.items.ItemType;
+import view.stage.ChildStage;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
 
-class NewAssetStage extends Stage {
+class NewAssetStage extends ChildStage {
     private static final String TITLE = "New asset";
     private final AnchorPane root = new AnchorPane();
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
-    private final Stage parent;
     private final ItemType itemType;
     private String path;
 
     NewAssetStage(Stage parent, ItemType itemType) {
-        super(StageStyle.UTILITY);
-        this.parent = parent;
+        super(parent);
         this.itemType = itemType;
         initWindow();
     }

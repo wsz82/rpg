@@ -11,8 +11,8 @@ import model.assets.Asset;
 import model.assets.AssetToContentConverter;
 import model.assets.AssetsList;
 import model.content.Content;
-import model.content.ContentList;
 import model.items.ItemType;
+import model.location.CurrentLocation;
 import model.stage.Coordinates;
 import model.stage.Pointer;
 
@@ -45,7 +45,7 @@ class AssetsTableView extends AssetsGenericTableView {
 
     private void setFilteredItems() {
         ObservableList<Asset> assets = AssetsList.get();
-        FilteredList<Asset> filteredList = new FilteredList<Asset>(assets);
+        FilteredList<Asset> filteredList = new FilteredList<>(assets);
         filteredList.setPredicate(asset -> asset.getType() == itemType);
         this.setItems(filteredList);
     }
@@ -66,7 +66,7 @@ class AssetsTableView extends AssetsGenericTableView {
     void addItemsToStageAndContents(Coordinates pos) {
         List<Asset> selectedAssets = this.getSelectionModel().getSelectedItems();
         List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
-        ContentList.getInstance().get().addAll(contents);
+        CurrentLocation.get().getContent().addAll(contents);
     }
 
     void addAsset() {

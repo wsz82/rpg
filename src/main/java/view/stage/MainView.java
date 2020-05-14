@@ -5,13 +5,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import view.assets.AssetsStage;
 import view.content.ContentStage;
 import view.layers.LayersStage;
+import view.locations.LocationStage;
 
 public class MainView {
     private static final String CONTENTS = "Contents";
@@ -19,11 +19,12 @@ public class MainView {
     private static final String ASSETS = "Assets";
     private static final int INIT_WIDTH = 800;
     private static final int INIT_HEIGHT = 600;
-    private static final ScrollPane center = new ScrollPane();
+    private static final Board BOARD = new Board();
+    private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
-    private ContentStage contentsWindow;
-    private LayersStage layersWindow;
-    private AssetsStage assetsWindow;
+    private final ContentStage contentsWindow;
+    private final LayersStage layersWindow;
+    private final AssetsStage assetsWindow;
     private double screenHeight;
     private double screenWidth;
 
@@ -37,14 +38,15 @@ public class MainView {
     void show() {
         BorderPane borderPane = new BorderPane();
         VBox topBar = new VBox();
-        VBox downBar = new VBox();
+        VBox bottomBar = new VBox();
 
+        scrollPane.setContent(BOARD);
         borderPane.setTop(topBar);
-        borderPane.setCenter(center);
-        borderPane.setBottom(downBar);
+        borderPane.setCenter(scrollPane);
+        borderPane.setBottom(bottomBar);
 
         setTopContent(topBar);
-        setBottomContent(center, downBar);
+        setBottomContent(bottomBar);
 
         Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         stage.setScene(scene);
@@ -68,10 +70,10 @@ public class MainView {
         topBar.getChildren().addAll(menuBar, toolBar);
     }
 
-    private void setBottomContent(ScrollPane center, VBox bottom) {
+    private void setBottomContent(VBox bottom) {
         HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        CoordinatesBox coordinatesBox = new CoordinatesBox(center);
+        CoordinatesBox coordinatesBox = new CoordinatesBox(BOARD);
         CurrentLayerBox currentLayerBox = new CurrentLayerBox();
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLayerBox);
         bottom.getChildren().addAll(bottomHorizontalBar);
@@ -86,9 +88,17 @@ public class MainView {
         setViewItemOnAction(contentsWindow, contents);
         setViewItemOnAction(layersWindow, layers);
         setViewItemOnAction(assetsWindow, assets);
-
         view.getItems().addAll(contents, layers, assets);
-        return new MenuBar(view);
+
+        Menu location = new Menu("Location");
+        MenuItem properties = new MenuItem("Properties");
+        properties.setOnAction(event -> {
+            LocationStage locationStage = new LocationStage(stage);
+            locationStage.show();
+        });
+        location.getItems().addAll(properties);
+
+        return new MenuBar(view, location);
     }
 
     private void setViewItemOnAction(Stage stage, CheckMenuItem menuItem) {
@@ -125,7 +135,7 @@ public class MainView {
         }
     }
 
-    public static Region getCenter() {
-        return center;
+    public static Board getBoard() {
+        return BOARD;
     }
 }

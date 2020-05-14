@@ -9,7 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import model.SafeIntegerStringConverter;
 import model.content.Content;
-import model.content.ContentList;
+import model.location.CurrentLocation;
 
 import java.util.List;
 
@@ -21,7 +21,13 @@ class ContentTableView extends TableView<Content> {
     }
 
     private void initTable() {
-        this.setItems(ContentList.getInstance().get());
+        this.setItems(CurrentLocation.get().getContent());
+        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.getName().equals(oldValue.getName())) {
+                this.setItems(CurrentLocation.get().getContent());
+            }
+        });
+
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.setEditable(true);
 
@@ -60,7 +66,7 @@ class ContentTableView extends TableView<Content> {
 
     void removeContents() {
         ObservableList<Content> contentsToRemove = this.getSelectionModel().getSelectedItems();
-        ContentList.getInstance().get().removeAll(contentsToRemove);
+        CurrentLocation.get().getContent().removeAll(contentsToRemove);
     }
 
     public void changeVisibility() {

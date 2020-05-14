@@ -6,7 +6,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import model.layer.Layer;
-import model.layer.LayersList;
+import model.location.CurrentLocation;
 import view.stage.ChildStage;
 
 import java.util.List;
@@ -53,11 +53,11 @@ public class LayersStage extends ChildStage {
     private void addLayer() {
         Layer layer = new Layer("new layer");
         Layer uniqueLayer = getUniqueLayer(layer);
-        LayersList.get().add(uniqueLayer);
+        CurrentLocation.get().getLayers().add(uniqueLayer);
     }
 
     private Layer getUniqueLayer(Layer layer) {
-        List<Layer> layers = LayersList.get();
+        List<Layer> layers = CurrentLocation.get().getLayers();
         boolean levelExists = layers.stream()
                 .anyMatch(l -> l.getLevel() == layer.getLevel());
         boolean nameExists = layers.stream()

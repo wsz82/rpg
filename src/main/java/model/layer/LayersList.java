@@ -4,15 +4,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class LayersList {
-    private static ObservableList<Layer> layers ;
+    private final ObservableList<Layer> layers;
 
-    public static ObservableList<Layer> get() {
-        if (layers == null) {
-            layers = FXCollections.observableArrayList();
-        }
-        return layers;
+    public LayersList() {
+        this.layers = FXCollections.observableArrayList();
     }
 
-    private LayersList() {
+    public ObservableList<Layer> get() {
+        return layers;
     }
 }
