@@ -1,8 +1,6 @@
 package view.stage;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -76,10 +74,11 @@ public class Board extends AnchorPane {
                 double x = content.getCoords().getX();
                 double y = content.getCoords().getY();
                 this.getChildren().add(iv);
-                this.positionInArea(
-                        iv, x, y, image.getWidth(), image.getHeight(), 0, HPos.LEFT, VPos.BOTTOM);
+                this.setLeftAnchor(iv, x);
+                this.setTopAnchor(iv, y);
 
                 iv.visibleProperty().bindBidirectional(content.visibleProperty());
+
                 contentImageMap.put(content, iv);
             }
         }

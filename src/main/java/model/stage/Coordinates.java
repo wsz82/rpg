@@ -3,8 +3,8 @@ package model.stage;
 import javafx.scene.input.MouseEvent;
 
 public class Coordinates {
-    private final int x;
-    private final int y;
+    private final double x;
+    private final double y;
 
     public Coordinates(int x, int y) {
         this.x = x;
@@ -12,15 +12,15 @@ public class Coordinates {
     }
 
     public Coordinates(MouseEvent event) {
-        this.x = (int) event.getX();
-        this.y = (int) event.getY();
+        this.x = event.getX();
+        this.y = event.getY();
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
