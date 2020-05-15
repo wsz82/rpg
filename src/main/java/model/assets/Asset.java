@@ -70,6 +70,9 @@ public class Asset {
     }
 
     public Image getImage() {
+        if (this.image.get() == null) {
+            this.image.set(loadImageFromPath());
+        }
         return image.get();
     }
 
@@ -77,17 +80,10 @@ public class Asset {
         return image;
     }
 
-    public void setImageFromPath() {
-        if (this.getImage() == null) {
-            this.image.set(loadImageFromPath());
-        }
-    }
-
     private Image loadImageFromPath() {
         if (getPath() == null || getPath().isEmpty()) {
             throw new NoSuchElementException();
         }
-
         return new Image(getPath());
     }
 }

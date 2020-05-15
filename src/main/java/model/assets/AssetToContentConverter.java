@@ -17,7 +17,6 @@ public class AssetToContentConverter {
         List<Content> contents = new ArrayList<>(assets.size());
         for (Asset asset
                 : assets) {
-            asset.setImageFromPath();
             convertAndAddItem(asset, contents, pos);
         }
         return contents;

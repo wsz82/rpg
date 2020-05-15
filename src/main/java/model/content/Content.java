@@ -5,6 +5,8 @@ import model.items.Item;
 import model.items.ItemType;
 import model.stage.Coordinates;
 
+import java.util.Objects;
+
 public class Content {
     private final ObjectProperty<Item> item;
     private final StringProperty name;
@@ -97,5 +99,23 @@ public class Content {
     public void setCoords(Coordinates coords) {
         this.coords.set(coords);
         item.get().setCoords(coords);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Content content = (Content) o;
+        return item.equals(content.item) &&
+                name.equals(content.name) &&
+                type.equals(content.type) &&
+                level.equals(content.level) &&
+                visible.equals(content.visible) &&
+                coords.equals(content.coords);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(item, name, type, level, visible, coords);
     }
 }

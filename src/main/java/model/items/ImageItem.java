@@ -10,4 +10,12 @@ public abstract class ImageItem extends Item{
         super(name, type, coords, level);
         this.image = image;
     }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
 }

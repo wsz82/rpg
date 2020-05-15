@@ -11,7 +11,7 @@ public class Pointer {
         @Override
         public void handle(MouseEvent event) {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                mark = new Coordinates(MainView.getBoard(), event);
+                mark = new Coordinates(event);
             }
         }
     };

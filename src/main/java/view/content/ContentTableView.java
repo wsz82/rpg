@@ -23,7 +23,8 @@ class ContentTableView extends TableView<Content> {
     private void initTable() {
         this.setItems(CurrentLocation.get().getContent());
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.getName().equals(oldValue.getName())) {
+            boolean locationIsChanged = !newValue.getName().equals(oldValue.getName());
+            if (locationIsChanged) {
                 this.setItems(CurrentLocation.get().getContent());
             }
         });

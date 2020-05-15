@@ -12,10 +12,10 @@ import model.layer.LayersList;
 import model.stage.CurrentLayer;
 
 public class CurrentLocation {
+    private static CurrentLocation currentLocation;
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
     private final IntegerProperty currentWidth = new SimpleIntegerProperty();
     private final IntegerProperty currentHeight = new SimpleIntegerProperty();
-    private static CurrentLocation currentLocation;
 
     public static CurrentLocation get() {
         if (currentLocation == null) {
