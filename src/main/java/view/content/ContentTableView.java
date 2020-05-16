@@ -1,5 +1,6 @@
 package view.content;
 
+import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -7,6 +8,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.converter.DoubleStringConverter;
 import model.SafeIntegerStringConverter;
 import model.content.Content;
 import model.location.CurrentLocation;
@@ -54,8 +56,42 @@ class ContentTableView extends TableView<Content> {
         visibilityCol.setEditable(true);
         visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
 
-        TableColumn<Content, Integer> posCol = new TableColumn<>("Position");
+        TableColumn<Content, Double> posCol = new TableColumn<>("Position");
+        posCol.setEditable(true);
         posCol.setCellValueFactory(new PropertyValueFactory<>("coords"));
+
+        TableColumn<Content, Double> xCol = new TableColumn<>("X");
+        xCol.setEditable(true);
+        xCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected Double computeValue() {
+                return param.getValue().getCoords().getX();
+            }
+        });
+        xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        xCol.setOnEditCommit(t -> {
+            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            content.getCoords().setX(t.getNewValue());
+            xCol.setVisible(false);
+            xCol.setVisible(true);
+        });
+
+        TableColumn<Content, Double> yCol = new TableColumn<>("Y");
+        yCol.setEditable(true);
+        yCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected Double computeValue() {
+                return param.getValue().getCoords().getY();
+            }
+        });
+        yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        yCol.setOnEditCommit(t -> {
+            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            content.getCoords().setY(t.getNewValue());
+            yCol.setVisible(false);
+            yCol.setVisible(true);
+        });
+        posCol.getColumns().addAll(xCol, yCol);
 
         ObservableList<TableColumn<Content, ?>> columns = this.getColumns();
         columns.add(0, nameCol);

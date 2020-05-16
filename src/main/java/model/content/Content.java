@@ -101,6 +101,16 @@ public class Content {
         item.get().setCoords(coords);
     }
 
+    public void setX(double x) {
+        this.coords.get().setX(x);
+        item.get().getCoords().setX(x);
+    }
+
+    public void setY(double y) {
+        this.coords.get().setY(y);
+        item.get().getCoords().setY(y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

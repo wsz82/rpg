@@ -10,6 +10,7 @@ import model.items.ImageItem;
 import model.items.Item;
 import model.location.CurrentLocation;
 import model.location.Location;
+import model.stage.Coordinates;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,11 +72,22 @@ public class Board extends AnchorPane {
                 ImageItem imageItem = (ImageItem) item;
                 Image image = imageItem.getImage();
                 ImageView iv = new ImageView(image);
-                double x = content.getCoords().getX();
-                double y = content.getCoords().getY();
+                Coordinates pos = content.getCoords();
+                double x = pos.getX();
+                double y = pos.getY();
                 this.getChildren().add(iv);
                 this.setLeftAnchor(iv, x);
                 this.setTopAnchor(iv, y);
+                pos.xProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue.doubleValue() != oldValue.doubleValue()) {
+                        this.setLeftAnchor(iv, newValue.doubleValue());
+                    }
+                });
+                pos.yProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue.doubleValue() != oldValue.doubleValue()) {
+                        this.setTopAnchor(iv, newValue.doubleValue());
+                    }
+                });
 
                 iv.visibleProperty().bindBidirectional(content.visibleProperty());
 
