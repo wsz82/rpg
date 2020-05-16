@@ -33,6 +33,7 @@ public class LocationParametersStage extends ChildStage {
         initOwner(parent);
         setTitle("Parameters");
         setScene(scene);
+        setHeight(200);
 
         HBox widthWithLabel = new HBox(10);
         Label widthLabel = new Label("Width");

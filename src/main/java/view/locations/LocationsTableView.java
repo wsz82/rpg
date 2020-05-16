@@ -38,6 +38,10 @@ public class LocationsTableView extends TableView<Location> {
             } else {
                 location.setName(t.getOldValue());
             }
+            Location currentLocation = CurrentLocation.get().getLocation();
+            if (location.equals(currentLocation)) {
+                CurrentLocation.get().setCurrentName(newValue);
+            }
             nameCol.setVisible(false);
             nameCol.setVisible(true);
         });

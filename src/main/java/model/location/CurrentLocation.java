@@ -1,9 +1,6 @@
 package model.location;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import model.content.Content;
 import model.content.ContentList;
@@ -16,6 +13,7 @@ public class CurrentLocation {
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
     private final IntegerProperty currentWidth = new SimpleIntegerProperty();
     private final IntegerProperty currentHeight = new SimpleIntegerProperty();
+    private final StringProperty currentName = new SimpleStringProperty();
 
     public static CurrentLocation get() {
         if (currentLocation == null) {
@@ -47,6 +45,7 @@ public class CurrentLocation {
         this.locationProperty.set(location);
         this.currentWidth.set(location.getWidth());
         this.currentHeight.set(location.getHeight());
+        this.currentName.set(location.getName());
         CurrentLayer.setCurrentLayer(0);
     }
 
@@ -82,5 +81,17 @@ public class CurrentLocation {
     public void setCurrentHeight(int currentHeight) {
         this.locationProperty.get().setHeight(currentHeight);
         this.currentHeight.set(currentHeight);
+    }
+
+    public String getCurrentName() {
+        return currentName.get();
+    }
+
+    public StringProperty currentNameProperty() {
+        return currentName;
+    }
+
+    public void setCurrentName(String currentName) {
+        this.currentName.set(currentName);
     }
 }

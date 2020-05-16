@@ -41,14 +41,13 @@ class NewAssetStage extends ChildStage {
         setTitle(TITLE);
         setScene(scene);
 
-        FlowPane flowPane = new FlowPane();
-        HBox createCancel = new HBox();
+        HBox createCancel = new HBox(10);
         createCancel.getChildren().addAll(create, cancel);
-        createCancel.setSpacing(10);
-        flowPane.setVgap(8);
-        flowPane.setHgap(4);
+
+        FlowPane flowPane = new FlowPane(8, 4);
         nameInput.setPromptText("Id");
         flowPane.getChildren().addAll(nameInput, imageButton);
+
         AnchorPane.setTopAnchor(flowPane, 10.0);
         AnchorPane.setLeftAnchor(flowPane, 10.0);
         AnchorPane.setBottomAnchor(createCancel, 10.0);

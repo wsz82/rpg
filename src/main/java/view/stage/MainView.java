@@ -79,8 +79,9 @@ public class MainView {
         HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
         CoordinatesBox coordinatesBox = new CoordinatesBox(BOARD);
+        CurrentLocationBox currentLocationBox = new CurrentLocationBox();
         CurrentLayerBox currentLayerBox = new CurrentLayerBox();
-        bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLayerBox);
+        bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);
         bottom.getChildren().addAll(bottomHorizontalBar);
     }
 
