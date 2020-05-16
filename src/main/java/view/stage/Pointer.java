@@ -15,8 +15,10 @@ public class Pointer {
         @Override
         public void handle(MouseEvent event) {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                mark = new Coordinates(event);
+                int z = Board.get().getzPos();
                 boolean markerIsNotDrawn = !Board.get().getChildren().contains(marker);
+
+                mark = new Coordinates(event, z);
                 if (markerIsNotDrawn) {
                     loadMarkerImage();
                     marker.setImage(markerImage);
@@ -66,7 +68,7 @@ public class Pointer {
         if (mark != null && active) {
             return mark;
         } else {
-            return new Coordinates(0, 0);
+            return new Coordinates(0, 0, 0);
         }
     }
 }

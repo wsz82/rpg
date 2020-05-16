@@ -3,22 +3,16 @@ package model.layer;
 import javafx.beans.property.*;
 
 public class Layer {
-    private final IntegerProperty level;
-    private final StringProperty name;
-    private final BooleanProperty visible;
+    private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
+    private final StringProperty name = new SimpleStringProperty(this, "name");
+    private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
 
     public Layer() {
-        this.level = new SimpleIntegerProperty(this, "level");
-        this.name = new SimpleStringProperty(this, "name");
-        this.visible = new SimpleBooleanProperty(this, "visible");
     }
 
     public Layer(String layerName) {
-        this.level = new SimpleIntegerProperty();
         this.level.set(0);
-        this.name = new SimpleStringProperty();
         this.name.set(layerName);
-        this.visible = new SimpleBooleanProperty();
         this.visible.set(true);
     }
 

@@ -13,14 +13,17 @@ class CoordinatesBox extends HBox {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                Coordinates coordinates = new Coordinates(event);
+                int z = Board.get().getzPos();
+                Coordinates coordinates = new Coordinates(event, z);
                 mouseX.setText("X: " + coordinates.getX());
                 mouseY.setText("Y: " + coordinates.getY());
+                mouseZ.setText("Z: " + coordinates.getZ());
             }
         }
     };
     private final Label mouseX = new Label();
     private final Label mouseY = new Label();
+    private final Label mouseZ = new Label();
     private final Region root;
 
     CoordinatesBox(Region region) {
@@ -30,8 +33,8 @@ class CoordinatesBox extends HBox {
 
     private void create() {
         root.addEventHandler(MouseEvent.MOUSE_MOVED, moveEvent);
-        getChildren().addAll(mouseX, mouseY);
+        getChildren().addAll(mouseX, mouseY, mouseZ);
         setAlignment(Pos.BOTTOM_LEFT);
-        setSpacing(20);
+        setSpacing(5);
     }
 }

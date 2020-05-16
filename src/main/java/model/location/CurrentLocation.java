@@ -6,7 +6,6 @@ import model.content.Content;
 import model.content.ContentList;
 import model.layer.Layer;
 import model.layer.LayersList;
-import model.stage.CurrentLayer;
 
 public class CurrentLocation {
     private static CurrentLocation currentLocation;
@@ -46,7 +45,6 @@ public class CurrentLocation {
         this.currentWidth.set(location.getWidth());
         this.currentHeight.set(location.getHeight());
         this.currentName.set(location.getName());
-        CurrentLayer.setCurrentLayer(0);
     }
 
     public Location getLocation() {

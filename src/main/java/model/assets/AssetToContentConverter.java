@@ -33,25 +33,25 @@ public class AssetToContentConverter {
 
     private static Content convertToLandscape(Asset asset, Coordinates pos) {
         Landscape landscape = new Landscape(
-                asset.getName(), asset.getType(), pos, CurrentLayer.getCurrentLayer(), asset.getImage());
+                asset.getName(), asset.getType(), pos, CurrentLayer.get().getCurrentLevel(), asset.getImage());
         return new Content(landscape);
     }
 
     private static Content convertToCover(Asset asset, Coordinates pos) {
         Cover cover = new Cover(
-                asset.getName(), asset.getType(), pos, CurrentLayer.getCurrentLayer(), asset.getImage());
+                asset.getName(), asset.getType(), pos, CurrentLayer.get().getCurrentLevel(), asset.getImage());
         return new Content(cover);
     }
 
     private static Content convertToMoveZone(Asset asset, Coordinates pos) {
         MoveZone moveZone = new MoveZone(
-                asset.getName(), asset.getType(), pos, CurrentLayer.getCurrentLayer(), asset.getImage());
+                asset.getName(), asset.getType(), pos, CurrentLayer.get().getCurrentLevel(), asset.getImage());
         return new Content(moveZone);
     }
 
     private static Content convertToFlyZone(Asset asset, Coordinates pos) {
         FlyZone flyZone = new FlyZone(
-                asset.getName(), asset.getType(), pos, CurrentLayer.getCurrentLayer(), asset.getImage());
+                asset.getName(), asset.getType(), pos, CurrentLayer.get().getCurrentLevel(), asset.getImage());
         return new Content(flyZone);
     }
 }

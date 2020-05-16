@@ -1,21 +1,31 @@
 package view.stage;
 
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.util.StringConverter;
+import model.stage.CurrentLayer;
 
-public class CurrentLayerBox extends HBox {
-    private static final Label currentLayerNumber = new Label();
+class CurrentLayerBox extends HBox {
 
     CurrentLayerBox() {
         super();
         final Label layerText = new Label("Layer: ");
+        final Label currentLayerNumber = new Label();
 
         getChildren().addAll(layerText, currentLayerNumber);
         setSpacing(5);
-        currentLayerNumber.setText("" + 0);
-    }
+        Bindings.bindBidirectional(currentLayerNumber.textProperty(), CurrentLayer.get().currentLevelProperty(),
+                new StringConverter<>() {
+                    @Override
+                    public String toString(Number object) {
+                        return "" + object.intValue();
+                    }
 
-    public static void setCurrentLayerNumber(int number) {
-        currentLayerNumber.setText("" + number);
+                    @Override
+                    public Number fromString(String string) {
+                        return 0;
+                    }
+                });
     }
 }

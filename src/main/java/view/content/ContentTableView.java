@@ -9,6 +9,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 import model.SafeIntegerStringConverter;
 import model.content.Content;
 import model.location.CurrentLocation;
@@ -91,7 +92,23 @@ class ContentTableView extends TableView<Content> {
             yCol.setVisible(false);
             yCol.setVisible(true);
         });
-        posCol.getColumns().addAll(xCol, yCol);
+
+        TableColumn<Content, Integer> zCol = new TableColumn<>("Z");
+        zCol.setEditable(true);
+        zCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected Integer computeValue() {
+                return param.getValue().getCoords().getZ();
+            }
+        });
+        zCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        zCol.setOnEditCommit(t -> {
+            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            content.getCoords().setZ(t.getNewValue());
+            zCol.setVisible(false);
+            zCol.setVisible(true);
+        });
+        posCol.getColumns().addAll(xCol, yCol, zCol);
 
         ObservableList<TableColumn<Content, ?>> columns = getColumns();
         columns.add(0, nameCol);
