@@ -23,16 +23,16 @@ class ContentTableView extends TableView<Content> {
     }
 
     private void initTable() {
-        this.setItems(CurrentLocation.get().getContent());
+        setItems(CurrentLocation.get().getContent());
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
             boolean locationIsChanged = !newValue.getName().equals(oldValue.getName());
             if (locationIsChanged) {
-                this.setItems(CurrentLocation.get().getContent());
+                setItems(CurrentLocation.get().getContent());
             }
         });
 
-        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.setEditable(true);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        setEditable(true);
 
         TableColumn<Content, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -93,7 +93,7 @@ class ContentTableView extends TableView<Content> {
         });
         posCol.getColumns().addAll(xCol, yCol);
 
-        ObservableList<TableColumn<Content, ?>> columns = this.getColumns();
+        ObservableList<TableColumn<Content, ?>> columns = getColumns();
         columns.add(0, nameCol);
         columns.add(1, typeCol);
         columns.add(2, levelCol);
@@ -102,12 +102,12 @@ class ContentTableView extends TableView<Content> {
     }
 
     void removeContents() {
-        ObservableList<Content> contentsToRemove = this.getSelectionModel().getSelectedItems();
+        ObservableList<Content> contentsToRemove = getSelectionModel().getSelectedItems();
         CurrentLocation.get().getContent().removeAll(contentsToRemove);
     }
 
     public void changeVisibility() {
-        List<Content> contentsToChange = this.getSelectionModel().getSelectedItems();
+        List<Content> contentsToChange = getSelectionModel().getSelectedItems();
         for (Content content : contentsToChange) {
             content.setVisible(!content.isVisible());
         }

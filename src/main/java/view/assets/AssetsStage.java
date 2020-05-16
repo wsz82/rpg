@@ -20,9 +20,9 @@ public class AssetsStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        this.initOwner(parent);
-        this.setTitle(ASSETS);
-        this.setScene(scene);
+        initOwner(parent);
+        setTitle(ASSETS);
+        setScene(scene);
 
         createTabs();
     }

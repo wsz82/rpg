@@ -11,26 +11,18 @@ import model.items.ItemType;
 import java.util.NoSuchElementException;
 
 public class Asset {
-    private final StringProperty name;
-    private final ObjectProperty<ItemType> type;
-    private final StringProperty path;
-    private final ObjectProperty<Image> image;
+    private final StringProperty name = new SimpleStringProperty(this, "name");
+    private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
+    private final StringProperty path = new SimpleStringProperty(this, "url");
+    private final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
 
     public Asset() {
-        this.name = new SimpleStringProperty(this, "name");
-        this.type = new SimpleObjectProperty<>(this, "type");
-        this.path = new SimpleStringProperty(this, "url");
-        this.image = new SimpleObjectProperty<>(this, "image");
     }
 
     public Asset(String name, ItemType type, String path) {
-        this.name = new SimpleStringProperty(this, "name");
-        setName(name);
-        this.type = new SimpleObjectProperty<>(this, "type");
-        setType(type);
-        this.path = new SimpleStringProperty(this, "url");
-        setPath(path);
-        this.image = new SimpleObjectProperty<>(this, "image");
+        this.name.set(name);
+        this.type.set(type);
+        this.path.set(path);
     }
 
     public String getName() {

@@ -17,7 +17,7 @@ public class Main extends Application {
 
     private void initLocation() {
         Location location;
-        location = new Location("new location", 800, 600);
+        location = new Location("new", 800, 600);
         CurrentLocation.get().setLocation(location);
         LocationsList.get().add(location);
     }

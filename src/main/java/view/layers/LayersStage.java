@@ -23,12 +23,10 @@ public class LayersStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        this.initOwner(parent);
-        this.setTitle(LAYERS);
-        this.setScene(scene);
-
+        initOwner(parent);
+        setTitle(LAYERS);
+        setScene(scene);
         setUpContextMenu();
-
         root.getChildren().add(table);
     }
 
@@ -76,6 +74,4 @@ public class LayersStage extends ChildStage {
     private void removeLayer() {
         table.removeLayers();
     }
-
-
 }

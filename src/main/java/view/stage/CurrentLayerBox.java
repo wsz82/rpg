@@ -9,8 +9,8 @@ public class CurrentLayerBox extends HBox {
 
     CurrentLayerBox() {
         super();
-        this.getChildren().addAll(layerText, currentLayerNumber);
-        this.setSpacing(5);
+        getChildren().addAll(layerText, currentLayerNumber);
+        setSpacing(5);
         currentLayerNumber.setText("" + 0);
     }
 

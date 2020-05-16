@@ -75,10 +75,12 @@ public class CurrentLocation {
     }
 
     public void setCurrentWidth(int currentWidth) {
+        this.locationProperty.get().setWidth(currentWidth);
         this.currentWidth.set(currentWidth);
     }
 
     public void setCurrentHeight(int currentHeight) {
+        this.locationProperty.get().setHeight(currentHeight);
         this.currentHeight.set(currentHeight);
     }
 }

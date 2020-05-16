@@ -28,7 +28,7 @@ public class Board extends AnchorPane {
         List<Content> removedContent = (List<Content>) c.getRemoved();
         for (Content content : removedContent) {
             ImageView imageToRemove = contentImageMap.get(content);
-            this.getChildren().remove(imageToRemove);
+            getChildren().remove(imageToRemove);
             contentImageMap.remove(content);
         }
     };
@@ -57,7 +57,7 @@ public class Board extends AnchorPane {
 
     private void clearBoardAndInflateWithNewLocation(Location newValue) {
         for (ImageView iv : contentImageMap.values()) {
-            this.getChildren().remove(iv);
+            getChildren().remove(iv);
         }
         contentImageMap.clear();
         List<Content> contents = newValue.getContents().get();
@@ -76,16 +76,16 @@ public class Board extends AnchorPane {
                 double x = pos.getX();
                 double y = pos.getY();
                 this.getChildren().add(iv);
-                this.setLeftAnchor(iv, x);
-                this.setTopAnchor(iv, y);
+                setLeftAnchor(iv, x);
+                setTopAnchor(iv, y);
                 pos.xProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.doubleValue() != oldValue.doubleValue()) {
-                        this.setLeftAnchor(iv, newValue.doubleValue());
+                        setLeftAnchor(iv, newValue.doubleValue());
                     }
                 });
                 pos.yProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.doubleValue() != oldValue.doubleValue()) {
-                        this.setTopAnchor(iv, newValue.doubleValue());
+                        setTopAnchor(iv, newValue.doubleValue());
                     }
                 });
 
@@ -97,15 +97,15 @@ public class Board extends AnchorPane {
     }
 
     private void bindWidthAndHeight() {
-        this.prefWidthProperty().bindBidirectional(
+        prefWidthProperty().bindBidirectional(
                 CurrentLocation.get().currentWidthProperty());
-        this.prefHeightProperty().bindBidirectional(
+        prefHeightProperty().bindBidirectional(
                 CurrentLocation.get().currentHeightProperty());
     }
 
     private void setBorder() {
         BorderStroke[] strokes = new BorderStroke[]{
                 new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)};
-        this.setBorder(new Border(strokes));
+        setBorder(new Border(strokes));
     }
 }

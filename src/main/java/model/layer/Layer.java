@@ -8,18 +8,18 @@ public class Layer {
     private final BooleanProperty visible;
 
     public Layer() {
-        level = new SimpleIntegerProperty(this, "level");
-        name = new SimpleStringProperty(this, "name");
-        visible = new SimpleBooleanProperty(this, "visible");
+        this.level = new SimpleIntegerProperty(this, "level");
+        this.name = new SimpleStringProperty(this, "name");
+        this.visible = new SimpleBooleanProperty(this, "visible");
     }
 
     public Layer(String layerName) {
-        level = new SimpleIntegerProperty();
-        level.set(0);
-        name = new SimpleStringProperty();
-        name.set(layerName);
-        visible = new SimpleBooleanProperty();
-        visible.set(true);
+        this.level = new SimpleIntegerProperty();
+        this.level.set(0);
+        this.name = new SimpleStringProperty();
+        this.name.set(layerName);
+        this.visible = new SimpleBooleanProperty();
+        this.visible.set(true);
     }
 
     public void setLevel(int value) {

@@ -39,7 +39,7 @@ class AssetsTableView extends AssetsGenericTableView {
         TableColumn<Asset, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        ObservableList<TableColumn<Asset, ?>> columns = this.getColumns();
+        ObservableList<TableColumn<Asset, ?>> columns = getColumns();
         columns.add(0, nameCol);
     }
 
@@ -47,7 +47,7 @@ class AssetsTableView extends AssetsGenericTableView {
         ObservableList<Asset> assets = AssetsList.get();
         FilteredList<Asset> filteredList = new FilteredList<>(assets);
         filteredList.setPredicate(asset -> asset.getType() == itemType);
-        this.setItems(filteredList);
+        setItems(filteredList);
     }
 
     private void setUpContextMenu() {
@@ -58,13 +58,13 @@ class AssetsTableView extends AssetsGenericTableView {
             addItemsToStageAndContents(pointerCoordinates);
         });
         contextMenu.getItems().addAll(addAsset, removeAsset, addItemsToStage);
-        this.setOnContextMenuRequested(event -> {
+        setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 
     void addItemsToStageAndContents(Coordinates pos) {
-        List<Asset> selectedAssets = this.getSelectionModel().getSelectedItems();
+        List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
         List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
         CurrentLocation.get().getContent().addAll(contents);
     }
@@ -75,7 +75,7 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     void removeAssets() {
-        ObservableList<Asset> assetsToRemove = this.getSelectionModel().getSelectedItems();
+        ObservableList<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
         AssetsList.get().removeAll(assetsToRemove);
     }
 }

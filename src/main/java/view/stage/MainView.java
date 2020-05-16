@@ -11,20 +11,23 @@ import javafx.stage.Stage;
 import view.assets.AssetsStage;
 import view.content.ContentStage;
 import view.layers.LayersStage;
-import view.locations.LocationStage;
+import view.locations.LocationParametersStage;
+import view.locations.LocationsStage;
 
 public class MainView {
     private static final String CONTENTS = "Contents";
     private static final String LAYERS = "Layers";
     private static final String ASSETS = "Assets";
-    private static final int INIT_WIDTH = 800;
-    private static final int INIT_HEIGHT = 600;
+    private static final String LOCATIONS = "Locations";
+    private static final double INIT_WIDTH = 800;
+    private static final double INIT_HEIGHT = 600;
     private static final Board BOARD = new Board();
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
     private final LayersStage layersWindow;
     private final AssetsStage assetsWindow;
+    private final LocationsStage locationsWindow;
     private double screenHeight;
     private double screenWidth;
 
@@ -33,6 +36,7 @@ public class MainView {
         contentsWindow = new ContentStage(stage);
         layersWindow = new LayersStage(stage);
         assetsWindow = new AssetsStage(stage);
+        locationsWindow = new LocationsStage(stage);
     }
 
     void show() {
@@ -56,12 +60,13 @@ public class MainView {
         createContentsWindow();
         createLayersWindow();
         createAssetsWindow();
+        createLocationsWindow();
     }
 
     private void getScreenDimensions() {
         Rectangle2D screenBound = Screen.getPrimary().getBounds();
-        screenHeight = (int) screenBound.getMaxY();
-        screenWidth = (int) screenBound.getMaxX();
+        screenHeight = screenBound.getMaxY();
+        screenWidth = screenBound.getMaxX();
     }
 
     private void setTopContent(VBox topBar) {
@@ -84,17 +89,19 @@ public class MainView {
         CheckMenuItem contents = new CheckMenuItem(CONTENTS);
         CheckMenuItem layers = new CheckMenuItem(LAYERS);
         CheckMenuItem assets = new CheckMenuItem(ASSETS);
+        CheckMenuItem locations = new CheckMenuItem(LOCATIONS);
 
         setViewItemOnAction(contentsWindow, contents);
         setViewItemOnAction(layersWindow, layers);
         setViewItemOnAction(assetsWindow, assets);
-        view.getItems().addAll(contents, layers, assets);
+        setViewItemOnAction(locationsWindow, locations);
+        view.getItems().addAll(contents, layers, assets, locations);
 
         Menu location = new Menu("Location");
         MenuItem parameters = new MenuItem("Parameters");
         parameters.setOnAction(event -> {
-            LocationStage locationStage = new LocationStage(stage);
-            locationStage.show();
+            LocationParametersStage locationParametersStage = new LocationParametersStage(stage);
+            locationParametersStage.show();
         });
         location.getItems().addAll(parameters);
 
@@ -125,6 +132,12 @@ public class MainView {
         assetsWindow.setX((double) 15/20 * screenWidth);
         assetsWindow.setY((double) 5/10 * screenHeight);
         assetsWindow.show();
+    }
+
+    private void createLocationsWindow() {
+        locationsWindow.setX((double) 15/20 * screenWidth);
+        locationsWindow.setY(0);
+        locationsWindow.show();
     }
 
     private void showOrHide(Stage stage, boolean isSelected) {

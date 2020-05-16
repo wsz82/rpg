@@ -26,16 +26,16 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
     }
 
     private void initTable() {
-        this.setItems(CurrentLocation.get().getLayers());
+        setItems(CurrentLocation.get().getLayers());
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
             boolean locationIsChanged = !newValue.getName().equals(oldValue.getName());
             if (locationIsChanged) {
-                this.setItems(CurrentLocation.get().getLayers());
+                setItems(CurrentLocation.get().getLayers());
             }
         });
 
-        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.setEditable(true);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        setEditable(true);
 
         TableColumn<Layer, Integer> levelCol = new TableColumn<>("Level");
         levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
@@ -87,9 +87,9 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         columns.add(1, nameCol);
         columns.add(2, visibleCol);
 
-        this.attachLevelValueListener(CurrentLocation.get().getContentList());
-        this.attachVisibleValueListener(CurrentLocation.get().getContentList());
-        this.getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
+        attachLevelValueListener(CurrentLocation.get().getContentList());
+        attachVisibleValueListener(CurrentLocation.get().getContentList());
+        getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
                 CurrentLayer.setCurrentLayer(newSel.getLevel());
             }
@@ -97,22 +97,22 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
     }
 
     private boolean isNameUnique(String newValue) {
-        return this.getItems().stream()
+        return getItems().stream()
                 .noneMatch(layer -> layer.getName().equals(newValue));
     }
 
     private boolean isLevelUnique(int newValue) {
-        return this.getItems().stream()
+        return getItems().stream()
                 .noneMatch(layer -> layer.getLevel() == newValue);
     }
 
     void removeLayers() {
-        List<Layer> layersToRemove = this.getSelectionModel().getSelectedItems();
+        List<Layer> layersToRemove = getSelectionModel().getSelectedItems();
         CurrentLocation.get().getLayers().removeAll(layersToRemove);
     }
 
     public void changeVisibility() {
-        List<Layer> layersToChange = this.getSelectionModel().getSelectedItems();
+        List<Layer> layersToChange = getSelectionModel().getSelectedItems();
         for (Layer layer : layersToChange) {
             layer.setVisible(!layer.getVisible());
         }

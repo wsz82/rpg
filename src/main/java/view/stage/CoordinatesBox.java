@@ -25,13 +25,13 @@ class CoordinatesBox extends HBox {
 
     CoordinatesBox(Region region) {
         this.root = region;
-        this.create();
+        create();
     }
 
     private void create() {
         root.addEventHandler(MouseEvent.MOUSE_MOVED, moveEvent);
-        this.getChildren().addAll(mouseX, mouseY);
-        this.setAlignment(Pos.BOTTOM_LEFT);
-        this.setSpacing(20);
+        getChildren().addAll(mouseX, mouseY);
+        setAlignment(Pos.BOTTOM_LEFT);
+        setSpacing(20);
     }
 }

@@ -8,35 +8,23 @@ import model.stage.Coordinates;
 import java.util.Objects;
 
 public class Content {
-    private final ObjectProperty<Item> item;
-    private final StringProperty name;
-    private final ObjectProperty<ItemType> type;
-    private final IntegerProperty level;
-    private final BooleanProperty visible;
-    private final ObjectProperty<Coordinates> coords;
+    private final ObjectProperty<Item> item = new SimpleObjectProperty<>(this, "item");
+    private final StringProperty name = new SimpleStringProperty(this, "name");
+    private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
+    private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
+    private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
+    private final ObjectProperty<Coordinates> coords = new SimpleObjectProperty<>(this, "coords");
 
     public Content() {
-        this.item = new SimpleObjectProperty<>(this, "item");
-        this.name = new SimpleStringProperty(this, "name");
-        this.type = new SimpleObjectProperty<>(this, "type");
-        this.level = new SimpleIntegerProperty(this, "level");
-        this.visible = new SimpleBooleanProperty(this, "visible");
-        this.coords = new SimpleObjectProperty<>(this, "coords");
     }
 
     public Content(Item item) {
-        this.item = new SimpleObjectProperty<>(this, "item");
         this.item.set(item);
-        this.name = new SimpleStringProperty(this, "name");
         this.name.set(item.getName());
-        this.type = new SimpleObjectProperty<>(this, "type");
         this.type.set(item.getType());
-        this.level = new SimpleIntegerProperty(this, "level");
-        setLevel(item.getLevel());
-        this.visible = new SimpleBooleanProperty(this, "visible");
-        setVisible(true);
-        this.coords = new SimpleObjectProperty<>(this, "coords");
-        setCoords(item.getCoords());
+        this.level.set(item.getLevel());
+        this.visible.set(true);
+        this.coords.set(item.getCoords());
     }
 
     public Item getItem() {

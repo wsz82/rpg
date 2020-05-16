@@ -37,9 +37,9 @@ class NewAssetStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        this.initOwner(parent);
-        this.setTitle(TITLE);
-        this.setScene(scene);
+        initOwner(parent);
+        setTitle(TITLE);
+        setScene(scene);
 
         FlowPane flowPane = new FlowPane();
         HBox createCancel = new HBox();
@@ -88,7 +88,7 @@ class NewAssetStage extends ChildStage {
                 return;
             }
             addNewAsset();
-            this.close();
+            close();
         });
     }
 
@@ -96,7 +96,7 @@ class NewAssetStage extends ChildStage {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
-                .ifPresent(r -> this.close());
+                .ifPresent(r -> close());
     }
 
     private void addNewAsset() {

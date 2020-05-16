@@ -7,6 +7,6 @@ import model.assets.Asset;
 abstract class AssetsGenericTableView extends TableView<Asset> {
 
     AssetsGenericTableView() {
-        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 }

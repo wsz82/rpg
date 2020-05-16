@@ -19,9 +19,9 @@ public class ContentStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        this.initOwner(parent);
-        this.setTitle(CONTENT);
-        this.setScene(scene);
+        initOwner(parent);
+        setTitle(CONTENT);
+        setScene(scene);
 
         setUpContextMenu();
 

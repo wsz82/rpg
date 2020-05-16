@@ -12,17 +12,17 @@ public class Location {
     private final ObjectProperty<ContentList> contents = new SimpleObjectProperty<>(this, "contents");
 
     public Location(String name) {
-        setName(name);
-        setLayers(new LayersList());
-        setContents(new ContentList());
+        this.name.set(name);
+        this.layers.set(new LayersList());
+        this.contents.set(new ContentList());
     }
 
     public Location(String name, int width, int height) {
-        setName(name);
-        setWidth(width);
-        setHeight(height);
-        setLayers(new LayersList());
-        setContents(new ContentList());
+        this.name.set(name);
+        this.width.set(width);
+        this.height.set(height);
+        this.layers.set(new LayersList());
+        this.contents.set(new ContentList());
     }
 
     public String getName() {

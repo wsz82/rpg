@@ -25,7 +25,7 @@ class EditorToolBar extends ToolBar {
             }
         });
 
-        this.getItems().addAll(pointerButton);
+        getItems().addAll(pointerButton);
     }
 
     private Image getPointerIcon() {
