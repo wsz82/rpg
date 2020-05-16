@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import view.stage.MainView;
+import view.stage.Board;
 
 import java.util.Objects;
 
@@ -16,14 +16,14 @@ public class Pointer {
         public void handle(MouseEvent event) {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 mark = new Coordinates(event);
-                boolean markerIsNotDrawn = !MainView.getBoard().getChildren().contains(marker);
+                boolean markerIsNotDrawn = !Board.get().getChildren().contains(marker);
                 if (markerIsNotDrawn) {
                     loadMarkerImage();
                     marker.setImage(markerImage);
-                    MainView.getBoard().getChildren().add(marker);
+                    Board.get().getChildren().add(marker);
                 }
-                MainView.getBoard().setLeftAnchor(marker, mark.getX() - markerImage.getWidth()/2);
-                MainView.getBoard().setTopAnchor(marker, mark.getY() - markerImage.getHeight()/2);
+                Board.get().setLeftAnchor(marker, mark.getX() - markerImage.getWidth()/2);
+                Board.get().setTopAnchor(marker, mark.getY() - markerImage.getHeight()/2);
             }
         }
     };
@@ -51,15 +51,15 @@ public class Pointer {
 
     public void activate() {
         active = true;
-        MainView.getBoard().setCursor(Cursor.CROSSHAIR);
-        MainView.getBoard().setOnMouseClicked(clickEvent);
+        Board.get().setCursor(Cursor.CROSSHAIR);
+        Board.get().setOnMouseClicked(clickEvent);
     }
 
     public void deactivate() {
         active = false;
-        MainView.getBoard().setCursor(Cursor.DEFAULT);
-        MainView.getBoard().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
-        MainView.getBoard().getChildren().remove(marker);
+        Board.get().setCursor(Cursor.DEFAULT);
+        Board.get().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
+        Board.get().getChildren().remove(marker);
     }
 
     public static Coordinates getMark() {

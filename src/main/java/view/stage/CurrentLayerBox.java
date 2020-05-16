@@ -4,11 +4,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class CurrentLayerBox extends HBox {
-    private final Label layerText = new Label("Layer: ");
     private static final Label currentLayerNumber = new Label();
 
     CurrentLayerBox() {
         super();
+        final Label layerText = new Label("Layer: ");
+
         getChildren().addAll(layerText, currentLayerNumber);
         setSpacing(5);
         currentLayerNumber.setText("" + 0);

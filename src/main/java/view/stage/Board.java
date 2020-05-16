@@ -32,8 +32,16 @@ public class Board extends AnchorPane {
             contentImageMap.remove(content);
         }
     };
+    private static Board board;
 
-    Board() {
+    public static Board get() {
+        if (board == null) {
+            board = new Board();
+        }
+        return board;
+    }
+
+    private Board() {
         bindWidthAndHeight();
         setBorder();
         bindWithLocationAndContentChange();

@@ -21,7 +21,7 @@ public class MainView {
     private static final String LOCATIONS = "Locations";
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
-    private static final Board BOARD = new Board();
+    private static final Board BOARD = Board.get();
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
@@ -147,9 +147,5 @@ public class MainView {
         } else {
             stage.show();
         }
-    }
-
-    public static Board getBoard() {
-        return BOARD;
     }
 }
