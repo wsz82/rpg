@@ -1,4 +1,4 @@
-package model.stage;
+package view.stage;
 
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import view.stage.Board;
+import model.stage.Coordinates;
 
 import java.util.Objects;
 
@@ -33,7 +33,7 @@ public class Pointer {
     private static boolean active;
     private Image markerImage;
 
-    public static Pointer getInstance() {
+    static Pointer getInstance() {
         if (pointer == null) {
             pointer = new Pointer();
         }
@@ -49,13 +49,13 @@ public class Pointer {
         );
     }
 
-    public void activate() {
+    void activate() {
         active = true;
         Board.get().setCursor(Cursor.CROSSHAIR);
         Board.get().setOnMouseClicked(clickEvent);
     }
 
-    public void deactivate() {
+    void deactivate() {
         active = false;
         Board.get().setCursor(Cursor.DEFAULT);
         Board.get().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);

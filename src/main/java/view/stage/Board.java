@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import model.content.Content;
 import model.items.ImageItem;
 import model.items.Item;
@@ -12,12 +13,12 @@ import model.location.CurrentLocation;
 import model.location.Location;
 import model.stage.Coordinates;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Board extends AnchorPane {
-    private final Map<Content, ImageView> contentImageMap = new HashMap<>(0);
+class Board extends AnchorPane {
+    private final Map<Content, ImageView> contentImageMap = new LinkedHashMap<>(0);
     private final ListChangeListener<? super Content> locationContentListener = c -> {
         if (!c.next()) {
             return;
@@ -34,7 +35,7 @@ public class Board extends AnchorPane {
     };
     private static Board board;
 
-    public static Board get() {
+    static Board get() {
         if (board == null) {
             board = new Board();
         }
@@ -43,7 +44,7 @@ public class Board extends AnchorPane {
 
     private Board() {
         bindWidthAndHeight();
-        setBorder();
+        setBorder(getDefinedBorder());
         bindWithLocationAndContentChange();
     }
 
@@ -83,17 +84,21 @@ public class Board extends AnchorPane {
                 Coordinates pos = content.getCoords();
                 double x = pos.getX();
                 double y = pos.getY();
-                this.getChildren().add(iv);
+
+                clipImage(iv, x, y);
+                getChildren().add(iv);
                 setLeftAnchor(iv, x);
                 setTopAnchor(iv, y);
                 pos.xProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.doubleValue() != oldValue.doubleValue()) {
                         setLeftAnchor(iv, newValue.doubleValue());
+                        clipImage(iv, newValue.doubleValue(), 0);
                     }
                 });
                 pos.yProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue.doubleValue() != oldValue.doubleValue()) {
                         setTopAnchor(iv, newValue.doubleValue());
+                        clipImage(iv, 0, newValue.doubleValue());
                     }
                 });
 
@@ -104,6 +109,12 @@ public class Board extends AnchorPane {
         }
     }
 
+    private void clipImage(ImageView iv, double x, double y) {
+        final Rectangle clipMask = new Rectangle(
+                CurrentLocation.get().getCurrentWidth() - x, CurrentLocation.get().getCurrentHeight() - y);
+        iv.setClip(clipMask);
+    }
+
     private void bindWidthAndHeight() {
         prefWidthProperty().bindBidirectional(
                 CurrentLocation.get().currentWidthProperty());
@@ -111,9 +122,9 @@ public class Board extends AnchorPane {
                 CurrentLocation.get().currentHeightProperty());
     }
 
-    private void setBorder() {
+    private Border getDefinedBorder() {
         BorderStroke[] strokes = new BorderStroke[]{
                 new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)};
-        setBorder(new Border(strokes));
+        return new Border(strokes);
     }
 }

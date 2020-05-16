@@ -5,7 +5,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import model.stage.Pointer;
 
 import java.util.Objects;
 

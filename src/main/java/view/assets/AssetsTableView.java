@@ -14,7 +14,7 @@ import model.content.Content;
 import model.items.ItemType;
 import model.location.CurrentLocation;
 import model.stage.Coordinates;
-import model.stage.Pointer;
+import view.stage.Pointer;
 
 import java.util.List;
 
