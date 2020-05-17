@@ -85,13 +85,13 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private boolean isNameUnique(String newValue) {
-        return getItems().stream()
+        return LocationsList.get().stream()
                 .noneMatch(layer -> layer.getName().equals(newValue));
     }
 
     void removeLocations() {
         List<Location> locationsToRemove = this.getSelectionModel().getSelectedItems();
-        getItems().removeAll(locationsToRemove);
+        LocationsList.get().removeAll(locationsToRemove);
     }
 
     public void goTo() {
