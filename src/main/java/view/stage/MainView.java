@@ -8,17 +8,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import view.assets.AssetsStage;
+import model.Controller;
+import model.plugin.ActivePlugin;
+import model.plugin.Plugin;
+import view.asset.AssetsStage;
 import view.content.ContentStage;
-import view.layers.LayersStage;
-import view.locations.LocationParametersStage;
-import view.locations.LocationsStage;
+import view.layer.LayersStage;
+import view.location.LocationParametersStage;
+import view.location.LocationsStage;
 
 public class MainView {
-    private static final String CONTENTS = "Contents";
-    private static final String LAYERS = "Layers";
-    private static final String ASSETS = "Assets";
-    private static final String LOCATIONS = "Locations";
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
     private static final Board BOARD = Board.get();
@@ -86,11 +85,23 @@ public class MainView {
     }
 
     private MenuBar getMenuBar() {
+        Menu file = new Menu("File");
+        MenuItem newPlugin = new MenuItem("New");
+        MenuItem save = new MenuItem("Save");
+        MenuItem saveAs = new MenuItem("Save as");
+        MenuItem load = new MenuItem("Load");
+
+        newPlugin.setOnAction(event -> createNewPlugin());
+        save.setOnAction(event -> saveFile());
+        saveAs.setOnAction(event -> saveAsFile());
+        load.setOnAction(event -> loadFile());
+        file.getItems().addAll(newPlugin, save, saveAs, load);
+
         Menu view = new Menu("View");
-        CheckMenuItem contents = new CheckMenuItem(CONTENTS);
-        CheckMenuItem layers = new CheckMenuItem(LAYERS);
-        CheckMenuItem assets = new CheckMenuItem(ASSETS);
-        CheckMenuItem locations = new CheckMenuItem(LOCATIONS);
+        CheckMenuItem contents = new CheckMenuItem("Contents");
+        CheckMenuItem layers = new CheckMenuItem("Layers");
+        CheckMenuItem assets = new CheckMenuItem("Assets");
+        CheckMenuItem locations = new CheckMenuItem("Locations");
 
         setViewItemOnAction(contentsWindow, contents);
         setViewItemOnAction(layersWindow, layers);
@@ -106,7 +117,31 @@ public class MainView {
         });
         location.getItems().addAll(parameters);
 
-        return new MenuBar(view, location);
+        return new MenuBar(file, view, location);
+    }
+
+    private void createNewPlugin() {
+        Controller.get().initNewPlugin();
+    }
+
+    private void loadFile() {
+        Plugin plugin = new Plugin();
+        plugin.load();
+    }
+
+    private void saveAsFile() {
+        Plugin plugin = new Plugin();
+        plugin.saveAs();
+    }
+
+    private void saveFile() {
+        Plugin plugin = new Plugin();
+        if (ActivePlugin.get().getActivePlugin() != null) {
+            plugin = ActivePlugin.get().getActivePlugin();
+            plugin.save();
+        } else {
+            plugin.saveAs();
+        }
     }
 
     private void setViewItemOnAction(Stage stage, CheckMenuItem menuItem) {

@@ -1,8 +1,8 @@
 package model.content;
 
 import javafx.beans.property.*;
-import model.items.Item;
-import model.items.ItemType;
+import model.item.Item;
+import model.item.ItemType;
 import model.stage.Coordinates;
 
 import java.util.Objects;
@@ -13,10 +13,9 @@ public class Content {
     private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
-    private final ObjectProperty<Coordinates> coords = new SimpleObjectProperty<>(this, "coords");
+    private final ObjectProperty<Coordinates> pos = new SimpleObjectProperty<>(this, "coords");
 
-    public Content() {
-    }
+    public Content() {}
 
     public Content(Item item) {
         this.item.set(item);
@@ -24,7 +23,11 @@ public class Content {
         this.type.set(item.getType());
         this.level.set(item.getLevel());
         this.visible.set(true);
-        this.coords.set(item.getCoords());
+        this.pos.set(item.getCoords());
+    }
+
+    public void setItem(Item item) {
+        this.item.set(item);
     }
 
     public Item getItem() {
@@ -35,12 +38,20 @@ public class Content {
         return item;
     }
 
+    public void setName(String name) {
+        this.name.set(name);
+    }
+
     public String getName() {
         return name.get();
     }
 
     public StringProperty nameProperty() {
         return name;
+    }
+
+    public void setType(ItemType type) {
+        this.type.set(type);
     }
 
     public ItemType getType() {
@@ -76,27 +87,17 @@ public class Content {
         item.get().setLevel(level);
     }
 
-    public Coordinates getCoords() {
-        return coords.get();
+    public Coordinates getPos() {
+        return pos.get();
     }
 
-    public ObjectProperty<Coordinates> coordsProperty() {
-        return coords;
+    public ObjectProperty<Coordinates> posProperty() {
+        return pos;
     }
 
-    public void setCoords(Coordinates coords) {
-        this.coords.set(coords);
-        item.get().setCoords(coords);
-    }
-
-    public void setX(double x) {
-        this.coords.get().setX(x);
-        item.get().getCoords().setX(x);
-    }
-
-    public void setY(double y) {
-        this.coords.get().setY(y);
-        item.get().getCoords().setY(y);
+    public void setPos(Coordinates pos) {
+        this.pos.set(pos);
+        item.get().setCoords(pos);
     }
 
     @Override
@@ -109,11 +110,11 @@ public class Content {
                 type.equals(content.type) &&
                 level.equals(content.level) &&
                 visible.equals(content.visible) &&
-                coords.equals(content.coords);
+                pos.equals(content.pos);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(item, name, type, level, visible, coords);
+        return Objects.hash(item, name, type, level, visible, pos);
     }
 }

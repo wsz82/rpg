@@ -11,6 +11,8 @@ public class Location {
     private final ObjectProperty<LayersList> layers = new SimpleObjectProperty<>(this, "layers");
     private final ObjectProperty<ContentList> contents = new SimpleObjectProperty<>(this, "contents");
 
+    public Location(){}
+
     public Location(String name) {
         this.name.set(name);
         this.layers.set(new LayersList());

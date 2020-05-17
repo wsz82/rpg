@@ -7,8 +7,7 @@ public class Layer {
     private final StringProperty name = new SimpleStringProperty(this, "name");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
 
-    public Layer() {
-    }
+    public Layer() {}
 
     public Layer(String layerName) {
         this.level.set(0);

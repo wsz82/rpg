@@ -9,9 +9,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import model.asset.Asset;
+import model.asset.AssetsList;
 import model.content.Content;
-import model.items.ImageItem;
-import model.items.Item;
+import model.item.ImageItem;
+import model.item.Item;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.stage.Coordinates;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 class Board extends AnchorPane {
     private static Board board;
     private final List<ContentWithImage> boardContents = new LinkedList<>();
-    private final ListChangeListener<? super Content> locationContentListener = c -> {
+    private final ListChangeListener<Content> locationContentListener = c -> {
         if (!c.next()) {
             return;
         }
@@ -59,19 +61,12 @@ class Board extends AnchorPane {
     }
 
     private void bindWithLocationAndContentChange() {
-        listenToContentChanges();
-        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            boolean locationIsChanged = !newValue.getName().equals(oldValue.getName());
-            if (locationIsChanged) {
-                CurrentLocation.get().getContent().removeListener(locationContentListener);
-                clearBoardAndInflateWithNewLocation(newValue);
-                listenToContentChanges();
-            }
-        });
-    }
-
-    private void listenToContentChanges() {
         CurrentLocation.get().getContent().addListener(locationContentListener);
+        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
+            CurrentLocation.get().getContent().removeListener(locationContentListener);
+            clearBoardAndInflateWithNewLocation(newValue);
+            CurrentLocation.get().getContent().addListener(locationContentListener);
+        });
     }
 
     private void clearBoardAndInflateWithNewLocation(Location newValue) {
@@ -90,9 +85,16 @@ class Board extends AnchorPane {
 
             if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
-                final Image image = imageItem.getImage();
+                Image image = imageItem.getImage();
+                if (image == null) {
+                    for (Asset asset : AssetsList.get()) {
+                        if (asset.getName().equals(imageItem.getName())) {
+                            image = asset.getImage();
+                        }
+                    }
+                }
                 final ImageView iv = new ImageView(image);
-                final Coordinates pos = content.getCoords();
+                final Coordinates pos = content.getPos();
                 final Rectangle clipMask = new Rectangle();
                 double x = pos.getX();
                 double y = pos.getY();
@@ -134,7 +136,7 @@ class Board extends AnchorPane {
                 boardContents.add(contentWithImage);
 
                 iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-                    zPos.set(content.getCoords().getZ());
+                    zPos.set(content.getPos().getZ());
                 });
 
                 sortContent(boardContents);
@@ -148,7 +150,7 @@ class Board extends AnchorPane {
         for (ContentWithImage ciw : sortedContent) {
             final ImageView iv = ciw.getImageView();
             final Content content = ciw.getContent();
-            final Coordinates pos = content.getCoords();
+            final Coordinates pos = content.getPos();
             final Rectangle clipMask = new Rectangle();
             double x = pos.getX();
             double y = pos.getY();

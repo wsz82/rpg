@@ -8,8 +8,8 @@ public class ContentWithImageComparator implements Comparator<ContentWithImage> 
     public int compare(ContentWithImage o1, ContentWithImage o2) {
         int o1level = o1.getContent().getLevel();
         int o2level = o2.getContent().getLevel();
-        int o1z = o1.getContent().getCoords().getZ();
-        int o2z = o2.getContent().getCoords().getZ();
+        int o1z = o1.getContent().getPos().getZ();
+        int o2z = o2.getContent().getPos().getZ();
         if (o1level < o2level) {
             return -1;
         } else if (o1level == o2level){

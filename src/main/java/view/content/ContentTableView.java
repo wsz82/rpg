@@ -10,9 +10,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-import model.SafeIntegerStringConverter;
 import model.content.Content;
 import model.location.CurrentLocation;
+import view.SafeIntegerStringConverter;
 
 import java.util.List;
 
@@ -26,10 +26,7 @@ class ContentTableView extends TableView<Content> {
     private void initTable() {
         setItems(CurrentLocation.get().getContent());
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            boolean locationIsChanged = !newValue.getName().equals(oldValue.getName());
-            if (locationIsChanged) {
-                setItems(CurrentLocation.get().getContent());
-            }
+            setItems(newValue.getContents().get());
         });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -66,13 +63,13 @@ class ContentTableView extends TableView<Content> {
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Double computeValue() {
-                return param.getValue().getCoords().getX();
+                return param.getValue().getPos().getX();
             }
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         xCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getCoords().setX(t.getNewValue());
+            content.getPos().setX(t.getNewValue());
             xCol.setVisible(false);
             xCol.setVisible(true);
         });
@@ -82,13 +79,13 @@ class ContentTableView extends TableView<Content> {
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Double computeValue() {
-                return param.getValue().getCoords().getY();
+                return param.getValue().getPos().getY();
             }
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         yCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getCoords().setY(t.getNewValue());
+            content.getPos().setY(t.getNewValue());
             yCol.setVisible(false);
             yCol.setVisible(true);
         });
@@ -98,13 +95,13 @@ class ContentTableView extends TableView<Content> {
         zCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getCoords().getZ();
+                return param.getValue().getPos().getZ();
             }
         });
         zCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         zCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getCoords().setZ(t.getNewValue());
+            content.getPos().setZ(t.getNewValue());
             zCol.setVisible(false);
             zCol.setVisible(true);
         });
