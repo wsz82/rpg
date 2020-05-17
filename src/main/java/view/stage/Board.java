@@ -19,6 +19,7 @@ import model.location.Location;
 import model.stage.Coordinates;
 import model.stage.CurrentLayer;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -139,7 +140,14 @@ class Board extends AnchorPane {
                     zPos.set(content.getPos().getZ());
                 });
 
-                sortContent(boardContents);
+                int z = pos.getZ();
+                int maxZ = boardContents.stream()
+                        .max(Comparator.comparingInt(o -> o.getContent().getPos().getZ()))
+                        .map(c -> c.getContent().getPos().getZ())
+                        .get();
+                if (z > maxZ) {
+                    sortContent(boardContents);
+                }
             }
         }
     }
