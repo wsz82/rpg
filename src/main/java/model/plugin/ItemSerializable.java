@@ -1,18 +1,14 @@
 package model.plugin;
 
-import model.item.ItemType;
-
 import java.io.Serializable;
 
 public class ItemSerializable implements Serializable {
     private String name;
-    private ItemType type;
     private CoordinatesSerializable pos;
     private int level;
 
-    public ItemSerializable(String name, ItemType type, CoordinatesSerializable pos, int level) {
+    public ItemSerializable(String name, CoordinatesSerializable pos, int level) {
         this.name = name;
-        this.type = type;
         this.pos = pos;
         this.level = level;
     }
@@ -23,14 +19,6 @@ public class ItemSerializable implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ItemType getType() {
-        return type;
-    }
-
-    public void setType(ItemType type) {
-        this.type = type;
     }
 
     public CoordinatesSerializable getPos() {

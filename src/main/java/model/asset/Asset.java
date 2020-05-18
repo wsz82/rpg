@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 public class Asset {
     private final StringProperty name = new SimpleStringProperty(this, "name");
     private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
-    private final StringProperty path = new SimpleStringProperty(this, "url");
+    private final StringProperty path = new SimpleStringProperty(this, "path");
     private final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
 
     public Asset() {
@@ -64,6 +64,9 @@ public class Asset {
     public Image getImage() {
         if (this.image.get() == null) {
             this.image.set(loadImageFromPath());
+            path.addListener((observable, oldValue, newValue) -> {
+                this.image.set(loadImageFromPath());
+            });
         }
         return image.get();
     }

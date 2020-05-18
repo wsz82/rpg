@@ -73,7 +73,7 @@ public class Plugin {
             List<AssetSerializable> assets = all.getAssets();
             AssetsList.get().setAll(SerializableConverter.toAssetObjects(assets));
             List<LocationSerializable> locations = all.getLocations();
-            LocationsList.get().setAll(SerializableConverter.toLocationObjects(locations));
+            LocationsList.get().setAll(SerializableConverter.toLocationObjects(locations, AssetsList.get()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -81,13 +81,5 @@ public class Plugin {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 }

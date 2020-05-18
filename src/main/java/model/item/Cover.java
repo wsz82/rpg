@@ -1,11 +1,11 @@
 package model.item;
 
-import javafx.scene.image.Image;
+import model.asset.Asset;
 import model.stage.Coordinates;
 
-public class Cover extends ImageItem {
+public class Cover extends Item {
 
-    public Cover(String name, ItemType type, Coordinates coords, int level, Image image) {
-        super(name, type, coords, level, image);
+    public Cover(Asset asset, Coordinates pos, int level) {
+        super(asset, pos, level);
     }
 }

@@ -1,42 +1,33 @@
 package model.item;
 
+import model.asset.Asset;
 import model.stage.Coordinates;
 
 public abstract class Item {
-    protected String name;
-    protected ItemType type;
-    protected Coordinates coords;
+    protected Asset asset;
+    protected Coordinates pos;
     protected int level;
 
-    public Item(String name, ItemType type, Coordinates coords, int level) {
-        this.name = name;
-        this.type = type;
-        this.coords = coords;
+    public Item(Asset asset, Coordinates pos, int level) {
+        this.asset = asset;
+        this.pos = pos;
         this.level = level;
     }
 
-    public Coordinates getCoords() {
-        return coords;
+    public Asset getAsset() {
+        return asset;
     }
 
-    public void setCoords(Coordinates coords) {
-        this.coords = coords;
+    public void setAsset(Asset asset) {
+        this.asset = asset;
     }
 
-    public ItemType getType() {
-        return type;
+    public Coordinates getPos() {
+        return pos;
     }
 
-    public void setType(ItemType type) {
-        this.type = type;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public void setPos(Coordinates pos) {
+        this.pos = pos;
     }
 
     public int getLevel() {

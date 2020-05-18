@@ -1,11 +1,11 @@
 package model.item;
 
-import javafx.scene.image.Image;
+import model.asset.Asset;
 import model.stage.Coordinates;
 
-public class FlyZone extends ImageItem {
+public class FlyZone extends Item {
 
-    public FlyZone(String name, ItemType type, Coordinates coords, int level, Image image) {
-        super(name, type, coords, level, image);
+    public FlyZone(Asset asset, Coordinates pos, int level) {
+        super(asset, pos, level);
     }
 }

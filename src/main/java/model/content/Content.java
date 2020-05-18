@@ -19,15 +19,18 @@ public class Content {
 
     public Content(Item item) {
         this.item.set(item);
-        this.name.set(item.getName());
-        this.type.set(item.getType());
+        this.name.set(item.getAsset().getName());
+        this.type.set(item.getAsset().getType());
         this.level.set(item.getLevel());
         this.visible.set(true);
-        this.pos.set(item.getCoords());
+        this.pos.set(item.getPos());
     }
 
     public void setItem(Item item) {
         this.item.set(item);
+        item.getAsset().nameProperty().addListener((observable, oldValue, newValue) -> {
+            setName(newValue);
+        });
     }
 
     public Item getItem() {
@@ -97,7 +100,7 @@ public class Content {
 
     public void setPos(Coordinates pos) {
         this.pos.set(pos);
-        item.get().setCoords(pos);
+        item.get().setPos(pos);
     }
 
     @Override

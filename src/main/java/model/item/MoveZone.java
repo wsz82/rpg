@@ -1,11 +1,11 @@
 package model.item;
 
-import javafx.scene.image.Image;
+import model.asset.Asset;
 import model.stage.Coordinates;
 
-public class MoveZone extends ImageItem {
+public class MoveZone extends Item {
 
-    public MoveZone(String name, ItemType type, Coordinates coords, int level, Image image) {
-        super(name, type, coords, level, image);
+    public MoveZone(Asset asset, Coordinates coords, int level) {
+        super(asset, coords, level);
     }
 }

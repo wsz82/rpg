@@ -9,10 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import model.asset.Asset;
-import model.asset.AssetsList;
 import model.content.Content;
-import model.item.ImageItem;
 import model.item.Item;
 import model.location.CurrentLocation;
 import model.location.Location;
@@ -82,72 +79,64 @@ class Board extends AnchorPane {
 
     private void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
-            Item item = content.getItem();
+            final Item item = content.getItem();
+            Image image = item.getAsset().getImage();
+            final ImageView iv = new ImageView(image);
+            final Coordinates pos = content.getPos();
+            final Rectangle clipMask = new Rectangle();
+            double x = pos.getX();
+            double y = pos.getY();
 
-            if (item instanceof ImageItem) {
-                final ImageItem imageItem = (ImageItem) item;
-                Image image = imageItem.getImage();
-                if (image == null) {
-                    for (Asset asset : AssetsList.get()) {
-                        if (asset.getName().equals(imageItem.getName())) {
-                            image = asset.getImage();
-                        }
-                    }
-                }
-                final ImageView iv = new ImageView(image);
-                final Coordinates pos = content.getPos();
-                final Rectangle clipMask = new Rectangle();
-                double x = pos.getX();
-                double y = pos.getY();
+            clipImageX(iv, clipMask, x);
+            clipImageY(iv, clipMask, y);
+            getChildren().add(iv);
+            setLeftAnchor(iv, x);
+            setTopAnchor(iv, y);
 
-                clipImageX(iv, clipMask, x);
-                clipImageY(iv, clipMask, y);
-                getChildren().add(iv);
-                setLeftAnchor(iv, x);
-                setTopAnchor(iv, y);
+            content.setVisible(CurrentLayer.get().getCurrentLayer().getVisible());
 
-                content.setVisible(CurrentLayer.get().getCurrentLayer().getVisible());
+            prefWidthProperty().addListener((observable, oldValue, newValue) -> {
+                clipMask.setWidth(newValue.doubleValue() - x);
+                iv.setClip(clipMask);
+            });
+            pos.xProperty().addListener((observable, oldValue, newValue) -> {
+                setLeftAnchor(iv, newValue.doubleValue());
+                clipImageX(iv, clipMask, newValue.doubleValue());
+            });
+            prefHeightProperty().addListener((observable, oldValue, newValue) -> {
+                clipMask.setHeight(newValue.doubleValue() - y);
+                iv.setClip(clipMask);
+            });
+            pos.yProperty().addListener((observable, oldValue, newValue) -> {
+                setTopAnchor(iv, newValue.doubleValue());
+                clipImageY(iv, clipMask, newValue.doubleValue());
+            });
+            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+                sortContent(boardContents);
+            });
+            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+                sortContent(boardContents);
+            });
+            item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
+                iv.setImage(item.getAsset().getImage());
+            });
 
-                prefWidthProperty().addListener((observable, oldValue, newValue) -> {
-                    clipMask.setWidth(newValue.doubleValue() - x);
-                    iv.setClip(clipMask);
-                });
-                pos.xProperty().addListener((observable, oldValue, newValue) -> {
-                    setLeftAnchor(iv, newValue.doubleValue());
-                    clipImageX(iv, clipMask, newValue.doubleValue());
-                });
-                prefHeightProperty().addListener((observable, oldValue, newValue) -> {
-                    clipMask.setHeight(newValue.doubleValue() - y);
-                    iv.setClip(clipMask);
-                });
-                pos.yProperty().addListener((observable, oldValue, newValue) -> {
-                    setTopAnchor(iv, newValue.doubleValue());
-                    clipImageY(iv, clipMask, newValue.doubleValue());
-                });
-                pos.zProperty().addListener((observable, oldValue, newValue) -> {
-                    sortContent(boardContents);
-                });
-                content.levelProperty().addListener((observable, oldValue, newValue) -> {
-                    sortContent(boardContents);
-                });
+            iv.visibleProperty().bindBidirectional(content.visibleProperty());
 
-                iv.visibleProperty().bindBidirectional(content.visibleProperty());
+            ContentWithImage contentWithImage = new ContentWithImage(content, iv);
+            boardContents.add(contentWithImage);
 
-                ContentWithImage contentWithImage = new ContentWithImage(content, iv);
-                boardContents.add(contentWithImage);
+            iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+                zPos.set(content.getPos().getZ());
+            });
 
-                iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-                    zPos.set(content.getPos().getZ());
-                });
-
-                int z = pos.getZ();
-                int maxZ = boardContents.stream()
-                        .max(Comparator.comparingInt(o -> o.getContent().getPos().getZ()))
-                        .map(c -> c.getContent().getPos().getZ())
-                        .get();
-                if (z > maxZ) {
-                    sortContent(boardContents);
-                }
+            int z = pos.getZ();
+            int maxZ = boardContents.stream()
+                    .max(Comparator.comparingInt(o -> o.getContent().getPos().getZ()))
+                    .map(c -> c.getContent().getPos().getZ())
+                    .get();
+            if (z > maxZ) {
+                sortContent(boardContents);
             }
         }
     }

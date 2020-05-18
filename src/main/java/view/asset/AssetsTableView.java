@@ -6,6 +6,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.asset.Asset;
 import model.asset.AssetToContentConverter;
@@ -16,6 +18,8 @@ import model.location.CurrentLocation;
 import model.stage.Coordinates;
 import view.stage.Pointer;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 
 class AssetsTableView extends AssetsGenericTableView {
@@ -33,14 +37,57 @@ class AssetsTableView extends AssetsGenericTableView {
         initTable();
         setFilteredItems();
         setUpContextMenu();
+        setEditable(true);
     }
 
     private void initTable() {
         TableColumn<Asset, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setEditable(true);
+        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        nameCol.setOnEditCommit(t -> {
+            Asset asset = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            String newValue = t.getNewValue();
+            if (assetNameIsNotUnique(newValue)) {
+                asset.setName(t.getOldValue());
+            } else {
+                asset.setName(newValue);
+            }
+            nameCol.setVisible(false);
+            nameCol.setVisible(true);
+        });
+
+        TableColumn<Asset, String> pathCol = new TableColumn<>("Path");
+        pathCol.setCellValueFactory(new PropertyValueFactory<>("path"));
+        pathCol.setEditable(true);
+        pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        pathCol.setOnEditCommit(t -> {
+            Asset asset = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose image for asset");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
+            );
+            File selectedFile = fileChooser.showOpenDialog(parent);
+            if (selectedFile != null && selectedFile.isFile()) {
+                try {
+                    String path = selectedFile.toURI().toURL().toString();
+                    asset.setPath(path);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+            pathCol.setVisible(false);
+            pathCol.setVisible(true);
+        });
 
         ObservableList<TableColumn<Asset, ?>> columns = getColumns();
-        columns.add(0, nameCol);
+        columns.addAll(nameCol, pathCol);
+    }
+
+    private boolean assetNameIsNotUnique(String newValue) {
+        return AssetsList.get().stream()
+                .anyMatch(p -> p.getName().equals(newValue));
     }
 
     private void setFilteredItems() {

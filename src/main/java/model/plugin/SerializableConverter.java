@@ -14,6 +14,7 @@ import model.stage.Coordinates;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SerializableConverter {
 
@@ -59,11 +60,10 @@ public class SerializableConverter {
     }
 
     private static ItemSerializable toSerializableItem(Item item) {
-        String name = item.getName();
-        ItemType type = item.getType();
-        CoordinatesSerializable pos = toSerializableCoordinates(item.getCoords());
+        AssetSerializable asset = toSerializableAsset(item.getAsset());
+        CoordinatesSerializable pos = toSerializableCoordinates(item.getPos());
         int level = item.getLevel();
-        return new ItemSerializable(name, type, pos, level);
+        return new ItemSerializable(asset.getName(), pos, level);
     }
 
     private static CoordinatesSerializable toSerializableCoordinates(Coordinates pos) {
@@ -73,7 +73,7 @@ public class SerializableConverter {
         return new CoordinatesSerializable(x, y, z);
     }
 
-    public static List<Location> toLocationObjects(List<LocationSerializable> input) {
+    public static List<Location> toLocationObjects(List<LocationSerializable> input, List<Asset> assets) {
         List<Location> output = FXCollections.observableArrayList();
         for (LocationSerializable ls : input) {
             Location location = new Location();
@@ -86,7 +86,7 @@ public class SerializableConverter {
             location.setLayers(layersList);
 
             ContentList contentList = new ContentList();
-            contentList.get().setAll(toContents(ls.getContents()));
+            contentList.get().setAll(toContents(ls.getContents(), assets));
             location.setContents(contentList);
 
             output.add(location);
@@ -106,34 +106,37 @@ public class SerializableConverter {
         return output;
     }
 
-    private static List<Content> toContents(List<ContentSerializable> input) {
+    private static List<Content> toContents(List<ContentSerializable> input, List<Asset> assets) {
         List<Content> output = FXCollections.observableArrayList();
         for (ContentSerializable cs : input) {
             Content content = new Content();
-            Item item = toItem(cs.getItem());
+            Item item = toItem(cs.getItem(), assets);
             content.setItem(item);
             content.setLevel(item.getLevel());
-            content.setName(item.getName());
-            content.setType(item.getType());
-            content.setPos(item.getCoords());
+            content.setName(item.getAsset().getName());
+            content.setType(item.getAsset().getType());
+            content.setPos(item.getPos());
             content.setVisible(cs.isVisible());
             output.add(content);
         }
         return output;
     }
 
-    private static Item toItem(ItemSerializable i) {
+    private static Item toItem(ItemSerializable i, List<Asset> assets) {
         Item output;
         String name = i.getName();
-        ItemType type = i.getType();
+        List<Asset> oneAsset = assets.stream()
+                .filter(a -> a.getName().equals(name))
+                .collect(Collectors.toList());
+        Asset asset = oneAsset.get(0);
         Coordinates pos = toCoordinates(i.getPos());
         int level = i.getLevel();
-        switch (type) {
-            case LANDSCAPE -> output = new Landscape(name, type, pos, level, null);
-            case COVER -> output = new Cover(name, type, pos, level, null);
-            case MOVE_ZONE -> output = new MoveZone(name, type, pos, level, null);
-            case FLY_ZONE -> output = new FlyZone(name, type, pos, level, null);
-            default -> output = new Landscape(name, type, pos, level, null);
+        switch (asset.getType()) {
+            case LANDSCAPE -> output = new Landscape(asset, pos, level);
+            case COVER -> output = new Cover(asset, pos, level);
+            case MOVE_ZONE -> output = new MoveZone(asset, pos, level);
+            case FLY_ZONE -> output = new FlyZone(asset, pos, level);
+            default -> output = new Landscape(asset, pos, level);
         }
         return output;
     }
@@ -145,13 +148,17 @@ public class SerializableConverter {
     public static List<AssetSerializable> assetsToSerializable(ObservableList<Asset> input) {
         List<AssetSerializable> output = new ArrayList<>(0);
         for (Asset asset : input) {
-            String name = asset.getName();
-            ItemType type = asset.getType();
-            String path = asset.getPath();
-            AssetSerializable as = new AssetSerializable(name, type, path);
+            AssetSerializable as = toSerializableAsset(asset);
             output.add(as);
         }
         return output;
+    }
+
+    private static AssetSerializable toSerializableAsset(Asset asset) {
+        String name = asset.getName();
+        ItemType type = asset.getType();
+        String path = asset.getPath();
+        return new AssetSerializable(name, type, path);
     }
 
     public static Collection<Asset> toAssetObjects(List<AssetSerializable> input) {
