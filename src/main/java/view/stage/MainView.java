@@ -1,13 +1,12 @@
 package view.stage;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.Controller;
 import model.plugin.ActivePlugin;
 import model.plugin.Plugin;
@@ -17,7 +16,9 @@ import view.layer.LayersStage;
 import view.location.LocationParametersStage;
 import view.location.LocationsStage;
 
-public class MainView {
+import java.io.File;
+
+class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
     private static final Board BOARD = Board.get();
@@ -27,8 +28,6 @@ public class MainView {
     private final LayersStage layersWindow;
     private final AssetsStage assetsWindow;
     private final LocationsStage locationsWindow;
-    private double screenHeight;
-    private double screenWidth;
 
     MainView(Stage stage) {
         this.stage = stage;
@@ -38,7 +37,7 @@ public class MainView {
         locationsWindow = new LocationsStage(stage);
     }
 
-    void show() {
+    void show(File programDir) {
         BorderPane borderPane = new BorderPane();
         VBox topBar = new VBox();
         VBox bottomBar = new VBox();
@@ -53,19 +52,53 @@ public class MainView {
 
         Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         stage.setScene(scene);
-        stage.show();
 
-        getScreenDimensions();
-        createContentsWindow();
-        createLayersWindow();
-        createAssetsWindow();
-        createLocationsWindow();
+        restoreSettings(programDir);
+        stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
+            storeSettings(programDir);
+        });
+
+        stage.show();
+        layersWindow.show();
+        assetsWindow.show();
+        contentsWindow.show();
+        locationsWindow.show();
     }
 
-    private void getScreenDimensions() {
-        Rectangle2D screenBound = Screen.getPrimary().getBounds();
-        screenHeight = screenBound.getMaxY();
-        screenWidth = screenBound.getMaxX();
+    private void storeSettings(File programDir) {
+        SettingsMemento memento = new SettingsMemento(
+                stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(),
+                layersWindow.getX(), layersWindow.getY(), layersWindow.getWidth(), layersWindow.getHeight(),
+                assetsWindow.getX(), assetsWindow.getY(), assetsWindow.getWidth(), assetsWindow.getHeight(),
+                contentsWindow.getX(), contentsWindow.getY(), contentsWindow.getWidth(), contentsWindow.getHeight(),
+                locationsWindow.getX(), locationsWindow.getY(), locationsWindow.getWidth(), locationsWindow.getHeight()
+        );
+        memento.saveMemento(programDir);
+    }
+
+    private void restoreSettings(File programDir) {
+        SettingsMemento memento = new SettingsMemento();
+        memento = memento.loadMemento(programDir);
+        stage.setX(memento.getStageX());
+        stage.setY(memento.getStageY());
+        stage.setWidth(memento.getStageWidth());
+        stage.setHeight(memento.getStageHeight());
+        layersWindow.setX(memento.getLayersX());
+        layersWindow.setY(memento.getLayersY());
+        layersWindow.setWidth(memento.getLayersWidth());
+        layersWindow.setHeight(memento.getLayersHeight());
+        assetsWindow.setX(memento.getAssetsX());
+        assetsWindow.setY(memento.getAssetsY());
+        assetsWindow.setWidth(memento.getAssetsWidth());
+        assetsWindow.setHeight(memento.getAssetsHeight());
+        contentsWindow.setX(memento.getContentsX());
+        contentsWindow.setY(memento.getContentsY());
+        contentsWindow.setWidth(memento.getContentsWidth());
+        contentsWindow.setHeight(memento.getContentsHeight());
+        locationsWindow.setX(memento.getLocationsX());
+        locationsWindow.setY(memento.getLocationsY());
+        locationsWindow.setWidth(memento.getLocationsWidth());
+        locationsWindow.setHeight(memento.getLocationsHeight());
     }
 
     private void setTopContent(VBox topBar) {
@@ -150,30 +183,6 @@ public class MainView {
         menuItem.setOnAction(event ->
                 showOrHide(stage, menuItem.isSelected())
         );
-    }
-
-    private void createContentsWindow() {
-        contentsWindow.setX(0);
-        contentsWindow.setY((double) 5/10 * screenHeight);
-        contentsWindow.show();
-    }
-
-    private void createLayersWindow() {
-        layersWindow.setX(0);
-        layersWindow.setY(0);
-        layersWindow.show();
-    }
-
-    private void createAssetsWindow() {
-        assetsWindow.setX((double) 15/20 * screenWidth);
-        assetsWindow.setY((double) 5/10 * screenHeight);
-        assetsWindow.show();
-    }
-
-    private void createLocationsWindow() {
-        locationsWindow.setX((double) 15/20 * screenWidth);
-        locationsWindow.setY(0);
-        locationsWindow.show();
     }
 
     private void showOrHide(Stage stage, boolean isSelected) {
