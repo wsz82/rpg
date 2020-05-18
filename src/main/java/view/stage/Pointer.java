@@ -54,13 +54,13 @@ public class Pointer {
     void activate() {
         active = true;
         Board.get().setCursor(Cursor.CROSSHAIR);
-        Board.get().setOnMouseClicked(clickEvent);
+        Board.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
     }
 
     void deactivate() {
         active = false;
         Board.get().setCursor(Cursor.DEFAULT);
-        Board.get().removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
+        Board.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         Board.get().getChildren().remove(marker);
     }
 
