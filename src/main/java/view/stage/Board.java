@@ -16,7 +16,6 @@ import model.location.Location;
 import model.stage.Coordinates;
 import model.stage.CurrentLayer;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,15 +79,25 @@ class Board extends AnchorPane {
     private void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
-            Image image = item.getAsset().getImage();
+            final Image image = item.getAsset().getImage();
             final ImageView iv = new ImageView(image);
             final Coordinates pos = content.getPos();
             final Rectangle clipMask = new Rectangle();
-            double x = pos.getX();
-            double y = pos.getY();
+            final double x = pos.getX();
+            final double y = pos.getY();
 
             clipImageX(iv, clipMask, x);
             clipImageY(iv, clipMask, y);
+            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+                int z = newValue.intValue();
+                int level = content.getLevel();
+                iv.setViewOrder(-(level*1000 + (double) z/1000));
+            });
+            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+                int level = newValue.intValue();
+                int z = content.getPos().getZ();
+                iv.setViewOrder(-(level*1000 + (double) z/1000));
+            });
             getChildren().add(iv);
             setLeftAnchor(iv, x);
             setTopAnchor(iv, y);
@@ -111,12 +120,6 @@ class Board extends AnchorPane {
                 setTopAnchor(iv, newValue.doubleValue());
                 clipImageY(iv, clipMask, newValue.doubleValue());
             });
-            pos.zProperty().addListener((observable, oldValue, newValue) -> {
-                sortContent(boardContents);
-            });
-            content.levelProperty().addListener((observable, oldValue, newValue) -> {
-                sortContent(boardContents);
-            });
             item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
                 iv.setImage(item.getAsset().getImage());
             });
@@ -129,34 +132,6 @@ class Board extends AnchorPane {
             iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
                 zPos.set(content.getPos().getZ());
             });
-
-            int z = pos.getZ();
-            int maxZ = boardContents.stream()
-                    .max(Comparator.comparingInt(o -> o.getContent().getPos().getZ()))
-                    .map(c -> c.getContent().getPos().getZ())
-                    .get();
-            if (z > maxZ) {
-                sortContent(boardContents);
-            }
-        }
-    }
-
-    private void sortContent(List<ContentWithImage> sortedContent) {
-        boardContents.sort(new ContentWithImageComparator());
-        getChildren().clear();
-        for (ContentWithImage ciw : sortedContent) {
-            final ImageView iv = ciw.getImageView();
-            final Content content = ciw.getContent();
-            final Coordinates pos = content.getPos();
-            final Rectangle clipMask = new Rectangle();
-            double x = pos.getX();
-            double y = pos.getY();
-
-            clipImageX(iv, clipMask, x);
-            clipImageY(iv, clipMask, y);
-            getChildren().add(iv);
-            setLeftAnchor(iv, x);
-            setTopAnchor(iv, y);
         }
     }
 
