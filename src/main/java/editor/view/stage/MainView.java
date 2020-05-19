@@ -1,7 +1,14 @@
 package editor.view.stage;
 
+import editor.view.asset.AssetsStage;
+import editor.view.content.ContentStage;
+import editor.view.layer.LayersStage;
+import editor.view.location.LocationParametersStage;
+import editor.view.location.LocationsStage;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -10,11 +17,6 @@ import javafx.stage.WindowEvent;
 import model.Controller;
 import model.plugin.ActivePlugin;
 import model.plugin.Plugin;
-import editor.view.asset.AssetsStage;
-import editor.view.content.ContentStage;
-import editor.view.layer.LayersStage;
-import editor.view.location.LocationParametersStage;
-import editor.view.location.LocationsStage;
 
 import java.io.File;
 
@@ -43,6 +45,10 @@ class MainView {
         VBox bottomBar = new VBox();
 
         scrollPane.setContent(EDITOR_BOARD);
+        scrollPane.setPannable(true);
+        scrollPane.addEventFilter(MouseEvent.ANY, event -> {
+            if (event.getButton() != MouseButton.MIDDLE) event.consume();
+        });
         borderPane.setTop(topBar);
         borderPane.setCenter(scrollPane);
         borderPane.setBottom(bottomBar);

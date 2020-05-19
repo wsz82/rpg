@@ -41,6 +41,8 @@ public class Game extends Stage {
         setFullScreenExitKeyCombination(
                 CLOSE_GAME);
         setFullScreen(true);
+//        setWidth(1000);
+//        setHeight(700);
         showMainMenu();
     }
 
