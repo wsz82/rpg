@@ -3,8 +3,8 @@ package model.content;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.location.CurrentLocation;
-import view.layer.LevelValueListener;
-import view.layer.VisibleValueListener;
+import editor.view.layer.LevelValueListener;
+import editor.view.layer.VisibleValueListener;
 
 public class ContentList implements LevelValueListener, VisibleValueListener {
     private final ObservableList<Content> contents;

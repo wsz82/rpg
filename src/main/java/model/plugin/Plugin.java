@@ -6,7 +6,7 @@ import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
 import model.stage.CurrentLayer;
-import view.stage.Main;
+import editor.view.stage.Main;
 
 import java.io.*;
 import java.util.List;
@@ -55,6 +55,9 @@ public class Plugin {
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
         file = fileChooser.showOpenDialog(Main.getStage());
+        if (file == null) {
+            return;
+        }
         LocationsList.get().clear();
         AssetsList.get().clear();
         deserializeAll();
