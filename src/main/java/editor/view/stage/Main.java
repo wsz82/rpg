@@ -25,7 +25,8 @@ public class Main extends Application {
         String path = System.getProperty("user.home");
         try {
             path = new File(
-                    this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+                    this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+                    .getParent();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

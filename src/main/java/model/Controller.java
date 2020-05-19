@@ -5,6 +5,8 @@ import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
+import model.plugin.ActivePlugin;
+import model.plugin.Plugin;
 import model.stage.CurrentLayer;
 
 public class Controller {
@@ -28,5 +30,14 @@ public class Controller {
         CurrentLocation.get().setLocation(location);
         CurrentLayer.get().setCurrentLayer(layer);
         AssetsList.get().clear();
+    }
+
+    public void setActivePlugin(Plugin plugin) {
+        ActivePlugin.get().setActivePlugin(plugin);
+        plugin.load();
+    }
+
+    public Plugin getActivePlugin() {
+        return ActivePlugin.get().getActivePlugin();
     }
 }

@@ -7,14 +7,29 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Controller;
 import model.plugin.Plugin;
 
-class Launcher {
-    private Stage stage;
+import java.io.File;
 
-    Launcher(Stage stage) {
+class Launcher {
+    private final File programDir;
+    private final Stage stage;
+
+    Launcher(Stage stage, File programDir) {
         this.stage = stage;
+        this.programDir = programDir;
         initLauncher();
+        restorePluginMemento();
+    }
+
+    private void restorePluginMemento() {
+        PluginCaretaker caretaker = new PluginCaretaker();
+        PluginMemento memento = caretaker.loadMemento(programDir);
+        Plugin plugin = memento.getPlugin();
+        if (plugin != null) {
+            Controller.get().setActivePlugin(plugin);
+        }
     }
 
     private void initLauncher() {
@@ -37,6 +52,9 @@ class Launcher {
     }
 
     private void play() {
+        if (Controller.get().getActivePlugin() == null) {
+            Controller.get().initNewPlugin();
+        }
         Game.get();
         stage.close();
     }
@@ -44,7 +62,14 @@ class Launcher {
     private void choosePlugin() {
         Plugin plugin = new Plugin();
         plugin.load();
+        savePluginMemento(plugin);
     }
+
+    private void savePluginMemento(Plugin plugin) {
+        PluginMemento memento = new PluginMemento(plugin);
+        PluginCaretaker caretaker = new PluginCaretaker();
+        caretaker.saveMemento(programDir, memento);
+    };
 
     private void exit() {
         stage.close();

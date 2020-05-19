@@ -11,7 +11,7 @@ import editor.view.stage.Main;
 import java.io.*;
 import java.util.List;
 
-public class Plugin {
+public class Plugin implements Serializable {
     private File file;
 
     public Plugin() {
@@ -49,12 +49,14 @@ public class Plugin {
     }
 
     public void load() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose plugin");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
-        );
-        file = fileChooser.showOpenDialog(Main.getStage());
+        if (file == null) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose plugin");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
+            );
+            file = fileChooser.showOpenDialog(Main.getStage());
+        }
         if (file == null) {
             return;
         }
