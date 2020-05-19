@@ -1,5 +1,6 @@
 package editor.view.stage;
 
+import board.Board;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
@@ -20,63 +21,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Board extends AnchorPane {
-    private static Board board;
-    private final List<ContentWithImage> boardContents = new LinkedList<>();
-    private final ListChangeListener<Content> locationContentListener = c -> {
-        if (!c.next()) {
-            return;
-        }
-        List<Content> addedContent = (List<Content>) c.getAddedSubList();
-        addContentsToStage(addedContent);
+class EditorBoard extends Board {
+    private static EditorBoard editorBoard;
 
-        List<Content> removedContent = (List<Content>) c.getRemoved();
-        for (Content content : removedContent) {
-            List<ContentWithImage> contentsWithImages = boardContents.stream()
-                    .filter(cwi -> cwi.getContent().equals(content))
-                    .collect(Collectors.toList());
-
-            ContentWithImage contentWithImage = contentsWithImages.get(0);
-            ImageView imageToRemove = contentWithImage.getImageView();
-            getChildren().remove(imageToRemove);
-            boardContents.remove(contentWithImage);
+    static EditorBoard get() {
+        if (editorBoard == null) {
+            editorBoard = new EditorBoard();
         }
-    };
-    private final IntegerProperty zPos = new SimpleIntegerProperty();
-
-    static Board get() {
-        if (board == null) {
-            board = new Board();
-        }
-        return board;
+        return editorBoard;
     }
 
-    private Board() {
+    private EditorBoard() {
         bindWidthAndHeight();
         setBorder(getDefinedBorder());
-        bindWithLocationAndContentChange();
     }
 
-    private void bindWithLocationAndContentChange() {
-        CurrentLocation.get().getContent().addListener(locationContentListener);
-        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            CurrentLocation.get().getContent().removeListener(locationContentListener);
-            clearBoardAndInflateWithNewLocation(newValue);
-            CurrentLocation.get().getContent().addListener(locationContentListener);
-        });
-    }
-
-    private void clearBoardAndInflateWithNewLocation(Location newValue) {
-        for (ContentWithImage contentWithImage : boardContents) {
-            ImageView iv = contentWithImage.getImageView();
-            getChildren().remove(iv);
-        }
-        boardContents.clear();
-        List<Content> contents = newValue.getContents().get();
-        addContentsToStage(contents);
-    }
-
-    private void addContentsToStage(List<Content> contents) {
+    @Override
+    protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
             final Image image = item.getAsset().getImage();
@@ -135,16 +96,6 @@ class Board extends AnchorPane {
         }
     }
 
-    private void clipImageX(ImageView iv, Rectangle clipMask, double x) {
-        clipMask.setWidth(CurrentLocation.get().getCurrentWidth() - x);
-        iv.setClip(clipMask);
-    }
-
-    private void clipImageY(ImageView iv, Rectangle clipMask, double y) {
-        clipMask.setHeight(CurrentLocation.get().getCurrentHeight() - y);
-        iv.setClip(clipMask);
-    }
-
     private void bindWidthAndHeight() {
         prefWidthProperty().bindBidirectional(
                 CurrentLocation.get().currentWidthProperty());
@@ -156,13 +107,5 @@ class Board extends AnchorPane {
         BorderStroke[] strokes = new BorderStroke[]{
                 new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)};
         return new Border(strokes);
-    }
-
-    public int getzPos() {
-        return zPos.get();
-    }
-
-    public IntegerProperty zPosProperty() {
-        return zPos;
     }
 }

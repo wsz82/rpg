@@ -13,7 +13,7 @@ class CoordinatesBox extends HBox {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                int z = Board.get().getzPos();
+                int z = EditorBoard.get().getzPos();
                 Coordinates coordinates = new Coordinates(event, z);
                 mouseX.setText("X: " + coordinates.getX());
                 mouseY.setText("Y: " + coordinates.getY());

@@ -16,17 +16,17 @@ public class Pointer {
         public void handle(MouseEvent event) {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                int z = Board.get().getzPos();
-                boolean markerIsNotDrawn = !Board.get().getChildren().contains(marker);
+                int z = EditorBoard.get().getzPos();
+                boolean markerIsNotDrawn = !EditorBoard.get().getChildren().contains(marker);
 
                 mark = new Coordinates(event, z);
                 if (markerIsNotDrawn) {
                     loadMarkerImage();
                     marker.setImage(markerImage);
-                    Board.get().getChildren().add(marker);
+                    EditorBoard.get().getChildren().add(marker);
                 }
-                Board.get().setLeftAnchor(marker, mark.getX() - markerImage.getWidth()/2);
-                Board.get().setTopAnchor(marker, mark.getY() - markerImage.getHeight()/2);
+                EditorBoard.get().setLeftAnchor(marker, mark.getX() - markerImage.getWidth()/2);
+                EditorBoard.get().setTopAnchor(marker, mark.getY() - markerImage.getHeight()/2);
             }
         }
     };
@@ -54,15 +54,15 @@ public class Pointer {
 
     void activate() {
         active = true;
-        Board.get().setCursor(Cursor.CROSSHAIR);
-        Board.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        EditorBoard.get().setCursor(Cursor.CROSSHAIR);
+        EditorBoard.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
     }
 
     void deactivate() {
         active = false;
-        Board.get().setCursor(Cursor.DEFAULT);
-        Board.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
-        Board.get().getChildren().remove(marker);
+        EditorBoard.get().setCursor(Cursor.DEFAULT);
+        EditorBoard.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        EditorBoard.get().getChildren().remove(marker);
     }
 
     public static Coordinates getMark() {

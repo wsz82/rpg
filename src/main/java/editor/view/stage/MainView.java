@@ -21,7 +21,7 @@ import java.io.File;
 class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
-    private static final Board BOARD = Board.get();
+    private static final EditorBoard EDITOR_BOARD = EditorBoard.get();
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
@@ -42,7 +42,7 @@ class MainView {
         VBox topBar = new VBox();
         VBox bottomBar = new VBox();
 
-        scrollPane.setContent(BOARD);
+        scrollPane.setContent(EDITOR_BOARD);
         borderPane.setTop(topBar);
         borderPane.setCenter(scrollPane);
         borderPane.setBottom(bottomBar);
@@ -110,7 +110,7 @@ class MainView {
     private void setBottomContent(VBox bottom) {
         HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        CoordinatesBox coordinatesBox = new CoordinatesBox(BOARD);
+        CoordinatesBox coordinatesBox = new CoordinatesBox(EDITOR_BOARD);
         CurrentLocationBox currentLocationBox = new CurrentLocationBox();
         CurrentLayerBox currentLayerBox = new CurrentLayerBox();
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);

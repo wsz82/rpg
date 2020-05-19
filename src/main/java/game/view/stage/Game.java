@@ -66,7 +66,7 @@ public class Game extends Stage {
 
         Game.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
 
-        GameBoard gameBoard = new GameBoard();
+        GameBoard gameBoard = GameBoard.get();
         gameEnvelope.setCenter(gameBoard);
         gameRoot.getChildren().addAll(gameEnvelope);
 

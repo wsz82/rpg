@@ -50,7 +50,7 @@ public class Plugin {
 
     public void load() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save plugin");
+        fileChooser.setTitle("Choose plugin");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
