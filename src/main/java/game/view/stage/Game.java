@@ -4,6 +4,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -22,7 +23,8 @@ public class Game extends Stage {
             showGameMenu();
         }
     };
-    private StackPane gameRoot;
+    private StackPane gameMenu;
+    private ScrollPane gameRoot;
     private StackPane menuRoot;
     private static Game game;
 
@@ -43,6 +45,15 @@ public class Game extends Stage {
     }
 
     private void showMainMenu() {
+        if (menuRoot == null) {
+            createMainMenu();
+        }
+        Scene scene = new Scene(menuRoot);
+        setScene(scene);
+        show();
+    }
+
+    private void createMainMenu() {
         menuRoot = new StackPane();
         VBox menu = new VBox(10);
         Button newGame = new Button("New Game");
@@ -54,21 +65,18 @@ public class Game extends Stage {
         menu.setAlignment(Pos.CENTER);
         menu.getChildren().addAll(newGame, loadGame, exit);
         menuRoot.getChildren().addAll(menu);
-
-        Scene scene = new Scene(menuRoot);
-        setScene(scene);
-        show();
     }
 
     private void startNewGame() {
-        gameRoot = new StackPane();
+        StackPane stackPane = new StackPane();
+        gameRoot = new GameScrollPane(stackPane);
         BorderPane gameEnvelope = new GameEnvelope();
 
-        Game.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
 
         GameBoard gameBoard = GameBoard.get();
         gameEnvelope.setCenter(gameBoard);
-        gameRoot.getChildren().addAll(gameEnvelope);
+        stackPane.getChildren().addAll(gameEnvelope);
 
         getScene().setRoot(gameRoot);
     }
@@ -80,8 +88,14 @@ public class Game extends Stage {
 
     private void showGameMenu() {
         removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        if (gameMenu == null) {
+            createGameMenu();
+        }
+        getScene().setRoot(gameMenu);
+    }
 
-        StackPane gameMenu = new StackPane();
+    private void createGameMenu() {
+        gameMenu = new StackPane();
         VBox menu = new VBox(10);
         menu.setAlignment(Pos.CENTER);
         Button resume = new Button("Resume");
@@ -99,7 +113,5 @@ public class Game extends Stage {
         });
         menu.getChildren().addAll(resume, save, load, mainMenu);
         gameMenu.getChildren().addAll(menu);
-
-        getScene().setRoot(gameMenu);
     }
 }
