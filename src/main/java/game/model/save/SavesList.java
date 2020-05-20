@@ -1,4 +1,4 @@
-package model.save;
+package game.model.save;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

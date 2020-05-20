@@ -1,15 +1,15 @@
-package game.view.launcher;
+package game.model.plugin;
 
 import model.plugin.Plugin;
 
-import java.io.*;
+import java.io.Serializable;
 
-class PluginMemento implements Serializable {
+public class PluginMemento implements Serializable {
     private Plugin plugin;
 
-    PluginMemento(){}
+    public PluginMemento(){}
 
-    PluginMemento(Plugin plugin){
+    public PluginMemento(Plugin plugin){
         this.plugin = plugin;
     }
 

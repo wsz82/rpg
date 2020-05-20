@@ -1,5 +1,6 @@
 package game.view.launcher;
 
+import game.model.GameController;
 import game.view.stage.Game;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,12 +21,7 @@ class Launcher {
     }
 
     private void restorePluginMemento() {
-        PluginCaretaker caretaker = new PluginCaretaker();
-        PluginMemento memento = caretaker.loadMemento(Main.getDir());
-        Plugin plugin = memento.getPlugin();
-        if (plugin != null) {
-            Controller.get().setActivePlugin(plugin);
-        }
+        GameController.get().restorePlugin();
     }
 
     private void initLauncher() {
@@ -58,14 +54,8 @@ class Launcher {
     private void choosePlugin() {
         Plugin plugin = new Plugin();
         plugin.load();
-        savePluginMemento(plugin);
+        GameController.get().storePlugin(plugin);
     }
-
-    private void savePluginMemento(Plugin plugin) {
-        PluginMemento memento = new PluginMemento(plugin);
-        PluginCaretaker caretaker = new PluginCaretaker();
-        caretaker.saveMemento(Main.getDir(), memento);
-    };
 
     private void exit() {
         stage.close();

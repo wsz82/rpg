@@ -1,11 +1,11 @@
-package game.view.launcher;
+package game.model.plugin;
 
 import java.io.*;
 
-class PluginCaretaker {
+public class PluginCaretaker {
     private static final String FILE_NAME = "plugins";
 
-    void saveMemento(File programDir, PluginMemento memento) {
+    public void saveMemento(File programDir, PluginMemento memento) {
         try (
                 ObjectOutputStream os = new ObjectOutputStream(
                         new FileOutputStream(programDir + File.separator + FILE_NAME))
@@ -16,7 +16,7 @@ class PluginCaretaker {
         }
     }
 
-    PluginMemento loadMemento(File programDir) {
+    public PluginMemento loadMemento(File programDir) {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {

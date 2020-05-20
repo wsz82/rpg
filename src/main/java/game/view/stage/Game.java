@@ -1,5 +1,7 @@
 package game.view.stage;
 
+import game.model.GameController;
+import game.model.save.SaveMemento;
 import game.view.launcher.Main;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -13,10 +15,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import model.Controller;
-import model.save.SaveMemento;
 
 import java.io.File;
 
@@ -108,6 +109,11 @@ public class Game extends Stage {
     }
 
     private void startNewGame() {
+        GameController.get().restorePlugin();
+        showGame();
+    }
+
+    private void initGameBoard() {
         StackPane stackPane = new StackPane();
         gameRoot = new GameScrollPane(stackPane);
         BorderPane gameEnvelope = new GameEnvelope();
@@ -115,8 +121,6 @@ public class Game extends Stage {
         GameBoard gameBoard = GameBoard.get();
         gameEnvelope.setCenter(gameBoard);
         stackPane.getChildren().addAll(gameEnvelope);
-
-        showGame();
     }
 
     private void leaveGame() {
@@ -183,7 +187,7 @@ public class Game extends Stage {
     }
 
     private void initSavesList(File programDir) {
-        Controller.get().initSavesList(programDir);
+        GameController.get().initSavesList(programDir);
     }
 
     private void initLoadsView() {
@@ -243,6 +247,9 @@ public class Game extends Stage {
     }
 
     private void showGame() {
+        if (gameRoot == null) {
+            initGameBoard();
+        }
         getScene().setRoot(gameRoot);
         removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
         addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
@@ -250,39 +257,43 @@ public class Game extends Stage {
 
     private void createNewSave() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Enter save name");
+        dialog.initOwner(this);
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initStyle(StageStyle.UNDECORATED);
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
         dialog.showAndWait()
                 .filter(f -> !f.equals(""))
                 .ifPresent(n -> saveGame(false, n));
     }
 
     private void initSavesListView() {
-        savesView = new ListView<>(Controller.get().getSavesList());
+        savesView = new ListView<>(GameController.get().getSavesList());
         savesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     private void initLoadsListView() {
-        loadsView = new ListView<>(Controller.get().getSavesList());
+        loadsView = new ListView<>(GameController.get().getSavesList());
         loadsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     private void loadSave() {
         String name = loadsView.getSelectionModel().getSelectedItem();
-        SaveMemento memento = Controller.get().loadGameSave(name, Main.getDir());
+        SaveMemento memento = GameController.get().loadGameSave(name, Main.getDir());
+        showGame();
         gameRoot.setHvalue(memento.gethValue());
         gameRoot.setVvalue(memento.getvValue());
-        showGame();
     }
 
     private void deleteSave() {
         String name = savesView.getSelectionModel().getSelectedItem();
-        Controller.get().deleteGameSave(name, Main.getDir());
+        GameController.get().deleteGameSave(name, Main.getDir());
     }
 
     private void saveGame(boolean overwrite, String name) {
         double hvalue = gameRoot.getHvalue();
         double vvalue = gameRoot.getVvalue();
-        Controller.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
+        GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
         showGame();
     }
 }
