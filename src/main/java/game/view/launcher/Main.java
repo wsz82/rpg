@@ -7,11 +7,12 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 public class Main extends Application {
+    private static File programDir;
 
     @Override
     public void start(Stage stage) {
-        File programDir = getProgramDir();
-        new Launcher(stage, programDir);
+        programDir = getProgramDir();
+        new Launcher(stage);
     }
 
     public static void main(String[] args) {
@@ -29,5 +30,9 @@ public class Main extends Application {
         }
         new File(path).mkdir();
         return new File(path);
+    }
+
+    public static File getDir() {
+        return programDir;
     }
 }

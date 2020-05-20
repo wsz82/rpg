@@ -1,7 +1,5 @@
 package game.view.launcher;
 
-import model.plugin.Plugin;
-
 import java.io.*;
 
 class PluginCaretaker {
@@ -18,7 +16,7 @@ class PluginCaretaker {
         }
     }
 
-    PluginMemento loadMemento (File programDir) {
+    PluginMemento loadMemento(File programDir) {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {

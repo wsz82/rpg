@@ -2,28 +2,28 @@ package model.plugin;
 
 import java.io.Serializable;
 
-public class ContentSerializable implements Serializable {
+class ContentSerializable implements Serializable {
     private ItemSerializable item;
     private boolean visible;
 
-    public ContentSerializable(ItemSerializable item, boolean visible) {
+    ContentSerializable(ItemSerializable item, boolean visible) {
         this.item = item;
         this.visible = visible;
     }
 
-    public ItemSerializable getItem() {
+    ItemSerializable getItem() {
         return item;
     }
 
-    public void setItem(ItemSerializable item) {
+    void setItem(ItemSerializable item) {
         this.item = item;
     }
 
-    public boolean isVisible() {
+    boolean isVisible() {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
+    void setVisible(boolean visible) {
         this.visible = visible;
     }
 }

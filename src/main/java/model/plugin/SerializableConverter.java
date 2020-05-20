@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class SerializableConverter {
 
-    static List<LocationSerializable> locationsToSerializable(List<Location> input) {
+    public static List<LocationSerializable> locationsToSerializable(List<Location> input) {
         List<LocationSerializable> output = new ArrayList<>(0);
         for (Location location : input) {
             String name = location.getName();
@@ -145,7 +145,7 @@ public class SerializableConverter {
         return new Coordinates(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static List<AssetSerializable> assetsToSerializable(ObservableList<Asset> input) {
+    static List<AssetSerializable> assetsToSerializable(ObservableList<Asset> input) {
         List<AssetSerializable> output = new ArrayList<>(0);
         for (Asset asset : input) {
             AssetSerializable as = toSerializableAsset(asset);
@@ -161,7 +161,7 @@ public class SerializableConverter {
         return new AssetSerializable(name, type, path);
     }
 
-    public static Collection<Asset> toAssetObjects(List<AssetSerializable> input) {
+    static Collection<Asset> toAssetObjects(List<AssetSerializable> input) {
         List<Asset> output = FXCollections.observableArrayList();
         for (AssetSerializable as : input) {
             Asset asset = new Asset();

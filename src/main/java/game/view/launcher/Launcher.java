@@ -10,22 +10,18 @@ import javafx.stage.Stage;
 import model.Controller;
 import model.plugin.Plugin;
 
-import java.io.File;
-
 class Launcher {
-    private final File programDir;
     private final Stage stage;
 
-    Launcher(Stage stage, File programDir) {
+    Launcher(Stage stage) {
         this.stage = stage;
-        this.programDir = programDir;
         initLauncher();
         restorePluginMemento();
     }
 
     private void restorePluginMemento() {
         PluginCaretaker caretaker = new PluginCaretaker();
-        PluginMemento memento = caretaker.loadMemento(programDir);
+        PluginMemento memento = caretaker.loadMemento(Main.getDir());
         Plugin plugin = memento.getPlugin();
         if (plugin != null) {
             Controller.get().setActivePlugin(plugin);
@@ -68,7 +64,7 @@ class Launcher {
     private void savePluginMemento(Plugin plugin) {
         PluginMemento memento = new PluginMemento(plugin);
         PluginCaretaker caretaker = new PluginCaretaker();
-        caretaker.saveMemento(programDir, memento);
+        caretaker.saveMemento(Main.getDir(), memento);
     };
 
     private void exit() {

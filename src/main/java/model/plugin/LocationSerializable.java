@@ -18,43 +18,43 @@ public class LocationSerializable implements Serializable {
         this.contents = contents;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
-    public int getWidth() {
+    int getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    void setWidth(int width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    int getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    void setHeight(int height) {
         this.height = height;
     }
 
-    public List<LayerSerializable> getLayers() {
+    List<LayerSerializable> getLayers() {
         return layers;
     }
 
-    public void setLayers(List<LayerSerializable> layers) {
+    void setLayers(List<LayerSerializable> layers) {
         this.layers = layers;
     }
 
-    public List<ContentSerializable> getContents() {
+    List<ContentSerializable> getContents() {
         return contents;
     }
 
-    public void setContents(List<ContentSerializable> contents) {
+    void setContents(List<ContentSerializable> contents) {
         this.contents = contents;
     }
 }

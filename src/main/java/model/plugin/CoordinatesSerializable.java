@@ -2,34 +2,34 @@ package model.plugin;
 
 import java.io.Serializable;
 
-public class CoordinatesSerializable implements Serializable {
+class CoordinatesSerializable implements Serializable {
     private double x;
     private double y;
     private int z;
 
-    public CoordinatesSerializable(double x, double y, int z) {
+    CoordinatesSerializable(double x, double y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public double getX() {
+    double getX() {
         return x;
     }
 
-    public void setX(double x) {
+    void setX(double x) {
         this.x = x;
     }
 
-    public double getY() {
+    double getY() {
         return y;
     }
 
-    public void setY(double y) {
+    void setY(double y) {
         this.y = y;
     }
 
-    public int getZ() {
+    int getZ() {
         return z;
     }
 
