@@ -1,25 +1,25 @@
 package editor.view.stage;
 
 import board.Board;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.ListChangeListener;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import model.Controller;
 import model.content.Content;
 import model.item.Item;
 import model.location.CurrentLocation;
-import model.location.Location;
 import model.stage.Coordinates;
 import model.stage.CurrentLayer;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 class EditorBoard extends Board {
     private static EditorBoard editorBoard;
@@ -93,7 +93,22 @@ class EditorBoard extends Board {
             iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
                 zPos.set(content.getPos().getZ());
             });
+
+            iv.setOnContextMenuRequested(event -> {
+                MenuItem remove = new MenuItem("Remove");
+                remove.setOnAction(ev -> removeItem(content));
+                ContextMenu menu = new ContextMenu(remove);
+                menu.show(this, event.getScreenX(), event.getScreenY());
+
+                this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+                    menu.hide();
+                });
+            });
         }
+    }
+
+    private void removeItem(Content content) {
+        Controller.get().removeContent(content);
     }
 
     private void bindWidthAndHeight() {

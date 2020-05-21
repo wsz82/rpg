@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -23,7 +24,7 @@ import java.io.File;
 class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
-    private static final EditorBoard EDITOR_BOARD = EditorBoard.get();
+    private static final AnchorPane EDITOR_BOARD = EditorBoard.get();
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
@@ -47,7 +48,9 @@ class MainView {
         scrollPane.setContent(EDITOR_BOARD);
         scrollPane.setPannable(true);
         scrollPane.addEventFilter(MouseEvent.ANY, event -> {
-            if (event.getButton() != MouseButton.MIDDLE) event.consume();
+            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
+                    && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
+                    && event.getButton() != MouseButton.MIDDLE) event.consume();
         });
         borderPane.setTop(topBar);
         borderPane.setCenter(scrollPane);

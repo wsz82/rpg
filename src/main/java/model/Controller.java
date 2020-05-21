@@ -1,6 +1,7 @@
 package model;
 
 import model.asset.AssetsList;
+import model.content.Content;
 import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.location.Location;
@@ -43,6 +44,10 @@ public class Controller {
 
     public Plugin getActivePlugin() {
         return ActivePlugin.get().getActivePlugin();
+    }
+
+    public void removeContent(Content content) {
+        CurrentLocation.get().getContent().remove(content);
     }
 
     public List<LocationSerializable> getLocationsSerializable() {
