@@ -193,6 +193,8 @@ public class Game extends Stage {
     private void initLoadsView() {
         loadsRoot = new StackPane();
         BorderPane borderPane = new BorderPane();
+        borderPane.setMaxWidth(300);
+        borderPane.setMaxHeight(500);
 
         if (loadsView == null) {
             initLoadsListView();
@@ -215,6 +217,8 @@ public class Game extends Stage {
     private void initSavesView() {
         savesRoot = new StackPane();
         BorderPane borderPane = new BorderPane();
+        borderPane.setMaxWidth(300);
+        borderPane.setMaxHeight(500);
 
         if (savesView == null) {
             initSavesListView();
