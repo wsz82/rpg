@@ -1,10 +1,12 @@
 package editor.view.stage;
 
 import board.Board;
+import editor.model.EditorController;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -105,6 +107,12 @@ class EditorBoard extends Board {
                 this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
                     menu.hide();
                 });
+            });
+
+            iv.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    EditorController.get().setActiveImage(iv);
+                }
             });
         }
     }
