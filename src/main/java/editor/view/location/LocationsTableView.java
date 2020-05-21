@@ -42,8 +42,7 @@ public class LocationsTableView extends TableView<Location> {
             if (location.equals(currentLocation)) {
                 CurrentLocation.get().setCurrentName(newValue);
             }
-            nameCol.setVisible(false);
-            nameCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Location, Integer> widthCol = new TableColumn<>("Width");
@@ -58,8 +57,7 @@ public class LocationsTableView extends TableView<Location> {
             if (location.equals(currentLocation)) {
                 CurrentLocation.get().setCurrentWidth(newWidth);
             }
-            widthCol.setVisible(false);
-            widthCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Location, Integer> heightCol = new TableColumn<>("Height");
@@ -74,8 +72,7 @@ public class LocationsTableView extends TableView<Location> {
             if (location.equals(currentLocation)) {
                 CurrentLocation.get().setCurrentHeight(newHeight);
             }
-            heightCol.setVisible(false);
-            heightCol.setVisible(true);
+            refresh();
         });
 
         ObservableList<TableColumn<Location, ?>> columns = this.getColumns();

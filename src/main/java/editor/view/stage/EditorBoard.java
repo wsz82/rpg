@@ -2,10 +2,12 @@ package editor.view.stage;
 
 import board.Board;
 import editor.model.EditorController;
+import editor.view.content.ContentTableView;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Border;
@@ -48,27 +50,33 @@ class EditorBoard extends Board {
             final Rectangle clipMask = new Rectangle();
             final double x = pos.getX();
             final double y = pos.getY();
+            final int z = pos.getZ();
+            final int level = content.getLevel();
 
             clipImageX(iv, clipMask, x);
             clipImageY(iv, clipMask, y);
-            pos.zProperty().addListener((observable, oldValue, newValue) -> {
-                int z = newValue.intValue();
-                int level = content.getLevel();
-                iv.setViewOrder(-(level*1000 + (double) z/1000));
-            });
-            content.levelProperty().addListener((observable, oldValue, newValue) -> {
-                int level = newValue.intValue();
-                int z = content.getPos().getZ();
-                iv.setViewOrder(-(level*1000 + (double) z/1000));
-            });
+            iv.setViewOrder(-(level*1000 + (double) z/1000));
             getChildren().add(iv);
             setLeftAnchor(iv, x);
             setTopAnchor(iv, y);
-
             content.setVisible(CurrentLayer.get().getCurrentLayer().getVisible());
 
+            ContentWithImage cwi = new ContentWithImage(content, iv);
+            boardContents.add(cwi);
+
+            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+                int zNew = newValue.intValue();
+                int levelNew = content.getLevel();
+                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
+            });
+            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+                int levelNew = newValue.intValue();
+                int zNew = content.getPos().getZ();
+                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
+            });
+
             prefWidthProperty().addListener((observable, oldValue, newValue) -> {
-                clipMask.setWidth(newValue.doubleValue() - x);
+                clipMask.setWidth(newValue.doubleValue() - pos.getX());
                 iv.setClip(clipMask);
             });
             pos.xProperty().addListener((observable, oldValue, newValue) -> {
@@ -76,7 +84,7 @@ class EditorBoard extends Board {
                 clipImageX(iv, clipMask, newValue.doubleValue());
             });
             prefHeightProperty().addListener((observable, oldValue, newValue) -> {
-                clipMask.setHeight(newValue.doubleValue() - y);
+                clipMask.setHeight(newValue.doubleValue() - pos.getY());
                 iv.setClip(clipMask);
             });
             pos.yProperty().addListener((observable, oldValue, newValue) -> {
@@ -88,9 +96,6 @@ class EditorBoard extends Board {
             });
 
             iv.visibleProperty().bindBidirectional(content.visibleProperty());
-
-            ContentWithImage contentWithImage = new ContentWithImage(content, iv);
-            boardContents.add(contentWithImage);
 
             iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
                 zPos.set(content.getPos().getZ());
@@ -111,9 +116,45 @@ class EditorBoard extends Board {
 
             iv.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
-                    EditorController.get().setActiveImage(iv);
+                    EditorController.get().getActiveContent().setContentWithImage(cwi);
                 }
             });
+            iv.setOnMouseClicked(e -> {
+                if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    iv.setFocusTraversable(true);
+                    iv.requestFocus();
+                    iv.setOnKeyPressed(ev -> {
+                        ev.consume();
+                        if (ev.getCode() == KeyCode.DOWN
+                                || ev.getCode() == KeyCode.UP
+                                || ev.getCode() == KeyCode.RIGHT
+                                || ev.getCode() == KeyCode.LEFT) {
+                            moveContent(ev.getCode(), content);
+                            ContentTableView.get().refresh();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    void moveContent(KeyCode keyCode, Content content){
+        Coordinates pos = content.getPos();
+        switch (keyCode) {
+            case UP -> {
+                int y = (int) pos.getY();
+                if (y > 0) pos.setY(pos.getY() - 1);
+            }
+            case LEFT -> {
+                int x = (int) pos.getX();
+                if (x > 0) pos.setX(pos.getX() - 1);
+            }
+            case DOWN -> {
+                pos.setY(pos.getY() + 1);
+            }
+            case RIGHT -> {
+                pos.setX(pos.getX() + 1);
+            }
         }
     }
 

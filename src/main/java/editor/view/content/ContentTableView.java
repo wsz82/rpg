@@ -1,5 +1,6 @@
 package editor.view.content;
 
+import editor.view.SafeIntegerStringConverter;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -12,13 +13,20 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import model.content.Content;
 import model.location.CurrentLocation;
-import editor.view.SafeIntegerStringConverter;
 
 import java.util.List;
 
-class ContentTableView extends TableView<Content> {
+public class ContentTableView extends TableView<Content> {
+    private static ContentTableView singleton;
 
-    ContentTableView() {
+    public static ContentTableView get() {
+        if (singleton == null) {
+            singleton = new ContentTableView();
+        }
+        return singleton;
+    }
+
+    private ContentTableView() {
         super();
         initTable();
     }
@@ -45,8 +53,7 @@ class ContentTableView extends TableView<Content> {
         levelCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
             content.setLevel(t.getNewValue());
-            levelCol.setVisible(false);
-            levelCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Content, Boolean> visibilityCol = new TableColumn<>("Visibility");
@@ -70,8 +77,7 @@ class ContentTableView extends TableView<Content> {
         xCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
             content.getPos().setX(t.getNewValue());
-            xCol.setVisible(false);
-            xCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Content, Double> yCol = new TableColumn<>("Y");
@@ -86,8 +92,7 @@ class ContentTableView extends TableView<Content> {
         yCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
             content.getPos().setY(t.getNewValue());
-            yCol.setVisible(false);
-            yCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Content, Integer> zCol = new TableColumn<>("Z");
@@ -102,8 +107,7 @@ class ContentTableView extends TableView<Content> {
         zCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
             content.getPos().setZ(t.getNewValue());
-            zCol.setVisible(false);
-            zCol.setVisible(true);
+            refresh();
         });
         posCol.getColumns().addAll(xCol, yCol, zCol);
 

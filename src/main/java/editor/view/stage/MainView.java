@@ -5,10 +5,12 @@ import editor.view.content.ContentStage;
 import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
+import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -47,11 +49,13 @@ class MainView {
 
         scrollPane.setContent(EDITOR_BOARD);
         scrollPane.setPannable(true);
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
         scrollPane.addEventFilter(MouseEvent.ANY, event -> {
             if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
                     && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
                     && event.getButton() != MouseButton.MIDDLE) event.consume();
         });
+
         borderPane.setTop(topBar);
         borderPane.setCenter(scrollPane);
         borderPane.setBottom(bottomBar);

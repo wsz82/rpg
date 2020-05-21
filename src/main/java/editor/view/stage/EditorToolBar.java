@@ -36,15 +36,13 @@ class EditorToolBar extends ToolBar {
         opacitySlider.setMajorTickUnit(0.3);
         opacitySlider.setBlockIncrement(0.1);
 
-        EditorController.get().activeImageProperty().addListener((observable, oldValue, newValue) -> {
+        EditorController.get().getActiveContent().imageProperty().addListener((observable, oldValue, newValue) -> {
             opacitySlider.setValue(newValue.getOpacity());
         });
 
         opacitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            ImageView iv = EditorController.get().getActiveImage();
-            if (iv != null) {
-                iv.setOpacity(newValue.doubleValue());
-            }
+            ImageView iv = Objects.requireNonNull(EditorController.get().getActiveContent().getImage());
+            iv.setOpacity(newValue.doubleValue());
         });
     }
 

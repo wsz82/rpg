@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.Pointer;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ContextMenu;
@@ -16,7 +17,6 @@ import model.content.Content;
 import model.item.ItemType;
 import model.location.CurrentLocation;
 import model.stage.Coordinates;
-import editor.view.stage.Pointer;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -53,8 +53,7 @@ class AssetsTableView extends AssetsGenericTableView {
             } else {
                 asset.setName(newValue);
             }
-            nameCol.setVisible(false);
-            nameCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Asset, String> pathCol = new TableColumn<>("Path");
@@ -77,8 +76,7 @@ class AssetsTableView extends AssetsGenericTableView {
                     e.printStackTrace();
                 }
             }
-            pathCol.setVisible(false);
-            pathCol.setVisible(true);
+            refresh();
         });
 
         ObservableList<TableColumn<Asset, ?>> columns = getColumns();

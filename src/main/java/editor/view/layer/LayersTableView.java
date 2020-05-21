@@ -1,5 +1,6 @@
 package editor.view.layer;
 
+import editor.view.SafeIntegerStringConverter;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -10,7 +11,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.stage.CurrentLayer;
-import editor.view.SafeIntegerStringConverter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,8 +50,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
             } else {
                 layer.setLevel(t.getOldValue());
             }
-            levelCol.setVisible(false);
-            levelCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Layer, String> nameCol = new TableColumn<>("Name");
@@ -66,8 +65,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
             } else {
                 layer.setName(t.getOldValue());
             }
-            nameCol.setVisible(false);
-            nameCol.setVisible(true);
+            refresh();
         });
 
         TableColumn<Layer, Boolean> visibleCol = new TableColumn<>("Visibility");

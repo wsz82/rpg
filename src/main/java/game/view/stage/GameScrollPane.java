@@ -3,6 +3,7 @@ package game.view.stage;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
@@ -20,9 +21,17 @@ class GameScrollPane extends ScrollPane {
 
         scrollOnEdges();
         setPannable(true);
-        addEventFilter(MouseEvent.ANY, event -> {
-            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
-                    && event.getButton() != MouseButton.MIDDLE) event.consume();
+        addEventFilter(MouseEvent.ANY, e -> {
+            if (!e.getEventType().equals(MouseEvent.MOUSE_MOVED)
+                    && e.getButton() != MouseButton.MIDDLE) e.consume();
+        });
+        setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.DOWN
+                    || e.getCode() == KeyCode.UP
+                    || e.getCode() == KeyCode.RIGHT
+                    || e.getCode() == KeyCode.LEFT) {
+                e.consume();
+            }
         });
     }
 
