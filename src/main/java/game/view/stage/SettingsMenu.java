@@ -64,7 +64,8 @@ class SettingsMenu extends StackPane {
         CheckBox fullScreen = new CheckBox("Full screen");
         fullScreen.setSelected(Game.get().isFullScreen());
         fullScreen.setOnAction(event -> {
-            Game.get().setFullScreen(fullScreen.isSelected());
+            changeFullScreenSetting(fullScreen.isSelected()
+            );
         });
 
         Button back = new Button("Back");
@@ -72,6 +73,14 @@ class SettingsMenu extends StackPane {
 
         settings.getChildren().addAll(fullScreen, back);
         graphicsRoot.getChildren().addAll(settings);
+    }
+
+    private void changeFullScreenSetting(boolean isSelected) {
+        if (isSelected) {
+            Game.get().setFullScreen(true);
+        } else {
+            Game.get().setFullScreen(false);
+        }
     }
 
     void goBackToSettings(){

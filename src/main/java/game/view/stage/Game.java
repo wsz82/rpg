@@ -2,6 +2,7 @@ package game.view.stage;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
+import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -68,7 +69,10 @@ public class Game extends Stage {
         setFullScreen(true);
 
         createMainMenu();
-        initSavesList(Main.getDir());
+        File programDir = Main.getDir();
+        initSavesList(programDir);
+        restoreSettings(programDir);
+
         Scene scene = new Scene(mainMenuRoot);
         setScene(scene);
         show();
@@ -299,5 +303,24 @@ public class Game extends Stage {
         double vvalue = gameRoot.getVvalue();
         GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
         showGame();
+    }
+
+    private void restoreSettings(File programDir) {
+        SettingMemento memento = GameController.get().loadSettings(programDir);
+
+        setFullScreen(memento.isFullScreen());
+    }
+
+    private void storeSettings() {
+        SettingMemento memento = new SettingMemento();
+        memento.setFullScreen(isFullScreen());
+
+        GameController.get().saveSettings(Main.getDir(), memento);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        storeSettings();
     }
 }

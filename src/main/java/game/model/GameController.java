@@ -5,6 +5,8 @@ import game.model.plugin.PluginMemento;
 import game.model.save.SaveCaretaker;
 import game.model.save.SaveMemento;
 import game.model.save.SavesList;
+import game.model.setting.SettingCaretaker;
+import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
 import javafx.collections.ObservableList;
 import model.Controller;
@@ -97,5 +99,15 @@ public class GameController {
         SaveCaretaker sc = new SaveCaretaker(programDir);
         List<String> savesNames = sc.getSavesNames();
         getSavesList().addAll(savesNames);
+    }
+
+    public SettingMemento loadSettings(File programDir) {
+        SettingCaretaker sc = new SettingCaretaker(programDir);
+        return sc.loadMemento();
+    }
+
+    public void saveSettings(File programDir, SettingMemento memento) {
+        SettingCaretaker sc = new SettingCaretaker(programDir);
+        sc.saveMemento(memento);
     }
 }
