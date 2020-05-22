@@ -16,7 +16,7 @@ import model.asset.AssetsList;
 import model.content.Content;
 import model.item.ItemType;
 import model.location.CurrentLocation;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -99,7 +99,7 @@ class AssetsTableView extends AssetsGenericTableView {
         addAsset.setOnAction(event -> addAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
-            Coordinates mark = Pointer.getMark();
+            Coords mark = Pointer.getMark();
             addItemsToStageAndContents(mark);
         });
         contextMenu.getItems().addAll(addAsset, removeAsset, addItemsToStage);
@@ -108,7 +108,7 @@ class AssetsTableView extends AssetsGenericTableView {
         });
     }
 
-    void addItemsToStageAndContents(Coordinates pos) {
+    void addItemsToStageAndContents(Coords pos) {
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
         List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
         CurrentLocation.get().getContent().addAll(contents);

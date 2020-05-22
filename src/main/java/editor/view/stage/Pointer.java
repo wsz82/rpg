@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public class Pointer {
                 int z = EditorBoard.get().getzPos();
                 boolean markerIsNotDrawn = !EditorBoard.get().getChildren().contains(marker);
 
-                mark = new Coordinates(event, z);
+                mark = new Coords(event, z);
                 if (markerIsNotDrawn) {
                     loadMarkerImage();
                     marker.setImage(markerImage);
@@ -31,7 +31,7 @@ public class Pointer {
         }
     };
     private final ImageView marker = new ImageView();
-    private static Coordinates mark;
+    private static Coords mark;
     private static Pointer pointer;
     private static boolean active;
     private Image markerImage;
@@ -65,11 +65,11 @@ public class Pointer {
         EditorBoard.get().getChildren().remove(marker);
     }
 
-    public static Coordinates getMark() {
+    public static Coords getMark() {
         if (mark != null && active) {
             return mark;
         } else {
-            return new Coordinates(0, 0, 0);
+            return new Coords(0, 0, 0);
         }
     }
 }

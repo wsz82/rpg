@@ -1,5 +1,8 @@
 package editor.model;
 
+import editor.model.settings.SettingsCaretaker;
+import editor.model.settings.SettingsMemento;
+
 import java.io.File;
 
 public class EditorController {

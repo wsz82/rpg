@@ -3,7 +3,7 @@ package model.content;
 import javafx.beans.property.*;
 import model.item.Item;
 import model.item.ItemType;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ public class Content {
     private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
-    private final ObjectProperty<Coordinates> pos = new SimpleObjectProperty<>(this, "coords");
+    private final ObjectProperty<Coords> pos = new SimpleObjectProperty<>(this, "coords");
 
     public Content() {}
 
@@ -90,15 +90,15 @@ public class Content {
         item.get().setLevel(level);
     }
 
-    public Coordinates getPos() {
+    public Coords getPos() {
         return pos.get();
     }
 
-    public ObjectProperty<Coordinates> posProperty() {
+    public ObjectProperty<Coords> posProperty() {
         return pos;
     }
 
-    public void setPos(Coordinates pos) {
+    public void setPos(Coords pos) {
         this.pos.set(pos);
         item.get().setPos(pos);
     }

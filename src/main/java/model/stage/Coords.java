@@ -6,18 +6,18 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.input.MouseEvent;
 
-public class Coordinates {
+public class Coords {
     private final DoubleProperty x = new SimpleDoubleProperty();
     private final DoubleProperty y = new SimpleDoubleProperty();
     private final IntegerProperty z = new SimpleIntegerProperty();
 
-    public Coordinates(double x, double y, int z) {
+    public Coords(double x, double y, int z) {
         this.x.set(x);
         this.y.set(y);
         this.z.set(z);
     }
 
-    public Coordinates(MouseEvent event, int z) {
+    public Coords(MouseEvent event, int z) {
         this.x.set(event.getX());
         this.y.set(event.getY());
         this.z.set(z);

@@ -19,7 +19,7 @@ class GameScrollPane extends ScrollPane {
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);
 
-        scrollOnEdges();
+//        scrollOnEdges();
         setPannable(true);
         addEventFilter(MouseEvent.ANY, e -> {
             if (!e.getEventType().equals(MouseEvent.MOUSE_MOVED)

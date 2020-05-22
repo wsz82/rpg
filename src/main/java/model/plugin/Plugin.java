@@ -1,12 +1,12 @@
 package model.plugin;
 
+import editor.view.stage.Main;
 import javafx.stage.FileChooser;
 import model.asset.AssetsList;
+import model.layer.CurrentLayer;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
-import model.stage.CurrentLayer;
-import editor.view.stage.Main;
 
 import java.io.*;
 import java.util.List;
@@ -38,7 +38,7 @@ public class Plugin implements Serializable {
         All all = new All(locations, assets);
         try (
             FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(all);
         } catch (FileNotFoundException e) {
@@ -72,7 +72,7 @@ public class Plugin implements Serializable {
     private void deserializeAll() {
         try (
             FileInputStream fos = new FileInputStream(file);
-            ObjectInputStream oos = new ObjectInputStream(fos);
+            ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             All all = (All) oos.readObject();
             List<AssetSerializable> assets = all.getAssets();

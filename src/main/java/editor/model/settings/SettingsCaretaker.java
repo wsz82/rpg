@@ -1,4 +1,4 @@
-package editor.model;
+package editor.model.settings;
 
 import java.io.*;
 

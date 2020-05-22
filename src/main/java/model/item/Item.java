@@ -1,14 +1,14 @@
 package model.item;
 
 import model.asset.Asset;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 public abstract class Item {
     protected Asset asset;
-    protected Coordinates pos;
+    protected Coords pos;
     protected int level;
 
-    public Item(Asset asset, Coordinates pos, int level) {
+    public Item(Asset asset, Coords pos, int level) {
         this.asset = asset;
         this.pos = pos;
         this.level = level;
@@ -22,11 +22,11 @@ public abstract class Item {
         this.asset = asset;
     }
 
-    public Coordinates getPos() {
+    public Coords getPos() {
         return pos;
     }
 
-    public void setPos(Coordinates pos) {
+    public void setPos(Coords pos) {
         this.pos = pos;
     }
 

@@ -1,11 +1,11 @@
 package model.item;
 
 import model.asset.Asset;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 public class MoveZone extends Item {
 
-    public MoveZone(Asset asset, Coordinates coords, int level) {
+    public MoveZone(Asset asset, Coords coords, int level) {
         super(asset, coords, level);
     }
 }

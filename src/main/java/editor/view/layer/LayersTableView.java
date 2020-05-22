@@ -8,9 +8,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import model.layer.CurrentLayer;
 import model.layer.Layer;
 import model.location.CurrentLocation;
-import model.stage.CurrentLayer;
 
 import java.util.HashSet;
 import java.util.List;

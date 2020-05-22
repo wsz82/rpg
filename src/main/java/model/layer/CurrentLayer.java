@@ -1,10 +1,9 @@
-package model.stage;
+package model.layer;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import model.layer.Layer;
 
 public class CurrentLayer {
     private final ObjectProperty<Layer> currentLayer = new SimpleObjectProperty<>();

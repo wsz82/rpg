@@ -101,4 +101,7 @@ public abstract class Board extends AnchorPane {
         return zPos;
     }
 
+    public List<ContentWithImage> getBoardContents() {
+        return boardContents;
+    }
 }

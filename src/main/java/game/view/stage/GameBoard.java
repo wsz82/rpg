@@ -7,10 +7,10 @@ import javafx.scene.image.WritableImage;
 import model.Controller;
 import model.content.Content;
 import model.item.Item;
+import model.layer.CurrentLayer;
 import model.location.CurrentLocation;
 import model.stage.ContentWithImage;
-import model.stage.Coordinates;
-import model.stage.CurrentLayer;
+import model.stage.Coords;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ class GameBoard extends Board {
     protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
-            final Coordinates pos = content.getPos();
+            final Coords pos = content.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
             final int z = pos.getZ();

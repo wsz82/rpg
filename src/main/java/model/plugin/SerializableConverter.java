@@ -9,7 +9,7 @@ import model.item.*;
 import model.layer.Layer;
 import model.layer.LayersList;
 import model.location.Location;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +66,7 @@ public class SerializableConverter {
         return new ItemSerializable(asset.getName(), pos, level);
     }
 
-    private static CoordinatesSerializable toSerializableCoordinates(Coordinates pos) {
+    private static CoordinatesSerializable toSerializableCoordinates(Coords pos) {
         double x = pos.getX();
         double y = pos.getY();
         int z = pos.getZ();
@@ -129,7 +129,7 @@ public class SerializableConverter {
                 .filter(a -> a.getName().equals(name))
                 .collect(Collectors.toList());
         Asset asset = oneAsset.get(0);
-        Coordinates pos = toCoordinates(i.getPos());
+        Coords pos = toCoordinates(i.getPos());
         int level = i.getLevel();
         switch (asset.getType()) {
             case LANDSCAPE -> output = new Landscape(asset, pos, level);
@@ -141,8 +141,8 @@ public class SerializableConverter {
         return output;
     }
 
-    private static Coordinates toCoordinates(CoordinatesSerializable pos) {
-        return new Coordinates(pos.getX(), pos.getY(), pos.getZ());
+    private static Coords toCoordinates(CoordinatesSerializable pos) {
+        return new Coords(pos.getX(), pos.getY(), pos.getZ());
     }
 
     static List<AssetSerializable> assetsToSerializable(ObservableList<Asset> input) {

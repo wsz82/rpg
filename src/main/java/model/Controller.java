@@ -2,6 +2,7 @@ package model;
 
 import model.asset.AssetsList;
 import model.content.Content;
+import model.layer.CurrentLayer;
 import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.location.Location;
@@ -10,7 +11,6 @@ import model.plugin.ActivePlugin;
 import model.plugin.LocationSerializable;
 import model.plugin.Plugin;
 import model.plugin.SerializableConverter;
-import model.stage.CurrentLayer;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import model.stage.Coordinates;
+import model.stage.Coords;
 
 class CoordinatesBox extends HBox {
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
@@ -14,10 +14,10 @@ class CoordinatesBox extends HBox {
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                 int z = EditorBoard.get().getzPos();
-                Coordinates coordinates = new Coordinates(event, z);
-                mouseX.setText("X: " + coordinates.getX());
-                mouseY.setText("Y: " + coordinates.getY());
-                mouseZ.setText("Z: " + coordinates.getZ());
+                Coords coords = new Coords(event, z);
+                mouseX.setText("X: " + coords.getX());
+                mouseY.setText("Y: " + coords.getY());
+                mouseZ.setText("Z: " + coords.getZ());
             }
         }
     };

@@ -48,8 +48,8 @@ class SettingsMenu extends StackPane {
     }
 
     private void openGraphicsSettings() {
-        Game.get().removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
-        Game.get().addEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
+        GameMenu.get().removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        GameMenu.get().addEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
         if (graphicsRoot == null) {
             initGraphicsSettings();
         }
@@ -62,7 +62,7 @@ class SettingsMenu extends StackPane {
         VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
         CheckBox fullScreen = new CheckBox("Full screen");
-        fullScreen.setSelected(Game.get().isFullScreen());
+        fullScreen.setSelected(GameMenu.get().isFullScreen());
         fullScreen.setOnAction(event -> {
             changeFullScreenSetting(fullScreen.isSelected()
             );
@@ -76,21 +76,17 @@ class SettingsMenu extends StackPane {
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
-        if (isSelected) {
-            Game.get().setFullScreen(true);
-        } else {
-            Game.get().setFullScreen(false);
-        }
+        GameMenu.get().setFullScreen(isSelected);
     }
 
     void goBackToSettings(){
-        Game.get().removeEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
-        Game.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        GameMenu.get().removeEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
+        GameMenu.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
         scene.setRoot(this);
     }
 
     void open(Scene scene, EventHandler<KeyEvent> menuReturn){
-        Game.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        GameMenu.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
         this.scene = scene;
         this.menuReturn = menuReturn;
         scene.setRoot(this);

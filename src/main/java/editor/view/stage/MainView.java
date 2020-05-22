@@ -1,7 +1,7 @@
 package editor.view.stage;
 
 import editor.model.EditorController;
-import editor.model.SettingsMemento;
+import editor.model.settings.SettingsMemento;
 import editor.view.asset.AssetsStage;
 import editor.view.content.ContentStage;
 import editor.view.layer.LayersStage;

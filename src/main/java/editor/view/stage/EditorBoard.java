@@ -14,9 +14,9 @@ import javafx.scene.input.MouseEvent;
 import model.Controller;
 import model.content.Content;
 import model.item.Item;
+import model.layer.CurrentLayer;
 import model.stage.ContentWithImage;
-import model.stage.Coordinates;
-import model.stage.CurrentLayer;
+import model.stage.Coords;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ class EditorBoard extends Board {
     protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
-            final Coordinates pos = content.getPos();
+            final Coords pos = content.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
             final int z = pos.getZ();
@@ -132,7 +132,7 @@ class EditorBoard extends Board {
     }
 
     void moveContent(KeyCode keyCode, Content content){
-        Coordinates pos = content.getPos();
+        Coords pos = content.getPos();
         switch (keyCode) {
             case UP -> {
                 int y = (int) pos.getY();

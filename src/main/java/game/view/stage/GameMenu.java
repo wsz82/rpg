@@ -22,7 +22,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 
-public class Game extends Stage {
+public class GameMenu extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
     private final EventHandler<KeyEvent> gameMenuReturn = event -> {
         event.consume();
@@ -50,16 +50,16 @@ public class Game extends Stage {
     private final Button cancel = new Button("Cancel");
     private ListView<String> savesView;
     private ListView<String> loadsView;
-    private static Game game;
+    private static GameMenu singleton;
 
-    public static Game get() {
-        if (game == null) {
-            game = new Game();
+    public static GameMenu get() {
+        if (singleton == null) {
+            singleton = new GameMenu();
         }
-        return game;
+        return singleton;
     }
 
-    private Game(){
+    private GameMenu(){
         super(StageStyle.UNDECORATED);
         setFullScreenExitHint("");
         setFullScreenExitKeyCombination(
@@ -128,7 +128,7 @@ public class Game extends Stage {
     }
 
     private void leaveGame() {
-        //TODO save
+        //TODO ask for save
         close();
     }
 
