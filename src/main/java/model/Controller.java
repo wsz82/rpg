@@ -46,6 +46,10 @@ public class Controller {
         return ActivePlugin.get().getActivePlugin();
     }
 
+    public CurrentLocation getCurrentLocation() {
+        return CurrentLocation.get();
+    }
+
     public void removeContent(Content content) {
         CurrentLocation.get().getContent().remove(content);
     }

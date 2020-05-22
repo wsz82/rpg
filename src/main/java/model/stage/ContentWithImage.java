@@ -1,4 +1,4 @@
-package editor.view.stage;
+package model.stage;
 
 import javafx.scene.image.ImageView;
 import model.content.Content;

@@ -1,10 +1,10 @@
 package editor.model;
 
-import editor.view.stage.ContentWithImage;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.ImageView;
 import model.content.Content;
+import model.stage.ContentWithImage;
 
 public class ActiveContent {
     private final ObjectProperty<ContentWithImage> ciw = new SimpleObjectProperty<>();

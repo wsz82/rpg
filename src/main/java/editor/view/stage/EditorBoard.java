@@ -7,19 +7,14 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import model.Controller;
 import model.content.Content;
 import model.item.Item;
-import model.location.CurrentLocation;
+import model.stage.ContentWithImage;
 import model.stage.Coordinates;
 import model.stage.CurrentLayer;
 
@@ -36,25 +31,22 @@ class EditorBoard extends Board {
     }
 
     private EditorBoard() {
-        bindWidthAndHeight();
-        setBorder(getDefinedBorder());
     }
 
     @Override
     protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
-            final Image image = item.getAsset().getImage();
-            final ImageView iv = new ImageView(image);
             final Coordinates pos = content.getPos();
-            final Rectangle clipMask = new Rectangle();
             final double x = pos.getX();
             final double y = pos.getY();
             final int z = pos.getZ();
             final int level = content.getLevel();
+            final Image originImage = item.getAsset().getImage();
+            final Image resizedImage = new WritableImage(
+                    originImage.getPixelReader(), (int) (getWidth() - x), (int) (getHeight() - y));
+            final ImageView iv = new ImageView(resizedImage);
 
-            clipImageX(iv, clipMask, x);
-            clipImageY(iv, clipMask, y);
             iv.setViewOrder(-(level*1000 + (double) z/1000));
             getChildren().add(iv);
             setLeftAnchor(iv, x);
@@ -76,23 +68,24 @@ class EditorBoard extends Board {
             });
 
             prefWidthProperty().addListener((observable, oldValue, newValue) -> {
-                clipMask.setWidth(newValue.doubleValue() - pos.getX());
-                iv.setClip(clipMask);
-            });
-            pos.xProperty().addListener((observable, oldValue, newValue) -> {
-                setLeftAnchor(iv, newValue.doubleValue());
-                clipImageX(iv, clipMask, newValue.doubleValue());
+                resizeImageWithChangedBoard(cwi, item.getAsset().getImage(), newValue.doubleValue(), getHeight());
             });
             prefHeightProperty().addListener((observable, oldValue, newValue) -> {
-                clipMask.setHeight(newValue.doubleValue() - pos.getY());
-                iv.setClip(clipMask);
+                resizeImageWithChangedBoard(cwi, item.getAsset().getImage(), getWidth(), newValue.doubleValue());
+            });
+            pos.xProperty().addListener((observable, oldValue, newValue) -> {
+                resizeRelocatedImage(cwi, item.getAsset().getImage(), newValue.doubleValue(), pos.getY());
+                setLeftAnchor(iv, newValue.doubleValue());
             });
             pos.yProperty().addListener((observable, oldValue, newValue) -> {
+                resizeRelocatedImage(cwi, item.getAsset().getImage(), pos.getX(), newValue.doubleValue());
                 setTopAnchor(iv, newValue.doubleValue());
-                clipImageY(iv, clipMask, newValue.doubleValue());
             });
             item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
-                iv.setImage(item.getAsset().getImage());
+                final Image changedImage = new WritableImage(
+                        item.getAsset().getImage().getPixelReader(),
+                        (int) (getWidth() - pos.getX()), (int) (getHeight() - pos.getY()));
+                iv.setImage(changedImage);
             });
 
             iv.visibleProperty().bindBidirectional(content.visibleProperty());
@@ -164,18 +157,5 @@ class EditorBoard extends Board {
 
     private void removeItem(Content content) {
         Controller.get().removeContent(content);
-    }
-
-    private void bindWidthAndHeight() {
-        prefWidthProperty().bindBidirectional(
-                CurrentLocation.get().currentWidthProperty());
-        prefHeightProperty().bindBidirectional(
-                CurrentLocation.get().currentHeightProperty());
-    }
-
-    private Border getDefinedBorder() {
-        BorderStroke[] strokes = new BorderStroke[]{
-                new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)};
-        return new Border(strokes);
     }
 }

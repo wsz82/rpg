@@ -1,5 +1,7 @@
 package editor.view.stage;
 
+import editor.model.EditorController;
+import editor.model.SettingsMemento;
 import editor.view.asset.AssetsStage;
 import editor.view.content.ContentStage;
 import editor.view.layer.LayersStage;
@@ -86,12 +88,11 @@ class MainView {
                 contentsWindow.getX(), contentsWindow.getY(), contentsWindow.getWidth(), contentsWindow.getHeight(),
                 locationsWindow.getX(), locationsWindow.getY(), locationsWindow.getWidth(), locationsWindow.getHeight()
         );
-        memento.saveMemento(programDir);
+        EditorController.get().storeSettings(programDir, memento);
     }
 
     private void restoreSettings(File programDir) {
-        SettingsMemento memento = new SettingsMemento();
-        memento = memento.loadMemento(programDir);
+        SettingsMemento memento = EditorController.get().restoreSettings(programDir);
         stage.setX(memento.getStageX());
         stage.setY(memento.getStageY());
         stage.setWidth(memento.getStageWidth());

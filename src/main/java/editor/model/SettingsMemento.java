@@ -1,10 +1,8 @@
-package editor.view.stage;
+package editor.model;
 
-import java.io.*;
+import java.io.Serializable;
 
-class SettingsMemento implements Serializable{
-    private static final String FILE_NAME = "settings";
-
+public class SettingsMemento implements Serializable {
     private double stageX;
     private double stageY;
     private double stageWidth;
@@ -30,9 +28,9 @@ class SettingsMemento implements Serializable{
     private double locationsWidth;
     private double locationsHeight;
 
-    SettingsMemento(){};
+    public SettingsMemento(){}
 
-    SettingsMemento(double stageX, double stageY, double stageWidth, double stageHeight,
+    public SettingsMemento(double stageX, double stageY, double stageWidth, double stageHeight,
                     double layersX, double layersY, double layersWidth, double layersHeight,
                     double assetsX, double assetsY, double assetsWidth, double assetsHeight,
                     double contentsX, double contentsY, double contentsWidth, double contentsHeight,
@@ -57,44 +55,6 @@ class SettingsMemento implements Serializable{
         this.locationsY = locationsY;
         this.locationsWidth = locationsWidth;
         this.locationsHeight = locationsHeight;
-    }
-
-    void saveMemento(File programDir) {
-        try (
-                ObjectOutputStream os = new ObjectOutputStream(
-                        new FileOutputStream(programDir + File.separator + FILE_NAME))
-        ) {
-            os.writeObject(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    SettingsMemento loadMemento (File programDir) {
-        boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
-
-        if (!mementoExists) {
-            return new SettingsMemento(
-                    0, 0, 800, 600,
-                    0, 600, 300, 300,
-                    800, 600, 400, 300,
-                    300, 600, 500, 300,
-                    800, 0, 400,600
-            );
-        }
-        SettingsMemento memento = new SettingsMemento();
-        try (
-                ObjectInputStream os = new ObjectInputStream(
-                        new FileInputStream(programDir + File.separator + FILE_NAME))
-        ) {
-            memento = (SettingsMemento) os.readObject();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return memento;
     }
 
     public double getStageX() {

@@ -1,15 +1,17 @@
 package board;
 
-import editor.view.stage.ContentWithImage;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.Rectangle;
+import model.Controller;
 import model.content.Content;
 import model.location.CurrentLocation;
 import model.location.Location;
+import model.stage.ContentWithImage;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +42,7 @@ public abstract class Board extends AnchorPane {
 
     protected Board(){
         bindWithLocationAndContentChange();
+        bindWidthAndHeight();
     }
 
     protected abstract void addContentsToStage(List<Content> contents);
@@ -63,14 +66,31 @@ public abstract class Board extends AnchorPane {
         addContentsToStage(contents);
     }
 
-    protected void clipImageX(ImageView iv, Rectangle clipMask, double x) {
-        clipMask.setWidth(CurrentLocation.get().getCurrentWidth() - x);
-        iv.setClip(clipMask);
+    protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
+        resizeImage(cwi, origin, (int) width, (int) height);
     }
 
-    protected void clipImageY(ImageView iv, Rectangle clipMask, double y) {
-        clipMask.setHeight(CurrentLocation.get().getCurrentHeight() - y);
-        iv.setClip(clipMask);
+    protected void resizeRelocatedImage(ContentWithImage cwi, Image origin, double x, double y) {
+        int width = (int) (getWidth() - x);
+        int height = (int) (getHeight() - y);
+        resizeImage(cwi, origin, width, height);
+    }
+
+    private void resizeImage(ContentWithImage cwi, Image origin, int width, int height) {
+        if (width < 1 || height < 1) {
+            Controller.get().removeContent(cwi.getContent());
+            return;
+        }
+        Image wi = new WritableImage(
+                origin.getPixelReader(), width, height);
+        cwi.getImageView().setImage(wi);
+    }
+
+    private void bindWidthAndHeight() {
+        prefWidthProperty().bindBidirectional(
+                CurrentLocation.get().currentWidthProperty());
+        prefHeightProperty().bindBidirectional(
+                CurrentLocation.get().currentHeightProperty());
     }
 
     public int getzPos() {
@@ -80,4 +100,5 @@ public abstract class Board extends AnchorPane {
     public IntegerProperty zPosProperty() {
         return zPos;
     }
+
 }

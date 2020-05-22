@@ -36,7 +36,7 @@ public class Game extends Stage {
             showMainMenu();
         }
     };
-    private EventHandler<KeyEvent> gameReturn = event -> {
+    private final EventHandler<KeyEvent> gameReturn = event -> {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
             showGame();
@@ -258,9 +258,9 @@ public class Game extends Stage {
         if (gameRoot == null) {
             initGameBoard();
         }
-        getScene().setRoot(gameRoot);
         removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
         addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
+        getScene().setRoot(gameRoot);
     }
 
     private void createNewSave() {
