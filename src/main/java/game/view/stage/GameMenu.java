@@ -39,11 +39,11 @@ public class GameMenu extends Stage {
     private final EventHandler<KeyEvent> gameReturn = event -> {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
-            showGame();
+            startGame(null);    //TODO return to game
         }
     };
     private StackPane gameMenuRoot;
-    private ScrollPane gameRoot;
+    private ScrollPane gameEnvironment;
     private StackPane mainMenuRoot;
     private StackPane savesRoot;
     private StackPane loadsRoot;
@@ -61,21 +61,6 @@ public class GameMenu extends Stage {
 
     private GameMenu(){
         super(StageStyle.UNDECORATED);
-        setFullScreenExitHint("");
-        setFullScreenExitKeyCombination(
-                CLOSE_GAME);
-        setWidth(800);
-        setHeight(600);
-        setFullScreen(true);
-
-        createMainMenu();
-        File programDir = Main.getDir();
-        initSavesList(programDir);
-        restoreSettings(programDir);
-
-        Scene scene = new Scene(mainMenuRoot);
-        setScene(scene);
-        show();
     }
 
     private void showMainMenu() {
@@ -113,18 +98,18 @@ public class GameMenu extends Stage {
     }
 
     private void startNewGame() {
-        GameController.get().restorePlugin();
-        showGame();
+        GameController.get().restoreLastPlugin();
+        startGame(null);
     }
 
-    private void initGameBoard() {
+    private void initGameEnvironment() {
         StackPane stackPane = new StackPane();
-        gameRoot = new GameScrollPane(stackPane);
-        BorderPane gameEnvelope = new GameEnvelope();
+        gameEnvironment = new GameScrollPane(stackPane);
+        BorderPane gameFrame = new GameFrame();
 
-        GameBoard gameBoard = GameBoard.get();
-        gameEnvelope.setCenter(gameBoard);
-        stackPane.getChildren().addAll(gameEnvelope);
+        GameBoard gameBoard = new GameBoard();
+        gameFrame.setCenter(gameBoard);
+        stackPane.getChildren().addAll(gameFrame);
     }
 
     private void leaveGame() {
@@ -147,7 +132,7 @@ public class GameMenu extends Stage {
         menu.setAlignment(Pos.CENTER);
         Button resume = new Button("Resume");
         resume.setOnAction(event -> {
-            showGame();
+            startGame(null);
         });
         Button saveMenu = new Button("Save game");
         saveMenu.setOnAction(event -> {
@@ -254,13 +239,13 @@ public class GameMenu extends Stage {
         saveGame(true, name);
     }
 
-    private void showGame() {
-        if (gameRoot == null) {
-            initGameBoard();
+    private void startGame(SaveMemento memento) {
+        if (gameEnvironment == null) {
+            initGameEnvironment();
         }
-        removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
-        addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
-        getScene().setRoot(gameRoot);
+        setRootToGame();
+
+        GameController.get().startGame(memento);
     }
 
     private void createNewSave() {
@@ -288,9 +273,9 @@ public class GameMenu extends Stage {
     private void loadSave() {
         String name = loadsView.getSelectionModel().getSelectedItem();
         SaveMemento memento = GameController.get().loadGameSave(name, Main.getDir());
-        showGame();
-        gameRoot.setHvalue(memento.gethValue());
-        gameRoot.setVvalue(memento.getvValue());
+        startGame(memento);
+        gameEnvironment.setHvalue(memento.gethValue());
+        gameEnvironment.setVvalue(memento.getvValue());
     }
 
     private void deleteSave() {
@@ -299,10 +284,17 @@ public class GameMenu extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        double hvalue = gameRoot.getHvalue();
-        double vvalue = gameRoot.getVvalue();
+        double hvalue = gameEnvironment.getHvalue();
+        double vvalue = gameEnvironment.getVvalue();
         GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
-        showGame();
+
+        setRootToGame();
+    }
+
+    private void setRootToGame() {
+        removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
+        addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
+        getScene().setRoot(gameEnvironment);
     }
 
     private void restoreSettings(File programDir) {
@@ -316,6 +308,24 @@ public class GameMenu extends Stage {
         memento.setFullScreen(isFullScreen());
 
         GameController.get().saveSettings(Main.getDir(), memento);
+    }
+
+    public void open() {
+        setFullScreenExitHint("");
+        setFullScreenExitKeyCombination(
+                CLOSE_GAME);
+        setWidth(800);
+        setHeight(600);
+        setFullScreen(true);
+
+        createMainMenu();
+        File programDir = Main.getDir();
+        initSavesList(programDir);
+        restoreSettings(programDir);
+
+        Scene scene = new Scene(mainMenuRoot);
+        setScene(scene);
+        show();
     }
 
     @Override

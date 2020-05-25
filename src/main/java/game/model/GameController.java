@@ -1,13 +1,14 @@
 package game.model;
 
-import game.model.plugin.PluginCaretaker;
-import game.model.plugin.PluginMemento;
+import game.model.plugin.LastPluginCaretaker;
 import game.model.save.SaveCaretaker;
 import game.model.save.SaveMemento;
 import game.model.save.SavesList;
 import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
+import game.model.world.World;
 import game.view.launcher.Main;
+import game.view.stage.GameBoard;
 import javafx.collections.ObservableList;
 import model.Controller;
 import model.asset.AssetsList;
@@ -32,33 +33,28 @@ public class GameController {
 
     private GameController(){}
 
-    public void restorePlugin() {
-        PluginCaretaker caretaker = new PluginCaretaker();
-        PluginMemento memento = caretaker.loadMemento(Main.getDir());
-        Plugin plugin = memento.getPlugin();
-        if (plugin != null) {
+    public void startGame(SaveMemento memento) {
+        World world = new World();
+        world.startGame(memento);
+    }
+
+    public void restoreLastPlugin() {
+        LastPluginCaretaker caretaker = new LastPluginCaretaker();
+        Plugin plugin = caretaker.loadMemento(Main.getDir());
+        if (plugin.getLocations() != null) {
             Controller.get().setActivePlugin(plugin);
         }
     }
 
-    public void storePlugin(Plugin plugin) {
-        PluginMemento memento = new PluginMemento(plugin);
-        PluginCaretaker caretaker = new PluginCaretaker();
-        caretaker.saveMemento(Main.getDir(), memento);
+    public void storeLastPlugin(Plugin plugin) {
+        LastPluginCaretaker caretaker = new LastPluginCaretaker();
+        caretaker.saveMemento(Main.getDir(), plugin);
     }
 
 
     public SaveMemento loadGameSave(String name, File programDir) {
         SaveCaretaker sc = new SaveCaretaker(programDir);
-        SaveMemento memento = sc.loadMemento(name);
-
-        LocationsList.get().clear();
-        LocationsList.get().setAll(
-                SerializableConverter.toLocationObjects(
-                        memento.getLocations(), AssetsList.get()));
-        Location first = LocationsList.get().get(0);       //TODO later change to Player current location
-        CurrentLocation.get().setLocation(first);
-        return memento;
+        return sc.loadMemento(name);
     }
 
     public void deleteGameSave(String name, File programDir) {
@@ -109,5 +105,20 @@ public class GameController {
     public void saveSettings(File programDir, SettingMemento memento) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
         sc.saveMemento(memento);
+    }
+
+    public void loadSaveToLists(SaveMemento memento) {
+        LocationsList.get().clear();
+
+        LocationsList.get().setAll(
+                SerializableConverter.toLocationObjects(
+                        memento.getLocations(), AssetsList.get()));
+
+        Location first = LocationsList.get().get(0);       //TODO change to Player current location
+        CurrentLocation.get().setLocation(first);
+    }
+
+    public GameBoard getBoard() {
+        return GameBoard.get();
     }
 }

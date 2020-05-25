@@ -17,11 +17,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import model.Controller;
 import model.plugin.ActivePlugin;
-import model.plugin.Plugin;
 
 import java.io.File;
 
@@ -44,7 +44,7 @@ class MainView {
         locationsWindow = new LocationsStage(stage);
     }
 
-    void show(File programDir) {
+    void show() {
         BorderPane borderPane = new BorderPane();
         VBox topBar = new VBox();
         VBox bottomBar = new VBox();
@@ -68,9 +68,9 @@ class MainView {
         Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         stage.setScene(scene);
 
-        restoreSettings(programDir);
+        restoreSettings(Main.getDir());
         stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
-            storeSettings(programDir);
+            storeSettings(Main.getDir());
         });
 
         stage.show();
@@ -172,22 +172,36 @@ class MainView {
     }
 
     private void loadFile() {
-        Plugin plugin = new Plugin();
-        plugin.load();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose plugin");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
+        File loadedFile = fileChooser.showOpenDialog(Main.getStage());
+
+        if (loadedFile == null) {
+            return;
+        }
+        Controller.get().loadAndRestorePlugin(loadedFile);
     }
 
     private void saveAsFile() {
-        Plugin plugin = new Plugin();
-        plugin.saveAs();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save plugin");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
+        );
+        File saveFile = fileChooser.showSaveDialog(Main.getStage());
+        if (saveFile == null) {
+            return;
+        }
+        EditorController.get().savePluginAs(saveFile);
     }
 
     private void saveFile() {
-        Plugin plugin = new Plugin();
         if (ActivePlugin.get().getActivePlugin() != null) {
-            plugin = ActivePlugin.get().getActivePlugin();
-            plugin.save();
+            EditorController.get().saveActivePlugin();
         } else {
-            plugin.saveAs();
+            saveAsFile();
         }
     }
 

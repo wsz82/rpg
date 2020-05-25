@@ -1,7 +1,6 @@
 package model.plugin;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import model.asset.Asset;
 import model.content.Content;
 import model.content.ContentList;
@@ -12,11 +11,23 @@ import model.location.Location;
 import model.stage.Coords;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class SerializableConverter {
+
+    public static PluginSerializable toPluginSerializable(Plugin plugin) {
+        List<LocationSerializable> locations = locationsToSerializable(plugin.getLocations());
+        List<AssetSerializable> assets = assetsToSerializable(plugin.getAssets());
+        return new PluginSerializable(locations, assets);
+    }
+
+    public static Plugin toPlugin(PluginSerializable ps) {
+        List<Asset> assets = toAssetObjects(ps.getAssets());
+        List<Location> locations = toLocationObjects(ps.getLocations(), assets);
+        return new Plugin(ps.getFile(), locations, assets);
+    }
 
     public static List<LocationSerializable> locationsToSerializable(List<Location> input) {
         List<LocationSerializable> output = new ArrayList<>(0);
@@ -107,6 +118,9 @@ public class SerializableConverter {
     }
 
     private static List<Content> toContents(List<ContentSerializable> input, List<Asset> assets) {
+        if (assets.isEmpty()) {
+            throw new NoSuchElementException("Assets list is empty");
+        }
         List<Content> output = FXCollections.observableArrayList();
         for (ContentSerializable cs : input) {
             Content content = new Content();
@@ -145,7 +159,7 @@ public class SerializableConverter {
         return new Coords(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    static List<AssetSerializable> assetsToSerializable(ObservableList<Asset> input) {
+    public static List<AssetSerializable> assetsToSerializable(List<Asset> input) {
         List<AssetSerializable> output = new ArrayList<>(0);
         for (Asset asset : input) {
             AssetSerializable as = toSerializableAsset(asset);
@@ -161,7 +175,7 @@ public class SerializableConverter {
         return new AssetSerializable(name, type, path);
     }
 
-    static Collection<Asset> toAssetObjects(List<AssetSerializable> input) {
+    static List<Asset> toAssetObjects(List<AssetSerializable> input) {
         List<Asset> output = FXCollections.observableArrayList();
         for (AssetSerializable as : input) {
             Asset asset = new Asset();

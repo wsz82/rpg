@@ -45,8 +45,6 @@ public abstract class Board extends AnchorPane {
         bindWidthAndHeight();
     }
 
-    protected abstract void addContentsToStage(List<Content> contents);
-
     private void bindWithLocationAndContentChange() {
         CurrentLocation.get().getContent().addListener(locationContentListener);
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
@@ -57,23 +55,13 @@ public abstract class Board extends AnchorPane {
     }
 
     private void clearBoardAndInflateWithNewLocation(Location newValue) {
-        for (ContentWithImage contentWithImage : boardContents) {
-            ImageView iv = contentWithImage.getImageView();
+        for (ContentWithImage cwi : boardContents) {
+            ImageView iv = cwi.getImageView();
             getChildren().remove(iv);
         }
         boardContents.clear();
         List<Content> contents = newValue.getContents().get();
         addContentsToStage(contents);
-    }
-
-    protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
-        resizeImage(cwi, origin, (int) width, (int) height);
-    }
-
-    protected void resizeRelocatedImage(ContentWithImage cwi, Image origin, double x, double y) {
-        int width = (int) (getWidth() - x);
-        int height = (int) (getHeight() - y);
-        resizeImage(cwi, origin, width, height);
     }
 
     private void resizeImage(ContentWithImage cwi, Image origin, int width, int height) {
@@ -87,10 +75,22 @@ public abstract class Board extends AnchorPane {
     }
 
     private void bindWidthAndHeight() {
-        prefWidthProperty().bindBidirectional(
+        prefWidthProperty().bind(
                 CurrentLocation.get().currentWidthProperty());
-        prefHeightProperty().bindBidirectional(
+        prefHeightProperty().bind(
                 CurrentLocation.get().currentHeightProperty());
+    }
+
+    protected abstract void addContentsToStage(List<Content> contents);
+
+    protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
+        resizeImage(cwi, origin, (int) width, (int) height);
+    }
+
+    protected void resizeRelocatedImage(ContentWithImage cwi, Image origin, double x, double y) {
+        int width = (int) (getWidth() - x);
+        int height = (int) (getHeight() - y);
+        resizeImage(cwi, origin, width, height);
     }
 
     public int getzPos() {

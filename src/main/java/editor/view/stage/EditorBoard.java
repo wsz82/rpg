@@ -35,6 +35,11 @@ class EditorBoard extends Board {
 
     @Override
     protected void addContentsToStage(List<Content> contents) {
+        if (getWidth() != Controller.get().getCurrentLocation().getCurrentWidth()
+                || getHeight() != Controller.get().getCurrentLocation().getCurrentHeight()) {
+            setWidth(Controller.get().getCurrentLocation().getCurrentWidth());
+            setHeight(Controller.get().getCurrentLocation().getCurrentHeight());
+        }
         for (Content content : contents) {
             final Item item = content.getItem();
             final Coords pos = content.getPos();
@@ -42,9 +47,11 @@ class EditorBoard extends Board {
             final double y = pos.getY();
             final int z = pos.getZ();
             final int level = content.getLevel();
+            final int width = Controller.get().getCurrentLocation().getCurrentWidth();
+            final int height = Controller.get().getCurrentLocation().getCurrentHeight();
             final Image originImage = item.getAsset().getImage();
             final Image resizedImage = new WritableImage(
-                    originImage.getPixelReader(), (int) (getWidth() - x), (int) (getHeight() - y));
+                    originImage.getPixelReader(), width - (int) x, height - (int) y);
             final ImageView iv = new ImageView(resizedImage);
 
             iv.setViewOrder(-(level*1000 + (double) z/1000));
@@ -55,17 +62,6 @@ class EditorBoard extends Board {
 
             ContentWithImage cwi = new ContentWithImage(content, iv);
             boardContents.add(cwi);
-
-            pos.zProperty().addListener((observable, oldValue, newValue) -> {
-                int zNew = newValue.intValue();
-                int levelNew = content.getLevel();
-                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
-            });
-            content.levelProperty().addListener((observable, oldValue, newValue) -> {
-                int levelNew = newValue.intValue();
-                int zNew = content.getPos().getZ();
-                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
-            });
 
             prefWidthProperty().addListener((observable, oldValue, newValue) -> {
                 resizeImageWithChangedBoard(cwi, item.getAsset().getImage(), newValue.doubleValue(), getHeight());
@@ -81,6 +77,17 @@ class EditorBoard extends Board {
                 resizeRelocatedImage(cwi, item.getAsset().getImage(), pos.getX(), newValue.doubleValue());
                 setTopAnchor(iv, newValue.doubleValue());
             });
+            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+                int zNew = newValue.intValue();
+                int levelNew = content.getLevel();
+                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
+            });
+            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+                int levelNew = newValue.intValue();
+                int zNew = content.getPos().getZ();
+                iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
+            });
+
             item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
                 final Image changedImage = new WritableImage(
                         item.getAsset().getImage().getPixelReader(),

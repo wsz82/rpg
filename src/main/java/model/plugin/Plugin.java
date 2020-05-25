@@ -1,90 +1,45 @@
 package model.plugin;
 
-import editor.view.stage.Main;
-import javafx.stage.FileChooser;
-import model.asset.AssetsList;
-import model.layer.CurrentLayer;
-import model.location.CurrentLocation;
+import model.asset.Asset;
 import model.location.Location;
-import model.location.LocationsList;
 
-import java.io.*;
+import java.io.File;
 import java.util.List;
 
-public class Plugin implements Serializable {
+public class Plugin {
     private File file;
+    private List<Location> locations;
+    private List<Asset> assets;
 
-    public Plugin() {
+    public Plugin(){}
+
+    public Plugin(File file, List<Location> locations, List<Asset> assets) {
+        this.file = file;
+        this.locations = locations;
+        this.assets = assets;
     }
 
-    public void save() {
-        serializeAll();
+    public File getFile() {
+        return file;
     }
 
-    public void saveAs() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save plugin");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
-        );
-        file = fileChooser.showSaveDialog(Main.getStage());
-        serializeAll();
-        ActivePlugin.get().setActivePlugin(this);
+    public void setFile(File file) {
+        this.file = file;
     }
 
-    private void serializeAll() {
-        List<LocationSerializable> locations = SerializableConverter.locationsToSerializable(LocationsList.get());
-        List<AssetSerializable> assets = SerializableConverter.assetsToSerializable(AssetsList.get());
-        All all = new All(locations, assets);
-        try (
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(all);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public List<Location> getLocations() {
+        return locations;
     }
 
-    public void load() {
-        if (file == null) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose plugin");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
-            );
-            file = fileChooser.showOpenDialog(Main.getStage());
-        }
-        if (file == null) {
-            return;
-        }
-        LocationsList.get().clear();
-        AssetsList.get().clear();
-        deserializeAll();
-        Location first = LocationsList.get().get(0);
-        CurrentLocation.get().setLocation(first);
-        CurrentLayer.get().setCurrentLayer(first.getLayers().get().get(0));
-        ActivePlugin.get().setActivePlugin(this);
+    public void setLocations(List<Location> locations) {
+        this.locations = locations;
     }
 
-    private void deserializeAll() {
-        try (
-            FileInputStream fos = new FileInputStream(file);
-            ObjectInputStream oos = new ObjectInputStream(fos)
-        ){
-            All all = (All) oos.readObject();
-            List<AssetSerializable> assets = all.getAssets();
-            AssetsList.get().setAll(SerializableConverter.toAssetObjects(assets));
-            List<LocationSerializable> locations = all.getLocations();
-            LocationsList.get().setAll(SerializableConverter.toLocationObjects(locations, AssetsList.get()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public List<Asset> getAssets() {
+        return assets;
+    }
+
+    public void setAssets(List<Asset> assets) {
+        this.assets = assets;
     }
 }

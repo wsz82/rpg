@@ -2,9 +2,9 @@ package game.view.stage;
 
 import javafx.scene.layout.BorderPane;
 
-class GameEnvelope extends BorderPane {
+class GameFrame extends BorderPane {
 
-    GameEnvelope() {
+    GameFrame() {
         initBoard();
     }
 

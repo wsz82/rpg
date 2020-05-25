@@ -7,11 +7,9 @@ import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
-import model.plugin.ActivePlugin;
-import model.plugin.LocationSerializable;
-import model.plugin.Plugin;
-import model.plugin.SerializableConverter;
+import model.plugin.*;
 
+import java.io.File;
 import java.util.List;
 
 public class Controller {
@@ -37,24 +35,48 @@ public class Controller {
         AssetsList.get().clear();
     }
 
+    public void loadAndRestorePlugin(File pluginDir) {
+        PluginCaretaker pc = new PluginCaretaker();
+        setActivePlugin(pc.load(pluginDir));
+        loadActivePluginToLists();
+    }
+
     public void setActivePlugin(Plugin plugin) {
         ActivePlugin.get().setActivePlugin(plugin);
-        plugin.load();
+    }
+
+    public void loadActivePluginToLists() {
+        Plugin plugin = ActivePlugin.get().getActivePlugin();
+
+        LocationsList.get().clear();
+        AssetsList.get().clear();
+
+        Location first = plugin.getLocations().get(0);    //TODO change to starting location
+        CurrentLocation.get().setLocation(first);
+        CurrentLayer.get().setCurrentLayer(first.getLayers().get().get(0));
+
+        AssetsList.get().setAll(plugin.getAssets());
+        LocationsList.get().setAll(plugin.getLocations());
     }
 
     public Plugin getActivePlugin() {
         return ActivePlugin.get().getActivePlugin();
     }
 
-    public CurrentLocation getCurrentLocation() {
-        return CurrentLocation.get();
-    }
-
     public void removeContent(Content content) {
         CurrentLocation.get().getContent().remove(content);
     }
 
+    public CurrentLocation getCurrentLocation() {
+        return CurrentLocation.get();
+    }
+
     public List<LocationSerializable> getLocationsSerializable() {
         return SerializableConverter.locationsToSerializable(LocationsList.get());
+    }
+
+    public Plugin loadPlugin(File pluginDir) {
+        PluginCaretaker pc = new PluginCaretaker();
+        return pc.load(pluginDir);
     }
 }
