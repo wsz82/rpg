@@ -104,10 +104,10 @@ public class GameMenu extends Stage {
 
     private void initGameEnvironment() {
         StackPane stackPane = new StackPane();
-        gameEnvironment = new GameScrollPane(stackPane);
+        gameEnvironment = GameScrollPane.get();
         BorderPane gameFrame = new GameFrame();
 
-        GameBoard gameBoard = new GameBoard();
+        GameBoard gameBoard = GameBoard.get();
         gameFrame.setCenter(gameBoard);
         stackPane.getChildren().addAll(gameFrame);
     }

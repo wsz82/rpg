@@ -25,6 +25,7 @@ public class Controller {
     private Controller(){}
 
     public void initNewPlugin() {
+        AssetsList.get().clear();
         LocationsList.get().clear();
         Location location = new Location("new", 800, 600);
         Layer layer = new Layer("new");
@@ -32,7 +33,6 @@ public class Controller {
         LocationsList.get().add(location);
         CurrentLocation.get().setLocation(location);
         CurrentLayer.get().setCurrentLayer(layer);
-        AssetsList.get().clear();
     }
 
     public void loadAndRestorePlugin(File pluginDir) {
@@ -43,6 +43,17 @@ public class Controller {
 
     public void setActivePlugin(Plugin plugin) {
         ActivePlugin.get().setActivePlugin(plugin);
+    }
+
+    public Plugin getActivePlugin() {
+        return ActivePlugin.get().getActivePlugin();
+    }
+
+    public void loadAssetsToList() {
+        Plugin plugin = ActivePlugin.get().getActivePlugin();
+
+        AssetsList.get().clear();
+        AssetsList.get().setAll(plugin.getAssets());
     }
 
     public void loadActivePluginToLists() {
@@ -59,24 +70,28 @@ public class Controller {
         LocationsList.get().setAll(plugin.getLocations());
     }
 
-    public Plugin getActivePlugin() {
-        return ActivePlugin.get().getActivePlugin();
+    public Plugin loadPlugin(File pluginDir) {
+        PluginCaretaker pc = new PluginCaretaker();
+        return pc.load(pluginDir);
     }
 
     public void removeContent(Content content) {
         CurrentLocation.get().getContent().remove(content);
     }
 
-    public CurrentLocation getCurrentLocation() {
-        return CurrentLocation.get();
+    public Layer getCurrentLayer() {
+        return CurrentLayer.get().getCurrentLayer();
     }
 
     public List<LocationSerializable> getLocationsSerializable() {
         return SerializableConverter.locationsToSerializable(LocationsList.get());
     }
 
-    public Plugin loadPlugin(File pluginDir) {
-        PluginCaretaker pc = new PluginCaretaker();
-        return pc.load(pluginDir);
+    public CurrentLocation getCurrentLocation() {
+        return CurrentLocation.get();
+    }
+
+    public void setCurrentLocation(Location location) {
+        CurrentLocation.get().setLocation(location);
     }
 }

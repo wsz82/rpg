@@ -7,6 +7,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
+import model.Controller;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
@@ -93,6 +94,6 @@ public class LocationsTableView extends TableView<Location> {
 
     public void goTo() {
         Location location = getSelectionModel().getSelectedItem();
-        CurrentLocation.get().setLocation(location);
+        Controller.get().setCurrentLocation(location);
     }
 }

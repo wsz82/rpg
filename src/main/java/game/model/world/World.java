@@ -3,17 +3,19 @@ package game.model.world;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.view.stage.GameBoard;
+import game.view.stage.GameScrollPane;
 import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import model.Controller;
 
 public class World {
     private final GameBoard board;
+    private final GameScrollPane scrollPane;
     private final long turnDurationMillis = 1000;
+    private final long highFreqDurationMillis = 8;
 
     public World() {
         this.board = GameController.get().getBoard();
+        this.scrollPane = GameController.get().getScrollPane();
     }
 
     public void startGame(SaveMemento memento) {
@@ -24,30 +26,45 @@ public class World {
             loadSave(memento);
         }
 
-        Service<Void> gameThread = new Service<>() {
-            @Override
-            protected Task<Void> createTask() {
+        showGame();
 
-                showGame();
-
-                while (isRunning()) {
-                    try {
-                        Thread.sleep(turnDurationMillis);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    Platform.runLater(() -> {
-                        showGame();
-                    });
+        Thread gameThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(turnDurationMillis);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-                return null;
+                Platform.runLater(() -> {
+                    showGame();
+                });
             }
-        };
-        gameThread.setOnReady(event -> gameThread.start());
+        });
+        gameThread.setDaemon(true);
+        gameThread.start();
+
+        Thread highFreqThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(highFreqDurationMillis);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                Platform.runLater(() -> {
+                    update();
+                });
+            }
+        });
+        highFreqThread.setDaemon(true);
+        highFreqThread.start();
     }
 
     private void showGame() {
-        board.redraw();
+        board.refresh();
+    }
+
+    private void update() {
+        scrollPane.updatePos();
     }
 
     private void loadSave(SaveMemento memento) {

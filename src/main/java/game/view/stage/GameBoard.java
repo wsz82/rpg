@@ -1,15 +1,17 @@
 package game.view.stage;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import model.Controller;
+import model.content.Content;
+import model.item.Item;
 import model.location.CurrentLocation;
+import model.stage.Coords;
 
 public class GameBoard extends AnchorPane {
     private static GameBoard singleton;
-
-    public GameBoard(){
-        setPrefHeight(CurrentLocation.get().getCurrentHeight());
-        setPrefWidth(CurrentLocation.get().getCurrentWidth());
-    }
 
     public static GameBoard get() {
         if (singleton == null) {
@@ -18,9 +20,59 @@ public class GameBoard extends AnchorPane {
         return singleton;
     }
 
-    public void redraw() {
-
+    private GameBoard(){
     }
+
+    public void refresh() {
+        getChildren().clear();
+        setPrefHeight(CurrentLocation.get().getCurrentHeight());
+        setPrefWidth(CurrentLocation.get().getCurrentWidth());
+        for (Content content : Controller.get().getCurrentLocation().getContent()) {
+            final Item item = content.getItem();
+            final Coords pos = content.getPos();
+            final double x = pos.getX();
+            final double y = pos.getY();
+            final int z = pos.getZ();
+            final int level = content.getLevel();
+
+            final Image origin = item.getAsset().getImage();
+            final int width = Controller.get().getCurrentLocation().getCurrentWidth();
+            final int height = Controller.get().getCurrentLocation().getCurrentHeight();
+            int resizeWidth = width - (int) x;
+            int resizeHeight = height - (int) y;
+            if (resizeWidth > origin.getWidth()) {
+                resizeWidth = (int) origin.getWidth();
+            }
+            if (resizeHeight > origin.getHeight()) {
+                resizeHeight = (int) origin.getHeight();
+            }
+            final Image resizedImage = new WritableImage(
+                    origin.getPixelReader(), resizeWidth, resizeHeight);
+            final ImageView iv = new ImageView(resizedImage);
+
+            iv.setViewOrder(-(level * 1000 + (double) z / 1000));
+            getChildren().add(iv);
+            setLeftAnchor(iv, x);
+            setTopAnchor(iv, y);
+            content.setVisible(Controller.get().getCurrentLayer().getVisible());
+
+//            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+//                int zNew = newValue.intValue();
+//                int levelNew = content.getLevel();
+//                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
+//            });
+//            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+//                int levelNew = newValue.intValue();
+//                int zNew = content.getPos().getZ();
+//                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
+//            });
+//
+//            item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
+//                iv.setImage(item.getAsset().getImage());
+//            });
+//
+//            iv.visibleProperty().bindBidirectional(content.visibleProperty());
+        }
 
 //    protected void addContentsToStage(List<Content> contents) {
 //        for (Content content : contents) {
@@ -73,4 +125,5 @@ public class GameBoard extends AnchorPane {
 //            iv.visibleProperty().bindBidirectional(content.visibleProperty());
 //        }
 //    }
+    }
 }

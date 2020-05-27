@@ -41,10 +41,10 @@ public class CurrentLocation {
     }
 
     public void setLocation(Location location) {
-        this.locationProperty.set(location);
         this.currentWidth.set(location.getWidth());
         this.currentHeight.set(location.getHeight());
         this.currentName.set(location.getName());
+        this.locationProperty.set(location);
     }
 
     public Location getLocation() {

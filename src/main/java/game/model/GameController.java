@@ -9,9 +9,12 @@ import game.model.setting.SettingMemento;
 import game.model.world.World;
 import game.view.launcher.Main;
 import game.view.stage.GameBoard;
+import game.view.stage.GameScrollPane;
 import javafx.collections.ObservableList;
 import model.Controller;
 import model.asset.AssetsList;
+import model.layer.CurrentLayer;
+import model.layer.Layer;
 import model.location.CurrentLocation;
 import model.location.Location;
 import model.location.LocationsList;
@@ -108,6 +111,11 @@ public class GameController {
     }
 
     public void loadSaveToLists(SaveMemento memento) {
+
+        if (AssetsList.get().isEmpty()) {
+            Controller.get().loadAssetsToList();
+        }
+
         LocationsList.get().clear();
 
         LocationsList.get().setAll(
@@ -116,9 +124,15 @@ public class GameController {
 
         Location first = LocationsList.get().get(0);       //TODO change to Player current location
         CurrentLocation.get().setLocation(first);
+        Layer layer = first.getLayers().get().get(0);
+        CurrentLayer.get().setCurrentLayer(layer);
     }
 
     public GameBoard getBoard() {
         return GameBoard.get();
+    }
+
+    public GameScrollPane getScrollPane() {
+        return GameScrollPane.get();
     }
 }

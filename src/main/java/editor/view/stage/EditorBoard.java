@@ -14,7 +14,6 @@ import javafx.scene.input.MouseEvent;
 import model.Controller;
 import model.content.Content;
 import model.item.Item;
-import model.layer.CurrentLayer;
 import model.stage.ContentWithImage;
 import model.stage.Coords;
 
@@ -35,11 +34,6 @@ class EditorBoard extends Board {
 
     @Override
     protected void addContentsToStage(List<Content> contents) {
-        if (getWidth() != Controller.get().getCurrentLocation().getCurrentWidth()
-                || getHeight() != Controller.get().getCurrentLocation().getCurrentHeight()) {
-            setWidth(Controller.get().getCurrentLocation().getCurrentWidth());
-            setHeight(Controller.get().getCurrentLocation().getCurrentHeight());
-        }
         for (Content content : contents) {
             final Item item = content.getItem();
             final Coords pos = content.getPos();
@@ -47,18 +41,26 @@ class EditorBoard extends Board {
             final double y = pos.getY();
             final int z = pos.getZ();
             final int level = content.getLevel();
-            final int width = Controller.get().getCurrentLocation().getCurrentWidth();
-            final int height = Controller.get().getCurrentLocation().getCurrentHeight();
-            final Image originImage = item.getAsset().getImage();
+            int width = Controller.get().getCurrentLocation().getCurrentWidth();
+            int height = Controller.get().getCurrentLocation().getCurrentHeight();
+            final Image origin = item.getAsset().getImage();
+            int resizeWidth = width - (int) x;
+            int resizeHeight = height - (int) y;
+            if (resizeWidth > origin.getWidth()) {
+                resizeWidth = (int) origin.getWidth();
+            }
+            if (resizeHeight > origin.getHeight()) {
+                resizeHeight = (int) origin.getHeight();
+            }
             final Image resizedImage = new WritableImage(
-                    originImage.getPixelReader(), width - (int) x, height - (int) y);
+                    origin.getPixelReader(), resizeWidth, resizeHeight);
             final ImageView iv = new ImageView(resizedImage);
 
             iv.setViewOrder(-(level*1000 + (double) z/1000));
             getChildren().add(iv);
             setLeftAnchor(iv, x);
             setTopAnchor(iv, y);
-            content.setVisible(CurrentLayer.get().getCurrentLayer().getVisible());
+            content.setVisible(Controller.get().getCurrentLayer().getVisible());
 
             ContentWithImage cwi = new ContentWithImage(content, iv);
             boardContents.add(cwi);

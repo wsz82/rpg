@@ -1,25 +1,30 @@
 package game.view.stage;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Screen;
 
 import java.awt.*;
 
-class GameScrollPane extends ScrollPane {
-    private static final double SCROLL_H_FACTOR = 0.00003;
-    private static final double SCROLL_V_FACTOR = 0.00001;
+public class GameScrollPane extends ScrollPane {
+    private static final double SCROLL_H_FACTOR = 10;
+    private static final double SCROLL_V_FACTOR = 3;
+    private static GameScrollPane singleton;
 
-    GameScrollPane(Node node){
+    public static GameScrollPane get() {
+        if (singleton == null) {
+            singleton = new GameScrollPane(GameBoard.get());
+        }
+        return singleton;
+    }
+
+    private GameScrollPane(Node node){
         super(node);
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollBarPolicy.NEVER);
 
-//        scrollOnEdges();
         setPannable(true);
         addEventFilter(MouseEvent.ANY, e -> {
             if (!e.getEventType().equals(MouseEvent.MOUSE_MOVED)
@@ -35,40 +40,26 @@ class GameScrollPane extends ScrollPane {
         });
     }
 
-    private void scrollOnEdges() {
-        final Rectangle2D bounds = Screen.getPrimary().getBounds();
-        final double width = bounds.getWidth();
-        final double height = bounds.getHeight();
+    public void updatePos() {
+        Point p = MouseInfo.getPointerInfo().getLocation();
+        int x = p.x;
+        int y = p.y;
+        int width = (int) getWidth();
+        int height = (int) getHeight();
+        double unnormalizedScrollHFactor = SCROLL_H_FACTOR / getWidth();
+        double unnormalizedScrollVFactor = SCROLL_V_FACTOR / getHeight();
 
-        addEventHandler(MouseEvent.MOUSE_MOVED, e -> {
-            e.consume();
-            Thread mousePosUpdater = new Thread(() -> {
-                synchronized (this) {
-                    double x = e.getScreenX();
-                    while (x < 10 && x >= 0) {
-                        setHvalue(getHvalue() - SCROLL_H_FACTOR);
-                        Point p = MouseInfo.getPointerInfo().getLocation();
-                        x = p.x;
-                    }
-                    while (x > width - 10 && x <= width) {
-                        setHvalue(getHvalue() + SCROLL_H_FACTOR);
-                        Point p = MouseInfo.getPointerInfo().getLocation();
-                        x = p.x;
-                    }
-                    double y = e.getY();
-                    while (y < 10 && y >= 0) {
-                        setVvalue(getVvalue() - SCROLL_V_FACTOR);
-                        Point p = MouseInfo.getPointerInfo().getLocation();
-                        y = p.y;
-                    }
-                    while (y > height - 10 && y <= height) {
-                        setVvalue(getVvalue() + SCROLL_V_FACTOR);
-                        Point p = MouseInfo.getPointerInfo().getLocation();
-                        y = p.y;
-                    }
-                }
-            });
-            mousePosUpdater.start();
-        });
+        if (x < 10 && x >= 0) {
+            setHvalue(getHvalue() - unnormalizedScrollHFactor);
+        } else
+        if (x > width - 10 && x <= width) {
+            setHvalue(getHvalue() + unnormalizedScrollHFactor);
+        } else
+        if (y < 10 && y >= 0) {
+            setVvalue(getVvalue() - unnormalizedScrollVFactor);
+        } else
+        if (y > height - 10 && y <= height) {
+            setVvalue(getVvalue() + unnormalizedScrollVFactor);
+        }
     }
 }

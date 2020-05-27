@@ -45,6 +45,8 @@ public abstract class Board extends AnchorPane {
         bindWidthAndHeight();
     }
 
+    protected abstract void addContentsToStage(List<Content> contents);
+
     private void bindWithLocationAndContentChange() {
         CurrentLocation.get().getContent().addListener(locationContentListener);
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
@@ -64,6 +66,37 @@ public abstract class Board extends AnchorPane {
         addContentsToStage(contents);
     }
 
+    private void bindWidthAndHeight() {
+        prefWidthProperty().bind(
+                CurrentLocation.get().currentWidthProperty());
+        prefHeightProperty().bind(
+                CurrentLocation.get().currentHeightProperty());
+    }
+
+    protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
+        double resizeWidth = width - cwi.getContent().getPos().getX();
+        double resizeHeight = height - cwi.getContent().getPos().getY();
+        if (resizeWidth > origin.getWidth()) {
+            resizeWidth = origin.getWidth();
+        }
+        if (resizeHeight > origin.getHeight()) {
+            resizeHeight = origin.getHeight();
+        }
+        resizeImage(cwi, origin, (int) resizeWidth, (int) resizeHeight);
+    }
+
+    protected void resizeRelocatedImage(ContentWithImage cwi, Image origin, double x, double y) {
+        int width = (int) (getWidth() - x);
+        int height = (int) (getHeight() - y);
+        if (width > origin.getWidth()) {
+            width = (int) origin.getWidth();
+        }
+        if (height > origin.getHeight()) {
+            height = (int) origin.getHeight();
+        }
+        resizeImage(cwi, origin, width, height);
+    }
+
     private void resizeImage(ContentWithImage cwi, Image origin, int width, int height) {
         if (width < 1 || height < 1) {
             Controller.get().removeContent(cwi.getContent());
@@ -72,25 +105,6 @@ public abstract class Board extends AnchorPane {
         Image wi = new WritableImage(
                 origin.getPixelReader(), width, height);
         cwi.getImageView().setImage(wi);
-    }
-
-    private void bindWidthAndHeight() {
-        prefWidthProperty().bind(
-                CurrentLocation.get().currentWidthProperty());
-        prefHeightProperty().bind(
-                CurrentLocation.get().currentHeightProperty());
-    }
-
-    protected abstract void addContentsToStage(List<Content> contents);
-
-    protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
-        resizeImage(cwi, origin, (int) width, (int) height);
-    }
-
-    protected void resizeRelocatedImage(ContentWithImage cwi, Image origin, double x, double y) {
-        int width = (int) (getWidth() - x);
-        int height = (int) (getHeight() - y);
-        resizeImage(cwi, origin, width, height);
     }
 
     public int getzPos() {
