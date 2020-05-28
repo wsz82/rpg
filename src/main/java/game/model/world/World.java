@@ -12,6 +12,8 @@ public class World {
     private final GameScrollPane scrollPane;
     private final long turnDurationMillis = 1000;
     private final long highFreqDurationMillis = 8;
+    private static Thread gameThread;
+    private static Thread highFreqThread;
 
     public World() {
         this.board = GameController.get().getBoard();
@@ -19,6 +21,7 @@ public class World {
     }
 
     public void startGame(SaveMemento memento) {
+        GameController.get().setGame(true);
 
         if (memento == null) {
             loadNewGame();
@@ -28,8 +31,8 @@ public class World {
 
         showGame();
 
-        Thread gameThread = new Thread(() -> {
-            while (true) {
+        gameThread = new Thread(() -> {
+            while (GameController.get().isGame()) {
                 try {
                     Thread.sleep(turnDurationMillis);
                 } catch (InterruptedException e) {
@@ -43,7 +46,7 @@ public class World {
         gameThread.setDaemon(true);
         gameThread.start();
 
-        Thread highFreqThread = new Thread(() -> {
+        highFreqThread = new Thread(() -> {
             while (true) {
                 try {
                     Thread.sleep(highFreqDurationMillis);
@@ -73,5 +76,13 @@ public class World {
 
     private void loadNewGame() {
         Controller.get().loadActivePluginToLists();
+    }
+
+    public static Thread getGameThread() {
+        return gameThread;
+    }
+
+    public static Thread getHighFreqThread() {
+        return highFreqThread;
     }
 }

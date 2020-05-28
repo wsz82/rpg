@@ -28,6 +28,7 @@ public class GameMenu extends Stage {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
             showGameMenu();
+            GameController.get().setGame(false);
         }
     };
     private final EventHandler<KeyEvent> mainMenuReturn = event -> {

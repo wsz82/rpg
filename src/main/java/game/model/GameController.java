@@ -26,6 +26,7 @@ import java.util.List;
 
 public class GameController {
     private static GameController singleton;
+    private boolean isGame;
 
     public static GameController get() {
         if (singleton == null) {
@@ -128,11 +129,27 @@ public class GameController {
         CurrentLayer.get().setCurrentLayer(layer);
     }
 
+    public Thread getGameThread(){
+        return World.getGameThread();
+    }
+
+    public Thread getHighFreqThread(){
+        return World.getHighFreqThread();
+    }
+
     public GameBoard getBoard() {
         return GameBoard.get();
     }
 
     public GameScrollPane getScrollPane() {
         return GameScrollPane.get();
+    }
+
+    public boolean isGame() {
+        return isGame;
+    }
+
+    public void setGame(boolean game) {
+        isGame = game;
     }
 }
