@@ -5,7 +5,7 @@ import model.stage.Coords;
 
 public class Creature extends Item{
     private Coords dest;
-    private int speed = 30;
+    private int speed = 50;
 
     public Creature(Asset asset, Coords pos, int level) {
         super(asset, pos, level);
@@ -28,11 +28,12 @@ public class Creature extends Item{
             return;
         }
         double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        double moveDist = speed;
         if (dist < speed) {
-            return;
+            moveDist = dist;
         }
-        double x3 = x1 + (double) speed/dist * (x2 - x1);
-        double y3 = y1 + (double) speed/dist * (y2 - y1);
+        double x3 = x1 + moveDist/dist * (x2 - x1);
+        double y3 = y1 + moveDist/dist * (y2 - y1);
         pos.setX(x3);
         pos.setY(y3);
     }
