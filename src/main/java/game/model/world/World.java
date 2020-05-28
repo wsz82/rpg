@@ -6,6 +6,7 @@ import game.view.stage.GameBoard;
 import game.view.stage.GameScrollPane;
 import javafx.application.Platform;
 import model.Controller;
+import model.item.Creature;
 
 public class World {
     private final GameBoard board;
@@ -33,6 +34,10 @@ public class World {
 
         gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
+                Creature pc = ActivePC.get().getCreature();
+                if (pc != null) {
+                    pc.move();
+                }
                 try {
                     Thread.sleep(turnDurationMillis);
                 } catch (InterruptedException e) {

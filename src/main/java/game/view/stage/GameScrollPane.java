@@ -1,10 +1,12 @@
 package game.view.stage;
 
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 
 import java.awt.*;
 
@@ -26,10 +28,13 @@ public class GameScrollPane extends ScrollPane {
         setVbarPolicy(ScrollBarPolicy.NEVER);
 
         setPannable(true);
-        addEventFilter(MouseEvent.ANY, e -> {
-            if (!e.getEventType().equals(MouseEvent.MOUSE_MOVED)
-                    && e.getButton() != MouseButton.MIDDLE) e.consume();
+        addEventFilter(ScrollEvent.SCROLL, Event::consume);
+        addEventFilter(MouseEvent.ANY, event -> {
+            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
+                    && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
+                    && event.getButton() != MouseButton.MIDDLE) event.consume();
         });
+
         setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.DOWN
                     || e.getCode() == KeyCode.UP
@@ -41,6 +46,9 @@ public class GameScrollPane extends ScrollPane {
     }
 
     public void updatePos() {
+        if (!GameMenu.get().isFullScreen()) {
+            return;
+        }
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
         int y = p.y;

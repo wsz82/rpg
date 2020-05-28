@@ -1,13 +1,15 @@
 package game.view.stage;
 
+import game.model.world.ActivePC;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import model.Controller;
 import model.content.Content;
+import model.item.Creature;
 import model.item.Item;
-import model.location.CurrentLocation;
 import model.stage.Coords;
 
 public class GameBoard extends AnchorPane {
@@ -25,8 +27,7 @@ public class GameBoard extends AnchorPane {
 
     public void refresh() {
         getChildren().clear();
-        setPrefHeight(CurrentLocation.get().getCurrentHeight());
-        setPrefWidth(CurrentLocation.get().getCurrentWidth());
+
         for (Content content : Controller.get().getCurrentLocation().getContent()) {
             final Item item = content.getItem();
             final Coords pos = content.getPos();
@@ -56,22 +57,50 @@ public class GameBoard extends AnchorPane {
             setTopAnchor(iv, y);
             content.setVisible(Controller.get().getCurrentLayer().getVisible());
 
-//            pos.zProperty().addListener((observable, oldValue, newValue) -> {
-//                int zNew = newValue.intValue();
-//                int levelNew = content.getLevel();
-//                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
-//            });
-//            content.levelProperty().addListener((observable, oldValue, newValue) -> {
-//                int levelNew = newValue.intValue();
-//                int zNew = content.getPos().getZ();
-//                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
-//            });
-//
-//            item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
-//                iv.setImage(item.getAsset().getImage());
-//            });
-//
-//            iv.visibleProperty().bindBidirectional(content.visibleProperty());
+            pos.zProperty().addListener((observable, oldValue, newValue) -> {
+                int zNew = newValue.intValue();
+                int levelNew = content.getLevel();
+                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
+            });
+            content.levelProperty().addListener((observable, oldValue, newValue) -> {
+                int levelNew = newValue.intValue();
+                int zNew = content.getPos().getZ();
+                iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
+            });
+
+            item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
+                iv.setImage(item.getAsset().getImage());
+            });
+
+            iv.visibleProperty().bindBidirectional(content.visibleProperty());
+
+            switch (item.getAsset().getType()) {
+                case CREATURE -> {
+                    boolean[] isActive = new boolean[]{false};
+                    iv.setOnMouseClicked(e -> {
+                        e.consume();
+                        if (e.getButton().equals(MouseButton.PRIMARY)) {
+                            isActive[0] = true;
+                            setOnMouseClicked(ev -> {
+                                if (ev.getButton().equals(MouseButton.PRIMARY)
+                                        && isActive[0]) {
+                                    Creature creature = (Creature) item;
+                                    int creatureWidth = (int) creature.getAsset().getImage().getWidth();
+                                    int creatureHeight = (int) creature.getAsset().getImage().getHeight();
+                                    double moveX = ev.getX() - (double) creatureWidth/2;
+                                    double moveY = ev.getY() - creatureHeight;
+                                    Coords dest = new Coords(moveX, moveY, creature.getPos().getZ());
+                                    creature.setDest(dest);
+                                    ActivePC.get().setCreature(creature);
+                                } else if (ev.getButton().equals(MouseButton.SECONDARY)) {
+                                    isActive[0] = false;
+                                    ActivePC.get().setCreature(null);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
         }
 
 //    protected void addContentsToStage(List<Content> contents) {

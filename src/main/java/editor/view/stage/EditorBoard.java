@@ -41,20 +41,9 @@ class EditorBoard extends Board {
             final double y = pos.getY();
             final int z = pos.getZ();
             final int level = content.getLevel();
-            int width = Controller.get().getCurrentLocation().getCurrentWidth();
-            int height = Controller.get().getCurrentLocation().getCurrentHeight();
-            final Image origin = item.getAsset().getImage();
-            int resizeWidth = width - (int) x;
-            int resizeHeight = height - (int) y;
-            if (resizeWidth > origin.getWidth()) {
-                resizeWidth = (int) origin.getWidth();
-            }
-            if (resizeHeight > origin.getHeight()) {
-                resizeHeight = (int) origin.getHeight();
-            }
-            final Image resizedImage = new WritableImage(
-                    origin.getPixelReader(), resizeWidth, resizeHeight);
-            final ImageView iv = new ImageView(resizedImage);
+
+            final ImageView iv = new ImageView();
+            setItemsImageForImageView(item, iv);
 
             iv.setViewOrder(-(level*1000 + (double) z/1000));
             getChildren().add(iv);
@@ -91,10 +80,7 @@ class EditorBoard extends Board {
             });
 
             item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
-                final Image changedImage = new WritableImage(
-                        item.getAsset().getImage().getPixelReader(),
-                        (int) (getWidth() - pos.getX()), (int) (getHeight() - pos.getY()));
-                iv.setImage(changedImage);
+                setItemsImageForImageView(item, iv);
             });
 
             iv.visibleProperty().bindBidirectional(content.visibleProperty());
@@ -138,6 +124,23 @@ class EditorBoard extends Board {
                 }
             });
         }
+    }
+
+    private void setItemsImageForImageView(Item item, ImageView iv) {
+        Image img = item.getAsset().getImage();
+        int width = Controller.get().getCurrentLocation().getCurrentWidth();
+        int height = Controller.get().getCurrentLocation().getCurrentHeight();
+        int resizeWidth = width - (int) item.getPos().getX();
+        int resizeHeight = height - (int) item.getPos().getY();
+        if (resizeWidth > img.getWidth()) {
+            resizeWidth = (int) img.getWidth();
+        }
+        if (resizeHeight > img.getHeight()) {
+            resizeHeight = (int) img.getHeight();
+        }
+        final Image changedImage = new WritableImage(
+                img.getPixelReader(), resizeWidth, resizeHeight);
+        iv.setImage(changedImage);
     }
 
     void moveContent(KeyCode keyCode, Content content){

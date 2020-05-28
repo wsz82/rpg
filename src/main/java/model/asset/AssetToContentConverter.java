@@ -1,15 +1,13 @@
 package model.asset;
 
+import model.Controller;
 import model.content.Content;
-import model.item.Cover;
-import model.item.FlyZone;
-import model.item.Landscape;
-import model.item.MoveZone;
-import model.layer.CurrentLayer;
+import model.item.*;
 import model.stage.Coords;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class AssetToContentConverter {
 
@@ -17,41 +15,52 @@ public class AssetToContentConverter {
         List<Content> contents = new ArrayList<>(assets.size());
         for (Asset asset
                 : assets) {
-            convertAndAddItem(asset, contents, pos);
+            Content content = convertToContent(asset, pos, Controller.get().getCurrentLayer().getLevel());
+            contents.add(content);
         }
         return contents;
     }
 
-    private static void convertAndAddItem(Asset asset, List<Content> contents, Coords pos) {
-        switch (asset.getType()) {
-            case LANDSCAPE -> contents.add(convertToLandscape(asset, pos));
-            case COVER -> contents.add(convertToCover(asset, pos));
-            case MOVE_ZONE -> contents.add(convertToMoveZone(asset, pos));
-            case FLY_ZONE -> contents.add(convertToFlyZone(asset, pos));
+    public static Content convertToContent(Asset asset, Coords pos, int level) {
+        if (asset == null) {
+            throw new NoSuchElementException("Asset is null");
         }
+        return switch (asset.getType()) {
+            case LANDSCAPE -> convertToLandscape(asset, pos, level);
+            case COVER -> convertToCover(asset, pos, level);
+            case MOVE_ZONE -> convertToMoveZone(asset, pos, level);
+            case FLY_ZONE -> convertToFlyZone(asset, pos, level);
+            case CREATURE -> convertToCreature(asset, pos, level);
+        };
     }
 
-    private static Content convertToLandscape(Asset asset, Coords pos) {
+    private static Content convertToCreature(Asset asset, Coords pos, int level) {
+        Creature creature = new Creature(
+                asset, pos, level);
+        return new Content(creature);
+    }
+
+    private static Content convertToLandscape(Asset asset, Coords pos, int level) {
         Landscape landscape = new Landscape(
-                asset, pos, CurrentLayer.get().getCurrentLevel());
+                asset, pos, level);
         return new Content(landscape);
     }
 
-    private static Content convertToCover(Asset asset, Coords pos) {
+    private static Content convertToCover(Asset asset, Coords pos, int level) {
         Cover cover = new Cover(
-                asset, pos, CurrentLayer.get().getCurrentLevel());
+                asset, pos, level);
         return new Content(cover);
     }
 
-    private static Content convertToMoveZone(Asset asset, Coords pos) {
+    private static Content convertToMoveZone(Asset asset, Coords pos, int level) {
         MoveZone moveZone = new MoveZone(
-                asset, pos, CurrentLayer.get().getCurrentLevel());
+                asset, pos, level);
         return new Content(moveZone);
     }
 
-    private static Content convertToFlyZone(Asset asset, Coords pos) {
+    private static Content convertToFlyZone(Asset asset, Coords pos, int level) {
         FlyZone flyZone = new FlyZone(
-                asset, pos, CurrentLayer.get().getCurrentLevel());
+                asset, pos, level);
         return new Content(flyZone);
     }
 }

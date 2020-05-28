@@ -2,9 +2,11 @@ package model.plugin;
 
 import javafx.collections.FXCollections;
 import model.asset.Asset;
+import model.asset.AssetToContentConverter;
 import model.content.Content;
 import model.content.ContentList;
-import model.item.*;
+import model.item.Item;
+import model.item.ItemType;
 import model.layer.Layer;
 import model.layer.LayersList;
 import model.location.Location;
@@ -123,34 +125,24 @@ public class SerializableConverter {
         }
         List<Content> output = FXCollections.observableArrayList();
         for (ContentSerializable cs : input) {
-            Content content = new Content();
-            Item item = toItem(cs.getItem(), assets);
-            content.setItem(item);
-            content.setLevel(item.getLevel());
-            content.setName(item.getAsset().getName());
-            content.setType(item.getAsset().getType());
-            content.setPos(item.getPos());
+            ItemSerializable is = cs.getItem();
+            String name = is.getName();
+            Coords pos = toCoordinates(is.getPos());
+            int level = is.getLevel();
+
+            List<Asset> oneAsset = assets.stream()
+                    .filter(a -> a.getName().equals(name))
+                    .collect(Collectors.toList());
+            Asset asset;
+            try {
+                asset = oneAsset.get(0);
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("No asset with name: " + name);
+                continue;
+            }
+            Content content = AssetToContentConverter.convertToContent(asset, pos, level);
             content.setVisible(cs.isVisible());
             output.add(content);
-        }
-        return output;
-    }
-
-    private static Item toItem(ItemSerializable i, List<Asset> assets) {
-        Item output;
-        String name = i.getName();
-        List<Asset> oneAsset = assets.stream()
-                .filter(a -> a.getName().equals(name))
-                .collect(Collectors.toList());
-        Asset asset = oneAsset.get(0);
-        Coords pos = toCoordinates(i.getPos());
-        int level = i.getLevel();
-        switch (asset.getType()) {
-            case LANDSCAPE -> output = new Landscape(asset, pos, level);
-            case COVER -> output = new Cover(asset, pos, level);
-            case MOVE_ZONE -> output = new MoveZone(asset, pos, level);
-            case FLY_ZONE -> output = new FlyZone(asset, pos, level);
-            default -> output = new Landscape(asset, pos, level);
         }
         return output;
     }

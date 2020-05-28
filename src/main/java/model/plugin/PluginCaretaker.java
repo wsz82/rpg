@@ -49,7 +49,7 @@ public class PluginCaretaker {
             List<Location> locations = SerializableConverter.toLocationObjects(
                     ps.getLocations(), assets);
 
-            plugin.setFile(ps.getFile());
+            plugin.setFile(file);
             plugin.setAssets(assets);
             plugin.setLocations(locations);
         } catch (FileNotFoundException e) {
