@@ -1,10 +1,10 @@
 package model.content;
 
+import editor.view.layer.LevelValueListener;
+import editor.view.layer.VisibleValueListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.location.CurrentLocation;
-import editor.view.layer.LevelValueListener;
-import editor.view.layer.VisibleValueListener;
 
 public class ContentList implements LevelValueListener, VisibleValueListener {
     private final ObservableList<Content> contents;
@@ -21,7 +21,7 @@ public class ContentList implements LevelValueListener, VisibleValueListener {
     public void onLevelValueChanged(int oldValue, int newValue) {
         for (Content content:
                 CurrentLocation.get().getContent()) {
-            if (content.getLevel() == oldValue) {
+            if (content.getItem().getLevel() == oldValue) {
                 content.setLevel(newValue);
             }
         }
@@ -31,7 +31,7 @@ public class ContentList implements LevelValueListener, VisibleValueListener {
     public void onVisibleValueChanged(int level, boolean newValue) {
         for (Content content:
                 CurrentLocation.get().getContent()) {
-            if (content.getLevel() == level) {
+            if (content.getItem().getLevel() == level) {
                 content.setVisible(newValue);
             }
         }

@@ -36,11 +36,11 @@ class EditorBoard extends Board {
     protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
             final Item item = content.getItem();
-            final Coords pos = content.getPos();
+            final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
             final int z = pos.getZ();
-            final int level = content.getLevel();
+            final int level = item.getLevel();
 
             final ImageView iv = new ImageView();
             setItemsImageForImageView(item, iv);
@@ -70,12 +70,12 @@ class EditorBoard extends Board {
             });
             pos.zProperty().addListener((observable, oldValue, newValue) -> {
                 int zNew = newValue.intValue();
-                int levelNew = content.getLevel();
+                int levelNew = item.getLevel();
                 iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
             });
             content.levelProperty().addListener((observable, oldValue, newValue) -> {
                 int levelNew = newValue.intValue();
-                int zNew = content.getPos().getZ();
+                int zNew = item.getPos().getZ();
                 iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
             });
 
@@ -86,7 +86,7 @@ class EditorBoard extends Board {
             iv.visibleProperty().bindBidirectional(content.visibleProperty());
 
             iv.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-                zPos.set(content.getPos().getZ());
+                zPos.set(item.getPos().getZ());
             });
 
             iv.setOnContextMenuRequested(event -> {
@@ -144,7 +144,7 @@ class EditorBoard extends Board {
     }
 
     void moveContent(KeyCode keyCode, Content content){
-        Coords pos = content.getPos();
+        Coords pos = content.getItem().getPos();
         switch (keyCode) {
             case UP -> {
                 int y = (int) pos.getY();

@@ -74,8 +74,8 @@ public abstract class Board extends AnchorPane {
     }
 
     protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
-        double resizeWidth = width - cwi.getContent().getPos().getX();
-        double resizeHeight = height - cwi.getContent().getPos().getY();
+        double resizeWidth = width - cwi.getContent().getItem().getPos().getX();
+        double resizeHeight = height - cwi.getContent().getItem().getPos().getY();
         if (resizeWidth > origin.getWidth()) {
             resizeWidth = origin.getWidth();
         }

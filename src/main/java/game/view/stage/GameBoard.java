@@ -29,11 +29,11 @@ public class GameBoard extends AnchorPane {
 
         for (Content content : Controller.get().getCurrentLocation().getContent()) {
             final Item item = content.getItem();
-            final Coords pos = content.getPos();
+            final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
             final int z = pos.getZ();
-            final int level = content.getLevel();
+            final int level = item.getLevel();
 
             final Image origin = item.getAsset().getImage();
             final int width = Controller.get().getCurrentLocation().getCurrentWidth();
@@ -58,12 +58,12 @@ public class GameBoard extends AnchorPane {
 
             pos.zProperty().addListener((observable, oldValue, newValue) -> {
                 int zNew = newValue.intValue();
-                int levelNew = content.getLevel();
+                int levelNew = item.getLevel();
                 iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
             });
             content.levelProperty().addListener((observable, oldValue, newValue) -> {
                 int levelNew = newValue.intValue();
-                int zNew = content.getPos().getZ();
+                int zNew = item.getPos().getZ();
                 iv.setViewOrder(-(levelNew * 1000 + (double) zNew / 1000));
             });
 

@@ -67,7 +67,7 @@ class EditorToolBar extends ToolBar {
                 iv.setOpacity(newValue.doubleValue());
             } else {
                 EditorBoard.get().getBoardContents().stream()
-                        .filter(c -> c.getContent().getLevel() == currentLevel)
+                        .filter(c -> c.getContent().getItem().getLevel() == currentLevel)
                         .forEach(i -> i.getImageView().setOpacity(newValue.doubleValue()));
             }
         });

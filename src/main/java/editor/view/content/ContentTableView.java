@@ -7,7 +7,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
@@ -41,13 +40,26 @@ public class ContentTableView extends TableView<Content> {
         setEditable(true);
 
         TableColumn<Content, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-
+        nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return param.getValue().getItem().getAsset().getName();
+            }
+        });
         TableColumn<Content, String> typeCol = new TableColumn<>("Type");
-        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-
+        typeCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return param.getValue().getItem().getAsset().getType().toString();
+            }
+        });
         TableColumn<Content, Integer> levelCol = new TableColumn<>("Level");
-        levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
+        levelCol.setCellValueFactory(param -> new ObjectBinding<>() {
+            @Override
+            protected Integer computeValue() {
+                return param.getValue().getItem().getLevel();
+            }
+        });
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
@@ -63,20 +75,19 @@ public class ContentTableView extends TableView<Content> {
 
         TableColumn<Content, Double> posCol = new TableColumn<>("Position");
         posCol.setEditable(true);
-        posCol.setCellValueFactory(new PropertyValueFactory<>("coords"));
 
         TableColumn<Content, Double> xCol = new TableColumn<>("X");
         xCol.setEditable(true);
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Double computeValue() {
-                return param.getValue().getPos().getX();
+                return param.getValue().getItem().getPos().getX();
             }
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         xCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getPos().setX(t.getNewValue());
+            content.getItem().getPos().setX(t.getNewValue());
             refresh();
         });
 
@@ -85,13 +96,13 @@ public class ContentTableView extends TableView<Content> {
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Double computeValue() {
-                return param.getValue().getPos().getY();
+                return param.getValue().getItem().getPos().getY();
             }
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         yCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getPos().setY(t.getNewValue());
+            content.getItem().getPos().setY(t.getNewValue());
             refresh();
         });
 
@@ -100,13 +111,13 @@ public class ContentTableView extends TableView<Content> {
         zCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getPos().getZ();
+                return param.getValue().getItem().getPos().getZ();
             }
         });
         zCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         zCol.setOnEditCommit(t -> {
             Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getPos().setZ(t.getNewValue());
+            content.getItem().getPos().setZ(t.getNewValue());
             refresh();
         });
         posCol.getColumns().addAll(xCol, yCol, zCol);
