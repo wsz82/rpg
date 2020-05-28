@@ -3,7 +3,7 @@ package model.item;
 import model.asset.Asset;
 import model.stage.Coords;
 
-public class Creature extends Item{
+public class Creature extends Item {
     private Coords dest;
     private int speed = 50;
 
@@ -20,6 +20,9 @@ public class Creature extends Item{
     }
 
     public void move() {
+        if (dest == null) {
+            return;
+        }
         double x1 = pos.getX();
         double x2 = dest.getX();
         double y1 = pos.getY();
@@ -44,5 +47,10 @@ public class Creature extends Item{
 
     public void setDest(Coords dest) {
         this.dest = dest;
+    }
+
+    @Override
+    public void update() {
+        move();
     }
 }

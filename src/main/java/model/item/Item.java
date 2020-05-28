@@ -3,7 +3,7 @@ package model.item;
 import model.asset.Asset;
 import model.stage.Coords;
 
-public abstract class Item {
+public abstract class Item implements ItemUpdater {
     protected Asset asset;
     protected Coords pos;
     protected int level;

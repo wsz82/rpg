@@ -8,4 +8,9 @@ public class Landscape extends Item {
     public Landscape(Asset asset, Coords pos, int level) {
         super(asset, pos, level);
     }
+
+    @Override
+    public void update() {
+
+    }
 }

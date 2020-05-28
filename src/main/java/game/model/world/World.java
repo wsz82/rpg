@@ -6,7 +6,7 @@ import game.view.stage.GameBoard;
 import game.view.stage.GameScrollPane;
 import javafx.application.Platform;
 import model.Controller;
-import model.item.Creature;
+import model.content.Content;
 
 public class World {
     private final GameBoard board;
@@ -34,10 +34,11 @@ public class World {
 
         gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
-                Creature pc = ActivePC.get().getCreature();
-                if (pc != null) {
-                    pc.move();
+
+                for (Content content : Controller.get().getCurrentLocation().getContent()) {
+                    content.getItem().update();
                 }
+
                 try {
                     Thread.sleep(turnDurationMillis);
                 } catch (InterruptedException e) {
