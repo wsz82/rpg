@@ -39,6 +39,8 @@ public class EditorController {
 
     public void saveActivePlugin() {
         PluginCaretaker pc = new PluginCaretaker();
+        ActivePlugin.get().getActivePlugin().setAssets(AssetsList.get());
+        ActivePlugin.get().getActivePlugin().setLocations(LocationsList.get());
         Plugin plugin = ActivePlugin.get().getActivePlugin();
         pc.save(plugin);
     }
