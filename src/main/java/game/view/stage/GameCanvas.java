@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import model.Controller;
 import model.content.Content;
+import model.content.ContentComparator;
 import model.item.Creature;
 import model.item.Item;
 import model.item.ItemType;
@@ -39,7 +40,7 @@ public class GameCanvas extends Canvas {
 
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())    //TODO
+                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
         for (Content content : contents) {
             final Item item = content.getItem();
@@ -112,12 +113,17 @@ public class GameCanvas extends Canvas {
     private Content lookForContent(double x, double y) {
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())    //TODO
+                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
         if (contents.isEmpty()) {
             return null;
         }
-        contents.sort((o1, o2) -> o2.getItem().getPos().getZ() - o1.getItem().getPos().getZ());
+        contents.sort(new ContentComparator() {
+            @Override
+            public int compare(Content o1, Content o2) {
+                return super.compare(o2, o1);
+            }
+        });
         for (Content c : contents) {
             double cX = c.getItem().getPos().getX();
             double cWidth = c.getItem().getAsset().getImage().getWidth();

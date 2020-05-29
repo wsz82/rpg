@@ -7,6 +7,7 @@ import game.view.stage.GameScrollPane;
 import javafx.application.Platform;
 import model.Controller;
 import model.content.Content;
+import model.content.ContentComparator;
 
 import java.util.List;
 
@@ -33,7 +34,12 @@ public class World {
             while (GameController.get().isGame()) {
 
                 List<Content> contents = Controller.get().getCurrentLocation().getContent();
-                contents.sort(new ContentComparator());
+                contents.sort(new ContentComparator() {
+                    @Override
+                    public int compare(Content o1, Content o2) {
+                        return super.compare(o1, o2);
+                    }
+                });
                 for (Content content : contents) {
                     content.getItem().update();
                 }

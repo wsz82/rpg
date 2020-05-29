@@ -1,10 +1,8 @@
-package game.model.world;
-
-import model.content.Content;
+package model.content;
 
 import java.util.Comparator;
 
-public class ContentComparator implements Comparator<Content> {
+abstract public class ContentComparator implements Comparator<Content> {
 
     @Override
     public int compare(Content o1, Content o2) {
