@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameCanvas extends Canvas {
+//    private final Map<Layer>
     private static GameCanvas singleton;
 
     public static GameCanvas get() {

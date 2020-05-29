@@ -44,7 +44,8 @@ public class GameController {
 
     public void restoreLastPlugin() {
         LastPluginCaretaker caretaker = new LastPluginCaretaker();
-        Plugin plugin = caretaker.loadMemento(Main.getDir());
+        File lastPluginDir = caretaker.loadMemento(Main.getDir());
+        Plugin plugin = Controller.get().loadPlugin(lastPluginDir);
         if (plugin.getLocations() != null) {
             Controller.get().setActivePlugin(plugin);
         }
@@ -52,7 +53,7 @@ public class GameController {
 
     public void storeLastPlugin(Plugin plugin) {
         LastPluginCaretaker caretaker = new LastPluginCaretaker();
-        caretaker.saveMemento(Main.getDir(), plugin);
+        caretaker.saveMemento(Main.getDir(), plugin.getFile());
     }
 
 
@@ -112,7 +113,6 @@ public class GameController {
     }
 
     public void loadSaveToLists(SaveMemento memento) {
-
         if (AssetsList.get().isEmpty()) {
             Controller.get().loadAssetsToList();
         }

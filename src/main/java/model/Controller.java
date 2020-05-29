@@ -71,6 +71,9 @@ public class Controller {
     }
 
     public Plugin loadPlugin(File pluginDir) {
+        if (pluginDir == null) {
+            return new Plugin();
+        }
         PluginCaretaker pc = new PluginCaretaker();
         return pc.load(pluginDir);
     }

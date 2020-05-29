@@ -5,7 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.*;
 import model.Controller;
-import model.content.Content;
+import model.layer.Layer;
 import model.location.CurrentLocation;
 
 import java.awt.*;
@@ -82,9 +82,9 @@ public class GameScrollPane extends ScrollPane {
     }
 
     private int[] getLevelsArr() {
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        return contents.stream()
-                .mapToInt(l -> l.getItem().getLevel())
+        List<Layer> layers = new ArrayList<>(Controller.get().getCurrentLocation().getLayers());
+        return layers.stream()
+                .mapToInt(l -> l.getLevel())
                 .distinct()
                 .sorted()
                 .toArray();

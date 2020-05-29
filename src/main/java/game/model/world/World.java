@@ -32,7 +32,6 @@ public class World {
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
-
                 List<Content> contents = Controller.get().getCurrentLocation().getContent();
                 contents.sort(new ContentComparator() {
                     @Override
@@ -43,7 +42,6 @@ public class World {
                 for (Content content : contents) {
                     content.getItem().update();
                 }
-
                 try {
                     Thread.sleep(turnDurationMillis);
                 } catch (InterruptedException e) {

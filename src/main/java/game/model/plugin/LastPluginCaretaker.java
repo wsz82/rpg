@@ -1,46 +1,38 @@
 package game.model.plugin;
 
-import model.plugin.Plugin;
-import model.plugin.PluginSerializable;
-import model.plugin.SerializableConverter;
-
 import java.io.*;
 
 public class LastPluginCaretaker {
     private static final String FILE_NAME = "last_plugin";
 
-    public void saveMemento(File programDir, Plugin plugin) {
-        PluginSerializable ps = SerializableConverter.toPluginSerializable(plugin);
+    public void saveMemento(File programDir, File pluginDir) {
         try (
                 ObjectOutputStream os = new ObjectOutputStream(
                         new FileOutputStream(programDir + File.separator + FILE_NAME))
         ) {
-            os.writeObject(ps);
+            os.writeObject(pluginDir);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Plugin loadMemento(File programDir) {
+    public File loadMemento(File programDir) {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {
-            return new Plugin();
+            return null;
         }
-        Plugin memento = new Plugin();
+        File lastPluginDir = null;
         try (
                 ObjectInputStream os = new ObjectInputStream(
                         new FileInputStream(programDir + File.separator + FILE_NAME))
         ) {
-            PluginSerializable ps = (PluginSerializable) os.readObject();
-
-            memento = SerializableConverter.toPlugin(ps);
-
+            lastPluginDir = (File) os.readObject();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return memento;
+        return lastPluginDir;
     }
 }
