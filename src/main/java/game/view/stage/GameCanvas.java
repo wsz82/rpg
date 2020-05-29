@@ -11,10 +11,11 @@ import model.content.Content;
 import model.item.Creature;
 import model.item.Item;
 import model.item.ItemType;
+import model.layer.CurrentLayer;
 import model.stage.Coords;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameCanvas extends Canvas {
     private static GameCanvas singleton;
@@ -35,13 +36,19 @@ public class GameCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        for (Content content : Controller.get().getCurrentLocation().getContent()) {
+        List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.isVisible())
+                .filter(c -> c.getItem().getLevel() == CurrentLayer.get().getCurrentLevel())    //TODO
+                .collect(Collectors.toList());
+        for (Content content : contents) {
             final Item item = content.getItem();
             final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
 
-            gc.drawImage(item.getAsset().getImage(), x, y);
+            if (content.isVisible()) {
+                gc.drawImage(item.getAsset().getImage(), x, y);
+            }
         }
     }
 
@@ -83,8 +90,11 @@ public class GameCanvas extends Canvas {
     }
 
     private Content lookForContent(double x, double y) {
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents.sort((o1, o2) -> o2.getItem().getPos().getZ() - o1.getItem().getPos().getZ() );
+        List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.isVisible())
+                .filter(c -> c.getItem().getLevel() == CurrentLayer.get().getCurrentLevel())    //TODO
+                .collect(Collectors.toList());
+        contents.sort((o1, o2) -> o2.getItem().getPos().getZ() - o1.getItem().getPos().getZ());
         for (Content c : contents) {
             double cX = c.getItem().getPos().getX();
             double cWidth = c.getItem().getAsset().getImage().getWidth();
