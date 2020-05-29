@@ -5,7 +5,7 @@ import model.stage.Coords;
 
 public class Creature extends Item {
     private Coords dest;
-    private int speed = 50;
+    private int speed = 30;
 
     public Creature(Asset asset, Coords pos, int level) {
         super(asset, pos, level);

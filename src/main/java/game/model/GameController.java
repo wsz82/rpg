@@ -8,7 +8,7 @@ import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
 import game.model.world.World;
 import game.view.launcher.Main;
-import game.view.stage.GameBoard;
+import game.view.stage.GameCanvas;
 import game.view.stage.GameScrollPane;
 import javafx.collections.ObservableList;
 import model.Controller;
@@ -129,16 +129,8 @@ public class GameController {
         CurrentLayer.get().setCurrentLayer(layer);
     }
 
-    public Thread getGameThread(){
-        return World.getGameThread();
-    }
-
-    public Thread getHighFreqThread(){
-        return World.getHighFreqThread();
-    }
-
-    public GameBoard getBoard() {
-        return GameBoard.get();
+    public GameCanvas getGameCanvas() {
+        return GameCanvas.get();
     }
 
     public GameScrollPane getScrollPane() {

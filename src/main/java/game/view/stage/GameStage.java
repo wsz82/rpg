@@ -6,6 +6,7 @@ import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -22,7 +23,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 
-public class GameMenu extends Stage {
+public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
     private final EventHandler<KeyEvent> gameMenuReturn = event -> {
         event.consume();
@@ -44,23 +45,24 @@ public class GameMenu extends Stage {
         }
     };
     private StackPane gameMenuRoot;
-    private ScrollPane gameEnvironment;
+    private Group gameRoot;
+    private ScrollPane gameScrollPane;
     private StackPane mainMenuRoot;
     private StackPane savesRoot;
     private StackPane loadsRoot;
     private final Button cancel = new Button("Cancel");
     private ListView<String> savesView;
     private ListView<String> loadsView;
-    private static GameMenu singleton;
+    private static GameStage singleton;
 
-    public static GameMenu get() {
+    public static GameStage get() {
         if (singleton == null) {
-            singleton = new GameMenu();
+            singleton = new GameStage();
         }
         return singleton;
     }
 
-    private GameMenu(){
+    private GameStage(){
         super(StageStyle.UNDECORATED);
     }
 
@@ -103,14 +105,10 @@ public class GameMenu extends Stage {
         startGame(null);
     }
 
-    private void initGameEnvironment() {
-        StackPane stackPane = new StackPane();
-        gameEnvironment = GameScrollPane.get();
-        BorderPane gameFrame = new GameFrame();
-
-        GameBoard gameBoard = GameBoard.get();
-        gameFrame.setCenter(gameBoard);
-        stackPane.getChildren().addAll(gameFrame);
+    private void initGameRoot() {
+        gameRoot = new Group();
+        gameScrollPane = GameScrollPane.get();
+        gameRoot.getChildren().addAll(gameScrollPane);
     }
 
     private void leaveGame() {
@@ -241,8 +239,8 @@ public class GameMenu extends Stage {
     }
 
     private void startGame(SaveMemento memento) {
-        if (gameEnvironment == null) {
-            initGameEnvironment();
+        if (gameRoot == null) {
+            initGameRoot();
         }
         setRootToGame();
 
@@ -275,8 +273,8 @@ public class GameMenu extends Stage {
         String name = loadsView.getSelectionModel().getSelectedItem();
         SaveMemento memento = GameController.get().loadGameSave(name, Main.getDir());
         startGame(memento);
-        gameEnvironment.setHvalue(memento.gethValue());
-        gameEnvironment.setVvalue(memento.getvValue());
+        gameScrollPane.setHvalue(memento.gethValue());
+        gameScrollPane.setVvalue(memento.getvValue());
     }
 
     private void deleteSave() {
@@ -285,8 +283,8 @@ public class GameMenu extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        double hvalue = gameEnvironment.getHvalue();
-        double vvalue = gameEnvironment.getVvalue();
+        double hvalue = gameScrollPane.getHvalue();
+        double vvalue = gameScrollPane.getVvalue();
         GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
 
         setRootToGame();
@@ -295,7 +293,7 @@ public class GameMenu extends Stage {
     private void setRootToGame() {
         removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
         addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
-        getScene().setRoot(gameEnvironment);
+        getScene().setRoot(gameRoot);
     }
 
     private void restoreSettings(File programDir) {

@@ -2,23 +2,20 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
-import game.view.stage.GameBoard;
+import game.view.stage.GameCanvas;
 import game.view.stage.GameScrollPane;
 import javafx.application.Platform;
 import model.Controller;
 import model.content.Content;
 
+import java.util.List;
+
 public class World {
-    private final GameBoard board;
-    private final GameScrollPane scrollPane;
-    private final long turnDurationMillis = 1000;
-    private final long highFreqDurationMillis = 8;
-    private static Thread gameThread;
-    private static Thread highFreqThread;
+    private final long turnDurationMillis = 16;
+    private final GameCanvas canvas = GameController.get().getGameCanvas();
+    private final GameScrollPane scrollPane = GameController.get().getScrollPane();
 
     public World() {
-        this.board = GameController.get().getBoard();
-        this.scrollPane = GameController.get().getScrollPane();
     }
 
     public void startGame(SaveMemento memento) {
@@ -32,10 +29,12 @@ public class World {
 
         showGame();
 
-        gameThread = new Thread(() -> {
+        Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
 
-                for (Content content : Controller.get().getCurrentLocation().getContent()) {
+                List<Content> contents = Controller.get().getCurrentLocation().getContent();
+                contents.sort(new ContentComparator());
+                for (Content content : contents) {
                     content.getItem().update();
                 }
 
@@ -51,28 +50,10 @@ public class World {
         });
         gameThread.setDaemon(true);
         gameThread.start();
-
-        highFreqThread = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(highFreqDurationMillis);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                Platform.runLater(() -> {
-                    update();
-                });
-            }
-        });
-        highFreqThread.setDaemon(true);
-        highFreqThread.start();
     }
 
     private void showGame() {
-        board.refresh();
-    }
-
-    private void update() {
+        canvas.refresh();
         scrollPane.updatePos();
     }
 
@@ -82,13 +63,5 @@ public class World {
 
     private void loadNewGame() {
         Controller.get().loadActivePluginToLists();
-    }
-
-    public static Thread getGameThread() {
-        return gameThread;
-    }
-
-    public static Thread getHighFreqThread() {
-        return highFreqThread;
     }
 }

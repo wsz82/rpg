@@ -2,7 +2,7 @@ package game.view.launcher;
 
 import editor.view.stage.Main;
 import game.model.GameController;
-import game.view.stage.GameMenu;
+import game.view.stage.GameStage;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,8 +51,8 @@ class Launcher {
         if (Controller.get().getActivePlugin() == null) {
             Controller.get().initNewPlugin();
         }
-        GameMenu gameMenu = GameMenu.get();
-        gameMenu.open();
+        GameStage gameStage = GameStage.get();
+        gameStage.open();
         stage.close();
     }
 
