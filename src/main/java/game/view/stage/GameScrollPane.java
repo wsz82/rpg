@@ -3,18 +3,20 @@ package game.view.stage;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import model.Controller;
+import model.content.Content;
+import model.location.CurrentLocation;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameScrollPane extends ScrollPane {
     private static final double SCROLL_H_FACTOR = 0.05;
     private static final double SCROLL_V_FACTOR = 0.05;
     private static GameScrollPane singleton;
+    private int[] levels;
 
     public static GameScrollPane get() {
         if (singleton == null) {
@@ -32,6 +34,14 @@ public class GameScrollPane extends ScrollPane {
         setVbarPolicy(ScrollBarPolicy.NEVER);
 
         setPannable(true);
+        hookupEvents();
+    }
+
+    private void hookupEvents() {
+        CurrentLocation.get().locationProperty().addListener(observable -> {
+            levels = getLevelsArr();
+        });
+
         addEventFilter(ScrollEvent.SCROLL, Event::consume);
         addEventFilter(MouseEvent.ANY, event -> {
             if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
@@ -39,14 +49,45 @@ public class GameScrollPane extends ScrollPane {
                     && event.getButton() != MouseButton.MIDDLE) event.consume();
         });
 
-        setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.DOWN
-                    || e.getCode() == KeyCode.UP
-                    || e.getCode() == KeyCode.RIGHT
-                    || e.getCode() == KeyCode.LEFT) {
-                e.consume();
+        addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            KeyCode key = e.getCode();
+            switch (key) {
+                case UP, DOWN, LEFT, RIGHT -> e.consume();
+                case PAGE_UP -> {
+                    e.consume();
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    int next = level;
+                    for (int i = 0; i < levels.length - 1; i++) {
+                        int current = levels[i];
+                        if (current == level) {
+                            next = levels[i + 1];
+                        }
+                    }
+                    Controller.get().getCurrentLayer().setLevel(next);
+                }
+                case PAGE_DOWN -> {
+                    e.consume();
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    int prev = level;
+                    for (int i = 1; i < levels.length; i++) {
+                        int current = levels[i];
+                        if (current == level) {
+                            prev = levels[i - 1];
+                        }
+                    }
+                    Controller.get().getCurrentLayer().setLevel(prev);
+                }
             }
         });
+    }
+
+    private int[] getLevelsArr() {
+        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
+        return contents.stream()
+                .mapToInt(l -> l.getItem().getLevel())
+                .distinct()
+                .sorted()
+                .toArray();
     }
 
     private void setSize() {

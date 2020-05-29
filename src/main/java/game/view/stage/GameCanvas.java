@@ -3,6 +3,8 @@ package game.view.stage;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -11,7 +13,6 @@ import model.content.Content;
 import model.item.Creature;
 import model.item.Item;
 import model.item.ItemType;
-import model.layer.CurrentLayer;
 import model.stage.Coords;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class GameCanvas extends Canvas {
 
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() == CurrentLayer.get().getCurrentLevel())    //TODO
+                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
         for (Content content : contents) {
             final Item item = content.getItem();
@@ -53,15 +54,34 @@ public class GameCanvas extends Canvas {
     }
 
     private void hookupEvents() {
+        setFocusTraversable(true);
+
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
                 Content content = lookForContent(e.getX(), e.getY());
+                if (content == null) {
+                    return;
+                }
                 ItemType type = content.getItem().getAsset().getType();
                 switch (type) {
-                    case CREATURE -> {
-                        gainControl(content);
-                    }
+                    case CREATURE -> gainControl(content);
+                }
+            }
+        });
+        addEventHandler(KeyEvent.ANY, e -> {
+            KeyCode key = e.getCode();
+            switch (key) {
+                case UP, DOWN, LEFT, RIGHT -> e.consume();
+                case PAGE_UP -> {
+                    e.consume();
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    Controller.get().getCurrentLayer().setLevel(level + 1);
+                }
+                case PAGE_DOWN -> {
+                    e.consume();
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    Controller.get().getCurrentLayer().setLevel(level - 1);
                 }
             }
         });
@@ -92,8 +112,11 @@ public class GameCanvas extends Canvas {
     private Content lookForContent(double x, double y) {
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() == CurrentLayer.get().getCurrentLevel())    //TODO
+                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
+        if (contents.isEmpty()) {
+            return null;
+        }
         contents.sort((o1, o2) -> o2.getItem().getPos().getZ() - o1.getItem().getPos().getZ());
         for (Content c : contents) {
             double cX = c.getItem().getPos().getX();
@@ -121,7 +144,7 @@ public class GameCanvas extends Canvas {
     }
 
     private void clear(GraphicsContext gc) {
-        gc.setFill(Color.GRAY);
+        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
     }
 }
