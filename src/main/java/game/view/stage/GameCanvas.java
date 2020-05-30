@@ -3,8 +3,6 @@ package game.view.stage;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -68,22 +66,6 @@ public class GameCanvas extends Canvas {
                 ItemType type = content.getItem().getAsset().getType();
                 switch (type) {
                     case CREATURE -> gainControl(content);
-                }
-            }
-        });
-        addEventHandler(KeyEvent.ANY, e -> {
-            KeyCode key = e.getCode();
-            switch (key) {
-                case UP, DOWN, LEFT, RIGHT -> e.consume();
-                case PAGE_UP -> {
-                    e.consume();
-                    int level = Controller.get().getCurrentLayer().getLevel();
-                    Controller.get().getCurrentLayer().setLevel(level + 1);
-                }
-                case PAGE_DOWN -> {
-                    e.consume();
-                    int level = Controller.get().getCurrentLayer().getLevel();
-                    Controller.get().getCurrentLayer().setLevel(level - 1);
                 }
             }
         });

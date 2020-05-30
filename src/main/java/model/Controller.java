@@ -32,7 +32,7 @@ public class Controller {
         location.getLayers().get().add(layer);
         LocationsList.get().add(location);
         CurrentLocation.get().setLocation(location);
-        CurrentLayer.get().setCurrentLayer(layer);
+        CurrentLayer.get().setLayer(layer);
     }
 
     public void loadAndRestorePlugin(File pluginDir) {
@@ -64,7 +64,7 @@ public class Controller {
 
         Location first = plugin.getLocations().get(0);    //TODO change to starting location
         CurrentLocation.get().setLocation(first);
-        CurrentLayer.get().setCurrentLayer(first.getLayers().get().get(0));
+        CurrentLayer.get().setLayer(first.getLayers().get().get(0));
 
         AssetsList.get().setAll(plugin.getAssets());
         LocationsList.get().setAll(plugin.getLocations());
@@ -82,8 +82,8 @@ public class Controller {
         CurrentLocation.get().getContent().remove(content);
     }
 
-    public Layer getCurrentLayer() {
-        return CurrentLayer.get().getCurrentLayer();
+    public CurrentLayer getCurrentLayer() {
+        return CurrentLayer.get();
     }
 
     public List<LocationSerializable> getLocationsSerializable() {

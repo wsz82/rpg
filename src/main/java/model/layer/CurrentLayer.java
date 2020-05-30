@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class CurrentLayer {
-    private final ObjectProperty<Layer> currentLayer = new SimpleObjectProperty<>();
-    private final IntegerProperty currentLevel = new SimpleIntegerProperty();
+    private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>();
+    private final IntegerProperty level = new SimpleIntegerProperty();
     private static CurrentLayer singleton;
 
     public static CurrentLayer get() {
@@ -20,24 +20,24 @@ public class CurrentLayer {
     private CurrentLayer() {
     }
 
-    public ObjectProperty<Layer> currentLayerProperty() {
-        return currentLayer;
+    public ObjectProperty<Layer> layerProperty() {
+        return layer;
     }
 
-    public Layer getCurrentLayer() {
-        return currentLayer.get();
+    public Layer getLayer() {
+        return layer.get();
     }
 
-    public void setCurrentLayer(Layer layer) {
-        currentLevel.set(layer.getLevel());
-        currentLayer.set(layer);
+    public void setLayer(Layer layer) {
+        level.set(layer.getLevel());
+        this.layer.set(layer);
     }
 
-    public int getCurrentLevel() {
-        return currentLevel.get();
+    public int getLevel() {
+        return level.get();
     }
 
-    public IntegerProperty currentLevelProperty() {
-        return currentLevel;
+    public IntegerProperty levelProperty() {
+        return level;
     }
 }

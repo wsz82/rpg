@@ -46,7 +46,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
 
             if (isLevelUnique(newValue)) {
                 layer.setLevel(newValue);
-                CurrentLayer.get().setCurrentLayer(layer);
+                CurrentLayer.get().setLayer(layer);
             } else {
                 layer.setLevel(t.getOldValue());
             }
@@ -86,7 +86,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         attachVisibleValueListener(CurrentLocation.get().getContentList());
         getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
-                CurrentLayer.get().setCurrentLayer(newSel);
+                CurrentLayer.get().setLayer(newSel);
             }
         });
     }

@@ -11,12 +11,12 @@ import model.content.ContentComparator;
 
 import java.util.List;
 
-public class World {
+public class GameRunner {
     private final long turnDurationMillis = 16;
     private final GameCanvas canvas = GameController.get().getGameCanvas();
     private final GameScrollPane scrollPane = GameController.get().getScrollPane();
 
-    public World() {
+    public GameRunner() {
     }
 
     public void startGame(SaveMemento memento) {

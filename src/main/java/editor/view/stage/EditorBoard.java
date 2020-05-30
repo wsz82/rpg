@@ -49,7 +49,7 @@ class EditorBoard extends Board {
             getChildren().add(iv);
             setLeftAnchor(iv, x);
             setTopAnchor(iv, y);
-            content.setVisible(Controller.get().getCurrentLayer().getVisible());
+            content.setVisible(Controller.get().getCurrentLayer().getLayer().getVisible());
 
             ContentWithImage cwi = new ContentWithImage(content, iv);
             boardContents.add(cwi);

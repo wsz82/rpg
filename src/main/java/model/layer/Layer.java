@@ -2,6 +2,8 @@ package model.layer;
 
 import javafx.beans.property.*;
 
+import java.util.Objects;
+
 public class Layer {
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final StringProperty name = new SimpleStringProperty(this, "name");
@@ -41,5 +43,19 @@ public class Layer {
 
     public BooleanProperty getVisibleProperty() {
         return visible;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Layer layer = (Layer) o;
+        return level.equals(layer.level) &&
+                name.equals(layer.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(level, name);
     }
 }

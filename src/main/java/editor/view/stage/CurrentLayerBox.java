@@ -15,7 +15,7 @@ class CurrentLayerBox extends HBox {
 
         getChildren().addAll(layerText, currentLayerNumber);
         setSpacing(5);
-        Bindings.bindBidirectional(currentLayerNumber.textProperty(), CurrentLayer.get().currentLevelProperty(),
+        Bindings.bindBidirectional(currentLayerNumber.textProperty(), CurrentLayer.get().levelProperty(),
                 new StringConverter<>() {
                     @Override
                     public String toString(Number object) {

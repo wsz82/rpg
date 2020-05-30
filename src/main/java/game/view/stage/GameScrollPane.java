@@ -10,13 +10,15 @@ import model.location.CurrentLocation;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameScrollPane extends ScrollPane {
     private static final double SCROLL_H_FACTOR = 0.05;
     private static final double SCROLL_V_FACTOR = 0.05;
     private static GameScrollPane singleton;
-    private int[] levels;
+    private List<Layer> layers;
 
     public static GameScrollPane get() {
         if (singleton == null) {
@@ -39,7 +41,7 @@ public class GameScrollPane extends ScrollPane {
 
     private void hookupEvents() {
         CurrentLocation.get().locationProperty().addListener(observable -> {
-            levels = getLevelsArr();
+            layers = getSortedLayers();
         });
 
         addEventFilter(ScrollEvent.SCROLL, Event::consume);
@@ -55,39 +57,38 @@ public class GameScrollPane extends ScrollPane {
                 case UP, DOWN, LEFT, RIGHT -> e.consume();
                 case PAGE_UP -> {
                     e.consume();
-                    int level = Controller.get().getCurrentLayer().getLevel();
-                    int next = level;
-                    for (int i = 0; i < levels.length - 1; i++) {
-                        int current = levels[i];
-                        if (current == level) {
-                            next = levels[i + 1];
+                    Layer layer = Controller.get().getCurrentLayer().getLayer();
+                    Layer next = layer;
+                    for (int i = 0; i < layers.size() - 1; i++) {
+                        Layer current = layers.get(i);
+                        if (current == layer) {
+                            next = layers.get(i + 1);
                         }
                     }
-                    Controller.get().getCurrentLayer().setLevel(next);
+                    Controller.get().getCurrentLayer().setLayer(next);
                 }
                 case PAGE_DOWN -> {
                     e.consume();
-                    int level = Controller.get().getCurrentLayer().getLevel();
-                    int prev = level;
-                    for (int i = 1; i < levels.length; i++) {
-                        int current = levels[i];
-                        if (current == level) {
-                            prev = levels[i - 1];
+                    Layer layer = Controller.get().getCurrentLayer().getLayer();
+                    Layer prev = layer;
+                    for (int i = 1; i < layers.size(); i++) {
+                        Layer current = layers.get(i);
+                        if (current == layer) {
+                            prev = layers.get(i - 1);
                         }
                     }
-                    Controller.get().getCurrentLayer().setLevel(prev);
+                    Controller.get().getCurrentLayer().setLayer(prev);
                 }
             }
         });
     }
 
-    private int[] getLevelsArr() {
+    private List<Layer> getSortedLayers() {
         List<Layer> layers = new ArrayList<>(Controller.get().getCurrentLocation().getLayers());
         return layers.stream()
-                .mapToInt(l -> l.getLevel())
                 .distinct()
-                .sorted()
-                .toArray();
+                .sorted(Comparator.comparingInt(Layer::getLevel))
+                .collect(Collectors.toList());
     }
 
     private void setSize() {

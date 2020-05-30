@@ -57,7 +57,7 @@ class EditorToolBar extends ToolBar {
         });
 
         opacitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int currentLevel = CurrentLayer.get().getCurrentLevel();
+            int currentLevel = CurrentLayer.get().getLevel();
             if (isItem[0]) {
                 ActiveContent ac = EditorController.get().getActiveContent();
                 ImageView iv = ac.getImage();

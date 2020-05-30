@@ -6,7 +6,7 @@ import game.model.save.SaveMemento;
 import game.model.save.SavesList;
 import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
-import game.model.world.World;
+import game.model.world.GameRunner;
 import game.view.launcher.Main;
 import game.view.stage.GameCanvas;
 import game.view.stage.GameScrollPane;
@@ -38,8 +38,8 @@ public class GameController {
     private GameController(){}
 
     public void startGame(SaveMemento memento) {
-        World world = new World();
-        world.startGame(memento);
+        GameRunner gameRunner = new GameRunner();
+        gameRunner.startGame(memento);
     }
 
     public void restoreLastPlugin() {
@@ -126,7 +126,7 @@ public class GameController {
         Location first = LocationsList.get().get(0);       //TODO change to Player current location
         CurrentLocation.get().setLocation(first);
         Layer layer = first.getLayers().get().get(0);
-        CurrentLayer.get().setCurrentLayer(layer);
+        CurrentLayer.get().setLayer(layer);
     }
 
     public GameCanvas getGameCanvas() {
