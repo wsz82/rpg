@@ -1,0 +1,32 @@
+<component name="ArtifactManager">
+  <artifact name="rpg">
+    <output-path>$PROJECT_DIR$/out/artifacts/rpg</output-path>
+    <root id="root">
+      <element id="archive" name="editor.jar">
+        <element id="module-output" name="io.wsz.editor" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/io.wsz.editor/META-INF/MANIFEST.MF" />
+        </element>
+      </element>
+      <element id="archive" name="game.jar">
+        <element id="module-output" name="io.wsz.game" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/io.wsz.game/META-INF/MANIFEST.MF" />
+        </element>
+      </element>
+      <element id="directory" name="model">
+        <element id="archive" name="model.jar">
+          <element id="directory" name="META-INF">
+            <element id="file-copy" path="$PROJECT_DIR$/io.wsz.model/META-INF/MANIFEST.MF" />
+          </element>
+          <element id="module-output" name="io.wsz.model" />
+        </element>
+      </element>
+      <element id="directory" name="javafx">
+        <element id="dir-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-14.0.1" />
+      </element>
+      <element id="file-copy" path="$APPLICATION_CONFIG_DIR$/scratches/run_editor.bat" />
+      <element id="file-copy" path="$APPLICATION_CONFIG_DIR$/scratches/run_game.bat" />
+    </root>
+  </artifact>
+</component>

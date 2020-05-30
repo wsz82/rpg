@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/io.wsz.editor/io.wsz.editor.iml" filepath="$PROJECT_DIR$/io.wsz.editor/io.wsz.editor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/io.wsz.game/io.wsz.game.iml" filepath="$PROJECT_DIR$/io.wsz.game/io.wsz.game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/io.wsz.model/io.wsz.model.iml" filepath="$PROJECT_DIR$/io.wsz.model/io.wsz.model.iml" />
+    </modules>
+  </component>
+</project>
