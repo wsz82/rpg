@@ -41,7 +41,7 @@ public class GameStage extends Stage {
     private final EventHandler<KeyEvent> gameReturn = event -> {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
-            startGame(null);    //TODO return to game
+            resumeGame();
         }
     };
     private StackPane gameMenuRoot;
@@ -131,7 +131,7 @@ public class GameStage extends Stage {
         menu.setAlignment(Pos.CENTER);
         Button resume = new Button("Resume");
         resume.setOnAction(event -> {
-            startGame(null);
+            resumeGame();
         });
         Button saveMenu = new Button("Save game");
         saveMenu.setOnAction(event -> {
@@ -238,12 +238,19 @@ public class GameStage extends Stage {
         saveGame(true, name);
     }
 
+    private void resumeGame() {
+        if (gameRoot == null) {
+            initGameRoot();
+        }
+        setRootToGame();
+        GameController.get().resumeGame();
+    }
+
     private void startGame(SaveMemento memento) {
         if (gameRoot == null) {
             initGameRoot();
         }
         setRootToGame();
-
         GameController.get().startGame(memento);
     }
 

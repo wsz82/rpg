@@ -42,6 +42,11 @@ public class GameController {
         gameRunner.startGame(memento);
     }
 
+    public void resumeGame() {
+        GameRunner gameRunner = new GameRunner();
+        gameRunner.resumeGame();
+    }
+
     public void restoreLastPlugin() {
         LastPluginCaretaker caretaker = new LastPluginCaretaker();
         File lastPluginDir = caretaker.loadMemento(Main.getDir());

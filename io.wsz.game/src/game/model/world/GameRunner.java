@@ -28,6 +28,15 @@ public class GameRunner {
             loadSave(memento);
         }
 
+        runGameThread();
+    }
+
+    public void resumeGame() {
+        GameController.get().setGame(true);
+        runGameThread();
+    }
+
+    private void runGameThread() {
         showGame();
 
         Thread gameThread = new Thread(() -> {
