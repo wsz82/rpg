@@ -99,6 +99,15 @@ public class LocationsTableView extends TableView<Location> {
                     .collect(Collectors.toList());
         }
         locations.removeAll(locationsToRemove);
+
+        changeCurrentLocationIfWasRemoved(locations);
+    }
+
+    private void changeCurrentLocationIfWasRemoved(List<Location> locations) {
+        Location currentLocation = Controller.get().getCurrentLocation().getLocation();
+        if (!locations.contains(currentLocation)) {
+            Controller.get().setCurrentLocation(locations.get(0));
+        }
     }
 
     public void goTo() {
