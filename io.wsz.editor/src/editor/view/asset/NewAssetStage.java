@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
+import editor.view.stage.Main;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.item.ItemType;
@@ -57,6 +58,7 @@ class NewAssetStage extends ChildStage {
         imageButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose image for asset");
+            fileChooser.setInitialDirectory(getAssetsTypeDir());
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
             );
@@ -89,6 +91,13 @@ class NewAssetStage extends ChildStage {
             addNewAsset();
             close();
         });
+    }
+
+    private File getAssetsTypeDir() {
+        String path = File.separator + "assets" + File.separator + itemType.toString().toLowerCase();
+        File dir = new File(Main.getDir() + path);
+        if (!dir.exists()) dir.mkdirs();
+        return dir;
     }
 
     private void alertOfNameExisting() {
