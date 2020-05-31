@@ -8,9 +8,7 @@ import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
@@ -69,9 +67,18 @@ public class ContentTableView extends TableView<Content> {
         levelCol.setOnEditCommit(t -> {
             int level = t.getNewValue();
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            c.setLevel(level);
-            int z = getUniqueZ(c.getItem().getPos().getZ(), level);
-            c.getItem().getPos().setZ(z);
+
+            List<Integer> levels = Controller.get().getCurrentLocation().getLayers().stream()
+                    .map(l -> l.getLevel())
+                    .collect(Collectors.toList());
+            if (!levels.contains(level)) {
+                alertLayerNotExisting(level);
+                c.getItem().setLevel(t.getOldValue());
+            } else {
+                c.setLevel(level);
+                int z = getUniqueZ(c.getItem().getPos().getZ(), level);
+                c.getItem().getPos().setZ(z);
+            }
             refresh();
         });
 
@@ -135,6 +142,13 @@ public class ContentTableView extends TableView<Content> {
         columns.add(2, levelCol);
         columns.add(3, visibilityCol);
         columns.add(4, posCol);
+    }
+
+    private void alertLayerNotExisting(int level) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Layer " + level + " does not exist!", ButtonType.CANCEL);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.CANCEL)
+                .ifPresent(r -> alert.close());
     }
 
     private int getUniqueZ(int z, int destLevel) {

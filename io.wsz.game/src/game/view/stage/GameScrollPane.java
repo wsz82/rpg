@@ -40,15 +40,15 @@ public class GameScrollPane extends ScrollPane {
     }
 
     private void hookupEvents() {
-        CurrentLocation.get().locationProperty().addListener(observable -> {
-            layers = getSortedLayers();
-        });
-
         addEventFilter(ScrollEvent.SCROLL, Event::consume);
         addEventFilter(MouseEvent.ANY, event -> {
             if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
                     && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
                     && event.getButton() != MouseButton.MIDDLE) event.consume();
+        });
+
+        CurrentLocation.get().locationProperty().addListener(observable -> {
+            layers = getSortedLayers();
         });
 
         addEventFilter(KeyEvent.KEY_PRESSED, e -> {

@@ -53,8 +53,6 @@ public class GameCanvas extends Canvas {
     }
 
     private void hookupEvents() {
-        setFocusTraversable(true);
-
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
