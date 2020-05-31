@@ -2,27 +2,24 @@ package editor.view.stage;
 
 import editor.model.ActiveContent;
 import editor.model.EditorController;
-import io.wsz.model.layer.CurrentLayer;
-import javafx.scene.control.Label;
+import io.wsz.model.Controller;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.Objects;
 
 class EditorToolBar extends ToolBar {
     private final ToggleButton pointerButton = new ToggleButton();
     private final Slider opacitySlider = new Slider(0.1, 1, 1);
-    private final Stage parent;
 
-    EditorToolBar(Stage parent) {
-        this.parent = parent;
-
+    EditorToolBar() {
         createPointerTool();
         VBox opacityBox = createOpacityTool();
 
@@ -30,35 +27,36 @@ class EditorToolBar extends ToolBar {
     }
 
     private VBox createOpacityTool() {
-        final boolean[] isItem = new boolean[]{true};
-        VBox opacityBox = new VBox(5);
-        Label opacityLabel = new Label("Item opacity");
-        opacityBox.getChildren().addAll(opacityLabel, opacitySlider);
+        final String itemOpacity = "Item opacity";
+        final String layerOpacity = "Layer opacity";
+        final ObservableList<String> opacityList = FXCollections.observableArrayList();
+        opacityList.add(itemOpacity);
+        opacityList.add(layerOpacity);
+        final ChoiceBox<String> cb = new ChoiceBox<>();
+        cb.setItems(opacityList);
+        final VBox opacityBox = new VBox(5);
 
-        opacityLabel.setOnMouseClicked(event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY)) {
-                if (isItem[0]) {
-                    isItem[0] = false;
-                    opacityLabel.setText("Layer opacity");
-                } else {
-                    isItem[0] = true;
-                    opacityLabel.setText("Item opacity");
-                }
-            }
-        });
+        opacityBox.getChildren().addAll(cb, opacitySlider);
 
+        cb.setValue(itemOpacity);
         opacitySlider.setShowTickMarks(true);
         opacitySlider.setShowTickLabels(true);
         opacitySlider.setMajorTickUnit(0.3);
         opacitySlider.setBlockIncrement(0.1);
 
+        hookupOpacityEvents(itemOpacity, cb);
+
+        return opacityBox;
+    }
+
+    private void hookupOpacityEvents(String itemOpacity, ChoiceBox<String> cb) {
         EditorController.get().getActiveContent().imageProperty().addListener((observable, oldValue, newValue) -> {
             opacitySlider.setValue(newValue.getOpacity());
         });
 
         opacitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int currentLevel = CurrentLayer.get().getLevel();
-            if (isItem[0]) {
+            int currentLevel = Controller.get().getCurrentLayer().getLevel();
+            if (cb.getValue().equals(itemOpacity)) {
                 ActiveContent ac = EditorController.get().getActiveContent();
                 ImageView iv = ac.getImage();
                 if (iv == null) {
@@ -71,7 +69,6 @@ class EditorToolBar extends ToolBar {
                         .forEach(i -> i.getImageView().setOpacity(newValue.doubleValue()));
             }
         });
-        return opacityBox;
     }
 
     private void createPointerTool() {

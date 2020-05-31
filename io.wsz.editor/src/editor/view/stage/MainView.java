@@ -117,7 +117,7 @@ class MainView {
 
     private void setTopContent(VBox topBar) {
         MenuBar menuBar = getMenuBar();
-        ToolBar toolBar = new EditorToolBar(stage);
+        ToolBar toolBar = new EditorToolBar();
         topBar.getChildren().addAll(menuBar, toolBar);
     }
 
