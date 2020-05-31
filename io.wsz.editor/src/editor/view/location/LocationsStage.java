@@ -1,6 +1,7 @@
 package editor.view.location;
 
 import editor.view.stage.ChildStage;
+import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import javafx.scene.Scene;
@@ -51,6 +52,8 @@ public class LocationsStage extends ChildStage {
     private void addLocation() {
         Location location = new Location("new", 800, 600);
         Location uniqueLocation = getUniqueLocation(location);
+        Layer layer = new Layer("new");
+        location.getLayers().get().add(layer);
         LocationsList.get().add(uniqueLocation);
     }
 

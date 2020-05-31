@@ -120,6 +120,9 @@ public class SerializableConverter {
     }
 
     private static List<Content> toContents(List<ContentSerializable> input, List<Asset> assets) {
+        if (input.isEmpty()) {
+            return new ArrayList<>(0);
+        }
         if (assets.isEmpty()) {
             throw new NoSuchElementException("Assets list is empty");
         }
