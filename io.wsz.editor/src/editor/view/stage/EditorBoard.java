@@ -91,9 +91,11 @@ class EditorBoard extends Board {
             iv.setOnContextMenuRequested(event -> {
                 MenuItem remove = new MenuItem("Remove");
                 remove.setOnAction(ev -> removeItem(content));
+                MenuItem moveToPointer = new MenuItem("Move to pointer");
+                moveToPointer.setOnAction(e -> moveToPointer(pos));
                 MenuItem setInvisible = new MenuItem("Set invisible");
                 setInvisible.setOnAction(e -> setInvisible(content));
-                ContextMenu menu = new ContextMenu(remove, setInvisible);
+                ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
                 menu.show(this, event.getScreenX(), event.getScreenY());
 
                 this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
@@ -140,6 +142,13 @@ class EditorBoard extends Board {
         final Image changedImage = new WritableImage(
                 img.getPixelReader(), resizeWidth, resizeHeight);
         iv.setImage(changedImage);
+    }
+
+    private void moveToPointer(Coords pos) {
+        Coords newPos = Pointer.getMark();
+        pos.setX(newPos.getX());
+        pos.setY(newPos.getY());
+        ContentTableView.get().refresh();
     }
 
     void moveContent(KeyCode keyCode, Content content){

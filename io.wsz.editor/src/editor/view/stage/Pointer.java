@@ -32,15 +32,15 @@ public class Pointer {
     };
     private final ImageView marker = new ImageView();
     private static Coords mark;
-    private static Pointer pointer;
+    private static Pointer singleton;
     private static boolean active;
     private Image markerImage;
 
-    static Pointer getInstance() {
-        if (pointer == null) {
-            pointer = new Pointer();
+    static Pointer get() {
+        if (singleton == null) {
+            singleton = new Pointer();
         }
-        return pointer;
+        return singleton;
     }
 
     private Pointer() {
