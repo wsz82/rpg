@@ -54,23 +54,6 @@ public class Controller {
         AssetsList.get().setAll(plugin.getAssets());
     }
 
-    public void loadActivePluginToLists() {
-        if (ActivePlugin.get().getPlugin() == null) {
-            return;
-        }
-        LocationsList.get().clear();
-        AssetsList.get().clear();
-
-        Plugin plugin = ActivePlugin.get().getPlugin();
-
-        Location first = plugin.getLocations().get(0);    //TODO change to starting location
-        CurrentLocation.get().setLocation(first);
-        CurrentLayer.get().setLayer(first.getLayers().get().get(0));
-
-        AssetsList.get().setAll(plugin.getAssets());
-        LocationsList.get().setAll(plugin.getLocations());
-    }
-
     public Plugin loadPlugin(File pluginDir) {
         if (pluginDir == null) {
             return new Plugin();

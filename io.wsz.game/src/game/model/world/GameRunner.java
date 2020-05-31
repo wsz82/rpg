@@ -7,6 +7,7 @@ import game.view.stage.GameScrollPane;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
+import io.wsz.model.plugin.Plugin;
 import javafx.application.Platform;
 
 import java.util.List;
@@ -77,6 +78,17 @@ public class GameRunner {
     }
 
     private void loadNewGame() {
-        Controller.get().loadActivePluginToLists();
+        GameController.get().loadGameActivePluginToLists();
+        initGameSettings();
+    }
+
+    private void initGameSettings() {
+        Plugin p = Controller.get().getActivePlugin();
+        int startX = p.getStartX();
+        int startY = p.getStartY();
+        double width = Controller.get().getCurrentLocation().getCurrentWidth();
+        double height = Controller.get().getCurrentLocation().getCurrentHeight();
+        scrollPane.setHvalue((double)startX/width);
+        scrollPane.setVvalue((double)startY/height);
     }
 }

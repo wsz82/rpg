@@ -5,6 +5,9 @@ import editor.model.settings.SettingsMemento;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.AssetsList;
+import io.wsz.model.layer.CurrentLayer;
+import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
@@ -71,11 +74,27 @@ public class EditorController {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = pc.load(pluginDir);
         Controller.get().setActivePlugin(p);
-        Controller.get().loadActivePluginToLists();
+        loadEditorActivePluginToLists();
         PluginSettingsStage.setStartingLocation(p.isStartingLocation());
         PluginSettingsStage.setStartLocationName(p.getStartLocation());
         PluginSettingsStage.setStartX(p.getStartX());
         PluginSettingsStage.setStartY(p.getStartY());
         PluginSettingsStage.setStartLayer(p.getStartLayer());
+    }
+
+    public void loadEditorActivePluginToLists() {
+        if (ActivePlugin.get().getPlugin() == null) {
+            return;
+        }
+        LocationsList.get().clear();
+        AssetsList.get().clear();
+
+        Plugin p = ActivePlugin.get().getPlugin();
+        Location first = p.getLocations().get(0);
+        CurrentLocation.get().setLocation(first);
+        CurrentLayer.get().setLayer(first.getLayers().get().get(0));
+
+        AssetsList.get().setAll(p.getAssets());
+        LocationsList.get().setAll(p.getLocations());
     }
 }

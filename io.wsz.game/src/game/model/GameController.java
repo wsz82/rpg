@@ -24,6 +24,7 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameController {
     private static GameController singleton;
@@ -137,6 +138,31 @@ public class GameController {
         CurrentLocation.get().setLocation(first);
         Layer layer = first.getLayers().get().get(0);
         CurrentLayer.get().setLayer(layer);
+    }
+
+    public void loadGameActivePluginToLists() {
+        if (ActivePlugin.get().getPlugin() == null) {
+            return;
+        }
+        LocationsList.get().clear();
+        AssetsList.get().clear();
+
+        Plugin p = ActivePlugin.get().getPlugin();
+
+        if (p.isStartingLocation()) {
+            List<Location> startLocation = p.getLocations().stream()
+                    .filter(l -> l.getName().equals(p.getStartLocation()))
+                    .collect(Collectors.toList());
+            Location first = startLocation.get(0);
+            CurrentLocation.get().setLocation(first);
+            List<Layer> startLayer = first.getLayers().get().stream()
+                    .filter(l -> l.getLevel() == p.getStartLayer())
+                    .collect(Collectors.toList());
+            CurrentLayer.get().setLayer(startLayer.get(0));
+        }
+
+        AssetsList.get().setAll(p.getAssets());
+        LocationsList.get().setAll(p.getLocations());
     }
 
     public GameCanvas getGameCanvas() {
