@@ -31,9 +31,11 @@ public class ContentStage extends ChildStage {
     private void setUpContextMenu() {
         final ContextMenu contextMenu = new ContextMenu();
         final MenuItem removeItems = new MenuItem("Remove items");
+        final MenuItem moveToPointer = new MenuItem("Move to pointer");
         final MenuItem changeVisibility = new MenuItem("Change visibility");
-        contextMenu.getItems().addAll(removeItems, changeVisibility);
+        contextMenu.getItems().addAll(removeItems, moveToPointer, changeVisibility);
         removeItems.setOnAction(event -> removeItems());
+        moveToPointer.setOnAction(e -> moveToPointer());
         changeVisibility.setOnAction(event -> changeVisibility());
         root.setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
@@ -42,6 +44,10 @@ public class ContentStage extends ChildStage {
 
     private void changeVisibility() {
         table.changeVisibility();
+    }
+
+    private void moveToPointer() {
+        table.moveToPointer();
     }
 
     private void removeItems() {

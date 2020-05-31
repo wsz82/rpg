@@ -1,9 +1,11 @@
 package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
+import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -173,5 +175,15 @@ public class ContentTableView extends TableView<Content> {
         for (Content content : contentsToChange) {
             content.setVisible(!content.isVisible());
         }
+    }
+
+    public void moveToPointer() {
+        List<Content> contentsToMove = getSelectionModel().getSelectedItems();
+        Coords newPos = Pointer.getMark();
+        for (Content c : contentsToMove) {
+            c.getItem().getPos().setX(newPos.getX());
+            c.getItem().getPos().setY(newPos.getY());
+        }
+        refresh();
     }
 }

@@ -89,13 +89,13 @@ class EditorBoard extends Board {
             });
 
             iv.setOnContextMenuRequested(event -> {
-                MenuItem remove = new MenuItem("Remove");
+                final MenuItem remove = new MenuItem("Remove");
                 remove.setOnAction(ev -> removeItem(content));
-                MenuItem moveToPointer = new MenuItem("Move to pointer");
+                final MenuItem moveToPointer = new MenuItem("Move to pointer");
                 moveToPointer.setOnAction(e -> moveToPointer(pos));
-                MenuItem setInvisible = new MenuItem("Set invisible");
+                final MenuItem setInvisible = new MenuItem("Set invisible");
                 setInvisible.setOnAction(e -> setInvisible(content));
-                ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
+                final ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
                 menu.show(this, event.getScreenX(), event.getScreenY());
 
                 this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
