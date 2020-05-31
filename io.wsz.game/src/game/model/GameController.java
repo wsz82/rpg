@@ -17,6 +17,7 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
+import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.SerializableConverter;
 import javafx.collections.ObservableList;
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class GameController {
     private static GameController singleton;
-    private boolean isGame;
+    private boolean isGame; //TODO make atomic?
 
     public static GameController get() {
         if (singleton == null) {
@@ -37,9 +38,13 @@ public class GameController {
 
     private GameController(){}
 
-    public void startGame(SaveMemento memento) {
+    public boolean startGame(SaveMemento memento) {
+        if (ActivePlugin.get().getPlugin() == null) {
+            return false;
+        }
         GameRunner gameRunner = new GameRunner();
         gameRunner.startGame(memento);
+        return true;
     }
 
     public void resumeGame() {

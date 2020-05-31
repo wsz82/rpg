@@ -29,6 +29,7 @@ public class Controller {
     public void initNewPlugin() {
         AssetsList.get().clear();
         LocationsList.get().clear();
+
         Location location = new Location("new", 800, 600);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);

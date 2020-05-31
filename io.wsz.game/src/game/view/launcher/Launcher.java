@@ -47,9 +47,6 @@ class Launcher {
     }
 
     private void play() {
-        if (Controller.get().getActivePlugin() == null) {
-            Controller.get().initNewPlugin();
-        }
         GameStage gameStage = GameStage.get();
         gameStage.open();
         stage.close();

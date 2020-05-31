@@ -38,6 +38,8 @@ public class GameRunner {
 
     private void runGameThread() {
         showGame();
+        scrollPane.requestFocus();
+        scrollPane.setFocusTraversable(false);
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {

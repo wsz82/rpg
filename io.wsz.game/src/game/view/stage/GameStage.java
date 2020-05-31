@@ -7,16 +7,15 @@ import game.view.launcher.Main;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -250,8 +249,43 @@ public class GameStage extends Stage {
         if (gameRoot == null) {
             initGameRoot();
         }
+        boolean gameStarted = GameController.get().startGame(memento);
+        if (!gameStarted) {
+            alertNoGame();
+            return;
+        }
         setRootToGame();
-        GameController.get().startGame(memento);
+    }
+
+    private void alertNoGame() {
+        Node root = getScene().getRoot();
+        VBox alert = new VBox(5);
+        alert.setAlignment(Pos.CENTER);
+        alert.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+
+        Label message = new Label("No game is chosen");
+        message.setAlignment(Pos.CENTER);
+        Button returnButton = new Button("Return");
+        returnButton.setAlignment(Pos.CENTER);
+        returnButton.setOnAction(e -> {
+            removeAlert(alert, root);
+        });
+
+        alert.getChildren().addAll(message, returnButton);
+
+        if (root == mainMenuRoot) {
+            mainMenuRoot.getChildren().add(alert);
+        } else if (root == loadsRoot) {
+            loadsRoot.getChildren().add(alert);
+        }
+    }
+
+    private void removeAlert(VBox alert, Node root) {
+        if (root == mainMenuRoot) {
+            mainMenuRoot.getChildren().remove(alert);
+        } else if (root == loadsRoot) {
+            loadsRoot.getChildren().remove(alert);
+        }
     }
 
     private void createNewSave() {
