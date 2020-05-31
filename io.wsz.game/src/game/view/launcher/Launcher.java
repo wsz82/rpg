@@ -55,6 +55,7 @@ class Launcher {
     private void choosePlugin() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose plugin");
+        fileChooser.setInitialDirectory(Main.getDir());
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
         File loadedFile = fileChooser.showOpenDialog(stage);

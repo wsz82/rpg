@@ -191,6 +191,7 @@ class MainView {
     private void loadFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose plugin");
+        fileChooser.setInitialDirectory(Main.getDir());
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
         File loadedFile = fileChooser.showOpenDialog(Main.getStage());
@@ -204,6 +205,7 @@ class MainView {
     private void saveAsFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save plugin");
+        fileChooser.setInitialDirectory(Main.getDir());
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
