@@ -19,6 +19,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class LayersTableView extends TableView<Layer> implements LevelValueObservable, VisibleValueObservable {
     private final Set<LevelValueListener> levelValueListeners = new HashSet<>();
@@ -107,7 +108,14 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
 
     void removeLayers() {
         List<Layer> layersToRemove = getSelectionModel().getSelectedItems();
-        CurrentLocation.get().getLayers().removeAll(layersToRemove);
+        List<Layer> layers = CurrentLocation.get().getLayers();
+        boolean listSizesAreEqual = layers.size() == layersToRemove.size();
+        if (listSizesAreEqual) {
+            layersToRemove = layersToRemove.stream()
+                    .limit(layers.size() - 1)
+                    .collect(Collectors.toList());
+        }
+        layers.removeAll(layersToRemove);
     }
 
     public void changeVisibility() {
