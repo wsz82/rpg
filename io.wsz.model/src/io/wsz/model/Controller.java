@@ -9,6 +9,7 @@ import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
+import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.Collection;
@@ -36,12 +37,6 @@ public class Controller {
         LocationsList.get().add(location);
         CurrentLocation.get().setLocation(location);
         CurrentLayer.get().setLayer(layer);
-    }
-
-    public void loadAndRestorePlugin(File pluginDir) {
-        PluginCaretaker pc = new PluginCaretaker();
-        setActivePlugin(pc.load(pluginDir));
-        loadActivePluginToLists();
     }
 
     public void setActivePlugin(Plugin plugin) {
@@ -104,7 +99,7 @@ public class Controller {
         CurrentLocation.get().setLocation(location);
     }
 
-    public List<Location> getLocationsList() {
+    public ObservableList<Location> getLocationsList() {
         return LocationsList.get();
     }
 

@@ -8,7 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class ContentStage extends ChildStage {
-    private static final String CONTENT = "Content";
+    private static final String TITLE = "Content";
     private final StackPane root = new StackPane();
     private final ContentTableView table = ContentTableView.get();
 
@@ -20,7 +20,7 @@ public class ContentStage extends ChildStage {
     private void initWindow() {
         Scene scene = new Scene(root);
         initOwner(parent);
-        setTitle(CONTENT);
+        setTitle(TITLE);
         setScene(scene);
 
         setUpContextMenu();

@@ -1,10 +1,6 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.asset.Asset;
-import io.wsz.model.location.Location;
-
 import java.io.*;
-import java.util.List;
 
 public class PluginCaretaker {
 
@@ -44,14 +40,7 @@ public class PluginCaretaker {
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             PluginSerializable ps = (PluginSerializable) oos.readObject();
-
-            List<Asset> assets = SerializableConverter.toAssetObjects(ps.getAssets());
-            List<Location> locations = SerializableConverter.toLocationObjects(
-                    ps.getLocations(), assets);
-
-            plugin.setFile(file);
-            plugin.setAssets(assets);
-            plugin.setLocations(locations);
+            plugin = SerializableConverter.toPlugin(ps);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

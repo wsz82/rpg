@@ -7,6 +7,7 @@ import editor.view.content.ContentStage;
 import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
+import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.plugin.ActivePlugin;
 import javafx.event.Event;
@@ -35,6 +36,7 @@ class MainView {
     private final LayersStage layersWindow;
     private final AssetsStage assetsWindow;
     private final LocationsStage locationsWindow;
+    private final PluginSettingsStage pss;
 
     MainView(Stage stage) {
         this.stage = stage;
@@ -42,6 +44,7 @@ class MainView {
         layersWindow = new LayersStage(stage);
         assetsWindow = new AssetsStage(stage);
         locationsWindow = new LocationsStage(stage);
+        pss = new PluginSettingsStage(stage);
     }
 
     void show() {
@@ -143,12 +146,16 @@ class MainView {
         MenuItem save = new MenuItem("Save");
         MenuItem saveAs = new MenuItem("Save as");
         MenuItem load = new MenuItem("Load");
+        MenuItem plugin = new MenuItem("Plugin settings");
+        MenuItem exit = new MenuItem("Exit");
 
         newPlugin.setOnAction(event -> createNewPlugin());
         save.setOnAction(event -> saveFile());
         saveAs.setOnAction(event -> saveAsFile());
         load.setOnAction(event -> loadFile());
-        file.getItems().addAll(newPlugin, save, saveAs, load);
+        plugin.setOnAction(e -> openPluginSettings());
+        exit.setOnAction(e -> stage.close());
+        file.getItems().addAll(newPlugin, save, saveAs, load, plugin, exit);
 
         Menu view = new Menu("View");
         CheckMenuItem contents = new CheckMenuItem("Contents");
@@ -173,6 +180,10 @@ class MainView {
         return new MenuBar(file, view, location);
     }
 
+    private void openPluginSettings() {
+        pss.open();
+    }
+
     private void createNewPlugin() {
         Controller.get().initNewPlugin();
     }
@@ -187,7 +198,7 @@ class MainView {
         if (loadedFile == null) {
             return;
         }
-        Controller.get().loadAndRestorePlugin(loadedFile);
+        EditorController.get().loadAndRestorePlugin(loadedFile);
     }
 
     private void saveAsFile() {

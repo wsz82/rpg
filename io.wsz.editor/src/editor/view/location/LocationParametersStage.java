@@ -1,25 +1,21 @@
 package editor.view.location;
 
+import editor.view.IntegerField;
 import editor.view.stage.ChildStage;
+import io.wsz.model.Controller;
 import io.wsz.model.location.CurrentLocation;
-import javafx.beans.value.ChangeListener;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.converter.IntegerStringConverter;
-
-import java.util.function.UnaryOperator;
 
 public class LocationParametersStage extends ChildStage {
     private final AnchorPane root = new AnchorPane();
-    private final TextField inputWidth = new TextField();
-    private final TextField inputHeight = new TextField();
+    private final IntegerField inputWidth = new IntegerField(1);
+    private final IntegerField inputHeight = new IntegerField(1);
     private final Button accept = new Button("Ok");
     private final Button cancel = new Button("Cancel");
 
@@ -38,14 +34,12 @@ public class LocationParametersStage extends ChildStage {
         HBox widthWithLabel = new HBox(10);
         Label widthLabel = new Label("Width");
         widthWithLabel.getChildren().addAll(widthLabel, inputWidth);
-        filterTextFieldForPositiveNumber(inputWidth);
         inputWidth.setText("" + CurrentLocation.get().getLocation().getWidth());
         inputWidth.setPrefWidth(80);
 
         HBox heightWithLabel = new HBox(10);
         Label heightLabel = new Label("Height");
         heightWithLabel.getChildren().addAll(heightLabel, inputHeight);
-        filterTextFieldForPositiveNumber(inputHeight);
         inputHeight.setText("" + CurrentLocation.get().getLocation().getHeight());
         inputHeight.setPrefWidth(80);
 
@@ -75,31 +69,7 @@ public class LocationParametersStage extends ChildStage {
     }
 
     private void changeCurrentLocationParameters(int width, int height) {
-        CurrentLocation.get().setCurrentWidth(width);
-        CurrentLocation.get().setCurrentHeight(height);
-    }
-
-    private void filterTextFieldForPositiveNumber(TextField textField) {
-        UnaryOperator<TextFormatter.Change> integerFilter = change -> {
-            String input = change.getControlNewText();
-            try {
-                Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            return change;
-        };
-        textField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter(), 1, integerFilter));
-        ChangeListener<String> positiveNumberListener = (observable, oldValue, newValue) -> {
-            int newNumber = 1;
-
-            try {
-                newNumber = Integer.parseInt(newValue);
-            } catch (NumberFormatException e) {
-                textField.setText("" + oldValue);
-            }
-            if (newNumber < 1) textField.setText("" + oldValue);
-        };
-        textField.textProperty().addListener(positiveNumberListener);
+        Controller.get().getCurrentLocation().setCurrentWidth(width);
+        Controller.get().getCurrentLocation().setCurrentHeight(height);
     }
 }

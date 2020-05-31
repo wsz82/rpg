@@ -22,13 +22,17 @@ public class SerializableConverter {
     public static PluginSerializable toPluginSerializable(Plugin plugin) {
         List<LocationSerializable> locations = locationsToSerializable(plugin.getLocations());
         List<AssetSerializable> assets = assetsToSerializable(plugin.getAssets());
-        return new PluginSerializable(locations, assets);
+        return new PluginSerializable(plugin.getFile(), locations, assets,
+                plugin.isStartingLocation(), plugin.getStartLocation(),
+                plugin.getStartX(), plugin.getStartY(), plugin.getStartLayer());
     }
 
     public static Plugin toPlugin(PluginSerializable ps) {
         List<Asset> assets = toAssetObjects(ps.getAssets());
         List<Location> locations = toLocationObjects(ps.getLocations(), assets);
-        return new Plugin(ps.getFile(), locations, assets);
+        return new Plugin(ps.getFile(), locations, assets,
+                ps.isStartingLocation(), ps.getStartLocation(),
+                ps.getStartX(), ps.getStartY(), ps.getStartLayer());
     }
 
     public static List<LocationSerializable> locationsToSerializable(List<Location> input) {
@@ -154,7 +158,7 @@ public class SerializableConverter {
         return new Coords(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static List<AssetSerializable> assetsToSerializable(List<Asset> input) {
+    private static List<AssetSerializable> assetsToSerializable(List<Asset> input) {
         List<AssetSerializable> output = new ArrayList<>(0);
         for (Asset asset : input) {
             AssetSerializable as = toSerializableAsset(asset);
@@ -170,7 +174,7 @@ public class SerializableConverter {
         return new AssetSerializable(name, type, path);
     }
 
-    static List<Asset> toAssetObjects(List<AssetSerializable> input) {
+    private static List<Asset> toAssetObjects(List<AssetSerializable> input) {
         List<Asset> output = FXCollections.observableArrayList();
         for (AssetSerializable as : input) {
             Asset asset = new Asset();
