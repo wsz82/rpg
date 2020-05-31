@@ -49,14 +49,7 @@ class MainView {
         VBox topBar = new VBox();
         VBox bottomBar = new VBox();
 
-        scrollPane.setContent(EDITOR_BOARD);
-        scrollPane.setPannable(true);
-        scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
-        scrollPane.addEventFilter(MouseEvent.ANY, event -> {
-            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
-                    && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
-                    && event.getButton() != MouseButton.MIDDLE) event.consume();
-        });
+        setUpScrollPane();
 
         borderPane.setTop(topBar);
         borderPane.setCenter(scrollPane);
@@ -78,6 +71,19 @@ class MainView {
         assetsWindow.show();
         contentsWindow.show();
         locationsWindow.show();
+    }
+
+    private void setUpScrollPane() {
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setContent(EDITOR_BOARD);
+        scrollPane.setPannable(true);
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
+        scrollPane.addEventFilter(MouseEvent.ANY, event -> {
+            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
+                    && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
+                    && event.getButton() != MouseButton.MIDDLE) event.consume();
+        });
     }
 
     private void storeSettings(File programDir) {
