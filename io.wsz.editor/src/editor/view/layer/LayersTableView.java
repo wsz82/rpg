@@ -1,11 +1,11 @@
 package editor.view.layer;
 
 import editor.view.SafeIntegerStringConverter;
+import io.wsz.model.Controller;
 import io.wsz.model.content.LevelValueListener;
 import io.wsz.model.content.LevelValueObservable;
 import io.wsz.model.content.VisibleValueListener;
 import io.wsz.model.content.VisibleValueObservable;
-import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import javafx.collections.ObservableList;
@@ -51,7 +51,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
 
             if (isLevelUnique(newValue)) {
                 layer.setLevel(newValue);
-                CurrentLayer.get().setLayer(layer);
+                Controller.get().getCurrentLayer().setLayer(layer);
             } else {
                 layer.setLevel(t.getOldValue());
             }
@@ -91,7 +91,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         attachVisibleValueListener(CurrentLocation.get().getContentList());
         getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
-                CurrentLayer.get().setLayer(newSel);
+                Controller.get().getCurrentLayer().setLayer(newSel);
             }
         });
     }
@@ -108,7 +108,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
 
     void removeLayers() {
         List<Layer> layersToRemove = getSelectionModel().getSelectedItems();
-        List<Layer> layers = CurrentLocation.get().getLayers();
+        List<Layer> layers = Controller.get().getCurrentLocation().getLayers();
         boolean listSizesAreEqual = layers.size() == layersToRemove.size();
         if (listSizesAreEqual) {
             layersToRemove = layersToRemove.stream()

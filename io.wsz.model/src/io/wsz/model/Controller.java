@@ -100,4 +100,8 @@ public class Controller {
     public void setCurrentLocation(Location location) {
         CurrentLocation.get().setLocation(location);
     }
+
+    public List<Location> getLocationsList() {
+        return LocationsList.get();
+    }
 }

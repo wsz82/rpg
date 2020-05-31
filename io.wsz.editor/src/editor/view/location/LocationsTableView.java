@@ -13,6 +13,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LocationsTableView extends TableView<Location> {
 
@@ -41,7 +42,7 @@ public class LocationsTableView extends TableView<Location> {
             }
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                CurrentLocation.get().setCurrentName(newValue);
+                Controller.get().getCurrentLocation().setCurrentName(newValue);
             }
             refresh();
         });
@@ -56,7 +57,7 @@ public class LocationsTableView extends TableView<Location> {
             location.setWidth(newWidth);
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                CurrentLocation.get().setCurrentWidth(newWidth);
+                Controller.get().getCurrentLocation().setCurrentWidth(newWidth);
             }
             refresh();
         });
@@ -71,7 +72,7 @@ public class LocationsTableView extends TableView<Location> {
             location.setHeight(t.getNewValue());
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                CurrentLocation.get().setCurrentHeight(newHeight);
+                Controller.get().getCurrentLocation().setCurrentHeight(newHeight);
             }
             refresh();
         });
@@ -83,13 +84,20 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private boolean isNameUnique(String newValue) {
-        return LocationsList.get().stream()
+        return Controller.get().getLocationsList().stream()
                 .noneMatch(layer -> layer.getName().equals(newValue));
     }
 
     void removeLocations() {
         List<Location> locationsToRemove = this.getSelectionModel().getSelectedItems();
-        LocationsList.get().removeAll(locationsToRemove);
+        List<Location> locations = Controller.get().getLocationsList();
+        boolean listSizesAreEqual = locations.size() == locationsToRemove.size();
+        if (listSizesAreEqual) {
+            locationsToRemove = locationsToRemove.stream()
+                    .limit(locations.size() - 1)
+                    .collect(Collectors.toList());
+        }
+        locations.removeAll(locationsToRemove);
     }
 
     public void goTo() {
