@@ -2,10 +2,12 @@ package io.wsz.model.item;
 
 import java.io.Serializable;
 
+/*content comparator depends on ordinal*/
+
 public enum ItemType implements Serializable {
-    LANDSCAPE,
     COVER,
-    MOVE_ZONE,
+    CREATURE,
+    LANDSCAPE,
     FLY_ZONE,
-    CREATURE
+    MOVE_ZONE
 }
