@@ -26,11 +26,11 @@ public class SettingsCaretaker {
 
         if (!mementoExists) {
             return new SettingsMemento(
-                    0, 0, 800, 600,
-                    0, 600, 300, 300,
-                    800, 600, 400, 300,
-                    300, 600, 500, 300,
-                    800, 0, 400,600
+                    0, 0, 1000, 750,
+                    1000, 0, 250,500,
+                    1250, 150, 350, 350,
+                    1000, 500, 600, 300,
+                    1250, 0, 300, 150
             );
         }
         SettingsMemento memento = new SettingsMemento();

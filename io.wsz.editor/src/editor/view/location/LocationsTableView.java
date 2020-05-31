@@ -46,6 +46,7 @@ public class LocationsTableView extends TableView<Location> {
             }
             refresh();
         });
+        nameCol.setPrefWidth(100);
 
         TableColumn<Location, Integer> widthCol = new TableColumn<>("Width");
         widthCol.setCellValueFactory(new PropertyValueFactory<>("width"));
