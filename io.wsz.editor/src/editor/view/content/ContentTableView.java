@@ -1,6 +1,7 @@
 package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
+import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.location.CurrentLocation;
 import javafx.beans.binding.ObjectBinding;
@@ -14,6 +15,7 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ContentTableView extends TableView<Content> {
     private static ContentTableView singleton;
@@ -63,8 +65,11 @@ public class ContentTableView extends TableView<Content> {
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
-            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.setLevel(t.getNewValue());
+            int level = t.getNewValue();
+            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            c.setLevel(level);
+            int z = getUniqueZ(c.getItem().getPos().getZ(), level);
+            c.getItem().getPos().setZ(z);
             refresh();
         });
 
@@ -86,8 +91,8 @@ public class ContentTableView extends TableView<Content> {
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         xCol.setOnEditCommit(t -> {
-            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getItem().getPos().setX(t.getNewValue());
+            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            c.getItem().getPos().setX(t.getNewValue());
             refresh();
         });
 
@@ -101,8 +106,8 @@ public class ContentTableView extends TableView<Content> {
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         yCol.setOnEditCommit(t -> {
-            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getItem().getPos().setY(t.getNewValue());
+            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            c.getItem().getPos().setY(t.getNewValue());
             refresh();
         });
 
@@ -116,8 +121,8 @@ public class ContentTableView extends TableView<Content> {
         });
         zCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         zCol.setOnEditCommit(t -> {
-            Content content = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            content.getItem().getPos().setZ(t.getNewValue());
+            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            reverseZwithOtherContent(c, t.getOldValue(), t.getNewValue());
             refresh();
         });
         posCol.getColumns().addAll(xCol, yCol, zCol);
@@ -128,6 +133,34 @@ public class ContentTableView extends TableView<Content> {
         columns.add(2, levelCol);
         columns.add(3, visibilityCol);
         columns.add(4, posCol);
+    }
+
+    private int getUniqueZ(int z, int destLevel) {
+        List<Integer> zPositions = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getLevel() == destLevel)
+                .map(c -> c.getItem().getPos().getZ())
+                .collect(Collectors.toList());
+        return iterateForUniqueZ(z, zPositions);
+    }
+
+    private int iterateForUniqueZ(int z, List<Integer> zPositions) {
+        if (!zPositions.contains(z)) {
+            return z;
+        } else {
+            z += 1;
+            return iterateForUniqueZ(z, zPositions);
+        }
+    }
+
+    private void reverseZwithOtherContent(Content c1, int oldValue, int newValue) {
+        List<Content> singleContent = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getPos().getZ() == newValue)
+                .collect(Collectors.toList());
+        if (!singleContent.isEmpty()) {
+            Content c2 = singleContent.get(0);
+            c2.getItem().getPos().setZ(oldValue);
+        }
+        c1.getItem().getPos().setZ(newValue);
     }
 
     void removeContents() {

@@ -1,5 +1,6 @@
 package io.wsz.model;
 
+import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.content.Content;
 import io.wsz.model.layer.CurrentLayer;
@@ -10,6 +11,7 @@ import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 public class Controller {
@@ -103,5 +105,9 @@ public class Controller {
 
     public List<Location> getLocationsList() {
         return LocationsList.get();
+    }
+
+    public Collection<Asset> getAssetsList() {
+        return AssetsList.get();
     }
 }

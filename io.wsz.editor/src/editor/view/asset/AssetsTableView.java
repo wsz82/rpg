@@ -1,12 +1,12 @@
 package editor.view.asset;
 
 import editor.view.stage.Pointer;
+import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetToContentConverter;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.content.Content;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class AssetsTableView extends AssetsGenericTableView {
     private final ContextMenu contextMenu = new ContextMenu();
@@ -84,7 +85,7 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     private boolean assetNameIsNotUnique(String newValue) {
-        return AssetsList.get().stream()
+        return Controller.get().getAssetsList().stream()
                 .anyMatch(p -> p.getName().equals(newValue));
     }
 
@@ -109,9 +110,28 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     void addItemsToStageAndContents(Coords pos) {
+        pos.setZ(getUniqueZ(pos.getZ()));
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
         List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
-        CurrentLocation.get().getContent().addAll(contents);
+        Controller.get().getCurrentLocation().getContent().addAll(contents);
+    }
+
+    private int getUniqueZ(int z) {
+        int level = Controller.get().getCurrentLayer().getLevel();
+        List<Integer> zPositions = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getLevel() == level)
+                .map(c -> c.getItem().getPos().getZ())
+                .collect(Collectors.toList());
+        return iterateForUniqueZ(z, zPositions);
+    }
+
+    private int iterateForUniqueZ(int z, List<Integer> zPositions) {
+        if (!zPositions.contains(z)) {
+            return z;
+        } else {
+            z += 1;
+            return iterateForUniqueZ(z, zPositions);
+        }
     }
 
     void addAsset() {
@@ -120,7 +140,7 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     void removeAssets() {
-        ObservableList<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
-        AssetsList.get().removeAll(assetsToRemove);
+        List<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
+        Controller.get().getAssetsList().removeAll(assetsToRemove);
     }
 }
