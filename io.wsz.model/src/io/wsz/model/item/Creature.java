@@ -1,16 +1,15 @@
 package io.wsz.model.item;
 
-import io.wsz.model.asset.Asset;
 import io.wsz.model.stage.Coords;
 
-public class Creature extends Item {
+public class Creature extends PosItem {
     private Coords dest;
     private CreatureSize size = CreatureSize.M;
     private CreatureControl control = CreatureControl.CONTROLABLE;
     private int speed = 30;
 
-    public Creature(Asset asset, Coords pos, int level) {
-        super(asset, pos, level);
+    public Creature(String name, ItemType type, String path, Coords pos, int level) {
+        super(name, type, path, pos, level);
     }
 
     public void move() {
@@ -36,16 +35,16 @@ public class Creature extends Item {
     }
 
     public Coords getCenterBottomPos() {
-        double width = getAsset().getImage().getWidth();
-        double height = getAsset().getImage().getHeight();
+        double width = getImage().getWidth();
+        double height = getImage().getHeight();
         double x = pos.getX() + width/2;
         double y = pos.getY() + height;
         return new Coords(x, y, pos.getZ());
     }
 
     public Coords calcCenterBottomPos(Coords difPos) {
-        double width = getAsset().getImage().getWidth();
-        double height = getAsset().getImage().getHeight();
+        double width = getImage().getWidth();
+        double height = getImage().getHeight();
         double x = difPos.getX() - width/2;
         double y = difPos.getY() - height;
         return new Coords(x, y, difPos.getZ());

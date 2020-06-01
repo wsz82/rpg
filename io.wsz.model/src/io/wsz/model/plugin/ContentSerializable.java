@@ -3,19 +3,19 @@ package io.wsz.model.plugin;
 import java.io.Serializable;
 
 public class ContentSerializable implements Serializable {
-    private ItemSerializable item;
+    private PosItemSerializable item;
     private boolean visible;
 
-    public ContentSerializable(ItemSerializable item, boolean visible) {
+    public ContentSerializable(PosItemSerializable item, boolean visible) {
         this.item = item;
         this.visible = visible;
     }
 
-    public ItemSerializable getItem() {
+    public PosItemSerializable getItem() {
         return item;
     }
 
-    public void setItem(ItemSerializable item) {
+    public void setItem(PosItemSerializable item) {
         this.item = item;
     }
 

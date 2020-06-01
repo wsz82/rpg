@@ -1,4 +1,4 @@
-package io.wsz.model.asset;
+package io.wsz.model.item;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

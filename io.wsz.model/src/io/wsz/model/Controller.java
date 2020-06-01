@@ -1,8 +1,8 @@
 package io.wsz.model;
 
-import io.wsz.model.asset.Asset;
-import io.wsz.model.asset.AssetsList;
 import io.wsz.model.content.Content;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;

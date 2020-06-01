@@ -13,8 +13,8 @@ abstract public class ContentComparator implements Comparator<Content> {
         if (o1level < o2level) {
             return -1;
         } else if (o1level == o2level){
-            int t1 = o1.getItem().getAsset().getType().ordinal();
-            int t2 = o2.getItem().getAsset().getType().ordinal();
+            int t1 = o1.getItem().getType().ordinal();
+            int t2 = o2.getItem().getType().ordinal();
             if (t1 < t2) {
                 return 1;
             } else if (t1 == t2) {

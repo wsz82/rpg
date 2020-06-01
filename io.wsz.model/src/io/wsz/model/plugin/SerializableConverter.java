@@ -1,11 +1,11 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.asset.Asset;
-import io.wsz.model.asset.AssetToContentConverter;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentList;
-import io.wsz.model.item.Item;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.AssetToContentConverter;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.layer.LayersList;
 import io.wsz.model.location.Location;
@@ -67,7 +67,7 @@ public class SerializableConverter {
         List<ContentSerializable> output = new ArrayList<>(0);
         List<Content> input = location.getContents().get();
         for (Content content : input) {
-            ItemSerializable item = toSerializableItem(content.getItem());
+            PosItemSerializable item = toSerializableItem(content.getItem());
             boolean visible = content.isVisible();
 
             ContentSerializable cs = new ContentSerializable(item, visible);
@@ -76,11 +76,13 @@ public class SerializableConverter {
         return output;
     }
 
-    private static ItemSerializable toSerializableItem(Item item) {
-        AssetSerializable asset = toSerializableAsset(item.getAsset());
+    private static PosItemSerializable toSerializableItem(PosItem item) {
+        String name = item.getName();
+        ItemType type = item.getType();
+        String path = item.getPath();
         CoordinatesSerializable pos = toSerializableCoordinates(item.getPos());
         int level = item.getLevel();
-        return new ItemSerializable(asset.getName(), pos, level);
+        return new PosItemSerializable(name, type, path, pos, level);
     }
 
     private static CoordinatesSerializable toSerializableCoordinates(Coords pos) {
@@ -132,7 +134,7 @@ public class SerializableConverter {
         }
         List<Content> output = FXCollections.observableArrayList();
         for (ContentSerializable cs : input) {
-            ItemSerializable is = cs.getItem();
+            PosItemSerializable is = cs.getItem();
             String name = is.getName();
             Coords pos = toCoordinates(is.getPos());
             int level = is.getLevel();
@@ -177,10 +179,7 @@ public class SerializableConverter {
     private static List<Asset> toAssetObjects(List<AssetSerializable> input) {
         List<Asset> output = FXCollections.observableArrayList();
         for (AssetSerializable as : input) {
-            Asset asset = new Asset();
-            asset.setName(as.getName());
-            asset.setType(as.getType());
-            asset.setPath(as.getPath());
+            Asset asset = new Asset(as.getName(), as.getType(), as.getPath());
             output.add(asset);
         }
         return output;

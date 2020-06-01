@@ -1,32 +1,32 @@
 package io.wsz.model.content;
 
-import io.wsz.model.item.Item;
+import io.wsz.model.item.PosItem;
 import javafx.beans.property.*;
 
 import java.util.Objects;
 
 public class Content {
-    private final ObjectProperty<Item> item = new SimpleObjectProperty<>(this, "item");
+    private final ObjectProperty<PosItem> item = new SimpleObjectProperty<>(this, "item");
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
 
     public Content() {}
 
-    public Content(Item item) {
+    public Content(PosItem item) {
         this.item.set(item);
         this.level.set(item.getLevel());
         this.visible.set(true);
     }
 
-    public void setItem(Item item) {
+    public void setItem(PosItem item) {
         this.item.set(item);
     }
 
-    public Item getItem() {
+    public PosItem getItem() {
         return item.get();
     }
 
-    public ObjectProperty<? extends Item> itemProperty() {
+    public ObjectProperty<PosItem> itemProperty() {
         return item;
     }
 

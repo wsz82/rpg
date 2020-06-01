@@ -1,6 +1,6 @@
 package editor.view.asset;
 
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Asset;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 

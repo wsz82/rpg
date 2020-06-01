@@ -2,34 +2,34 @@ package io.wsz.model.plugin;
 
 import java.io.Serializable;
 
-class CoordinatesSerializable implements Serializable {
+public class CoordinatesSerializable implements Serializable {
     private double x;
     private double y;
     private int z;
 
-    CoordinatesSerializable(double x, double y, int z) {
+    public CoordinatesSerializable(double x, double y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    double getX() {
+    public double getX() {
         return x;
     }
 
-    void setX(double x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    double getY() {
+    public double getY() {
         return y;
     }
 
-    void setY(double y) {
+    public void setY(double y) {
         this.y = y;
     }
 
-    int getZ() {
+    public int getZ() {
         return z;
     }
 

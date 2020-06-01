@@ -39,8 +39,8 @@ public class GameCanvas extends Canvas {
                 .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
         for (Content content : contents) {
-            final Item item = content.getItem();
-            final ItemType type = content.getItem().getAsset().getType();
+            final PosItem item = content.getItem();
+            final ItemType type = content.getItem().getType();
             final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
@@ -50,7 +50,7 @@ public class GameCanvas extends Canvas {
                 switch (type) {
                     case CREATURE -> drawCreatureSize((Creature) item, gc);
                 }
-                gc.drawImage(item.getAsset().getImage(), x, y);
+                gc.drawImage(item.getImage(), x, y);
             }
         }
     }
@@ -105,7 +105,7 @@ public class GameCanvas extends Canvas {
                 if (content == null) {
                     return;
                 }
-                ItemType type = content.getItem().getAsset().getType();
+                ItemType type = content.getItem().getType();
                 switch (type) {
                     case CREATURE -> interactWith(content);
                 }
@@ -156,13 +156,13 @@ public class GameCanvas extends Canvas {
         });
         for (Content c : contents) {
             double cX = c.getItem().getPos().getX();
-            double cWidth = c.getItem().getAsset().getImage().getWidth();
+            double cWidth = c.getItem().getImage().getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 continue;
             }
             double cY = c.getItem().getPos().getY();
-            double cHeight = c.getItem().getAsset().getImage().getHeight();
+            double cHeight = c.getItem().getImage().getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
                 continue;

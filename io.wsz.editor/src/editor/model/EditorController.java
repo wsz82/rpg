@@ -4,7 +4,7 @@ import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.AssetsList;
+import io.wsz.model.item.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;

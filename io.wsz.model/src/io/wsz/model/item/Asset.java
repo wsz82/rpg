@@ -1,7 +1,5 @@
-package io.wsz.model.asset;
+package io.wsz.model.item;
 
-
-import io.wsz.model.item.ItemType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,13 +9,10 @@ import javafx.scene.image.Image;
 import java.util.NoSuchElementException;
 
 public class Asset {
-    private final StringProperty name = new SimpleStringProperty(this, "name");
-    private final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
-    private final StringProperty path = new SimpleStringProperty(this, "path");
-    private final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
-
-    public Asset() {
-    }
+    protected final StringProperty name = new SimpleStringProperty(this, "name");
+    protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
+    protected final StringProperty path = new SimpleStringProperty(this, "path");
+    protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
 
     public Asset(String name, ItemType type, String path) {
         this.name.set(name);
@@ -71,14 +66,18 @@ public class Asset {
         return image.get();
     }
 
-    public ObjectProperty<Image> imageProperty() {
-        return image;
-    }
-
     private Image loadImageFromPath() {
         if (getPath() == null || getPath().isEmpty()) {
             throw new NoSuchElementException();
         }
         return new Image(getPath());
+    }
+
+    public ObjectProperty<Image> imageProperty() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image.set(image);
     }
 }

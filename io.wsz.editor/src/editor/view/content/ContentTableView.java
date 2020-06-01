@@ -45,14 +45,14 @@ public class ContentTableView extends TableView<Content> {
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getItem().getAsset().getName();
+                return param.getValue().getItem().getName();
             }
         });
         TableColumn<Content, String> typeCol = new TableColumn<>("Type");
         typeCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getItem().getAsset().getType().toString();
+                return param.getValue().getItem().getType().toString();
             }
         });
         TableColumn<Content, Integer> levelCol = new TableColumn<>("Level");
@@ -145,7 +145,8 @@ public class ContentTableView extends TableView<Content> {
     }
 
     private void alertLayerNotExisting(int level) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Layer " + level + " does not exist!", ButtonType.CANCEL);
+        Alert alert = new Alert(
+                Alert.AlertType.INFORMATION, "Layer " + level + " does not exist!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());

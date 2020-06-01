@@ -11,7 +11,7 @@ import game.view.launcher.Main;
 import game.view.stage.GameCanvas;
 import game.view.stage.GameScrollPane;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.AssetsList;
+import io.wsz.model.item.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;

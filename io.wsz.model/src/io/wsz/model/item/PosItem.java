@@ -1,25 +1,15 @@
 package io.wsz.model.item;
 
-import io.wsz.model.asset.Asset;
 import io.wsz.model.stage.Coords;
 
-public abstract class Item implements ItemUpdater {
-    protected Asset asset;
+public abstract class PosItem extends Asset implements ItemUpdater {
     protected Coords pos;
     protected int level;
 
-    public Item(Asset asset, Coords pos, int level) {
-        this.asset = asset;
+    public PosItem(String name, ItemType type, String path, Coords pos, int level) {
+        super(name, type, path);
         this.pos = pos;
         this.level = level;
-    }
-
-    public Asset getAsset() {
-        return asset;
-    }
-
-    public void setAsset(Asset asset) {
-        this.asset = asset;
     }
 
     public Coords getPos() {

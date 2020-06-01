@@ -1,12 +1,11 @@
 package io.wsz.model.item;
 
-import io.wsz.model.asset.Asset;
 import io.wsz.model.stage.Coords;
 
-public class Landscape extends Item {
+public class Landscape extends PosItem {
 
-    public Landscape(Asset asset, Coords pos, int level) {
-        super(asset, pos, level);
+    public Landscape(String name, ItemType type, String path, Coords pos, int level) {
+        super(name, type, path, pos, level);
     }
 
     @Override

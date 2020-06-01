@@ -2,10 +2,10 @@ package editor.view.asset;
 
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.Asset;
-import io.wsz.model.asset.AssetToContentConverter;
-import io.wsz.model.asset.AssetsList;
 import io.wsz.model.content.Content;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.AssetToContentConverter;
+import io.wsz.model.item.AssetsList;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;

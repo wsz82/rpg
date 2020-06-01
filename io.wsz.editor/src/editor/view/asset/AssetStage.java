@@ -3,7 +3,7 @@ package editor.view.asset;
 import editor.view.stage.ChildStage;
 import editor.view.stage.Main;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Asset;
 import io.wsz.model.item.ItemType;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

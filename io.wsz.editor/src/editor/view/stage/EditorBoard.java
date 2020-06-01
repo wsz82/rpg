@@ -4,7 +4,8 @@ import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.item.Item;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.ContentWithImage;
 import io.wsz.model.stage.Coords;
 import javafx.scene.control.ContextMenu;
@@ -17,6 +18,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 class EditorBoard extends Board {
     private static EditorBoard editorBoard;
@@ -34,7 +36,7 @@ class EditorBoard extends Board {
     @Override
     protected void addContentsToStage(List<Content> contents) {
         for (Content content : contents) {
-            final Item item = content.getItem();
+            final PosItem item = content.getItem();
             final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
@@ -54,17 +56,17 @@ class EditorBoard extends Board {
             boardContents.add(cwi);
 
             prefWidthProperty().addListener((observable, oldValue, newValue) -> {
-                resizeImageWithChangedBoard(cwi, item.getAsset().getImage(), newValue.doubleValue(), getHeight());
+                resizeImageWithChangedBoard(cwi, item.getImage(), newValue.doubleValue(), getHeight());
             });
             prefHeightProperty().addListener((observable, oldValue, newValue) -> {
-                resizeImageWithChangedBoard(cwi, item.getAsset().getImage(), getWidth(), newValue.doubleValue());
+                resizeImageWithChangedBoard(cwi, item.getImage(), getWidth(), newValue.doubleValue());
             });
             pos.xProperty().addListener((observable, oldValue, newValue) -> {
-                resizeRelocatedImage(cwi, item.getAsset().getImage(), newValue.doubleValue(), pos.getY());
+                resizeRelocatedImage(cwi, item.getImage(), newValue.doubleValue(), pos.getY());
                 setLeftAnchor(iv, newValue.doubleValue());
             });
             pos.yProperty().addListener((observable, oldValue, newValue) -> {
-                resizeRelocatedImage(cwi, item.getAsset().getImage(), pos.getX(), newValue.doubleValue());
+                resizeRelocatedImage(cwi, item.getImage(), pos.getX(), newValue.doubleValue());
                 setTopAnchor(iv, newValue.doubleValue());
             });
             pos.zProperty().addListener((observable, oldValue, newValue) -> {
@@ -78,7 +80,11 @@ class EditorBoard extends Board {
                 iv.setViewOrder(-(levelNew*1000 + (double) zNew/1000));
             });
 
-            item.getAsset().pathProperty().addListener((observable, oldValue, newValue) -> {
+            List<Asset> singleAsset = Controller.get().getAssetsList().stream()
+                    .filter(a -> a.getName().equals(item.getName()))
+                    .collect(Collectors.toList());
+            singleAsset.get(0).pathProperty().addListener((observable, oldValue, newValue) -> {
+                item.setPath(newValue);
                 setItemsImageForImageView(item, iv);
             });
 
@@ -127,8 +133,8 @@ class EditorBoard extends Board {
         }
     }
 
-    private void setItemsImageForImageView(Item item, ImageView iv) {
-        Image img = item.getAsset().getImage();
+    private void setItemsImageForImageView(PosItem item, ImageView iv) {
+        Image img = item.getImage();
         int width = Controller.get().getCurrentLocation().getWidth();
         int height = Controller.get().getCurrentLocation().getHeight();
         int resizeWidth = width - (int) item.getPos().getX();
