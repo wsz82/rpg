@@ -161,6 +161,6 @@ class AssetStage extends ChildStage {
         final Alert alert = new Alert(Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
-                .ifPresent(r -> close());
+                .ifPresent(r -> alert.close());
     }
 }

@@ -141,6 +141,20 @@ class AssetsTableView extends AssetsGenericTableView {
 
     void removeAssets() {
         List<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
+        removeContent(assetsToRemove);
         Controller.get().getAssetsList().removeAll(assetsToRemove);
+    }
+
+    private void removeContent(List<Asset> assetsToRemove) {
+        List<String> assetsNames = assetsToRemove.stream()
+                .map(a -> a.getName())
+                .collect(Collectors.toList());
+        List<Content> contentToRemove = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> {
+                    String name = c.getItem().getName();
+                    return assetsNames.contains(name);
+                })
+                .collect(Collectors.toList());
+        Controller.get().getCurrentLocation().getContent().removeAll(contentToRemove);
     }
 }
