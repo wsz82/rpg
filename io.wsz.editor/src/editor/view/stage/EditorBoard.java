@@ -83,9 +83,14 @@ class EditorBoard extends Board {
             List<Asset> singleAsset = Controller.get().getAssetsList().stream()
                     .filter(a -> a.getName().equals(item.getName()))
                     .collect(Collectors.toList());
-            singleAsset.get(0).pathProperty().addListener((observable, oldValue, newValue) -> {
+            Asset origin = singleAsset.get(0);
+            origin.pathProperty().addListener((observable, oldValue, newValue) -> {
                 item.setPath(newValue);
                 setItemsImageForImageView(item, iv);
+            });
+            origin.nameProperty().addListener((observable, oldValue, newValue) -> {
+                item.setName(newValue);
+                ContentTableView.get().refresh();
             });
 
             iv.visibleProperty().bindBidirectional(content.visibleProperty());
