@@ -1,10 +1,7 @@
 package editor.view.asset;
 
 import editor.view.IntegerField;
-import io.wsz.model.item.Asset;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -58,6 +55,31 @@ public class CreatureAssetStage extends AssetStage {
     @Override
     protected void fillInputs() {
         super.fillInputs();
-//        asset.
+        Creature cr = (Creature) asset;
+        CreatureSize size = cr.getSize();
+        sizeCB.setValue(size);
+        CreatureControl control = cr.getControl();
+        controlCB.setValue(control);
+        int speed = cr.getSpeed();
+        speedInput.setText(String.valueOf(speed));
+    }
+
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+        defineAsset();
+    }
+
+    @Override
+    protected void onEdit() {
+        super.onEdit();
+        defineAsset();
+    }
+
+    private void defineAsset() {
+        Creature cr = (Creature) asset;
+        cr.setSize(sizeCB.getValue());
+        cr.setControl(controlCB.getValue());
+        cr.setSpeed(Integer.parseInt(speedInput.getText()));
     }
 }

@@ -3,8 +3,7 @@ package editor.view.asset;
 import editor.view.stage.ChildStage;
 import editor.view.stage.Main;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Asset;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -146,7 +145,13 @@ class AssetStage extends ChildStage {
 
     private void addNewAsset() {
         String name = nameInput.getText();
-        Asset asset = new Asset(name, itemType, path);
+        asset = switch (itemType) {
+            case COVER -> new Cover(name, itemType, path, null, 0);
+            case CREATURE -> new Creature(name, itemType, path, null, 0);
+            case LANDSCAPE -> new Landscape(name, itemType, path, null, 0);
+            case FLY_ZONE -> new FlyZone(name, itemType, path, null, 0);
+            case MOVE_ZONE -> new MoveZone(name, itemType, path, null, 0);
+        };
         Controller.get().getAssetsList().add(asset);
     }
 

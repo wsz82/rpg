@@ -24,10 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class AssetsTableView extends AssetsGenericTableView {
-    private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem addAsset = new MenuItem("Add asset");
-    private final MenuItem removeAsset = new MenuItem("Remove asset/s");
-    private final MenuItem addItemsToStage = new MenuItem("Add item/s to stage");
     private final ItemType itemType;
     private final Stage parent;
 
@@ -97,16 +93,34 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     private void setUpContextMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem addAsset = new MenuItem("Add asset");
+        final MenuItem editAsset = new MenuItem("Edit asset");
+        final MenuItem removeAsset = new MenuItem("Remove asset/s");
+        final MenuItem addItemsToStage = new MenuItem("Add item/s to stage");
         addAsset.setOnAction(event -> addAsset());
+        editAsset.setOnAction(event -> editAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
             Coords mark = Pointer.getMark();
             addItemsToStageAndContents(mark);
         });
-        contextMenu.getItems().addAll(addAsset, removeAsset, addItemsToStage);
+        contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
+    }
+
+    private void editAsset() {
+        Asset assetToEdit = getSelectionModel().getSelectedItem();
+        if (assetToEdit == null) {
+            return;
+        }
+        AssetStage assetStage = switch (itemType) {
+            case CREATURE -> new CreatureAssetStage(parent, assetToEdit);
+            default -> new AssetStage(parent, assetToEdit);
+        };
+        assetStage.show();
     }
 
     void addItemsToStageAndContents(Coords pos) {
