@@ -135,8 +135,8 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     void addAsset() {
-        NewAssetStage newAssetStage = new NewAssetStage(parent, itemType);
-        newAssetStage.show();
+        AssetStage assetStage = new AssetStage(parent, itemType);
+        assetStage.show();
     }
 
     void removeAssets() {
