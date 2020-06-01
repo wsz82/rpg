@@ -44,7 +44,7 @@ class AssetStage extends ChildStage {
     }
 
     private void initWindow() {
-        setTitle(itemType.toString().toLowerCase() + "asset");
+        setTitle(itemType.toString().toLowerCase() + " asset");
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
         containerWithButtons.setPadding(new Insets(10));
