@@ -3,9 +3,7 @@ package game.view.stage;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.Item;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
@@ -42,14 +40,61 @@ public class GameCanvas extends Canvas {
                 .collect(Collectors.toList());
         for (Content content : contents) {
             final Item item = content.getItem();
+            final ItemType type = content.getItem().getAsset().getType();
             final Coords pos = item.getPos();
             final double x = pos.getX();
             final double y = pos.getY();
 
+
             if (content.isVisible()) {
+                switch (type) {
+                    case CREATURE -> drawCreatureSize((Creature) item, gc);
+                }
                 gc.drawImage(item.getAsset().getImage(), x, y);
             }
         }
+    }
+
+    private void drawCreatureSize(Creature cr, GraphicsContext gc) {
+        CreatureControl control = cr.getControl();
+        if (control != CreatureControl.CONTROL
+                && control != CreatureControl.ENEMY) {
+            return;
+        }
+        CreatureSize size = cr.getSize();
+        int width = 15;
+        int height = 7;
+        switch (size) {
+            case XS -> {
+                width *= 2;
+                height *= 2;
+            }
+            case S -> {
+                width *= 3;
+                height *= 3;
+            }
+            case M -> {
+                width *= 4;
+                height *= 5;
+            }
+            case L -> {
+                width *= 5;
+                height *= 6;
+            }
+            case XL -> {
+                width *= 7;
+                height *= 8;
+            }
+        }
+        Coords centerBottomPos = cr.getCenterBottomPos();
+        double x = centerBottomPos.getX();
+        double y = centerBottomPos.getY();
+        switch (control) {
+            case CONTROL -> gc.setStroke(Color.GREEN);
+            case ENEMY -> gc.setStroke(Color.RED);
+        }
+        gc.setLineWidth(2);
+        gc.strokeOval(x - width/2.0, y - height/2.0, width, height);
     }
 
     private void hookupEvents() {
@@ -62,23 +107,27 @@ public class GameCanvas extends Canvas {
                 }
                 ItemType type = content.getItem().getAsset().getType();
                 switch (type) {
-                    case CREATURE -> gainControl(content);
+                    case CREATURE -> interactWith(content);
                 }
             }
         });
     }
 
-    private void gainControl(Content content) {
+    private void interactWith(Content content) {
+        Creature cr = (Creature) content.getItem();
         final EventHandler<MouseEvent> creatureMoveTo = e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
-                Creature creature = (Creature) content.getItem();
-                int creatureWidth = (int) creature.getAsset().getImage().getWidth();
-                int creatureHeight = (int) creature.getAsset().getImage().getHeight();
-                double moveX = e.getX() - (double) creatureWidth/2;
-                double moveY = e.getY() - creatureHeight;
-                Coords dest = new Coords(moveX, moveY, creature.getPos().getZ());
-                creature.setDest(dest);
+                CreatureControl control = cr.getControl();
+                if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
+                    return;
+                }
+                if (control == CreatureControl.CONTROLABLE) {
+                    cr.setControl(CreatureControl.CONTROL);
+                }
+                Coords rawPos = new Coords(e.getX(), e.getY(), cr.getPos().getZ());
+                Coords dest = cr.calcCenterBottomPos(rawPos);
+                cr.setDest(dest);
             }
         };
         addEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
@@ -86,6 +135,7 @@ public class GameCanvas extends Canvas {
             if (e.getButton().equals(MouseButton.SECONDARY)) {
                 e.consume();
                 removeEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
+                cr.setControl(CreatureControl.CONTROLABLE);
             }
         });
     }

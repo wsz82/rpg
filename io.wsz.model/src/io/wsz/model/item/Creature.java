@@ -5,18 +5,12 @@ import io.wsz.model.stage.Coords;
 
 public class Creature extends Item {
     private Coords dest;
+    private CreatureSize size = CreatureSize.M;
+    private CreatureControl control = CreatureControl.CONTROLABLE;
     private int speed = 30;
 
     public Creature(Asset asset, Coords pos, int level) {
         super(asset, pos, level);
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
     }
 
     public void move() {
@@ -41,12 +35,52 @@ public class Creature extends Item {
         pos.setY(y3);
     }
 
+    public Coords getCenterBottomPos() {
+        double width = getAsset().getImage().getWidth();
+        double height = getAsset().getImage().getHeight();
+        double x = pos.getX() + width/2;
+        double y = pos.getY() + height;
+        return new Coords(x, y, pos.getZ());
+    }
+
+    public Coords calcCenterBottomPos(Coords difPos) {
+        double width = getAsset().getImage().getWidth();
+        double height = getAsset().getImage().getHeight();
+        double x = difPos.getX() - width/2;
+        double y = difPos.getY() - height;
+        return new Coords(x, y, difPos.getZ());
+    }
+
     public Coords getDest() {
         return dest;
     }
 
     public void setDest(Coords dest) {
         this.dest = dest;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public CreatureSize getSize() {
+        return size;
+    }
+
+    public void setSize(CreatureSize size) {
+        this.size = size;
+    }
+
+    public CreatureControl getControl() {
+        return control;
+    }
+
+    public void setControl(CreatureControl control) {
+        this.control = control;
     }
 
     @Override
