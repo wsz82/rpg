@@ -14,20 +14,20 @@ import io.wsz.model.Controller;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
-import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.ActivePlugin;
+import io.wsz.model.plugin.LocationSerializable;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.SerializableConverter;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ScrollPane;
 
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameController {
-    private static GameController singleton;
+    private static volatile GameController singleton;
     private boolean isGame; //TODO make atomic?
 
     public static GameController get() {
@@ -54,21 +54,21 @@ public class GameController {
     }
 
     public void restoreLastPlugin() {
-        LastPluginCaretaker caretaker = new LastPluginCaretaker();
-        File lastPluginDir = caretaker.loadMemento(Main.getDir());
-        Plugin plugin = Controller.get().loadPlugin(lastPluginDir);
-        if (plugin.getLocations() != null) {
-            Controller.get().setActivePlugin(plugin);
+        LastPluginCaretaker pc = new LastPluginCaretaker();
+        File lastPluginDir = pc.loadMemento(Main.getDir());
+        Plugin p = Controller.get().loadPlugin(lastPluginDir);
+        if (p.getLocations() != null) {
+            Controller.get().setActivePlugin(p);
         }
     }
 
-    public void storeLastPlugin(Plugin plugin) {
-        LastPluginCaretaker caretaker = new LastPluginCaretaker();
-        caretaker.saveMemento(Main.getDir(), plugin.getFile());
+    public void storeLastPlugin(Plugin p) {
+        LastPluginCaretaker pc = new LastPluginCaretaker();
+        pc.saveMemento(Main.getDir(), p.getFile());
     }
 
 
-    public SaveMemento loadGameSave(String name, File programDir) {
+    public SaveMemento loadSaveMemento(String name, File programDir) {
         SaveCaretaker sc = new SaveCaretaker(programDir);
         return sc.loadMemento(name);
     }
@@ -90,7 +90,9 @@ public class GameController {
             name = createUniqueName(name);
             getSavesList().add(name);
         }
-        SaveMemento memento = new SaveMemento(name, hvalue, vvalue);
+        String currentLocationName = Controller.get().getCurrentLocation().getName();
+        int currentLayer = Controller.get().getCurrentLayer().getLevel();
+        SaveMemento memento = new SaveMemento(name, hvalue, vvalue, currentLocationName, currentLayer);
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.createSave(memento);
     }
@@ -123,29 +125,36 @@ public class GameController {
         sc.saveMemento(memento);
     }
 
-    public void loadSaveToLists(SaveMemento memento) {
+    public void loadSaveToLists(SaveMemento m) {
         if (AssetsList.get().isEmpty()) {
             Controller.get().loadAssetsToList();
         }
 
-        LocationsList.get().clear();
+        Controller.get().getLocationsList().clear();
 
-        LocationsList.get().setAll(
-                SerializableConverter.toLocationObjects(
-                        memento.getLocations(), AssetsList.get()));
+        List<LocationSerializable> lsList = m.getLocations();
+        List<Location> locations = SerializableConverter.toLocationObjects(lsList, AssetsList.get());
+        Controller.get().getLocationsList().setAll(locations);
 
-        Location first = LocationsList.get().get(0);       //TODO change to Player current location
-        CurrentLocation.get().setLocation(first);
-        Layer layer = first.getLayers().get().get(0);
-        CurrentLayer.get().setLayer(layer);
+        List<Location> singleLocation = locations.stream()
+                .filter(l -> l.getName().equals(m.getCurrentLocationName()))
+                .collect(Collectors.toList());
+        Location currentLocation = singleLocation.get(0);
+        Controller.get().getCurrentLocation().setLocation(currentLocation);
+
+        List<Layer> singleLayer = currentLocation.getLayers().get().stream()
+                .filter(l -> l.getLevel() == m.getCurrentLayer())
+                .collect(Collectors.toList());
+        Layer layer = singleLayer.get(0);
+        Controller.get().getCurrentLayer().setLayer(layer);
     }
 
     public void loadGameActivePluginToLists() {
         if (ActivePlugin.get().getPlugin() == null) {
             return;
         }
-        LocationsList.get().clear();
-        AssetsList.get().clear();
+        Controller.get().getLocationsList().clear();
+        Controller.get().getAssetsList().clear();
 
         Plugin p = ActivePlugin.get().getPlugin();
 
@@ -154,15 +163,15 @@ public class GameController {
                     .filter(l -> l.getName().equals(p.getStartLocation()))
                     .collect(Collectors.toList());
             Location first = startLocation.get(0);
-            CurrentLocation.get().setLocation(first);
+            Controller.get().getCurrentLocation().setLocation(first);
             List<Layer> startLayer = first.getLayers().get().stream()
                     .filter(l -> l.getLevel() == p.getStartLayer())
                     .collect(Collectors.toList());
             CurrentLayer.get().setLayer(startLayer.get(0));
         }
 
-        AssetsList.get().setAll(p.getAssets());
-        LocationsList.get().setAll(p.getLocations());
+        Controller.get().getAssetsList().setAll(p.getAssets());
+        Controller.get().getLocationsList().setAll(p.getLocations());
     }
 
     public GameCanvas getGameCanvas() {
@@ -179,5 +188,32 @@ public class GameController {
 
     public void setGame(boolean game) {
         isGame = game;
+    }
+
+    public void initLoadedGameSettings(SaveMemento memento) {
+        ScrollPane gameScrollPane = getScrollPane();
+        gameScrollPane.setHvalue(memento.gethValue());
+        gameScrollPane.setVvalue(memento.getvValue());
+    }
+
+    public void initNewGameSettings() {
+        Plugin p = Controller.get().getActivePlugin();
+        int startX = p.getStartX();
+        int startY = p.getStartY();
+        double width = Controller.get().getCurrentLocation().getWidth();
+        double height = Controller.get().getCurrentLocation().getHeight();
+        ScrollPane gameScrollPane = getScrollPane();
+        gameScrollPane.setHvalue((double)startX/width);
+        gameScrollPane.setVvalue((double)startY/height);
+    }
+
+    public void showGame() {
+        getGameCanvas().refresh();
+        getScrollPane().updatePos();
+    }
+
+    public void focusGameScrollPane() {
+        getScrollPane().requestFocus();
+        getScrollPane().setFocusTraversable(false);
     }
 }

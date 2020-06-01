@@ -42,7 +42,7 @@ public class LocationsTableView extends TableView<Location> {
             }
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setCurrentName(newValue);
+                Controller.get().getCurrentLocation().setName(newValue);
             }
             refresh();
         });
@@ -58,7 +58,7 @@ public class LocationsTableView extends TableView<Location> {
             location.setWidth(newWidth);
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setCurrentWidth(newWidth);
+                Controller.get().getCurrentLocation().setWidth(newWidth);
             }
             refresh();
         });
@@ -73,7 +73,7 @@ public class LocationsTableView extends TableView<Location> {
             location.setHeight(t.getNewValue());
             Location currentLocation = CurrentLocation.get().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setCurrentHeight(newHeight);
+                Controller.get().getCurrentLocation().setHeight(newHeight);
             }
             refresh();
         });
@@ -106,12 +106,12 @@ public class LocationsTableView extends TableView<Location> {
     private void changeCurrentLocationIfWasRemoved(List<Location> locations) {
         Location currentLocation = Controller.get().getCurrentLocation().getLocation();
         if (!locations.contains(currentLocation)) {
-            Controller.get().setCurrentLocation(locations.get(0));
+            Controller.get().getCurrentLocation().setLocation(locations.get(0));
         }
     }
 
     public void goTo() {
         Location location = getSelectionModel().getSelectedItem();
-        Controller.get().setCurrentLocation(location);
+        Controller.get().getCurrentLocation().setLocation(location);
     }
 }

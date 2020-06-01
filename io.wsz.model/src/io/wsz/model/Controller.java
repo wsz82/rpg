@@ -4,7 +4,6 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.content.Content;
 import io.wsz.model.layer.CurrentLayer;
-import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
@@ -12,11 +11,10 @@ import io.wsz.model.plugin.*;
 import javafx.collections.ObservableList;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 
 public class Controller {
-    private static Controller singleton;
+    private static volatile Controller singleton;
 
     public static Controller get() {
         if (singleton == null) {
@@ -27,20 +25,8 @@ public class Controller {
 
     private Controller(){}
 
-    public void initNewPlugin() {
-        AssetsList.get().clear();
-        LocationsList.get().clear();
-
-        Location location = new Location("new", 800, 600);
-        Layer layer = new Layer("new");
-        location.getLayers().get().add(layer);
-        LocationsList.get().add(location);
-        CurrentLocation.get().setLocation(location);
-        CurrentLayer.get().setLayer(layer);
-    }
-
     public void setActivePlugin(Plugin plugin) {
-        ActivePlugin.get().setActivePlugin(plugin);
+        ActivePlugin.get().setPlugin(plugin);
     }
 
     public Plugin getActivePlugin() {
@@ -78,15 +64,11 @@ public class Controller {
         return CurrentLocation.get();
     }
 
-    public void setCurrentLocation(Location location) {
-        CurrentLocation.get().setLocation(location);
-    }
-
     public ObservableList<Location> getLocationsList() {
         return LocationsList.get();
     }
 
-    public Collection<Asset> getAssetsList() {
+    public ObservableList<Asset> getAssetsList() {
         return AssetsList.get();
     }
 }

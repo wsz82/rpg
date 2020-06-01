@@ -8,17 +8,17 @@ import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 
 public class CurrentLocation {
-    private static CurrentLocation currentLocation;
+    private static CurrentLocation singleton;
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
-    private final IntegerProperty currentWidth = new SimpleIntegerProperty();
-    private final IntegerProperty currentHeight = new SimpleIntegerProperty();
-    private final StringProperty currentName = new SimpleStringProperty();
+    private final IntegerProperty width = new SimpleIntegerProperty();
+    private final IntegerProperty height = new SimpleIntegerProperty();
+    private final StringProperty name = new SimpleStringProperty();
 
     public static CurrentLocation get() {
-        if (currentLocation == null) {
-            currentLocation = new CurrentLocation();
+        if (singleton == null) {
+            singleton = new CurrentLocation();
         }
-        return currentLocation;
+        return singleton;
     }
 
     private CurrentLocation(){
@@ -41,9 +41,9 @@ public class CurrentLocation {
     }
 
     public void setLocation(Location location) {
-        this.currentWidth.set(location.getWidth());
-        this.currentHeight.set(location.getHeight());
-        this.currentName.set(location.getName());
+        this.width.set(location.getWidth());
+        this.height.set(location.getHeight());
+        this.name.set(location.getName());
         this.locationProperty.set(location);
     }
 
@@ -55,41 +55,41 @@ public class CurrentLocation {
         return locationProperty;
     }
 
-    public int getCurrentWidth() {
-        return currentWidth.get();
+    public int getWidth() {
+        return width.get();
     }
 
-    public IntegerProperty currentWidthProperty() {
-        return currentWidth;
+    public IntegerProperty widthProperty() {
+        return width;
     }
 
-    public int getCurrentHeight() {
-        return currentHeight.get();
+    public int getHeight() {
+        return height.get();
     }
 
-    public IntegerProperty currentHeightProperty() {
-        return currentHeight;
+    public IntegerProperty heightProperty() {
+        return height;
     }
 
-    public void setCurrentWidth(int currentWidth) {
-        this.locationProperty.get().setWidth(currentWidth);
-        this.currentWidth.set(currentWidth);
+    public void setWidth(int width) {
+        this.locationProperty.get().setWidth(width);
+        this.width.set(width);
     }
 
-    public void setCurrentHeight(int currentHeight) {
-        this.locationProperty.get().setHeight(currentHeight);
-        this.currentHeight.set(currentHeight);
+    public void setHeight(int height) {
+        this.locationProperty.get().setHeight(height);
+        this.height.set(height);
     }
 
-    public String getCurrentName() {
-        return currentName.get();
+    public String getName() {
+        return name.get();
     }
 
-    public StringProperty currentNameProperty() {
-        return currentName;
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    public void setCurrentName(String currentName) {
-        this.currentName.set(currentName);
+    public void setName(String name) {
+        this.name.set(name);
     }
 }

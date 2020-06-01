@@ -1,7 +1,7 @@
 package io.wsz.model.plugin;
 
 public class ActivePlugin {
-    private Plugin activePlugin;
+    private Plugin plugin;
     private static ActivePlugin singleton;
 
     public static ActivePlugin get() {
@@ -15,10 +15,10 @@ public class ActivePlugin {
     }
 
     public Plugin getPlugin() {
-        return activePlugin;
+        return plugin;
     }
 
-    public void setActivePlugin(Plugin activePlugin) {
-        this.activePlugin = activePlugin;
+    public void setPlugin(Plugin plugin) {
+        this.plugin = plugin;
     }
 }

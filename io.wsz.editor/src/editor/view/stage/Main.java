@@ -1,6 +1,6 @@
 package editor.view.stage;
 
-import io.wsz.model.Controller;
+import editor.model.EditorController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         mainStage = stage;
-        Controller.get().initNewPlugin();
+        EditorController.get().initNewPlugin();
 
         setProgramDir();
 

@@ -312,10 +312,8 @@ public class GameStage extends Stage {
 
     private void loadSave() {
         String name = loadsView.getSelectionModel().getSelectedItem();
-        SaveMemento memento = GameController.get().loadGameSave(name, Main.getDir());
+        SaveMemento memento = GameController.get().loadSaveMemento(name, Main.getDir());
         startGame(memento);
-        gameScrollPane.setHvalue(memento.gethValue());
-        gameScrollPane.setVvalue(memento.getvValue());
     }
 
     private void deleteSave() {
@@ -327,8 +325,7 @@ public class GameStage extends Stage {
         double hvalue = gameScrollPane.getHvalue();
         double vvalue = gameScrollPane.getVvalue();
         GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
-
-        setRootToGame();
+        resumeGame();
     }
 
     private void setRootToGame() {

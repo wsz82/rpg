@@ -129,8 +129,8 @@ class EditorBoard extends Board {
 
     private void setItemsImageForImageView(Item item, ImageView iv) {
         Image img = item.getAsset().getImage();
-        int width = Controller.get().getCurrentLocation().getCurrentWidth();
-        int height = Controller.get().getCurrentLocation().getCurrentHeight();
+        int width = Controller.get().getCurrentLocation().getWidth();
+        int height = Controller.get().getCurrentLocation().getHeight();
         int resizeWidth = width - (int) item.getPos().getX();
         int resizeHeight = height - (int) item.getPos().getY();
         if (resizeWidth > img.getWidth()) {

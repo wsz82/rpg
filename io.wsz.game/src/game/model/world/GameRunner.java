@@ -2,20 +2,15 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
-import game.view.stage.GameCanvas;
-import game.view.stage.GameScrollPane;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
-import io.wsz.model.plugin.Plugin;
 import javafx.application.Platform;
 
 import java.util.List;
 
 public class GameRunner {
     private final long turnDurationMillis = 16;
-    private final GameCanvas canvas = GameController.get().getGameCanvas();
-    private final GameScrollPane scrollPane = GameController.get().getScrollPane();
 
     public GameRunner() {
     }
@@ -39,8 +34,7 @@ public class GameRunner {
 
     private void runGameThread() {
         showGame();
-        scrollPane.requestFocus();
-        scrollPane.setFocusTraversable(false);
+        GameController.get().focusGameScrollPane();
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
@@ -69,26 +63,16 @@ public class GameRunner {
     }
 
     private void showGame() {
-        canvas.refresh();
-        scrollPane.updatePos();
+        GameController.get().showGame();
     }
 
     private void loadSave(SaveMemento memento) {
         GameController.get().loadSaveToLists(memento);
+        GameController.get().initLoadedGameSettings(memento);
     }
 
     private void loadNewGame() {
         GameController.get().loadGameActivePluginToLists();
-        initGameSettings();
-    }
-
-    private void initGameSettings() {
-        Plugin p = Controller.get().getActivePlugin();
-        int startX = p.getStartX();
-        int startY = p.getStartY();
-        double width = Controller.get().getCurrentLocation().getCurrentWidth();
-        double height = Controller.get().getCurrentLocation().getCurrentHeight();
-        scrollPane.setHvalue((double)startX/width);
-        scrollPane.setVvalue((double)startY/height);
+        GameController.get().initNewGameSettings();
     }
 }

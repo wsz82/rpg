@@ -10,13 +10,17 @@ public class SaveMemento implements Serializable {
     private double hValue;
     private double vValue;
     private List<LocationSerializable> locations;
+    private String currentLocationName;
+    private int currentLayer;
 
     public SaveMemento(){}
 
-    public SaveMemento(String name, double hValue, double vValue){
+    public SaveMemento(String name, double hValue, double vValue, String currentLocationName, int currentLayer) {
         this.name = name;
         this.hValue = hValue;
         this.vValue = vValue;
+        this.currentLocationName = currentLocationName;
+        this.currentLayer = currentLayer;
     }
 
     public String getName() {
@@ -49,5 +53,21 @@ public class SaveMemento implements Serializable {
 
     public void setLocations(List<LocationSerializable> locations) {
         this.locations = locations;
+    }
+
+    public String getCurrentLocationName() {
+        return currentLocationName;
+    }
+
+    public void setCurrentLocationName(String currentLocationName) {
+        this.currentLocationName = currentLocationName;
+    }
+
+    public int getCurrentLayer() {
+        return currentLayer;
+    }
+
+    public void setCurrentLayer(int currentLayer) {
+        this.currentLayer = currentLayer;
     }
 }

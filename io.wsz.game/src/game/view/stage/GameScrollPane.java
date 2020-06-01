@@ -114,9 +114,9 @@ public class GameScrollPane extends ScrollPane {
         int x = p.x;
         int y = p.y;
         double width = (int) getWidth();
-        double canvasWidth = Controller.get().getCurrentLocation().getCurrentWidth();
+        double canvasWidth = Controller.get().getCurrentLocation().getWidth();
         double height = (int) getHeight();
-        double canvasHeight = Controller.get().getCurrentLocation().getCurrentHeight();
+        double canvasHeight = Controller.get().getCurrentLocation().getHeight();
         double normalizedScrollHFactor = SCROLL_H_FACTOR * getWidth() / canvasWidth;
         double normalizedScrollVFactor = SCROLL_V_FACTOR * getHeight() / canvasHeight;
 

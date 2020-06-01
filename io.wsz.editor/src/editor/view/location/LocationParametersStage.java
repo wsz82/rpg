@@ -69,7 +69,7 @@ public class LocationParametersStage extends ChildStage {
     }
 
     private void changeCurrentLocationParameters(int width, int height) {
-        Controller.get().getCurrentLocation().setCurrentWidth(width);
-        Controller.get().getCurrentLocation().setCurrentHeight(height);
+        Controller.get().getCurrentLocation().setWidth(width);
+        Controller.get().getCurrentLocation().setHeight(height);
     }
 }

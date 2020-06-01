@@ -8,7 +8,6 @@ import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
 import editor.view.plugin.PluginSettingsStage;
-import io.wsz.model.Controller;
 import io.wsz.model.plugin.ActivePlugin;
 import javafx.event.Event;
 import javafx.scene.Scene;
@@ -185,7 +184,7 @@ class MainView {
     }
 
     private void createNewPlugin() {
-        Controller.get().initNewPlugin();
+        EditorController.get().initNewPlugin();
     }
 
     private void loadFile() {

@@ -6,6 +6,7 @@ import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
+import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
@@ -39,6 +40,18 @@ public class EditorController {
         new SettingsCaretaker(programDir).saveMemento(memento);
     }
 
+    public void initNewPlugin() {
+        Controller.get().getAssetsList().clear();
+        Controller.get().getLocationsList().clear();
+
+        Location location = new Location("new", 800, 600);
+        Layer layer = new Layer("new");
+        location.getLayers().get().add(layer);
+        LocationsList.get().add(location);
+        Controller.get().getCurrentLocation().setLocation(location);
+        Controller.get().getCurrentLayer().setLayer(layer);
+    }
+
     public void saveActivePlugin() {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = ActivePlugin.get().getPlugin();
@@ -52,7 +65,7 @@ public class EditorController {
         p.setFile(pluginDir);
         setPluginsParams(p);
         pc.saveAs(p);
-        ActivePlugin.get().setActivePlugin(p);
+        ActivePlugin.get().setPlugin(p);
     }
 
     private void setPluginsParams(Plugin p) {

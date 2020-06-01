@@ -123,8 +123,8 @@ public class GameCanvas extends Canvas {
     }
 
     private void setSize() {
-        int width = Controller.get().getCurrentLocation().getCurrentWidth();
-        int height = Controller.get().getCurrentLocation().getCurrentHeight();
+        int width = Controller.get().getCurrentLocation().getWidth();
+        int height = Controller.get().getCurrentLocation().getHeight();
         setWidth(width);
         setHeight(height);
     }

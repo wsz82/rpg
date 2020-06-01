@@ -68,9 +68,9 @@ public abstract class Board extends AnchorPane {
 
     private void bindWidthAndHeight() {
         prefWidthProperty().bind(
-                CurrentLocation.get().currentWidthProperty());
+                CurrentLocation.get().widthProperty());
         prefHeightProperty().bind(
-                CurrentLocation.get().currentHeightProperty());
+                CurrentLocation.get().heightProperty());
     }
 
     protected void resizeImageWithChangedBoard(ContentWithImage cwi, Image origin, double width, double height) {
