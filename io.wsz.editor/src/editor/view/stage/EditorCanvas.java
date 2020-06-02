@@ -215,14 +215,8 @@ public class EditorCanvas extends Canvas {
     void moveContent(KeyCode keyCode, Content c){
         Coords pos = c.getItem().getPos();
         switch (keyCode) {
-            case UP -> {
-                int y = (int) pos.getY();
-                if (y > 0) pos.setY(pos.getY() - 1);
-            }
-            case LEFT -> {
-                int x = (int) pos.getX();
-                if (x > 0) pos.setX(pos.getX() - 1);
-            }
+            case UP -> pos.setY(pos.getY() - 1);
+            case LEFT -> pos.setX(pos.getX() - 1);
             case DOWN -> pos.setY(pos.getY() + 1);
             case RIGHT -> pos.setX(pos.getX() + 1);
         }
