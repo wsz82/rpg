@@ -45,7 +45,6 @@ public class GameCanvas extends Canvas {
             final double x = pos.getX();
             final double y = pos.getY();
 
-
             if (content.isVisible()) {
                 switch (type) {
                     case CREATURE -> drawCreatureSize((Creature) item, gc);
@@ -142,8 +141,9 @@ public class GameCanvas extends Canvas {
 
     private Content lookForContent(double x, double y) {
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getType() == ItemType.CREATURE) //TODO other types that need to be interact with
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
+                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())
                 .collect(Collectors.toList());
         if (contents.isEmpty()) {
             return null;
