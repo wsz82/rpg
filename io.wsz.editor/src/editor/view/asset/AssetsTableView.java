@@ -4,7 +4,7 @@ import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.item.Asset;
-import io.wsz.model.item.AssetToContentConverter;
+import io.wsz.model.item.AssetConverter;
 import io.wsz.model.item.AssetsList;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
@@ -118,7 +118,7 @@ class AssetsTableView extends AssetsGenericTableView {
         }
         AssetStage assetStage = switch (itemType) {
             case CREATURE -> new CreatureAssetStage(parent, assetToEdit);
-            default -> new AssetStage(parent, assetToEdit);
+            default -> new AssetStageImpl(parent, assetToEdit);
         };
         assetStage.show();
     }
@@ -126,7 +126,7 @@ class AssetsTableView extends AssetsGenericTableView {
     void addItemsToStageAndContents(Coords pos) {
         pos.setZ(getUniqueZ(pos.getZ()));
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
-        List<Content> contents = AssetToContentConverter.convert(selectedAssets, pos);
+        List<Content> contents = AssetConverter.convertToContent(selectedAssets, pos);
         Controller.get().getCurrentLocation().getContent().addAll(contents);
     }
 
@@ -151,7 +151,7 @@ class AssetsTableView extends AssetsGenericTableView {
     void addAsset() {
         AssetStage assetStage = switch (itemType) {
             case CREATURE -> new CreatureAssetStage(parent, itemType);
-            default -> new AssetStage(parent, itemType);
+            default -> new AssetStageImpl(parent, itemType);
         };
         assetStage.show();
     }

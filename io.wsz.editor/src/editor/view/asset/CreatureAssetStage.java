@@ -27,7 +27,9 @@ public class CreatureAssetStage extends AssetStage {
         initWindow();
     }
 
-    private void initWindow() {
+    @Override
+    protected void initWindow() {
+        super.initWindow();
         setTitle(TITLE);
 
         final HBox sizeBox = new HBox(10);
@@ -50,11 +52,16 @@ public class CreatureAssetStage extends AssetStage {
         ObservableList<CreatureControl> controls = FXCollections.observableArrayList();
         controls.addAll(Arrays.asList(CreatureControl.values()));
         controlCB.setItems(controls);
+
+        fillInputs();
     }
 
     @Override
     protected void fillInputs() {
         super.fillInputs();
+        if (asset == null) {
+            return;
+        }
         Creature cr = (Creature) asset;
         CreatureSize size = cr.getSize();
         sizeCB.setValue(size);

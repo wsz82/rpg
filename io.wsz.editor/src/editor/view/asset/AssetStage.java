@@ -17,7 +17,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
 
-class AssetStage extends ChildStage {
+abstract class AssetStage extends ChildStage {
     protected Asset asset;
     protected final VBox container = new VBox(5);
     private final TextField nameInput = new TextField();
@@ -33,16 +33,14 @@ class AssetStage extends ChildStage {
         super(parent);
         this.itemType = asset.getType();
         this.asset = asset;
-        initWindow();
     }
 
     AssetStage(Stage parent, ItemType itemType) {
         super(parent);
         this.itemType = itemType;
-        initWindow();
     }
 
-    private void initWindow() {
+    protected void initWindow() {
         setTitle(itemType.toString().toLowerCase() + " asset");
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
@@ -76,12 +74,12 @@ class AssetStage extends ChildStage {
         root.getChildren().add(containerWithButtons);
 
         hookupEvents();
-        if (asset != null) {
-            fillInputs();
-        }
     }
 
     protected void fillInputs() {
+        if (asset == null) {
+            return;
+        }
         nameInput.setText(asset.getName());
         path = asset.getPath();
         imageLabel.setText(asset.getPath());

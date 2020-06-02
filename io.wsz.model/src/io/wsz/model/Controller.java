@@ -57,7 +57,7 @@ public class Controller {
     }
 
     public List<LocationSerializable> getLocationsSerializable() {
-        return SerializableConverter.locationsToSerializable(LocationsList.get());
+        return SerializableConverter.toSerializableLocations(LocationsList.get());
     }
 
     public CurrentLocation getCurrentLocation() {

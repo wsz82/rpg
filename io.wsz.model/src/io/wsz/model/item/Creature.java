@@ -4,12 +4,21 @@ import io.wsz.model.stage.Coords;
 
 public class Creature extends PosItem {
     private Coords dest;
-    private CreatureSize size = CreatureSize.M;
-    private CreatureControl control = CreatureControl.CONTROLABLE;
-    private int speed = 30;
+    private CreatureSize size;
+    private CreatureControl control;
+    private int speed;
 
     public Creature(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path, pos, level);
+    }
+
+    public Creature(String name, ItemType type, String path, Coords pos, int level,
+                    Coords dest, CreatureSize size, CreatureControl control, int speed) {
+        super(name, type, path, pos, level);
+        this.dest = dest;
+        this.size = size;
+        this.control = control;
+        this.speed = speed;
     }
 
     public void move() {

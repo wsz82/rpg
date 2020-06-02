@@ -133,7 +133,7 @@ public class GameController {
         Controller.get().getLocationsList().clear();
 
         List<LocationSerializable> lsList = m.getLocations();
-        List<Location> locations = SerializableConverter.toLocationObjects(lsList, AssetsList.get());
+        List<Location> locations = SerializableConverter.toLocation(lsList, AssetsList.get());
         Controller.get().getLocationsList().setAll(locations);
 
         List<Location> singleLocation = locations.stream()

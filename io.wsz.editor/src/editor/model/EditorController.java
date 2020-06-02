@@ -5,9 +5,7 @@ import editor.model.settings.SettingsMemento;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.item.AssetsList;
-import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.ActivePlugin;
@@ -47,7 +45,7 @@ public class EditorController {
         Location location = new Location("new", 800, 600);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);
-        LocationsList.get().add(location);
+        Controller.get().getLocationsList().add(location);
         Controller.get().getCurrentLocation().setLocation(location);
         Controller.get().getCurrentLayer().setLayer(layer);
     }
@@ -99,15 +97,22 @@ public class EditorController {
         if (ActivePlugin.get().getPlugin() == null) {
             return;
         }
-        LocationsList.get().clear();
-        AssetsList.get().clear();
+        Controller.get().getAssetsList().clear();
+        Controller.get().getLocationsList().clear();
 
         Plugin p = ActivePlugin.get().getPlugin();
-        Location first = p.getLocations().get(0);
-        CurrentLocation.get().setLocation(first);
-        CurrentLayer.get().setLayer(first.getLayers().get().get(0));
 
-        AssetsList.get().setAll(p.getAssets());
-        LocationsList.get().setAll(p.getLocations());
+        boolean listAreLoaded = loadLists(p);
+        if (listAreLoaded) {
+            Location first = p.getLocations().get(0);
+            Controller.get().getCurrentLocation().setLocation(first);
+            Controller.get().getCurrentLayer().setLayer(first.getLayers().get().get(0));
+        }
+    }
+
+    private boolean loadLists(Plugin p) {
+        Controller.get().getAssetsList().setAll(p.getAssets());
+        Controller.get().getLocationsList().setAll(p.getLocations());
+        return true;
     }
 }
