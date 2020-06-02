@@ -124,28 +124,9 @@ class AssetsTableView extends AssetsGenericTableView {
     }
 
     void addItemsToStageAndContents(Coords pos) {
-        pos.setZ(getUniqueZ(pos.getZ()));
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
         List<Content> contents = AssetConverter.convertToContent(selectedAssets, pos);
         Controller.get().getCurrentLocation().getContent().addAll(contents);
-    }
-
-    private int getUniqueZ(int z) {
-        int level = Controller.get().getCurrentLayer().getLevel();
-        List<Integer> zPositions = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getLevel() == level)
-                .map(c -> c.getItem().getPos().getZ())
-                .collect(Collectors.toList());
-        return iterateForUniqueZ(z, zPositions);
-    }
-
-    private int iterateForUniqueZ(int z, List<Integer> zPositions) {
-        if (!zPositions.contains(z)) {
-            return z;
-        } else {
-            z += 1;
-            return iterateForUniqueZ(z, zPositions);
-        }
     }
 
     void addAsset() {

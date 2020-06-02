@@ -1,6 +1,7 @@
 package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
+import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
@@ -12,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,12 +74,9 @@ public class ContentTableView extends TableView<Content> {
             if (!levels.contains(level)) {
                 alertLayerNotExisting(level);
                 c.getItem().setLevel(t.getOldValue());
-            } else {
-                c.setLevel(level);
-                int z = getUniqueZ(c.getItem().getPos().getZ(), level);
-                c.getItem().getPos().setZ(z);
             }
             refresh();
+            EditorCanvas.get().refresh();
         });
 
         TableColumn<Content, Boolean> visibilityCol = new TableColumn<>("Visibility");
@@ -103,6 +100,7 @@ public class ContentTableView extends TableView<Content> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
             c.getItem().getPos().setX(t.getNewValue());
             refresh();
+            EditorCanvas.get().refresh();
         });
 
         TableColumn<Content, Double> yCol = new TableColumn<>("Y");
@@ -118,23 +116,9 @@ public class ContentTableView extends TableView<Content> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
             c.getItem().getPos().setY(t.getNewValue());
             refresh();
+            EditorCanvas.get().refresh();
         });
-
-        TableColumn<Content, Integer> zCol = new TableColumn<>("Z");
-        zCol.setEditable(true);
-        zCol.setCellValueFactory(param -> new ObjectBinding<>() {
-            @Override
-            protected Integer computeValue() {
-                return param.getValue().getItem().getPos().getZ();
-            }
-        });
-        zCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        zCol.setOnEditCommit(t -> {
-            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            reverseZwithOtherContent(c, t.getOldValue(), t.getNewValue());
-            refresh();
-        });
-        posCol.getColumns().addAll(xCol, yCol, zCol);
+        posCol.getColumns().addAll(xCol, yCol);
 
         ObservableList<TableColumn<Content, ?>> columns = getColumns();
         columns.add(0, nameCol);
@@ -150,34 +134,6 @@ public class ContentTableView extends TableView<Content> {
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());
-    }
-
-    private int getUniqueZ(int z, int destLevel) {
-        List<Integer> zPositions = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getLevel() == destLevel)
-                .map(c -> c.getItem().getPos().getZ())
-                .collect(Collectors.toList());
-        return iterateForUniqueZ(z, zPositions);
-    }
-
-    private int iterateForUniqueZ(int z, List<Integer> zPositions) {
-        if (!zPositions.contains(z)) {
-            return z;
-        } else {
-            z += 1;
-            return iterateForUniqueZ(z, zPositions);
-        }
-    }
-
-    private void reverseZwithOtherContent(Content c1, int oldValue, int newValue) {
-        List<Content> singleContent = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getPos().getZ() == newValue)
-                .collect(Collectors.toList());
-        if (!singleContent.isEmpty()) {
-            Content c2 = singleContent.get(0);
-            c2.getItem().getPos().setZ(oldValue);
-        }
-        c1.getItem().getPos().setZ(newValue);
     }
 
     void removeContents() {

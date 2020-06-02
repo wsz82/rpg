@@ -11,11 +11,11 @@ import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.plugin.ActivePlugin;
 import javafx.event.Event;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -28,7 +28,7 @@ import java.io.File;
 class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
-    private static final AnchorPane EDITOR_BOARD = EditorBoard.get();
+    private static final Canvas EDITOR_CANVAS = EditorCanvas.get();
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
@@ -78,7 +78,7 @@ class MainView {
     private void setUpScrollPane() {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setContent(EDITOR_BOARD);
+        scrollPane.setContent(EDITOR_CANVAS);
         scrollPane.setPannable(true);
         scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
         scrollPane.addEventFilter(MouseEvent.ANY, event -> {
@@ -132,7 +132,7 @@ class MainView {
     private void setBottomContent(VBox bottom) {
         HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        CoordinatesBox coordinatesBox = new CoordinatesBox(EDITOR_BOARD);
+        CoordinatesBox coordinatesBox = new CoordinatesBox(EDITOR_CANVAS);
         CurrentLocationBox currentLocationBox = new CurrentLocationBox();
         CurrentLayerBox currentLayerBox = new CurrentLayerBox();
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);

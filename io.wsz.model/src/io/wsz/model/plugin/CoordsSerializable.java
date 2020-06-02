@@ -5,12 +5,10 @@ import java.io.Serializable;
 public class CoordsSerializable implements Serializable {
     private double x;
     private double y;
-    private int z;
 
-    public CoordsSerializable(double x, double y, int z) {
+    public CoordsSerializable(double x, double y) {
         this.x = x;
         this.y = y;
-        this.z = z;
     }
 
     public double getX() {
@@ -27,13 +25,5 @@ public class CoordsSerializable implements Serializable {
 
     public void setY(double y) {
         this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z = z;
     }
 }

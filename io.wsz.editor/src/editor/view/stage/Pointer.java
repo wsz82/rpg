@@ -4,7 +4,6 @@ import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -16,21 +15,17 @@ public class Pointer {
         public void handle(MouseEvent event) {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                int z = EditorBoard.get().getzPos();
-                boolean markerIsNotDrawn = !EditorBoard.get().getChildren().contains(marker);
 
-                mark = new Coords(event, z);
-                if (markerIsNotDrawn) {
+                mark = new Coords(event);
+                if (markerImage == null) {
                     loadMarkerImage();
-                    marker.setImage(markerImage);
-                    EditorBoard.get().getChildren().add(marker);
                 }
-                EditorBoard.get().setLeftAnchor(marker, mark.getX() - markerImage.getWidth()/2);
-                EditorBoard.get().setTopAnchor(marker, mark.getY() - markerImage.getHeight()/2);
+                double x = mark.getX() - markerImage.getWidth()/2;
+                double y = mark.getY() - markerImage.getHeight()/2;
+                EditorCanvas.get().drawMarker(markerImage, x, y);
             }
         }
     };
-    private final ImageView marker = new ImageView();
     private static Coords mark;
     private static Pointer singleton;
     private static boolean active;
@@ -41,7 +36,7 @@ public class Pointer {
             singleton = new Pointer();
         }
         return singleton;
-    }
+}
 
     private Pointer() {
     }
@@ -54,22 +49,22 @@ public class Pointer {
 
     void activate() {
         active = true;
-        EditorBoard.get().setCursor(Cursor.CROSSHAIR);
-        EditorBoard.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        EditorCanvas.get().setCursor(Cursor.CROSSHAIR);
+        EditorCanvas.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
     }
 
     void deactivate() {
         active = false;
-        EditorBoard.get().setCursor(Cursor.DEFAULT);
-        EditorBoard.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
-        EditorBoard.get().getChildren().remove(marker);
+        EditorCanvas.get().setCursor(Cursor.DEFAULT);
+        EditorCanvas.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        EditorCanvas.get().removeMarker();
     }
 
     public static Coords getMark() {
         if (mark != null && active) {
             return mark;
         } else {
-            return new Coords(0, 0, 0);
+            return new Coords(0, 0);
         }
     }
 }

@@ -1,26 +1,21 @@
 package io.wsz.model.stage;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.input.MouseEvent;
 
 public class Coords {
     private final DoubleProperty x = new SimpleDoubleProperty();
     private final DoubleProperty y = new SimpleDoubleProperty();
-    private final IntegerProperty z = new SimpleIntegerProperty();
 
-    public Coords(double x, double y, int z) {
+    public Coords(double x, double y) {
         this.x.set(x);
         this.y.set(y);
-        this.z.set(z);
     }
 
-    public Coords(MouseEvent event, int z) {
+    public Coords(MouseEvent event) {
         this.x.set(event.getX());
         this.y.set(event.getY());
-        this.z.set(z);
     }
 
     public DoubleProperty xProperty() {
@@ -47,20 +42,8 @@ public class Coords {
         return y.get();
     }
 
-    public int getZ() {
-        return z.get();
-    }
-
-    public IntegerProperty zProperty() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z.set(z);
-    }
-
     @Override
     public String toString() {
-        return "" + x.get() + ", " + y.get() + ", " + z.get();
+        return "" + x.get() + ", " + y.get();
     }
 }

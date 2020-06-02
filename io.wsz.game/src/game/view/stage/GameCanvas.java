@@ -124,7 +124,7 @@ public class GameCanvas extends Canvas {
                 if (control == CreatureControl.CONTROLABLE) {
                     cr.setControl(CreatureControl.CONTROL);
                 }
-                Coords rawPos = new Coords(e.getX(), e.getY(), cr.getPos().getZ());
+                Coords rawPos = new Coords(e.getX(), e.getY());
                 Coords dest = cr.calcCenterBottomPos(rawPos);
                 cr.setDest(dest);
             }

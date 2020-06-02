@@ -48,7 +48,7 @@ public class Creature extends PosItem {
         double height = getImage().getHeight();
         double x = pos.getX() + width/2;
         double y = pos.getY() + height;
-        return new Coords(x, y, pos.getZ());
+        return new Coords(x, y);
     }
 
     public Coords calcCenterBottomPos(Coords difPos) {
@@ -56,7 +56,7 @@ public class Creature extends PosItem {
         double height = getImage().getHeight();
         double x = difPos.getX() - width/2;
         double y = difPos.getY() - height;
-        return new Coords(x, y, difPos.getZ());
+        return new Coords(x, y);
     }
 
     public Coords getDest() {

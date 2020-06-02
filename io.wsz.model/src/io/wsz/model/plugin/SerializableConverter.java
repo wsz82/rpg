@@ -108,8 +108,7 @@ public class SerializableConverter {
         }
         double x = pos.getX();
         double y = pos.getY();
-        int z = pos.getZ();
-        return new CoordsSerializable(x, y, z);
+        return new CoordsSerializable(x, y);
     }
 
     public static List<Location> toLocation(List<LocationSerializable> input, List<Asset> assets) {
@@ -196,7 +195,7 @@ public class SerializableConverter {
         if (pos == null) {
             return null;
         }
-        return new Coords(pos.getX(), pos.getY(), pos.getZ());
+        return new Coords(pos.getX(), pos.getY());
     }
 
     private static List<AssetSerializable> toSerializableAssets(List<Asset> input) {

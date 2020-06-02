@@ -1,8 +1,5 @@
 package editor.view.stage;
 
-import editor.model.ActiveContent;
-import editor.model.EditorController;
-import io.wsz.model.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -50,24 +47,8 @@ class EditorToolBar extends ToolBar {
     }
 
     private void hookupOpacityEvents(String itemOpacity, ChoiceBox<String> cb) {
-        EditorController.get().getActiveContent().imageProperty().addListener((observable, oldValue, newValue) -> {
-            opacitySlider.setValue(newValue.getOpacity());
-        });
-
-        opacitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int currentLevel = Controller.get().getCurrentLayer().getLevel();
-            if (cb.getValue().equals(itemOpacity)) {
-                ActiveContent ac = EditorController.get().getActiveContent();
-                ImageView iv = ac.getImage();
-                if (iv == null) {
-                    return;
-                }
-                iv.setOpacity(newValue.doubleValue());
-            } else {
-                EditorBoard.get().getBoardContents().stream()
-                        .filter(c -> c.getContent().getItem().getLevel() == currentLevel)
-                        .forEach(i -> i.getImageView().setOpacity(newValue.doubleValue()));
-            }
+        opacitySlider.pressedProperty().addListener((observable, oldValue, newValue) -> {
+           //TODO changing opacity
         });
     }
 
