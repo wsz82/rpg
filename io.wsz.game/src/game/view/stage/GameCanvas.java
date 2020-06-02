@@ -8,6 +8,7 @@ import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -161,10 +162,20 @@ public class GameCanvas extends Canvas {
             if (!fitX) {
                 continue;
             }
+
             double cY = c.getItem().getPos().getY();
             double cHeight = c.getItem().getImage().getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
+                continue;
+            }
+
+            Image img = c.getItem().getImage();
+            int imgX = (int) (x - cX);
+            int imgY = (int) (y - cY);
+            Color color = img.getPixelReader().getColor(imgX, imgY);
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (isPixelTransparent) {
                 continue;
             }
             return c;

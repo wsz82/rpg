@@ -189,10 +189,20 @@ public class EditorCanvas extends Canvas {
             if (!fitX) {
                 continue;
             }
+
             double cY = c.getItem().getPos().getY();
             double cHeight = c.getItem().getImage().getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
+                continue;
+            }
+
+            Image img = c.getItem().getImage();
+            int imgX = (int) (x - cX);
+            int imgY = (int) (y - cY);
+            Color color = img.getPixelReader().getColor(imgX, imgY);
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (isPixelTransparent) {
                 continue;
             }
             return c;
