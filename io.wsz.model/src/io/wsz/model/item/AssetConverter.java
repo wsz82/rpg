@@ -37,7 +37,15 @@ public class AssetConverter {
             case OBSTACLE -> new Content(convertObstacle(name, type, path, pos, level));
             case FLY_ZONE -> new Content(convertToFlyZone(name, type, path, pos, level));
             case CREATURE -> new Content(convertToCreature(name, type, path, pos, level, asset));
+            case TELEPORT -> new Content(convertToTeleport(name, type, path, pos, level, asset));
         };
+    }
+
+    private static PosItem convertToTeleport(String name, ItemType type, String path, Coords pos, int level,
+                                             Asset asset) {
+        Teleport origin = (Teleport) asset;
+        return new Teleport(name, type, path, pos, level,
+                origin.getLocationName(), origin.getPos(), origin.getLevel());
     }
 
     public static Creature convertToCreature(String name, ItemType type, String path, Coords pos, int level,

@@ -1,5 +1,7 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
+import io.wsz.model.content.Content;
 import io.wsz.model.stage.Coords;
 
 public class Creature extends PosItem {
@@ -25,6 +27,11 @@ public class Creature extends PosItem {
         if (dest == null) {
             return;
         }
+        Content c = getObstacle();
+        if (c != null) {
+            Coords free = Controller.get().getBoard().getFreePos(getCorners(), c);
+            setDest(calcDest(free));
+        }
         double x1 = pos.getX();
         double x2 = dest.getX();
         double y1 = pos.getY();
@@ -43,8 +50,10 @@ public class Creature extends PosItem {
         pos.setY(y3);
     }
 
-    public void stop() {
-        setDest(null);
+    private Content getObstacle() {
+        Coords[] poss = getCorners();
+        ItemType[] types = new ItemType[] {ItemType.OBSTACLE};
+        return Controller.get().getBoard().lookForContent(poss, types, false);
     }
 
     public Coords getCenterBottomPos() {
@@ -55,7 +64,7 @@ public class Creature extends PosItem {
         return new Coords(x, y);
     }
 
-    public Coords calcCenterBottomPos(Coords difPos) {
+    public Coords calcDest(Coords difPos) {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
         double x = difPos.getX() - width/2;
@@ -80,8 +89,8 @@ public class Creature extends PosItem {
         return dest;
     }
 
-    public void setDest(Coords dest) {
-        this.dest = dest;
+    public void setDest(Coords pos) {
+        this.dest = pos;
     }
 
     public int getSpeed() {

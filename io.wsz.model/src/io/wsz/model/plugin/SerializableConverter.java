@@ -76,13 +76,13 @@ public class SerializableConverter {
         String name = item.getName();
         ItemType type = item.getType();
         String path = item.getPath();
-        CoordsSerializable pos = toSerializableCoords(item.getPos());
+        Coords pos = item.getPos();
         int level = item.getLevel();
         return toConcreteItemSerializable(item, name, type, path, pos, level);
     }
 
     private static PosItemSerializable toConcreteItemSerializable(
-            Asset asset, String name, ItemType type, String path, CoordsSerializable pos, int level) {
+            Asset asset, String name, ItemType type, String path, Coords pos, int level) {
         return  switch (type) {
             case CREATURE -> toCreatureSerializable(name, type, path, pos, level, asset);
             default -> toPosItemSerializable(name, type, path, pos, level);
@@ -90,25 +90,16 @@ public class SerializableConverter {
     }
 
     private static PosItemSerializable toPosItemSerializable(
-            String name, ItemType type, String path, CoordsSerializable pos, int level) {
+            String name, ItemType type, String path, Coords pos, int level) {
         return new PosItemSerializable(name, type, path, pos, level);
     }
 
     private static CreatureSerializable toCreatureSerializable(
-            String name, ItemType type, String path, CoordsSerializable pos, int level, Asset asset) {
+            String name, ItemType type, String path, Coords pos, int level, Asset asset) {
         Creature cr = (Creature) asset;
-        CoordsSerializable dest = toSerializableCoords(cr.getDest());
+        Coords dest = cr.getDest();
         return new CreatureSerializable(
                 name, type, path, pos, level, dest, cr.getSize(), cr.getControl(), cr.getSpeed());
-    }
-
-    private static CoordsSerializable toSerializableCoords(Coords pos) {
-        if (pos == null) {
-            return null;
-        }
-        double x = pos.getX();
-        double y = pos.getY();
-        return new CoordsSerializable(x, y);
     }
 
     public static List<Location> toLocation(List<LocationSerializable> input, List<Asset> assets) {
@@ -167,7 +158,7 @@ public class SerializableConverter {
         ItemType type = is.getType();
         String name = is.getName();
         String path = is.getPath();
-        Coords pos = toCoordinates(is.getPos());
+        Coords pos = is.getPos();
         int level = is.getLevel();
         return toConcreteItem(is, type, name, path, pos, level);
     }
@@ -180,22 +171,22 @@ public class SerializableConverter {
             case FLY_ZONE -> new FlyZone(name, type, path, pos, level);
             case LANDSCAPE -> new Landscape(name, type, path, pos, level);
             case OBSTACLE -> new Obstacle(name, type, path, pos, level);
+            case TELEPORT -> toTeleport(name, type, path, pos, level, as);
         };
+    }
+
+    private static PosItem toTeleport(String name, ItemType type, String path, Coords pos, int level,
+                                      AssetSerializable as) {
+        TeleportSerializable ts = (TeleportSerializable) as;
+        return new Teleport(name, type, path, pos, level,
+                ts.getLocationName(), ts.getExit(), ts.getExitLevel());
     }
 
     private static Creature toCreature(String name, ItemType type, String path, Coords pos, int level,
                                       AssetSerializable as) {
         CreatureSerializable cs = (CreatureSerializable) as;
-        Coords dest = toCoordinates(cs.getPos());
         return new Creature(name, type, path, pos, level,
-                dest, cs.getSize(), cs.getControl(), cs.getSpeed());
-    }
-
-    private static Coords toCoordinates(CoordsSerializable pos) {
-        if (pos == null) {
-            return null;
-        }
-        return new Coords(pos.getX(), pos.getY());
+                cs.getDest(), cs.getSize(), cs.getControl(), cs.getSpeed());
     }
 
     private static List<AssetSerializable> toSerializableAssets(List<Asset> input) {

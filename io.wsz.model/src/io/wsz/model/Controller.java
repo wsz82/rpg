@@ -8,13 +8,14 @@ import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
+import io.wsz.model.stage.Board;
 import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.List;
 
 public class Controller {
-    private static volatile Controller singleton;
+    private static Controller singleton;
 
     public static Controller get() {
         if (singleton == null) {
@@ -70,5 +71,9 @@ public class Controller {
 
     public ObservableList<Asset> getAssetsList() {
         return AssetsList.get();
+    }
+
+    public Board getBoard() {
+        return Board.get();
     }
 }

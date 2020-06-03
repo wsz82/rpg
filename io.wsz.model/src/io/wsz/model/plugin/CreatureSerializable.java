@@ -3,15 +3,16 @@ package io.wsz.model.plugin;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.stage.Coords;
 
 public class CreatureSerializable extends PosItemSerializable {
-    protected CoordsSerializable dest;
-    protected CreatureSize size = CreatureSize.M;
-    protected CreatureControl control = CreatureControl.CONTROLABLE;
-    protected int speed = 30;
+    protected Coords dest;
+    protected CreatureSize size;
+    protected CreatureControl control;
+    protected int speed;
 
-    public CreatureSerializable(String name, ItemType type, String path, CoordsSerializable pos, int level,
-                                CoordsSerializable dest, CreatureSize size, CreatureControl control, int speed) {
+    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level,
+                                Coords dest, CreatureSize size, CreatureControl control, int speed) {
         super(name, type, path, pos, level);
         this.dest = dest;
         this.size = size;
@@ -19,15 +20,15 @@ public class CreatureSerializable extends PosItemSerializable {
         this.speed = speed;
     }
 
-    public CreatureSerializable(String name, ItemType type, String path, CoordsSerializable pos, int level) {
+    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path, pos, level);
     }
 
-    public CoordsSerializable getDest() {
+    public Coords getDest() {
         return dest;
     }
 
-    public void setDest(CoordsSerializable dest) {
+    public void setDest(Coords dest) {
         this.dest = dest;
     }
 

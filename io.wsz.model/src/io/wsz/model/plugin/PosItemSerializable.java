@@ -1,22 +1,23 @@
 package io.wsz.model.plugin;
 
 import io.wsz.model.item.ItemType;
+import io.wsz.model.stage.Coords;
 
 public class PosItemSerializable extends AssetSerializable {
-    protected CoordsSerializable pos;
+    protected Coords pos;
     protected int level;
 
-    public PosItemSerializable(String name, ItemType type, String path, CoordsSerializable pos, int level) {
+    public PosItemSerializable(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path);
         this.pos = pos;
         this.level = level;
     }
 
-    public CoordsSerializable getPos() {
+    public Coords getPos() {
         return pos;
     }
 
-    public void setPos(CoordsSerializable pos) {
+    public void setPos(Coords pos) {
         this.pos = pos;
     }
 

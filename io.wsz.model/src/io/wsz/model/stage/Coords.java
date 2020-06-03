@@ -1,53 +1,38 @@
 package io.wsz.model.stage;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.input.MouseEvent;
+import java.io.Serializable;
 
-public class Coords {
-    private final DoubleProperty x = new SimpleDoubleProperty();
-    private final DoubleProperty y = new SimpleDoubleProperty();
+public class Coords implements Serializable {
+    private double x;
+    private double y;
 
     public Coords(double x, double y) {
-        this.x.set(x);
-        this.y.set(y);
+        this.x = x;
+        this.y = y;
     }
 
-    public Coords(MouseEvent event) {
-        this.x.set(event.getX());
-        this.y.set(event.getY());
+    public boolean is0() {
+        return x == 0 && y == 0;
     }
 
-    public DoubleProperty xProperty() {
+    public double getX() {
         return x;
     }
 
     public void setX(double x) {
-        this.x.set(x);
+        this.x = x;
     }
 
-    public DoubleProperty yProperty() {
+    public double getY() {
         return y;
     }
 
     public void setY(double y) {
-        this.y.set(y);
-    }
-
-    public double getX() {
-        return x.get();
-    }
-
-    public double getY() {
-        return y.get();
-    }
-
-    public boolean is0() {
-        return x.get() == 0 && y.get() == 0;
+        this.y = y;
     }
 
     @Override
     public String toString() {
-        return "" + x.get() + ", " + y.get();
+        return "" + x + ", " + y;
     }
 }
