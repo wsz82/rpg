@@ -7,5 +7,5 @@ public enum ItemType {
     CREATURE,
     LANDSCAPE,
     FLY_ZONE,
-    MOVE_ZONE
+    OBSTACLE
 }

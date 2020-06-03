@@ -43,6 +43,10 @@ public class Creature extends PosItem {
         pos.setY(y3);
     }
 
+    public void stop() {
+        setDest(null);
+    }
+
     public Coords getCenterBottomPos() {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
@@ -57,6 +61,19 @@ public class Creature extends PosItem {
         double x = difPos.getX() - width/2;
         double y = difPos.getY() - height;
         return new Coords(x, y);
+    }
+
+    public Coords[] getCorners() {
+        double halfWidth = size.getWidth()/2.0;
+        double halfHeight = size.getHeight()/2.0;
+        Coords centerBottomPos = getCenterBottomPos();
+        double centerX = centerBottomPos.getX();
+        double centerY = centerBottomPos.getY();
+        Coords top = new Coords(centerX, centerY - halfHeight);
+        Coords bottom = new Coords(centerX, centerY + halfHeight);
+        Coords right = new Coords(centerX + halfWidth, centerY);
+        Coords left = new Coords(centerX - halfWidth, centerY);
+        return new Coords[] {top, bottom, right, left};
     }
 
     public Coords getDest() {

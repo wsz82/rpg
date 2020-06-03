@@ -13,6 +13,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ public class GameCanvas extends Canvas {
         clear(gc);
 
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getType() != ItemType.OBSTACLE)
                 .filter(c -> c.isVisible())
                 .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
@@ -48,10 +51,22 @@ public class GameCanvas extends Canvas {
 
             if (content.isVisible()) {
                 switch (type) {
-                    case CREATURE -> drawCreatureSize((Creature) item, gc);
+                    case CREATURE -> {
+                        checkPositionAvailability((Creature) item);
+                        drawCreatureSize((Creature) item, gc);
+                    }
                 }
                 gc.drawImage(item.getImage(), x, y);
             }
+        }
+    }
+
+    private void checkPositionAvailability(Creature cr) {
+        Coords[] poss = cr.getCorners();
+        ItemType[] types = new ItemType[] {ItemType.OBSTACLE};
+        Content c = lookForContent(poss, types, false);
+        if (c != null) {
+            cr.stop();
         }
     }
 
@@ -77,7 +92,9 @@ public class GameCanvas extends Canvas {
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
-                Content content = lookForContent(e.getX(), e.getY());
+                Coords pos = new Coords(e.getX(), e.getY());
+                Coords[] poss = new Coords[] {pos};
+                Content content = lookForContent(poss, null, true);
                 if (content == null) {
                     return;
                 }
@@ -103,7 +120,10 @@ public class GameCanvas extends Canvas {
                 }
                 Coords rawPos = new Coords(e.getX(), e.getY());
                 Coords dest = cr.calcCenterBottomPos(rawPos);
-                cr.setDest(dest);
+                boolean pointInObstacle = pointInObstacle(rawPos);
+                if (!pointInObstacle) {
+                    cr.setDest(dest);
+                }
             }
         };
         addEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
@@ -116,11 +136,31 @@ public class GameCanvas extends Canvas {
         });
     }
 
-    private Content lookForContent(double x, double y) {
+    private boolean pointInObstacle(Coords dest) {
+        Coords[] poss = new Coords[] {dest};
+        ItemType[] types = new ItemType[] {ItemType.OBSTACLE};
+        Content obstacle = lookForContent(poss, types, false);
+        return obstacle != null;
+    }
+
+    private Content lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
+        if (types == null) {
+            types = new ItemType[] {ItemType.CREATURE};//TODO other types that need to be interact with
+        }
+        List<ItemType> typesList = new ArrayList<>(1);
+        Collections.addAll(typesList, types);
         List<Content> contents = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getType() == ItemType.CREATURE) //TODO other types that need to be interact with
+                .filter(c -> typesList.contains(c.getItem().getType()))
                 .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())
+                .filter(c -> {
+                    int level = c.getItem().getLevel();
+                    int actualLevel = Controller.get().getCurrentLayer().getLevel();
+                    if (includeLevelsBelow) {
+                        return level <= actualLevel;
+                    } else {
+                        return level == actualLevel;
+                    }
+                })
                 .collect(Collectors.toList());
         if (contents.isEmpty()) {
             return null;
@@ -132,29 +172,34 @@ public class GameCanvas extends Canvas {
             }
         });
         for (Content c : contents) {
-            double cX = c.getItem().getPos().getX();
-            double cWidth = c.getItem().getImage().getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
-                continue;
-            }
+            for (Coords pos : poss) {
+                double x = pos.getX();
+                double y = pos.getY();
 
-            double cY = c.getItem().getPos().getY();
-            double cHeight = c.getItem().getImage().getHeight();
-            boolean fitY = y >= cY && y <= cY + cHeight;
-            if (!fitY) {
-                continue;
-            }
+                double cX = c.getItem().getPos().getX();
+                double cWidth = c.getItem().getImage().getWidth();
+                boolean fitX = x >= cX && x <= cX + cWidth;
+                if (!fitX) {
+                    continue;
+                }
 
-            Image img = c.getItem().getImage();
-            int imgX = (int) (x - cX);
-            int imgY = (int) (y - cY);
-            Color color = img.getPixelReader().getColor(imgX, imgY);
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                continue;
+                double cY = c.getItem().getPos().getY();
+                double cHeight = c.getItem().getImage().getHeight();
+                boolean fitY = y >= cY && y <= cY + cHeight;
+                if (!fitY) {
+                    continue;
+                }
+
+                Image img = c.getItem().getImage();
+                int imgX = (int) (x - cX);
+                int imgY = (int) (y - cY);
+                Color color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
+                boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+                if (isPixelTransparent) {
+                    continue;
+                }
+                return c;
             }
-            return c;
         }
         return null;
     }

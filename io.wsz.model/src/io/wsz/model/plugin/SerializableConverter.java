@@ -179,7 +179,7 @@ public class SerializableConverter {
             case COVER -> new Cover(name, type, path, pos, level);
             case FLY_ZONE -> new FlyZone(name, type, path, pos, level);
             case LANDSCAPE -> new Landscape(name, type, path, pos, level);
-            case MOVE_ZONE -> new MoveZone(name, type, path, pos, level);
+            case OBSTACLE -> new Obstacle(name, type, path, pos, level);
         };
     }
 

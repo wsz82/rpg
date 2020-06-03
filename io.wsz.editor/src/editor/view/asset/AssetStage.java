@@ -148,7 +148,7 @@ abstract class AssetStage extends ChildStage {
             case CREATURE -> new Creature(name, itemType, path, null, 0);
             case LANDSCAPE -> new Landscape(name, itemType, path, null, 0);
             case FLY_ZONE -> new FlyZone(name, itemType, path, null, 0);
-            case MOVE_ZONE -> new MoveZone(name, itemType, path, null, 0);
+            case OBSTACLE -> new Obstacle(name, itemType, path, null, 0);
         };
         Controller.get().getAssetsList().add(asset);
     }
