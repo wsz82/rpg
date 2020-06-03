@@ -97,16 +97,16 @@ public class GameCanvas extends Canvas {
 
     private void interactWith(Content c) {
         Creature cr = (Creature) c.getItem();
+        CreatureControl control = cr.getControl();
+        if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
+            return;
+        }
+        if (control == CreatureControl.CONTROLABLE) {
+            cr.setControl(CreatureControl.CONTROL);
+        }
         final EventHandler<MouseEvent> creatureMoveTo = e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
-                CreatureControl control = cr.getControl();
-                if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
-                    return;
-                }
-                if (control == CreatureControl.CONTROLABLE) {
-                    cr.setControl(CreatureControl.CONTROL);
-                }
                 Coords rawPos = new Coords(e.getX(), e.getY());
                 cr.setDest(cr.calcDest(rawPos));
             }
