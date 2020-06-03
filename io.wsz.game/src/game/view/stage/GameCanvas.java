@@ -167,8 +167,8 @@ public class GameCanvas extends Canvas {
         }
         contents.sort(new ContentComparator() {
             @Override
-            public int compare(Content o1, Content o2) {
-                return super.compare(o2, o1);
+            public int compare(Content c1, Content c2) {
+                return super.compare(c2, c1);
             }
         });
         for (Content c : contents) {

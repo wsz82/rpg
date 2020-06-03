@@ -46,8 +46,8 @@ public class EditorCanvas extends Canvas {
     public void refresh() {
         Controller.get().getCurrentLocation().getContent().sort(new ContentComparator() {
             @Override
-            public int compare(Content o1, Content o2) {
-                return super.compare(o1, o2);
+            public int compare(Content c1, Content c2) {
+                return super.compare(c1, c2);
             }
         });
         setSize();
@@ -184,8 +184,8 @@ public class EditorCanvas extends Canvas {
         }
         contents.sort(new ContentComparator() {
             @Override
-            public int compare(Content o1, Content o2) {
-                return super.compare(o2, o1);
+            public int compare(Content c1, Content c2) {
+                return super.compare(c2, c1);
             }
         });
         for (Content c : contents) {

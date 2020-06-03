@@ -41,8 +41,8 @@ public class GameRunner {
                 List<Content> contents = Controller.get().getCurrentLocation().getContent();
                 contents.sort(new ContentComparator() {
                     @Override
-                    public int compare(Content o1, Content o2) {
-                        return super.compare(o1, o2);
+                    public int compare(Content c1, Content c2) {
+                        return super.compare(c1, c2);
                     }
                 });
                 for (Content content : contents) {
