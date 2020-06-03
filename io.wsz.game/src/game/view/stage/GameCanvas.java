@@ -17,6 +17,15 @@ import java.util.stream.Collectors;
 
 public class GameCanvas extends Canvas {
     private static GameCanvas singleton;
+    private Creature activeCreature;
+    private final EventHandler<MouseEvent> creatureMoveTo = e -> {
+        if (e.getButton().equals(MouseButton.PRIMARY)) {
+            e.consume();
+            Coords pos = new Coords(e.getX(), e.getY());
+            if (activeCreature.onInteractWith(pos)) return;
+            activeCreature.setDest(activeCreature.calcDest(pos));
+        }
+    };
 
     public static GameCanvas get() {
         if (singleton == null) {
@@ -87,30 +96,28 @@ public class GameCanvas extends Canvas {
                 if (c == null) {
                     return;
                 }
-                ItemType type = c.getItem().getType();
+                PosItem item = c.getItem();
+                ItemType type = item.getType();
                 switch (type) {
-                    case CREATURE -> interactWith(c);
+                    case CREATURE -> interactWithCreature((Creature) item);
                 }
             }
         });
     }
 
-    private void interactWith(Content c) {
-        Creature cr = (Creature) c.getItem();
-        CreatureControl control = cr.getControl();
-        if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
+    private void interactWithCreature(Creature cr) {
+        boolean isInteracted = cr.onInteraction();
+        if (!isInteracted) {
             return;
         }
-        if (control == CreatureControl.CONTROLABLE) {
-            cr.setControl(CreatureControl.CONTROL);
+        if (activeCreature != null) {
+            activeCreature.onStopInteraction();
         }
-        final EventHandler<MouseEvent> creatureMoveTo = e -> {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                e.consume();
-                Coords rawPos = new Coords(e.getX(), e.getY());
-                cr.setDest(cr.calcDest(rawPos));
-            }
-        };
+        activeCreature = cr;
+        hookupCreatureEvents(cr);
+    }
+
+    private void hookupCreatureEvents(Creature cr) {
         addEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
         addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             if (e.getButton().equals(MouseButton.SECONDARY)) {

@@ -85,6 +85,38 @@ public class Creature extends PosItem {
         return new Coords[] {top, bottom, right, left};
     }
 
+    public boolean onInteraction() {
+        if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
+            return false;
+        }
+        if (control == CreatureControl.CONTROLABLE) {
+            setControl(CreatureControl.CONTROL);
+            return true;
+        }
+        return false;
+    }
+
+    public void onStopInteraction() {
+        if (control == CreatureControl.CONTROL) {
+            setControl(CreatureControl.CONTROLABLE);
+        }
+    }
+
+    public boolean onInteractWith(Coords pos) {
+        Coords[] poss = new Coords[] {pos};
+        ItemType[] types = new ItemType[] {ItemType.CREATURE}; //TODO other types
+        Content c = Controller.get().getBoard().lookForContent(poss, types, true);
+        if (c == null) {
+            return false;
+        }
+        PosItem item = c.getItem();
+        if (c.getItem() instanceof Creature) {
+            Creature cr = (Creature) item;
+            return cr.getControl() == CreatureControl.CONTROLABLE || cr.getControl() == CreatureControl.CONTROL;
+        }
+        return true;
+    }
+
     public Coords getDest() {
         return dest;
     }
