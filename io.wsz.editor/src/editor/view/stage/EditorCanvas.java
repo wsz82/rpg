@@ -44,6 +44,12 @@ public class EditorCanvas extends Canvas {
     }
 
     public void refresh() {
+        Controller.get().getCurrentLocation().getContent().sort(new ContentComparator() {
+            @Override
+            public int compare(Content o1, Content o2) {
+                return super.compare(o1, o2);
+            }
+        });
         setSize();
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
