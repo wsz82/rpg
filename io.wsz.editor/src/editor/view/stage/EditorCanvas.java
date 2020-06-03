@@ -6,6 +6,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
 import io.wsz.model.item.Asset;
+import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
@@ -102,21 +103,22 @@ public class EditorCanvas extends Canvas {
         });
 
         setOnMouseClicked(e -> {
+            Content c = new Content();
+            if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
+                Coords[] poss = new Coords[] {new Coords(e.getX(), e.getY())};
+                ItemType[] types = ItemType.values();
+                c = Controller.get().getBoard().lookForContent(poss, types, true);
+            }
+            if (c == null) {
+                return;
+            }
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
                 setFocusTraversable(true);
                 requestFocus();
-                Content c = lookForContent(e.getX(), e.getY());
-                if (c == null) {
-                    return;
-                }
                 makeActive(c);
             } else if (e.getButton().equals(MouseButton.SECONDARY)) {
                 e.consume();
-                Content c = lookForContent(e.getX(), e.getY());
-                if (c == null) {
-                    return;
-                }
                 openContextMenu(c, e);
             }
         });
@@ -174,49 +176,6 @@ public class EditorCanvas extends Canvas {
         setInvisible.setOnAction(ev -> setInvisible(c));
         final ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
         menu.show(this, e.getScreenX(), e.getScreenY());
-    }
-
-    private Content lookForContent(double x, double y) {
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents = contents.stream()
-                .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel()) //TODO change
-                .collect(Collectors.toList());
-        if (contents.isEmpty()) {
-            return null;
-        }
-        contents.sort(new ContentComparator() {
-            @Override
-            public int compare(Content c1, Content c2) {
-                return super.compare(c2, c1);
-            }
-        });
-        for (Content c : contents) {
-            double cX = c.getItem().getPos().getX();
-            double cWidth = c.getItem().getImage().getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth; //TODO transparent looking
-            if (!fitX) {
-                continue;
-            }
-
-            double cY = c.getItem().getPos().getY();
-            double cHeight = c.getItem().getImage().getHeight();
-            boolean fitY = y >= cY && y <= cY + cHeight;
-            if (!fitY) {
-                continue;
-            }
-
-            Image img = c.getItem().getImage();
-            int imgX = (int) (x - cX);
-            int imgY = (int) (y - cY);
-            Color color = img.getPixelReader().getColor(imgX, imgY);
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                continue;
-            }
-            return c;
-        }
-        return null;
     }
 
     private void setSize() {

@@ -25,9 +25,6 @@ public class Board {
     private Board(){}
 
     public Content lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
-        if (types == null) {
-            types = new ItemType[] {ItemType.CREATURE};//TODO other types that need to be interact with default
-        }
         List<ItemType> typesList = new ArrayList<>(1);
         Collections.addAll(typesList, types);
         List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
@@ -75,7 +72,12 @@ public class Board {
                 Image img = c.getItem().getImage();
                 int imgX = (int) (x - cX);
                 int imgY = (int) (y - cY);
-                Color color = img.getPixelReader().getColor(imgX, imgY);
+                Color color;
+                try {
+                    color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
+                } catch (IndexOutOfBoundsException e) {
+                    return null;
+                }
                 boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
                 if (isPixelTransparent) {
                     continue;

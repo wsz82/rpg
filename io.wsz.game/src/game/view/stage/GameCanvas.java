@@ -82,13 +82,14 @@ public class GameCanvas extends Canvas {
                 e.consume();
                 Coords pos = new Coords(e.getX(), e.getY());
                 Coords[] poss = new Coords[] {pos};
-                Content content = Controller.get().getBoard().lookForContent(poss, null, true);
-                if (content == null) {
+                ItemType[] types = new ItemType[] {ItemType.CREATURE};
+                Content c = Controller.get().getBoard().lookForContent(poss, types, true);
+                if (c == null) {
                     return;
                 }
-                ItemType type = content.getItem().getType();
+                ItemType type = c.getItem().getType();
                 switch (type) {
-                    case CREATURE -> interactWith(content);
+                    case CREATURE -> interactWith(c);
                 }
             }
         });

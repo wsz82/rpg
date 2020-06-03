@@ -32,7 +32,7 @@ abstract public class ContentComparator implements Comparator<Content> {
                 return 1;
             } else if (t1 == t2) {
                 if (t1 == ItemType.LANDSCAPE) {
-                    return o1y_fixed + o2y_fixed;//TODO
+                    return o2y_fixed - o1y_fixed;
                 }
                 return o1y_fixed - o2y_fixed;
             } else {
