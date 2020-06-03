@@ -62,30 +62,6 @@ public class GameCanvas extends Canvas {
             return;
         }
         CreatureSize size = cr.getSize();
-        int width = 15;
-        int height = 7;
-        switch (size) {
-            case XS -> {
-                width *= 2;
-                height *= 2;
-            }
-            case S -> {
-                width *= 3;
-                height *= 3;
-            }
-            case M -> {
-                width *= 4;
-                height *= 5;
-            }
-            case L -> {
-                width *= 5;
-                height *= 6;
-            }
-            case XL -> {
-                width *= 7;
-                height *= 8;
-            }
-        }
         Coords centerBottomPos = cr.getCenterBottomPos();
         double x = centerBottomPos.getX();
         double y = centerBottomPos.getY();
@@ -94,7 +70,7 @@ public class GameCanvas extends Canvas {
             case ENEMY -> gc.setStroke(Color.RED);
         }
         gc.setLineWidth(2);
-        gc.strokeOval(x - width/2.0, y - height/2.0, width, height);
+        gc.strokeOval(x - size.getWidth()/2.0, y - size.getHeight()/2.0, size.getWidth(), size.getHeight());
     }
 
     private void hookupEvents() {

@@ -42,6 +42,10 @@ public class Coords {
         return y.get();
     }
 
+    public boolean is0() {
+        return x.get() == 0 && y.get() == 0;
+    }
+
     @Override
     public String toString() {
         return "" + x.get() + ", " + y.get();
