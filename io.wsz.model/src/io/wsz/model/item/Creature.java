@@ -85,36 +85,44 @@ public class Creature extends PosItem {
         return new Coords[] {top, bottom, right, left};
     }
 
-    public boolean onInteraction() {
-        if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
-            return false;
-        } else
-        if (control == CreatureControl.CONTROLABLE) {
-            setControl(CreatureControl.CONTROL);
-            return true;
-        }
-        return false;
-    }
-
-    public void onStopInteraction() {
+    public void interact() {
         if (control == CreatureControl.CONTROL) {
             setControl(CreatureControl.CONTROLABLE);
+        } else if (control == CreatureControl.CONTROLABLE) {
+            looseAllControl();
+            setControl(CreatureControl.CONTROL);
         }
     }
 
-    public boolean onInteractWith(Coords pos) {
+    private void looseAllControl() {
+        Controller.get().getBoard().getControlledCreatures()
+                .forEach(Creature::loseControl);
+    }
+
+    public void loseControl() {
+        setControl(CreatureControl.CONTROLABLE);
+    }
+
+    public void onInteractWith(Coords pos) {
         Coords[] poss = new Coords[] {pos};
-        ItemType[] types = new ItemType[] {ItemType.CREATURE}; //TODO other types
+        ItemType[] types = ItemType.values();
         Content c = Controller.get().getBoard().lookForContent(poss, types, true);
         if (c == null) {
-            return false;
+            return;
         }
-        PosItem item = c.getItem();
-        if (c.getItem() instanceof Creature) {
-            Creature cr = (Creature) item;
-            return cr.getControl() == CreatureControl.CONTROLABLE || cr.getControl() == CreatureControl.CONTROL;
+        PosItem item = c.getItem(); //TODO other types
+        ItemType type = item.getType();
+        switch (type) {
+            case CREATURE -> interactWithCreature((Creature) item);
+            default -> setDest(calcDest(pos));
         }
-        return true;
+    }
+
+    private void interactWithCreature(Creature cr) {
+        if (cr.getControl().equals(CreatureControl.CONTROLABLE)) {
+            cr.setControl(CreatureControl.CONTROL);
+            this.setControl(CreatureControl.CONTROLABLE);
+        }
     }
 
     public Coords getDest() {

@@ -3,12 +3,11 @@ package game.view.stage;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.item.*;
+import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
-import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -17,15 +16,7 @@ import java.util.stream.Collectors;
 
 public class GameCanvas extends Canvas {
     private static GameCanvas singleton;
-    private Creature activeCreature;    //TODO find different solution for keeping control
-    private final EventHandler<MouseEvent> creatureMoveTo = e -> {
-        if (e.getButton().equals(MouseButton.PRIMARY)) {
-            e.consume();
-            Coords pos = new Coords(e.getX(), e.getY());
-            if (activeCreature.onInteractWith(pos)) return;
-            activeCreature.setDest(activeCreature.calcDest(pos));
-        }
-    };
+    private final Board board = Controller.get().getBoard();
 
     public static GameCanvas get() {
         if (singleton == null) {
@@ -59,10 +50,6 @@ public class GameCanvas extends Canvas {
             if (content.isVisible()) {
                 switch (type) {
                     case CREATURE -> {
-                        if (((Creature) item).getControl().equals(CreatureControl.CONTROL)) {
-                            activeCreature = (Creature) item;
-                            hookupCreatureEvents((Creature) item);
-                        }
                         drawCreatureSize((Creature) item, gc);
                     }
                 }
@@ -97,39 +84,27 @@ public class GameCanvas extends Canvas {
                 Coords[] poss = new Coords[] {pos};
                 ItemType[] types = new ItemType[] {ItemType.CREATURE};
                 Content c = Controller.get().getBoard().lookForContent(poss, types, true);
-                if (c == null) {
-                    return;
+                if (c != null) {
+                    PosItem item = c.getItem();
+                    ItemType type = item.getType();
+                    switch (type) {
+                        case CREATURE -> ((Creature) item).interact();
+                    }
+                } else {
+                    commandControllable(pos);
                 }
-                PosItem item = c.getItem();
-                ItemType type = item.getType();
-                switch (type) {
-                    case CREATURE -> interactWithCreature((Creature) item);
-                }
+            } else if (e.getButton().equals(MouseButton.SECONDARY)) {
+                board.getControlledCreatures()
+                        .forEach(Creature::loseControl);
             }
         });
     }
 
-    private void interactWithCreature(Creature cr) {
-        boolean isInteracted = cr.onInteraction();
-        if (!isInteracted) {
-            return;
-        }
-        if (activeCreature != null && activeCreature != cr) {
-            activeCreature.onStopInteraction();
-        }
-        activeCreature = cr;
-        hookupCreatureEvents(cr);
-    }
 
-    private void hookupCreatureEvents(Creature cr) {
-        addEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
-        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getButton().equals(MouseButton.SECONDARY)) {
-                e.consume();
-                removeEventHandler(MouseEvent.MOUSE_CLICKED, creatureMoveTo);
-                cr.setControl(CreatureControl.CONTROLABLE);
-            }
-        });
+
+    private void commandControllable(Coords pos) {
+        board.getControlledCreatures()
+                .forEach(c -> c.onInteractWith(pos));
     }
 
     private void setSize() {

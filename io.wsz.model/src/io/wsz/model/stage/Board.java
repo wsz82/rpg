@@ -3,6 +3,8 @@ package io.wsz.model.stage;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.ItemType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -140,5 +142,16 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public List<Creature> getControlledCreatures() {
+        return Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getType().equals(ItemType.CREATURE))
+                .filter(c -> {
+                    Creature cr = (Creature) c.getItem();
+                    return cr.getControl().equals(CreatureControl.CONTROL);
+                })
+                .map(c -> (Creature) c.getItem())
+                .collect(Collectors.toList());
     }
 }
