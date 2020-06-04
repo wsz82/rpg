@@ -10,6 +10,7 @@ public class Plugin {
     private File file;
     private List<Location> locations;
     private List<Asset> assets;
+    private boolean active;
     private boolean isStartingLocation;
     private String startLocation;
     private int startX;
@@ -24,11 +25,12 @@ public class Plugin {
         this.assets = assets;
     }
 
-    public Plugin(File file, List<Location> locations, List<Asset> assets,
+    public Plugin(File file, List<Location> locations, List<Asset> assets, boolean active,
                   boolean isStartingLocation, String startLocation, int startX, int startY, int startLayer) {
         this.file = file;
         this.locations = locations;
         this.assets = assets;
+        this.active = active;
         this.isStartingLocation = isStartingLocation;
         this.startLocation = startLocation;
         this.startX = startX;
@@ -58,6 +60,14 @@ public class Plugin {
 
     public void setAssets(List<Asset> assets) {
         this.assets = assets;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isStartingLocation() {

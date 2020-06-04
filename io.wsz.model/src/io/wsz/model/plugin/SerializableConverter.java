@@ -18,7 +18,7 @@ public class SerializableConverter {
     public static PluginSerializable toPluginSerializable(Plugin plugin) {
         List<LocationSerializable> locations = toSerializableLocations(plugin.getLocations());
         List<AssetSerializable> assets = toSerializableAssets(plugin.getAssets());
-        return new PluginSerializable(plugin.getFile(), locations, assets,
+        return new PluginSerializable(plugin.getFile(), locations, assets, plugin.isActive(),
                 plugin.isStartingLocation(), plugin.getStartLocation(),
                 plugin.getStartX(), plugin.getStartY(), plugin.getStartLayer());
     }
@@ -26,7 +26,7 @@ public class SerializableConverter {
     public static Plugin toPlugin(PluginSerializable ps) {
         List<Asset> assets = toAssets(ps.getAssets());
         List<Location> locations = toLocation(ps.getLocations(), assets);
-        return new Plugin(ps.getFile(), locations, assets,
+        return new Plugin(ps.getFile(), locations, assets, ps.isActive(),
                 ps.isStartingLocation(), ps.getStartLocation(),
                 ps.getStartX(), ps.getStartY(), ps.getStartLayer());
     }

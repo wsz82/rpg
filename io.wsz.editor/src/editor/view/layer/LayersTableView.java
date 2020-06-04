@@ -72,7 +72,6 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         nameCol.setPrefWidth(100);
 
         TableColumn<Layer, Boolean> visibleCol = new TableColumn<>("Visibility");
-        visibleCol.setCellValueFactory(param -> param.getValue().getVisibleProperty());
         visibleCol.setEditable(true);
         visibleCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibleCol));
         visibleCol.setCellValueFactory(p -> {

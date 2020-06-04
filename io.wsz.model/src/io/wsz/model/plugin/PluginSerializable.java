@@ -9,6 +9,7 @@ public class PluginSerializable implements Serializable {
     private File file;
     private List<LocationSerializable> locations;
     private List<AssetSerializable> assets;
+    private boolean active;
     private boolean isStartingLocation;
     private String startLocation;
     private int startX;
@@ -23,11 +24,12 @@ public class PluginSerializable implements Serializable {
         this.assets = assets;
     }
 
-    public PluginSerializable(File file, List<LocationSerializable> locations, List<AssetSerializable> assets,
+    public PluginSerializable(File file, List<LocationSerializable> locations, List<AssetSerializable> assets, boolean active,
                               boolean isStartingLocation, String startLocation, int startX, int startY, int startLayer) {
         this.file = file;
         this.locations = locations;
         this.assets = assets;
+        this.active = active;
         this.isStartingLocation = isStartingLocation;
         this.startLocation = startLocation;
         this.startX = startX;
@@ -57,6 +59,14 @@ public class PluginSerializable implements Serializable {
 
     public void setAssets(List<AssetSerializable> assets) {
         this.assets = assets;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isStartingLocation() {

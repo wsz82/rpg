@@ -22,31 +22,26 @@ public class PluginCaretaker {
             ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(ps);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Plugin load(File file) {
+    public Plugin load(File file) throws ClassCastException {
         return deserializeAll(file);
     }
 
-    private Plugin deserializeAll(File file) {
-        Plugin plugin = new Plugin();
+    private Plugin deserializeAll(File file) throws ClassCastException {
+        Plugin plugin;
         try (
             FileInputStream fos = new FileInputStream(file);
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             PluginSerializable ps = (PluginSerializable) oos.readObject();
             plugin = SerializableConverter.toPlugin(ps);
-        } catch (FileNotFoundException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            return null;
         }
         return plugin;
     }

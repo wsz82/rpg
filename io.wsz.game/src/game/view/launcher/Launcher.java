@@ -2,17 +2,12 @@ package game.view.launcher;
 
 import game.model.GameController;
 import game.view.stage.GameStage;
-import io.wsz.model.Controller;
-import io.wsz.model.plugin.Plugin;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 class Launcher {
     private final Stage stage;
@@ -33,11 +28,11 @@ class Launcher {
         VBox menu = new VBox(10);
         Button play = new Button("Play");
         play.setOnAction(event -> play());
-        Button chooseGame = new Button("Choose game");
-        chooseGame.setOnAction(event -> choosePlugin());
+        Button plugins = new Button("Plugins");
+        plugins.setOnAction(event -> openPluginsTable());
         Button exit = new Button("Exit");
         exit.setOnAction(event -> exit());
-        menu.getChildren().addAll(play, chooseGame, exit);
+        menu.getChildren().addAll(play, plugins, exit);
         menu.setAlignment(Pos.CENTER);
         root.getChildren().addAll(menu);
 
@@ -52,20 +47,30 @@ class Launcher {
         stage.close();
     }
 
-    private void choosePlugin() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose plugin");
-        fileChooser.setInitialDirectory(Main.getDir());
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
-        File loadedFile = fileChooser.showOpenDialog(stage);
-
-        if (loadedFile == null) {
-            return;
-        }
-        Plugin plugin = Controller.get().loadPlugin(loadedFile);
-        Controller.get().setActivePlugin(plugin);
-        GameController.get().storeLastPlugin(plugin);
+    private void openPluginsTable() {
+        Stage plugins = new PluginsTable();
+        plugins.initOwner(stage);
+        plugins.show();
+//        FileChooser fileChooser = new FileChooser();
+//        fileChooser.setTitle("Choose plugin");
+//        Plugin active = ActivePlugin.get().getPlugin();
+//        File initial;
+//        if (active != null) {
+//            initial = active.getFile().getParentFile();
+//        } else {
+//            initial = Main.getDir();
+//        }
+//        fileChooser.setInitialDirectory(initial);
+//        fileChooser.getExtensionFilters().addAll(
+//                new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
+//        File loadedFile = fileChooser.showOpenDialog(stage);
+//
+//        if (loadedFile == null) {
+//            return;
+//        }
+//        Plugin plugin = Controller.get().loadPlugin(loadedFile);
+//        Controller.get().setActivePlugin(plugin);
+//        GameController.get().storeLastPlugin(plugin);
     }
 
     private void exit() {
