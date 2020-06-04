@@ -47,7 +47,7 @@ public class AssetConverter {
                                              Asset asset) {
         Teleport origin = (Teleport) asset;
         return new Teleport(name, type, path, pos, level,
-                origin.getLocationName(), origin.getPos(), origin.getLevel());
+                origin.getLocationName(), origin.getExit(), origin.getExitLevel());
     }
 
     public static Creature convertToCreature(String name, ItemType type, String path, Coords pos, int level,

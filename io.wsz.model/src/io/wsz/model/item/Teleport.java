@@ -7,16 +7,16 @@ public class Teleport extends PosItem {
     private Coords exit;
     private int exitLevel;
 
-    public Teleport(String name, ItemType type, String path, Coords coords, int exitLevel) {
-        super(name, type, path, coords, exitLevel);
+    public Teleport(String name, ItemType type, String path, Coords pos, int level) {
+        super(name, type, path, pos, level);
     }
 
-    public Teleport(String name, ItemType type, String path, Coords exit, int exitLevel,
-                    String locationName, Coords pos1, int level1) {
-        super(name, type, path, exit, exitLevel);
+    public Teleport(String name, ItemType type, String path, Coords pos, int level,
+                    String locationName, Coords exitPos, int exitLevel) {
+        super(name, type, path, pos, level);
         this.locationName = locationName;
-        this.exit = pos1;
-        this.exitLevel = level1;
+        this.exit = exitPos;
+        this.exitLevel = exitLevel;
     }
 
     public String getLocationName() {
@@ -27,23 +27,19 @@ public class Teleport extends PosItem {
         this.locationName = locationName;
     }
 
-    @Override
-    public Coords getPos() {
+    public Coords getExit() {
         return exit;
     }
 
-    @Override
-    public void setPos(Coords exit) {
+    public void setExit(Coords exit) {
         this.exit = exit;
     }
 
-    @Override
-    public int getLevel() {
+    public int getExitLevel() {
         return exitLevel;
     }
 
-    @Override
-    public void setLevel(int exitLevel) {
+    public void setExitLevel(int exitLevel) {
         this.exitLevel = exitLevel;
     }
 

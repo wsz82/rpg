@@ -85,8 +85,16 @@ public class SerializableConverter {
             Asset asset, String name, ItemType type, String path, Coords pos, int level) {
         return  switch (type) {
             case CREATURE -> toCreatureSerializable(name, type, path, pos, level, asset);
+            case TELEPORT -> toTeleportSerializable(name, type, path, pos, level, asset);
             default -> toPosItemSerializable(name, type, path, pos, level);
         };
+    }
+
+    private static PosItemSerializable toTeleportSerializable(
+            String name, ItemType type, String path, Coords pos, int level, Asset asset) {
+        Teleport t = (Teleport) asset;
+        return new TeleportSerializable(
+                name, type, path, pos, level, t.getLocationName(), t.getExit(), t.getExitLevel());
     }
 
     private static PosItemSerializable toPosItemSerializable(
@@ -175,7 +183,7 @@ public class SerializableConverter {
         };
     }
 
-    private static PosItem toTeleport(String name, ItemType type, String path, Coords pos, int level,
+    private static Teleport toTeleport(String name, ItemType type, String path, Coords pos, int level,
                                       AssetSerializable as) {
         TeleportSerializable ts = (TeleportSerializable) as;
         return new Teleport(name, type, path, pos, level,

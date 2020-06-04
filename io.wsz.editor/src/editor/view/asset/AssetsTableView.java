@@ -97,6 +97,7 @@ class AssetsTableView extends AssetsGenericTableView {
         }
         AssetStage assetStage = switch (itemType) {
             case CREATURE -> new CreatureAssetStage(parent, assetToEdit);
+            case TELEPORT -> new TeleportAssetStage(parent, assetToEdit);
             default -> new AssetStageImpl(parent, assetToEdit);
         };
         assetStage.show();
@@ -111,6 +112,7 @@ class AssetsTableView extends AssetsGenericTableView {
     void addAsset() {
         AssetStage assetStage = switch (itemType) {
             case CREATURE -> new CreatureAssetStage(parent, itemType);
+            case TELEPORT -> new TeleportAssetStage(parent, itemType);
             default -> new AssetStageImpl(parent, itemType);
         };
         assetStage.show();
