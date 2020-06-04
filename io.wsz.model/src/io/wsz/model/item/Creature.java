@@ -88,7 +88,7 @@ public class Creature extends PosItem {
     public boolean onInteraction() {
         if (control == CreatureControl.NEUTRAL || control == CreatureControl.ENEMY) {
             return false;
-        }
+        } else
         if (control == CreatureControl.CONTROLABLE) {
             setControl(CreatureControl.CONTROL);
             return true;

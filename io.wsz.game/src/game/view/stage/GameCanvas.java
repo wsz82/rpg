@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class GameCanvas extends Canvas {
     private static GameCanvas singleton;
-    private Creature activeCreature;
+    private Creature activeCreature;    //TODO find different solution for keeping control
     private final EventHandler<MouseEvent> creatureMoveTo = e -> {
         if (e.getButton().equals(MouseButton.PRIMARY)) {
             e.consume();
@@ -59,6 +59,10 @@ public class GameCanvas extends Canvas {
             if (content.isVisible()) {
                 switch (type) {
                     case CREATURE -> {
+                        if (((Creature) item).getControl().equals(CreatureControl.CONTROL)) {
+                            activeCreature = (Creature) item;
+                            hookupCreatureEvents((Creature) item);
+                        }
                         drawCreatureSize((Creature) item, gc);
                     }
                 }
@@ -110,7 +114,7 @@ public class GameCanvas extends Canvas {
         if (!isInteracted) {
             return;
         }
-        if (activeCreature != null) {
+        if (activeCreature != null && activeCreature != cr) {
             activeCreature.onStopInteraction();
         }
         activeCreature = cr;
