@@ -15,11 +15,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,27 +51,9 @@ class AssetsTableView extends AssetsGenericTableView {
         });
 
         TableColumn<Asset, String> pathCol = new TableColumn<>("Path");
-        pathCol.setCellValueFactory(new PropertyValueFactory<>("path"));
-        pathCol.setEditable(true);
+        pathCol.setCellValueFactory(new PropertyValueFactory<>("relativePath"));
+        pathCol.setEditable(false);
         pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        pathCol.setOnEditCommit(t -> {
-            Asset asset = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose image for asset");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
-            );
-            File selectedFile = fileChooser.showOpenDialog(parent);
-            if (selectedFile != null && selectedFile.isFile()) {
-                try {
-                    String path = selectedFile.toURI().toURL().toString();
-                    asset.setPath(path);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-            }
-            refresh();
-        });
 
         ObservableList<TableColumn<Asset, ?>> columns = getColumns();
         columns.addAll(nameCol, pathCol);

@@ -132,8 +132,9 @@ public class EditorCanvas extends Canvas {
             List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
                     .filter(a -> a.getName().equals(con.getItem().getName()))
                     .collect(Collectors.toList());
-            correspondingAsset.get(0).pathProperty().addListener((observable, oldValue, newValue) -> {
-                con.getItem().setImage(correspondingAsset.get(0).getImage());
+            correspondingAsset.get(0).relativePathProperty().addListener((observable, oldValue, newValue) -> {
+                con.getItem().setRelativePath(newValue);
+                con.getItem().setImage(correspondingAsset.get(0).loadImageFromPath());
                 refresh();
             });
             correspondingAsset.get(0).nameProperty().addListener((observable, oldValue, newValue) -> {

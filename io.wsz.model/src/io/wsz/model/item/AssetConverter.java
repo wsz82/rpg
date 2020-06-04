@@ -30,7 +30,7 @@ public class AssetConverter {
         }
         String name = asset.getName();
         ItemType type = asset.getType();
-        String path = asset.getPath();
+        String path = asset.getRelativePath();
         return switch (asset.getType()) {
             case LANDSCAPE -> new Content(convertToLandscape(name, type, path, pos, level));
             case COVER -> new Content(convertToCover(name, type, path, pos, level));

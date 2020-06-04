@@ -75,7 +75,7 @@ public class SerializableConverter {
     private static PosItemSerializable toPosItemSerializable(PosItem item) {
         String name = item.getName();
         ItemType type = item.getType();
-        String path = item.getPath();
+        String path = item.getRelativePath();
         Coords pos = item.getPos();
         int level = item.getLevel();
         return toConcreteItemSerializable(item, name, type, path, pos, level);
@@ -201,7 +201,7 @@ public class SerializableConverter {
     private static AssetSerializable toAssetSerializable(Asset asset) {
         String name = asset.getName();
         ItemType type = asset.getType();
-        String path = asset.getPath();
+        String path = asset.getRelativePath();
         return toConcreteItemSerializable(asset, name, type, path, null, 0);
     }
 

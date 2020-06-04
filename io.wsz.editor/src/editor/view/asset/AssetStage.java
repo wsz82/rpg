@@ -1,7 +1,6 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
-import editor.view.stage.Main;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import javafx.geometry.Insets;
@@ -14,7 +13,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 
 abstract class AssetStage extends ChildStage {
@@ -26,22 +24,22 @@ abstract class AssetStage extends ChildStage {
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
-    private final ItemType itemType;
+    private final ItemType type;
     private String path;
 
     AssetStage(Stage parent, Asset asset) {
         super(parent);
-        this.itemType = asset.getType();
+        this.type = asset.getType();
         this.asset = asset;
     }
 
-    AssetStage(Stage parent, ItemType itemType) {
+    AssetStage(Stage parent, ItemType type) {
         super(parent);
-        this.itemType = itemType;
+        this.type = type;
     }
 
     protected void initWindow() {
-        setTitle(itemType.toString().toLowerCase() + " asset");
+        setTitle(type.toString().toLowerCase() + " asset");
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
         containerWithButtons.setPadding(new Insets(10));
@@ -81,27 +79,26 @@ abstract class AssetStage extends ChildStage {
             return;
         }
         nameInput.setText(asset.getName());
-        path = asset.getPath();
-        imageLabel.setText(asset.getPath());
+        path = asset.getRelativePath();
+        imageLabel.setText(asset.getRelativePath());
     }
 
     private void hookupEvents() {
         imageButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose image for asset");
-            fileChooser.setInitialDirectory(getAssetsTypeDir());
+            fileChooser.setInitialDirectory(Asset.createAssetTypeDir(type));
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
             );
             File selectedFile = fileChooser.showOpenDialog(this);
-            if (selectedFile != null && selectedFile.isFile()) {
-                try {
-                    path = selectedFile.toURI().toURL().toString();
-                    imageLabel.setText(path);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+            if (selectedFile == null || !selectedFile.isFile()) {
+                return;
             }
+            String selectedFilePath = selectedFile.getAbsolutePath();
+            if (pathIsIncorrect(selectedFilePath)) return;
+            path = Asset.convertToRelativeFilePath(selectedFilePath, type);
+            imageLabel.setText(path);
         });
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
@@ -115,12 +112,12 @@ abstract class AssetStage extends ChildStage {
             return;
         }
         editAsset();
-        close();
     }
 
     private void editAsset() {
         asset.setName(nameInput.getText());
-        asset.setPath(path);
+        asset.setRelativePath(path);
+        close();
     }
 
     protected void onCreate() {
@@ -141,24 +138,39 @@ abstract class AssetStage extends ChildStage {
         addNewAsset();
     }
 
-    private void addNewAsset() {
-        String name = nameInput.getText();
-        asset = switch (itemType) {
-            case COVER -> new Cover(name, itemType, path, null, 0);
-            case CREATURE -> new Creature(name, itemType, path, null, 0);
-            case LANDSCAPE -> new Landscape(name, itemType, path, null, 0);
-            case FLY_ZONE -> new FlyZone(name, itemType, path, null, 0);
-            case OBSTACLE -> new Obstacle(name, itemType, path, null, 0);
-            case TELEPORT -> new Teleport(name, itemType, path, null, 0);
-        };
-        Controller.get().getAssetsList().add(asset);
+    private boolean pathIsIncorrect(String path) {
+        File selectedFile = new File(path);
+        File parent = selectedFile.getParentFile();
+        File required = new File(
+                Controller.getProgramDir().getAbsolutePath() + Asset.getRelativeTypePath(type));
+        if (!parent.getAbsolutePath().equals(required.getAbsolutePath())) {
+            alertWrongDirectory();
+            return true;
+        }
+        return false;
     }
 
-    private File getAssetsTypeDir() {
-        String path = File.separator + "assets" + File.separator + itemType.toString().toLowerCase();
-        File dir = new File(Main.getDir() + path);
-        if (!dir.exists()) dir.mkdirs();
-        return dir;
+    private void alertWrongDirectory() {
+        String required = Asset.createAssetTypeDir(type).getAbsolutePath();
+        final Alert alert = new Alert(
+                Alert.AlertType.ERROR, "Get image from directory: " + required, ButtonType.CANCEL);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.CANCEL)
+                .ifPresent(r -> alert.close());
+    }
+
+    private void addNewAsset() {
+        String name = nameInput.getText();
+        String relativePath = Asset.convertToRelativeFilePath(path, type);
+        asset = switch (type) {
+            case COVER -> new Cover(name, type, relativePath, null, 0);
+            case CREATURE -> new Creature(name, type, relativePath, null, 0);
+            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0);
+            case FLY_ZONE -> new FlyZone(name, type, relativePath, null, 0);
+            case OBSTACLE -> new Obstacle(name, type, relativePath, null, 0);
+            case TELEPORT -> new Teleport(name, type, relativePath, null, 0);
+        };
+        Controller.get().getAssetsList().add(asset);
     }
 
     private void alertOfNameExisting() {

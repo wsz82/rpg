@@ -1,6 +1,7 @@
 package editor.view.stage;
 
 import editor.model.EditorController;
+import io.wsz.model.Controller;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -17,6 +18,7 @@ public class Main extends Application {
         EditorController.get().initNewPlugin();
 
         setProgramDir();
+        Controller.setProgramDir(programDir);
 
         MainView view = new MainView(stage);
         view.show();

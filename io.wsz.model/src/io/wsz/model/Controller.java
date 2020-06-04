@@ -16,12 +16,21 @@ import java.util.List;
 
 public class Controller {
     private static Controller singleton;
+    private static File programDir;
 
     public static Controller get() {
         if (singleton == null) {
             singleton = new Controller();
         }
         return singleton;
+    }
+
+    public static File getProgramDir() {
+        return programDir;
+    }
+
+    public static void setProgramDir(File programDir) {
+        Controller.programDir = programDir;
     }
 
     private Controller(){}

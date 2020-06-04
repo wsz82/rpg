@@ -1,5 +1,6 @@
 package game.view.launcher;
 
+import io.wsz.model.Controller;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,6 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         programDir = getProgramDir();
+        Controller.setProgramDir(programDir);
         new Launcher(stage);
     }
 
