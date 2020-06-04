@@ -1,5 +1,6 @@
 package editor.view.stage;
 
+import editor.model.ActiveContent;
 import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
@@ -59,6 +60,7 @@ public class EditorCanvas extends Canvas {
                 return super.compare(c1, c2);
             }
         });
+        boolean activeContentMarked = false;
         for (Content c : contents) {
             final PosItem item = c.getItem();
             final Coords pos = item.getPos();
@@ -67,6 +69,11 @@ public class EditorCanvas extends Canvas {
 
             if (c.isVisible()) {
                 gc.drawImage(item.getImage(), x, y);
+                if (!activeContentMarked
+                        && c.equals(EditorController.get().getActiveContent().getContent())) {
+                    activeContentMarked = true;
+                    drawActiveContentRectangle(gc, c);
+                }
             }
         }
 
@@ -77,6 +84,18 @@ public class EditorCanvas extends Canvas {
             double y = mark.getY() - marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
+    }
+
+    private void drawActiveContentRectangle(GraphicsContext gc, Content c) {
+        PosItem item = c.getItem();
+        double x = item.getPos().getX();
+        double y = item.getPos().getY();
+        double width = item.getImage().getWidth();
+        double height = item.getImage().getHeight();
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(0.5);
+        gc.setLineDashes(20);
+        gc.strokeRect(x, y, width, height);
     }
 
     private void hookupEvents() {
@@ -106,37 +125,43 @@ public class EditorCanvas extends Canvas {
         });
 
         setOnMouseClicked(e -> {
-            if (pointer.isActive()) {
-                setFocusTraversable(true);
-                requestFocus();
-                attachArrowsEventToPointer();
-                return;
-            }
-            Content c = new Content();
-            if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                Coords[] poss = new Coords[] {new Coords(e.getX(), e.getY())};
-                ItemType[] types = ItemType.values();
-                c = Controller.get().getBoard().lookForContent(poss, types, true);
-            }
-            if (c == null) {
-                return;
-            }
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
-                e.consume();
-                setFocusTraversable(true);
-                requestFocus();
-                attachArrowsEventToContent(c);
-            } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                e.consume();
-                openContextMenu(c, e);
+            e.consume();
+            setFocusTraversable(true);
+            requestFocus();
+            ActiveContent ac = EditorController.get().getActiveContent();
+            try {
+                if (pointer.isActive()) {
+                    ac.setContent(null);
+                    attachArrowsEventToPointer();
+                } else {
+                    Content c = new Content();
+                    if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
+                        Coords[] poss = new Coords[]{new Coords(e.getX(), e.getY())};
+                        ItemType[] types = ItemType.values();
+                        c = Controller.get().getBoard().lookForContent(poss, types, true);
+                    }
+                    if (c != null) {
+                        if (e.getButton().equals(MouseButton.PRIMARY)) {
+                            attachArrowsEventToContent(c);
+                        } else if (e.getButton().equals(MouseButton.SECONDARY)) {
+                            openContextMenu(c, e);
+                        }
+                    } else {
+                        ac.setContent(null);
+                    }
+                }
+            } finally {
+                if (((e.getButton().equals(MouseButton.SECONDARY)
+                        || (ac.getContent()) == null) && !pointer.isActive())) {
+                    removeArrowsEvent();
+                }
+                refresh();
             }
         });
     }
 
     private void attachArrowsEventToPointer() {
-        if (arrowsEvent != null) {
-            removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-        }
+        removeArrowsEvent();
         arrowsEvent = e -> {
             e.consume();
             if (e.getCode() == KeyCode.DOWN
@@ -150,11 +175,15 @@ public class EditorCanvas extends Canvas {
         addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
     }
 
-    private void attachArrowsEventToContent(Content c) {
-        EditorController.get().getActiveContent().setContent(c);
+    private void removeArrowsEvent() {
         if (arrowsEvent != null) {
             removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
         }
+    }
+
+    private void attachArrowsEventToContent(Content c) {
+        EditorController.get().getActiveContent().setContent(c);
+        removeArrowsEvent();
         arrowsEvent = e -> {
             e.consume();
             if (e.getCode() == KeyCode.DOWN
@@ -168,12 +197,6 @@ public class EditorCanvas extends Canvas {
             }
         };
         addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getButton().equals(MouseButton.SECONDARY)) {
-                e.consume();
-                removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-            }
-        });
     }
 
     private void hookupContentEvents(List<Content> addedContent) {
