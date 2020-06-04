@@ -14,11 +14,12 @@ public class AssetConverter {
         List<Content> contents = new ArrayList<>(assets.size());
         for (Asset asset
                 : assets) {
+            Coords newPos = new Coords(pos.getX(), pos.getY());
             if (!pos.is0()) {
                 double height = asset.getImage().getHeight();
-                pos.setY(pos.getY() - height);
+                newPos.setY(pos.getY() - height);
             }
-            Content content = convertToContent(asset, pos, Controller.get().getCurrentLayer().getLevel());
+            Content content = convertToContent(asset, newPos, Controller.get().getCurrentLayer().getLevel());
             contents.add(content);
         }
         return contents;
@@ -31,6 +32,7 @@ public class AssetConverter {
         String name = asset.getName();
         ItemType type = asset.getType();
         String path = asset.getRelativePath();
+
         return switch (asset.getType()) {
             case LANDSCAPE -> new Content(convertToLandscape(name, type, path, pos, level));
             case COVER -> new Content(convertToCover(name, type, path, pos, level));
