@@ -28,9 +28,8 @@ import java.util.stream.Collectors;
 
 public class EditorCanvas extends Canvas {
     private static EditorCanvas singleton;
-    private boolean drawMarker;
-    private Image markerImage;
-    private double markerX, markerY;
+    private final Pointer pointer = Pointer.get();
+    private EventHandler<KeyEvent> arrowsEvent;
 
     public static EditorCanvas get() {
         if (singleton == null) {
@@ -71,8 +70,12 @@ public class EditorCanvas extends Canvas {
             }
         }
 
-        if (drawMarker) {
-            gc.drawImage(markerImage, markerX, markerY);
+        if (pointer.isActive()) {
+            Coords mark = pointer.getMark();
+            Image marker = pointer.getMarkerImage();
+            double x = mark.getX() - marker.getWidth()/2;
+            double y = mark.getY() - marker.getHeight()/2;
+            gc.drawImage(marker, x, y);
         }
     }
 
@@ -103,6 +106,12 @@ public class EditorCanvas extends Canvas {
         });
 
         setOnMouseClicked(e -> {
+            if (pointer.isActive()) {
+                setFocusTraversable(true);
+                requestFocus();
+                attachArrowsEventToPointer();
+                return;
+            }
             Content c = new Content();
             if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
                 Coords[] poss = new Coords[] {new Coords(e.getX(), e.getY())};
@@ -116,10 +125,53 @@ public class EditorCanvas extends Canvas {
                 e.consume();
                 setFocusTraversable(true);
                 requestFocus();
-                makeActive(c);
+                attachArrowsEventToContent(c);
             } else if (e.getButton().equals(MouseButton.SECONDARY)) {
                 e.consume();
                 openContextMenu(c, e);
+            }
+        });
+    }
+
+    private void attachArrowsEventToPointer() {
+        if (arrowsEvent != null) {
+            removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
+        }
+        arrowsEvent = e -> {
+            e.consume();
+            if (e.getCode() == KeyCode.DOWN
+                    || e.getCode() == KeyCode.UP
+                    || e.getCode() == KeyCode.RIGHT
+                    || e.getCode() == KeyCode.LEFT) {
+                movePointer(e.getCode());
+                refresh();
+            }
+        };
+        addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
+    }
+
+    private void attachArrowsEventToContent(Content c) {
+        EditorController.get().getActiveContent().setContent(c);
+        if (arrowsEvent != null) {
+            removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
+        }
+        arrowsEvent = e -> {
+            e.consume();
+            if (e.getCode() == KeyCode.DOWN
+                    || e.getCode() == KeyCode.UP
+                    || e.getCode() == KeyCode.RIGHT
+                    || e.getCode() == KeyCode.LEFT) {
+                Content active = EditorController.get().getActiveContent().getContent();
+                moveContent(e.getCode(), active);
+                ContentTableView.get().refresh();
+                refresh();
+            }
+        };
+        addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
+        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            if (e.getButton().equals(MouseButton.SECONDARY)) {
+                e.consume();
+                removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
             }
         });
     }
@@ -145,29 +197,6 @@ public class EditorCanvas extends Canvas {
         refresh();
     }
 
-    private void makeActive(Content c) {
-        EditorController.get().getActiveContent().setContent(c);
-        final EventHandler<KeyEvent> onActive = e -> {
-            e.consume();
-            if (e.getCode() == KeyCode.DOWN
-                    || e.getCode() == KeyCode.UP
-                    || e.getCode() == KeyCode.RIGHT
-                    || e.getCode() == KeyCode.LEFT) {
-                Content active = EditorController.get().getActiveContent().getContent();
-                moveContent(e.getCode(), active);
-                ContentTableView.get().refresh();
-                refresh();
-            }
-        };
-        addEventHandler(KeyEvent.KEY_PRESSED, onActive);
-        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getButton().equals(MouseButton.SECONDARY)) {
-                e.consume();
-                removeEventHandler(KeyEvent.KEY_PRESSED, onActive);
-            }
-        });
-    }
-
     private void openContextMenu(Content c, MouseEvent e) {
         final MenuItem remove = new MenuItem("Remove");
         remove.setOnAction(ev -> removeItem(c));
@@ -177,6 +206,10 @@ public class EditorCanvas extends Canvas {
         setInvisible.setOnAction(ev -> setInvisible(c));
         final ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
         menu.show(this, e.getScreenX(), e.getScreenY());
+        addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
+            ev.consume();
+            menu.hide();
+        });
     }
 
     private void setSize() {
@@ -191,8 +224,17 @@ public class EditorCanvas extends Canvas {
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
     }
 
-    void moveContent(KeyCode keyCode, Content c){
+    private void moveContent(KeyCode keyCode, Content c){
         Coords pos = c.getItem().getPos();
+        updatePos(keyCode, pos);
+    }
+
+    private void movePointer(KeyCode keyCode) {
+        Coords mark = pointer.getMark();
+        updatePos(keyCode, mark);
+    }
+
+    private void updatePos(KeyCode keyCode, Coords pos) {
         switch (keyCode) {
             case UP -> pos.setY(pos.getY() - 1);
             case LEFT -> pos.setX(pos.getX() - 1);
@@ -204,7 +246,7 @@ public class EditorCanvas extends Canvas {
 
     private void moveToPointer(Content c) {
         Coords pos = c.getItem().getPos();
-        Coords newPos = Pointer.getMark();
+        Coords newPos = pointer.getMark();
         pos.setX(newPos.getX());
         pos.setY(newPos.getY());
         ContentTableView.get().refresh();
@@ -218,19 +260,6 @@ public class EditorCanvas extends Canvas {
 
     private void removeItem(Content c) {
         Controller.get().removeContent(c);
-        refresh();
-    }
-
-    public void drawMarker(Image markerImage, double x, double y) {
-        this.markerX = x;
-        this.markerY = y;
-        this.drawMarker = true;
-        this.markerImage = markerImage;
-        refresh();
-    }
-
-    public void removeMarker() {
-        this.drawMarker = false;
         refresh();
     }
 }

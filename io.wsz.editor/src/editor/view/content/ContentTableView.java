@@ -150,7 +150,7 @@ public class ContentTableView extends TableView<Content> {
 
     public void moveToPointer() {
         List<Content> contentsToMove = getSelectionModel().getSelectedItems();
-        Coords newPos = Pointer.getMark();
+        Coords newPos = Pointer.get().getMark();
         for (Content c : contentsToMove) {
             c.getItem().getPos().setX(newPos.getX());
             c.getItem().getPos().setY(newPos.getY());

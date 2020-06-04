@@ -81,7 +81,7 @@ class AssetsTableView extends AssetsGenericTableView {
         editAsset.setOnAction(event -> editAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
-            Coords mark = Pointer.getMark();
+            Coords mark = Pointer.get().getMark();
             addItemsToStageAndContents(mark);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
