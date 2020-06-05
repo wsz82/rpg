@@ -79,6 +79,9 @@ public class Creature extends PosItem {
     }
 
     public Coords calcDest(Coords difPos) {
+        if (difPos == null) {
+            return null;
+        }
         double width = getImage().getWidth();
         double height = getImage().getHeight();
         double x = difPos.getX() - width/2;
@@ -158,19 +161,8 @@ public class Creature extends PosItem {
         double targetY = targetPos.getY();
         int targetHeight = target.getHeight();
         if (targetX < targetWidth && targetY < targetHeight) {
-            List<Content> current = Controller.get().getCurrentLocation().getContent();
-            List<Content> singleContent = current.stream()
-                    .filter(c -> c.getItem().equals(this))
-                    .collect(Collectors.toList());
-            Content thisContent = singleContent.get(0);
-            current.remove(thisContent);
-            target.getContents().get().add(thisContent);
-
-            Controller.get().getCurrentLocation().setLocation(target);
-            Controller.get().getCurrentLayer().setLayer(targetLayer);
-            pos.setX(targetX);
-            pos.setY(targetY);
-            level = targetLevel;
+            Location from = Controller.get().getCurrentLocation().getLocation();
+            changeLocation(from, target, targetLayer, targetX, targetY);
             dest = null;
         }
     }

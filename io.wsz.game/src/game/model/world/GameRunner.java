@@ -4,9 +4,9 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentComparator;
 import javafx.application.Platform;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameRunner {
@@ -38,16 +38,14 @@ public class GameRunner {
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
-                List<Content> contents = Controller.get().getCurrentLocation().getContent();
-                contents.sort(new ContentComparator() {
-                    @Override
-                    public int compare(Content c1, Content c2) {
-                        return super.compare(c1, c2);
+                synchronized (Controller.get().getCurrentLocation().getContent()) {
+                    List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
+
+                    for (Content content : contents) {
+                        content.getItem().update();
                     }
-                });
-                for (Content content : contents) {
-                    content.getItem().update();
                 }
+
                 try {
                     Thread.sleep(turnDurationMillis);
                 } catch (InterruptedException e) {
@@ -56,6 +54,7 @@ public class GameRunner {
                 Platform.runLater(() -> {
                     showGame();
                 });
+
             }
         });
         gameThread.setDaemon(true);

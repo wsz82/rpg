@@ -6,9 +6,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class CurrentLayer {
+    private static CurrentLayer singleton;
     private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>();
     private final IntegerProperty level = new SimpleIntegerProperty();
-    private static CurrentLayer singleton;
 
     public static CurrentLayer get() {
         if (singleton == null) {

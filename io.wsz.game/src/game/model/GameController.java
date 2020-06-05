@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GameController {
-    private static volatile GameController singleton;
-    private boolean isGame; //TODO make atomic?
+    private static GameController singleton;
+    private volatile boolean isGame; //TODO make atomic?
 
     public static GameController get() {
         if (singleton == null) {

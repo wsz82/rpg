@@ -132,7 +132,7 @@ public class Board {
             int imgY = (int) (y - cY);
             Color color;
             try {
-                color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
+                color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index out of bounds exception
             } catch (IndexOutOfBoundsException e) {
                 return null;
             }

@@ -86,6 +86,9 @@ public class TeleportAssetStage extends AssetStage {
         List<Location> singleLocation = Controller.get().getLocationsList().stream()
                 .filter(l -> l.getName().equals(s))
                 .collect(Collectors.toList());
+        if (singleLocation.isEmpty()) {
+            return null;
+        }
         return singleLocation.get(0);
     }
 

@@ -2,6 +2,7 @@ package game.view.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
+import io.wsz.model.content.ContentComparator;
 import io.wsz.model.item.*;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
@@ -34,26 +35,35 @@ public class GameCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents = contents.stream()
-                .filter(c -> c.getItem().getType() != ItemType.OBSTACLE)
-                .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
-                .collect(Collectors.toList());
-        for (Content content : contents) {
-            final PosItem item = content.getItem();
-            final ItemType type = content.getItem().getType();
-            final Coords pos = item.getPos();
-            final double x = pos.getX();
-            final double y = pos.getY();
-
-            if (content.isVisible()) {
-                switch (type) {
-                    case CREATURE -> {
-                        drawCreatureSize((Creature) item, gc);
-                    }
+        synchronized (Controller.get().getCurrentLocation().getContent()) {
+            List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
+            contents.sort(new ContentComparator() {
+                @Override
+                public int compare(Content c1, Content c2) {
+                    return super.compare(c1, c2);
                 }
-                gc.drawImage(item.getImage(), x, y);
+            });
+
+            contents = contents.stream()
+                    .filter(c -> c.getItem().getType() != ItemType.OBSTACLE)
+                    .filter(c -> c.isVisible())
+                    .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
+                    .collect(Collectors.toList());
+            for (Content content : contents) {
+                final PosItem item = content.getItem();
+                final ItemType type = content.getItem().getType();
+                final Coords pos = item.getPos();
+                final double x = pos.getX();
+                final double y = pos.getY();
+
+                if (content.isVisible()) {
+                    switch (type) {
+                        case CREATURE -> {
+                            drawCreatureSize((Creature) item, gc);
+                        }
+                    }
+                    gc.drawImage(item.getImage(), x, y);
+                }
             }
         }
     }
