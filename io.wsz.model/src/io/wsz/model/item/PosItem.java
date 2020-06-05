@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class PosItem extends Asset implements ItemUpdater {
-    protected Coords pos;
-    protected int level;
+    protected volatile Coords pos;
+    protected volatile int level;
 
     public PosItem(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path);
@@ -18,7 +18,7 @@ public abstract class PosItem extends Asset implements ItemUpdater {
         this.level = level;
     }
 
-    public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
+    public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
         List<Content> fromContent = from.getContents().get();
         List<Content> singleContent = fromContent.stream()
                 .filter(c -> c.getItem().equals(this))

@@ -3,10 +3,10 @@ package io.wsz.model.stage;
 import java.io.Serializable;
 
 public class Coords implements Serializable {
-    private double x;
-    private double y;
+    private volatile int x;
+    private volatile int y;
 
-    public Coords(double x, double y) {
+    public Coords(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -15,24 +15,19 @@ public class Coords implements Serializable {
         return x == 0 && y == 0;
     }
 
-    public double getX() {
+    public int getX() {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(int x) {
         this.x = x;
     }
 
-    public double getY() {
+    public int getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(int y) {
         this.y = y;
-    }
-
-    @Override
-    public String toString() {
-        return "" + x + ", " + y;
     }
 }

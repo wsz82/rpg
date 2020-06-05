@@ -16,7 +16,7 @@ public class Pointer {
         public void handle(MouseEvent event) {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                mark = new Coords(event.getX(), event.getY());
+                mark = new Coords((int)event.getX(), (int) event.getY());
                 if (markerImage == null) {
                     loadMarkerImage();
                 }

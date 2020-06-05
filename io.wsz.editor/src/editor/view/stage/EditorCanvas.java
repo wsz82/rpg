@@ -64,8 +64,8 @@ public class EditorCanvas extends Canvas {
         for (Content c : contents) {
             final PosItem item = c.getItem();
             final Coords pos = item.getPos();
-            final double x = pos.getX();
-            final double y = pos.getY();
+            final int x = pos.getX();
+            final int y = pos.getY();
 
             if (c.isVisible()) {
                 gc.drawImage(item.getImage(), x, y);
@@ -80,16 +80,16 @@ public class EditorCanvas extends Canvas {
         if (pointer.isActive()) {
             Coords mark = pointer.getMark();
             Image marker = pointer.getMarkerImage();
-            double x = mark.getX() - marker.getWidth()/2;
-            double y = mark.getY() - marker.getHeight()/2;
+            int x = mark.getX() - (int) marker.getWidth()/2;
+            int y = mark.getY() - (int) marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
     }
 
     private void drawActiveContentRectangle(GraphicsContext gc, Content c) {
         PosItem item = c.getItem();
-        double x = item.getPos().getX();
-        double y = item.getPos().getY();
+        int x = item.getPos().getX();
+        int y = item.getPos().getY();
         double width = item.getImage().getWidth();
         double height = item.getImage().getHeight();
         gc.setStroke(Color.RED);
@@ -135,7 +135,7 @@ public class EditorCanvas extends Canvas {
                 }
                 Content c = new Content();
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    Coords[] poss = new Coords[]{new Coords(e.getX(), e.getY())};
+                    Coords[] poss = new Coords[]{new Coords((int) e.getX(), (int) e.getY())};
                     ItemType[] types = ItemType.values();
                     c = Controller.get().getBoard().lookForContent(poss, types, true);
                 }
@@ -279,9 +279,9 @@ public class EditorCanvas extends Canvas {
         Coords pos = c.getItem().getPos();
         Coords newPos = pointer.getMark();
         pos.setX(newPos.getX());
-        double y = 0;
+        int y = 0;
         if (newPos.getY() != 0) {
-            y = newPos.getY() - c.getItem().getImage().getHeight();
+            y = newPos.getY() - (int) c.getItem().getImage().getHeight();
         }
         pos.setY(y);
         ContentTableView.get().refresh();

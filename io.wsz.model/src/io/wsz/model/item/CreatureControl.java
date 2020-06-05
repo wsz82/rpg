@@ -2,7 +2,7 @@ package io.wsz.model.item;
 
 public enum CreatureControl {
     NEUTRAL,
-    CONTROLABLE,
+    CONTROLLABLE,
     CONTROL,
     ENEMY
 }

@@ -3,9 +3,9 @@ package io.wsz.model.item;
 import io.wsz.model.stage.Coords;
 
 public class Teleport extends PosItem {
-    private String locationName;
-    private Coords exit;
-    private int exitLevel;
+    private volatile String locationName;
+    private volatile Coords exit;
+    private volatile int exitLevel;
 
     public Teleport(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path, pos, level);

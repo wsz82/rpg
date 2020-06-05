@@ -53,8 +53,8 @@ public class GameCanvas extends Canvas {
                 final PosItem item = content.getItem();
                 final ItemType type = content.getItem().getType();
                 final Coords pos = item.getPos();
-                final double x = pos.getX();
-                final double y = pos.getY();
+                final int x = pos.getX();
+                final int y = pos.getY();
 
                 if (content.isVisible()) {
                     switch (type) {
@@ -76,8 +76,8 @@ public class GameCanvas extends Canvas {
         }
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenterBottomPos();
-        double x = centerBottomPos.getX();
-        double y = centerBottomPos.getY();
+        int x = centerBottomPos.getX();
+        int y = centerBottomPos.getY();
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
@@ -90,7 +90,7 @@ public class GameCanvas extends Canvas {
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
-                Coords pos = new Coords(e.getX(), e.getY());
+                Coords pos = new Coords((int) e.getX(), (int) e.getY());
                 Coords[] poss = new Coords[] {pos};
                 ItemType[] types = new ItemType[] {ItemType.CREATURE};
                 Content c = Controller.get().getBoard().lookForContent(poss, types, true);
@@ -109,8 +109,6 @@ public class GameCanvas extends Canvas {
             }
         });
     }
-
-
 
     private void commandControllable(Coords pos) {
         board.getControlledCreatures()

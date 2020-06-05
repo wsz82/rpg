@@ -17,7 +17,7 @@ public class AssetConverter {
             Coords newPos = new Coords(pos.getX(), pos.getY());
             if (!pos.is0()) {
                 double height = asset.getImage().getHeight();
-                newPos.setY(pos.getY() - height);
+                newPos.setY(pos.getY() - (int) height);
             }
             Content content = convertToContent(asset, newPos, Controller.get().getCurrentLayer().getLevel());
             contents.add(content);

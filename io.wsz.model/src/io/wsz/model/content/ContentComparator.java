@@ -25,10 +25,10 @@ abstract public class ContentComparator implements Comparator<Content> {
             ItemType t2 = i2.getType();
             Coords pos1 = i1.getPos();
             Coords pos2 = i2.getPos();
-            int o1y_bottom = (int) (pos1.getY() + i1.getImage().getHeight());
-            int o2y_bottom = (int) (pos2.getY() + i2.getImage().getHeight());
-            int o1y_top = (int) pos1.getY();
-            int o2y_top = (int) pos2.getY();
+            int o1y_bottom = pos1.getY() + (int) i1.getImage().getHeight();
+            int o2y_bottom = pos2.getY() + (int) i2.getImage().getHeight();
+            int o1y_top = pos1.getY();
+            int o2y_top = pos2.getY();
 
             if (t1.equals(ItemType.CREATURE) && t2.equals(ItemType.COVER)) {
                 Creature cr = (Creature) i1;

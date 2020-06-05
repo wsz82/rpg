@@ -55,26 +55,26 @@ public class Board {
         });
         for (Content c : contents) {
             for (Coords pos : poss) {
-                double x = pos.getX();
-                double y = pos.getY();
+                int x = pos.getX();
+                int y = pos.getY();
 
-                double cX = c.getItem().getPos().getX();
-                double cWidth = c.getItem().getImage().getWidth();
+                int cX = c.getItem().getPos().getX();
+                int cWidth = (int) c.getItem().getImage().getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                double cY = c.getItem().getPos().getY();
-                double cHeight = c.getItem().getImage().getHeight();
+                int cY = c.getItem().getPos().getY();
+                int cHeight = (int) c.getItem().getImage().getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
                     continue;
                 }
 
                 Image img = c.getItem().getImage();
-                int imgX = (int) (x - cX);
-                int imgY = (int) (y - cY);
+                int imgX = x - cX;
+                int imgY = y - cY;
                 Color color;
                 try {
                     color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
@@ -94,26 +94,26 @@ public class Board {
     public boolean isCovered(Creature cr, Cover cover) {
         Coords[] poss = cr.getCorners();
         for (Coords pos : poss) {
-            double x = pos.getX();
-            double y = pos.getY();
+            int x = pos.getX();
+            int y = pos.getY();
 
-            double cX = cover.getPos().getX();
-//            double cWidth = cover.getImage().getWidth();    //TODO loaded pos is not real
-//            boolean fitX = x >= cX && x <= cX + cWidth;
-//            if (!fitX) {
-//                continue;
-//            }
+            int cX = cover.getPos().getX();
+            int cWidth = (int) cover.getImage().getWidth();
+            boolean fitX = x >= cX && x <= cX + cWidth;
+            if (!fitX) {
+                continue;
+            }
 
-            double cY = cover.getPos().getY();
+            int cY = cover.getPos().getY();
 
             Image img = cover.getImage();
-            int imgX = (int) (x - cX);
-            int imgY = (int) (y - cY);
+            int imgX = x - cX;
+            int imgY = y - cY;
             Color color;
             try {
-                color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index out of bounds exception
+                color = img.getPixelReader().getColor(imgX, imgY);
             } catch (IndexOutOfBoundsException e) {
-                return true;
+                continue;
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (!isPixelTransparent) {
@@ -143,31 +143,31 @@ public class Board {
         Collections.addAll(coordsList, poss);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
-            double x = pos.getX();
-            double y = pos.getY();
+            int x = pos.getX();
+            int y = pos.getY();
 
-            double cX = obstacle.getItem().getPos().getX();
-            double cWidth = obstacle.getItem().getImage().getWidth();
+            int cX = obstacle.getItem().getPos().getX();
+            int cWidth = (int) obstacle.getItem().getImage().getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            double cY = obstacle.getItem().getPos().getY();
-            double cHeight = obstacle.getItem().getImage().getHeight();
+            int cY = obstacle.getItem().getPos().getY();
+            int cHeight = (int) obstacle.getItem().getImage().getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
                 return pos;
             }
 
             Image img = obstacle.getItem().getImage();
-            int imgX = (int) (x - cX);
-            int imgY = (int) (y - cY);
+            int imgX = x - cX;
+            int imgY = y - cY;
             Color color;
             try {
-                color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index out of bounds exception
+                color = img.getPixelReader().getColor(imgX, imgY);
             } catch (IndexOutOfBoundsException e) {
-                continue;
+                continue; //TODO return pos?
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (isPixelTransparent) {

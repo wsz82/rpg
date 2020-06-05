@@ -7,8 +7,8 @@ public enum CreatureSize {
     L (25*4, 11*4),
     XL (25*5, 11*5);
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     CreatureSize(int width, int height) {
         this.width = width;
@@ -19,15 +19,7 @@ public enum CreatureSize {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 }

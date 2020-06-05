@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Creature extends PosItem {
-    private Coords dest;
-    private CreatureSize size;
-    private CreatureControl control;
-    private int speed;
+    private volatile Coords dest;
+    private volatile CreatureSize size;
+    private volatile CreatureControl control;
+    private volatile int speed;
 
     public Creature(String name, ItemType type, String path, Coords pos, int level) {
         super(name, type, path, pos, level);
@@ -42,11 +42,12 @@ public class Creature extends PosItem {
         if (dest == null) {
             return;
         }
-        double x1 = pos.getX();
-        double x2 = dest.getX();
-        double y1 = pos.getY();
-        double y2 = dest.getY();
-        if ((int) x1 == (int) x2 && (int) y1 == (int) y2) {
+        int x1 = pos.getX();
+        int x2 = dest.getX();
+        int y1 = pos.getY();
+        int y2 = dest.getY();
+        if (x1 == x2 && y1 == y2) {
+            dest = null;
             return;
         }
         double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -54,8 +55,8 @@ public class Creature extends PosItem {
         if (dist < speed) {
             moveDist = dist;
         }
-        double x3 = x1 + moveDist/dist * (x2 - x1);
-        double y3 = y1 + moveDist/dist * (y2 - y1);
+        int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
+        int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         pos.setX(x3);
         pos.setY(y3);
     }
@@ -73,8 +74,8 @@ public class Creature extends PosItem {
     public Coords getCenterBottomPos() {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
-        double x = pos.getX() + width/2;
-        double y = pos.getY() + height;
+        int x = pos.getX() + (int) (width/2);
+        int y = pos.getY() + (int) height;
         return new Coords(x, y);
     }
 
@@ -84,17 +85,17 @@ public class Creature extends PosItem {
         }
         double width = getImage().getWidth();
         double height = getImage().getHeight();
-        double x = difPos.getX() - width/2;
-        double y = difPos.getY() - height;
+        int x = difPos.getX() - (int) (width/2);
+        int y = difPos.getY() - (int) height;
         return new Coords(x, y);
     }
 
     public Coords[] getCorners() {
-        double halfWidth = size.getWidth()/2.0;
-        double halfHeight = size.getHeight()/2.0;
+        int halfWidth = size.getWidth()/2;
+        int halfHeight = size.getHeight()/2;
         Coords centerBottomPos = getCenterBottomPos();
-        double centerX = centerBottomPos.getX();
-        double centerY = centerBottomPos.getY();
+        int centerX = centerBottomPos.getX();
+        int centerY = centerBottomPos.getY();
         Coords top = new Coords(centerX, centerY - halfHeight);
         Coords bottom = new Coords(centerX, centerY + halfHeight);
         Coords right = new Coords(centerX + halfWidth, centerY);
@@ -104,8 +105,8 @@ public class Creature extends PosItem {
 
     public void interact() {
         if (control == CreatureControl.CONTROL) {
-            setControl(CreatureControl.CONTROLABLE);
-        } else if (control == CreatureControl.CONTROLABLE) {
+            setControl(CreatureControl.CONTROLLABLE);
+        } else if (control == CreatureControl.CONTROLLABLE) {
             looseAllControl();
             setControl(CreatureControl.CONTROL);
         }
@@ -117,7 +118,7 @@ public class Creature extends PosItem {
     }
 
     public void loseControl() {
-        setControl(CreatureControl.CONTROLABLE);
+        setControl(CreatureControl.CONTROLLABLE);
     }
 
     public void onInteractWith(Coords pos) {
@@ -156,9 +157,9 @@ public class Creature extends PosItem {
             return;
         }
         Coords targetPos = t.getExit();
-        double targetX = targetPos.getX();
+        int targetX = targetPos.getX();
         int targetWidth = target.getWidth();
-        double targetY = targetPos.getY();
+        int targetY = targetPos.getY();
         int targetHeight = target.getHeight();
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();
@@ -175,9 +176,9 @@ public class Creature extends PosItem {
     }
 
     private void interactWithCreature(Creature cr) {
-        if (cr.getControl().equals(CreatureControl.CONTROLABLE)) {
+        if (cr.getControl().equals(CreatureControl.CONTROLLABLE)) {
             cr.setControl(CreatureControl.CONTROL);
-            this.setControl(CreatureControl.CONTROLABLE);
+            this.setControl(CreatureControl.CONTROLLABLE);
         }
     }
 

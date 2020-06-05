@@ -18,7 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
-import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,18 +92,18 @@ public class ContentTableView extends TableView<Content> {
         visibilityCol.setEditable(true);
         visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
 
-        TableColumn<Content, Double> posCol = new TableColumn<>("Position");
+        TableColumn<Content, Integer> posCol = new TableColumn<>("Position");
         posCol.setEditable(true);
 
-        TableColumn<Content, Double> xCol = new TableColumn<>("X");
+        TableColumn<Content, Integer> xCol = new TableColumn<>("X");
         xCol.setEditable(true);
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
-            protected Double computeValue() {
+            protected Integer computeValue() {
                 return param.getValue().getItem().getPos().getX();
             }
         });
-        xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        xCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         xCol.setOnEditCommit(t -> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
             c.getItem().getPos().setX(t.getNewValue());
@@ -111,15 +111,15 @@ public class ContentTableView extends TableView<Content> {
             EditorCanvas.get().refresh();
         });
 
-        TableColumn<Content, Double> yCol = new TableColumn<>("Y");
+        TableColumn<Content, Integer> yCol = new TableColumn<>("Y");
         yCol.setEditable(true);
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
-            protected Double computeValue() {
+            protected Integer computeValue() {
                 return param.getValue().getItem().getPos().getY();
             }
         });
-        yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        yCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         yCol.setOnEditCommit(t -> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
             c.getItem().getPos().setY(t.getNewValue());
