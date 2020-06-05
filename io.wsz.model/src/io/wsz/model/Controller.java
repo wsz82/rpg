@@ -119,4 +119,9 @@ public class Controller {
         sp.setHvalue(hValue);
         sp.setVvalue(vValue);
     }
+
+    public Plugin loadPluginMetadata(String name) {
+        PluginCaretaker pc = new PluginCaretaker();
+        return pc.getPluginMetadata(name);
+    }
 }

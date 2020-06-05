@@ -49,4 +49,22 @@ public class PluginCaretaker {
         }
         return plugin;
     }
+
+    public Plugin getPluginMetadata(String pluginName) {
+        File file = Controller.getProgramDir();
+        Plugin p = new Plugin();
+        try (
+                FileInputStream fos = new FileInputStream(file + File.separator + pluginName);
+                ObjectInputStream oos = new ObjectInputStream(fos)
+        ){
+            PluginSerializable ps = (PluginSerializable) oos.readObject();
+            p.setName(ps.getName());
+            p.setStartingLocation(ps.isStartingLocation());
+            p.setActive(ps.isActive());
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return p;
+    }
 }

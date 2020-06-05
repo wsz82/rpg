@@ -3,7 +3,6 @@ package game.view.launcher;
 import game.model.GameController;
 import io.wsz.model.Controller;
 import io.wsz.model.plugin.Plugin;
-import io.wsz.model.plugin.PluginCaretaker;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,8 +80,8 @@ public class PluginsTable extends Stage {
             alertNoPluginToActivate();
             return;
         }
-        String loadedPlugin = pluginToActivate.getName();
-        Plugin plugin = Controller.get().loadPlugin(loadedPlugin);
+        String pluginToActivateName = pluginToActivate.getName();
+        Plugin plugin = Controller.get().loadPlugin(pluginToActivateName);
         Controller.get().setActivePlugin(plugin);
         GameController.get().storeLastPlugin(plugin);
         close();
@@ -157,12 +156,8 @@ public class PluginsTable extends Stage {
     public List<Plugin> getPlugins() {
         File[] files = Main.getDir().listFiles((dir, name) -> name.endsWith(".rpg"));
         List<Plugin> plugins = new ArrayList<>(0);
-        PluginCaretaker pc = new PluginCaretaker();
         for (File file : Objects.requireNonNull(files)) {
-            Plugin p = pc.load(file.getName());
-            if (p == null) {
-                continue;
-            }
+            Plugin p = Controller.get().loadPluginMetadata(file.getName());
             plugins.add(p);
         }
         return plugins;
