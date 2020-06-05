@@ -79,6 +79,9 @@ public class EditorCanvas extends Canvas {
 
         if (pointer.isActive()) {
             Coords mark = pointer.getMark();
+            if (mark == null) {
+                return;
+            }
             Image marker = pointer.getMarkerImage();
             int x = mark.getX() - (int) marker.getWidth()/2;
             int y = mark.getY() - (int) marker.getHeight()/2;
