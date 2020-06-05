@@ -3,6 +3,7 @@ package io.wsz.model.stage;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentComparator;
+import io.wsz.model.item.Cover;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.ItemType;
@@ -78,7 +79,7 @@ public class Board {
                 try {
                     color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
                 } catch (IndexOutOfBoundsException e) {
-                    return null;
+                    continue;
                 }
                 boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
                 if (isPixelTransparent) {
@@ -88,6 +89,38 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public boolean isCovered(Creature cr, Cover cover) {
+        Coords[] poss = cr.getCorners();
+        for (Coords pos : poss) {
+            double x = pos.getX();
+            double y = pos.getY();
+
+            double cX = cover.getPos().getX();
+            double cWidth = cover.getImage().getWidth();
+            boolean fitX = x >= cX && x <= cX + cWidth;
+            if (!fitX) {
+                continue;
+            }
+
+            double cY = cover.getPos().getY();
+
+            Image img = cover.getImage();
+            int imgX = (int) (x - cX);
+            int imgY = (int) (y - cY);
+            Color color;
+            try {
+                color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index out of bounds exception
+            } catch (IndexOutOfBoundsException e) {
+                return true;
+            }
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (!isPixelTransparent) {
+                return  true;
+            }
+        }
+        return false;
     }
 
     public Coords getFreePos(Coords[] poss, Content obstacle) {
@@ -134,7 +167,7 @@ public class Board {
             try {
                 color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index out of bounds exception
             } catch (IndexOutOfBoundsException e) {
-                return null;
+                continue;
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (isPixelTransparent) {
