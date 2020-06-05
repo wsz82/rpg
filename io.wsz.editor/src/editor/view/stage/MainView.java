@@ -7,6 +7,7 @@ import editor.view.content.ContentStage;
 import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
+import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.plugin.ActivePlugin;
 import javafx.event.Event;
@@ -144,17 +145,17 @@ class MainView {
         MenuItem newPlugin = new MenuItem("New");
         MenuItem save = new MenuItem("Save");
         MenuItem saveAs = new MenuItem("Save as");
-        MenuItem load = new MenuItem("Load");
+        MenuItem plugins = new MenuItem("Plugins");
         MenuItem plugin = new MenuItem("Plugin settings");
         MenuItem exit = new MenuItem("Exit");
 
         newPlugin.setOnAction(event -> createNewPlugin());
         save.setOnAction(event -> saveFile());
         saveAs.setOnAction(event -> saveAsFile());
-        load.setOnAction(event -> loadFile());
+        plugins.setOnAction(event -> openPluginsTable());
         plugin.setOnAction(e -> openPluginSettings());
         exit.setOnAction(e -> stage.close());
-        file.getItems().addAll(newPlugin, save, saveAs, load, plugin, exit);
+        file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
 
         Menu view = new Menu("View");
         CheckMenuItem contents = new CheckMenuItem("Contents");
@@ -187,18 +188,10 @@ class MainView {
         EditorController.get().initNewPlugin();
     }
 
-    private void loadFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose plugin");
-        fileChooser.setInitialDirectory(Main.getDir());
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
-        File loadedFile = fileChooser.showOpenDialog(Main.getStage());
-
-        if (loadedFile == null) {
-            return;
-        }
-        EditorController.get().loadAndRestorePlugin(loadedFile.getName());  //TODO pick up from list
+    private void openPluginsTable() {
+        Stage plugins = new EditorPluginsTable();
+        plugins.initOwner(stage);
+        plugins.show();
     }
 
     private void saveAsFile() {

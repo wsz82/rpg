@@ -48,7 +48,7 @@ class Launcher {
     }
 
     private void openPluginsTable() {
-        Stage plugins = new PluginsTable();
+        Stage plugins = new GamePluginsTable();
         plugins.initOwner(stage);
         plugins.show();
 //        FileChooser fileChooser = new FileChooser();
