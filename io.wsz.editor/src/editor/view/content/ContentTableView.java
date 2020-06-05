@@ -74,9 +74,11 @@ public class ContentTableView extends TableView<Content> {
             if (!levels.contains(level)) {
                 alertLayerNotExisting(level);
                 c.getItem().setLevel(t.getOldValue());
+            } else {
+                c.getItem().setLevel(level);
+                EditorCanvas.get().refresh();
             }
             refresh();
-            EditorCanvas.get().refresh();
         });
 
         TableColumn<Content, Boolean> visibilityCol = new TableColumn<>("Visibility");

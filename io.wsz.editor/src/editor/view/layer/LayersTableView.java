@@ -1,6 +1,8 @@
 package editor.view.layer;
 
 import editor.view.SafeIntegerStringConverter;
+import editor.view.content.ContentTableView;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.content.*;
 import io.wsz.model.layer.Layer;
@@ -42,13 +44,14 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
             Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            int newValue = t.getNewValue();
+            int level = t.getNewValue();
+            notifyLevelValueListeners(t.getOldValue(), level);
 
-            notifyLevelValueListeners(t.getOldValue(), t.getNewValue());
-
-            if (isLevelUnique(newValue)) {
-                layer.setLevel(newValue);
+            if (isLevelUnique(level)) {
+                layer.setLevel(level);
                 Controller.get().getCurrentLayer().setLayer(layer);
+                ContentTableView.get().refresh();
+                EditorCanvas.get().refresh();
             } else {
                 layer.setLevel(t.getOldValue());
             }

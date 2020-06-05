@@ -21,6 +21,10 @@ public class Layer {
         level.set(value);
     }
 
+    public IntegerProperty levelProperty() {
+        return level;
+    }
+
     public int getLevel() {
         return level.get();
     }
