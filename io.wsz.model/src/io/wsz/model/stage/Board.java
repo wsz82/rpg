@@ -98,11 +98,11 @@ public class Board {
             double y = pos.getY();
 
             double cX = cover.getPos().getX();
-            double cWidth = cover.getImage().getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
-                continue;
-            }
+//            double cWidth = cover.getImage().getWidth();    //TODO loaded pos is not real
+//            boolean fitX = x >= cX && x <= cX + cWidth;
+//            if (!fitX) {
+//                continue;
+//            }
 
             double cY = cover.getPos().getY();
 
