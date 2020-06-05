@@ -168,6 +168,10 @@ public class ContentTableView extends TableView<Content> {
 
     public void editContent(Stage parent) {
         Content c = getSelectionModel().getSelectedItem();
+        openEditWindow(parent, c);
+    }
+
+    public void openEditWindow(Stage parent, Content c) {
         if (c == null) {
             return;
         }

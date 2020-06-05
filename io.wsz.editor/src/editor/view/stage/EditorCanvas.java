@@ -223,18 +223,24 @@ public class EditorCanvas extends Canvas {
     }
 
     private void openContextMenu(Content c, MouseEvent e) {
+        final MenuItem edit = new MenuItem("Edit item");
+        edit.setOnAction(event -> edit(c));
         final MenuItem remove = new MenuItem("Remove");
         remove.setOnAction(ev -> removeItem(c));
         final MenuItem moveToPointer = new MenuItem("Move to pointer");
         moveToPointer.setOnAction(ev -> moveToPointer(c));
         final MenuItem setInvisible = new MenuItem("Set invisible");
         setInvisible.setOnAction(ev -> setInvisible(c));
-        final ContextMenu menu = new ContextMenu(remove, moveToPointer, setInvisible);
+        final ContextMenu menu = new ContextMenu(edit, remove, moveToPointer, setInvisible);
         menu.show(this, e.getScreenX(), e.getScreenY());
         addEventHandler(MouseEvent.MOUSE_CLICKED, ev -> {
             ev.consume();
             menu.hide();
         });
+    }
+
+    private void edit(Content c) {
+        ContentTableView.get().openEditWindow(Main.getStage(), c);
     }
 
     private void setSize() {
