@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class GameScrollPane extends ScrollPane {
     private static final double SCROLL_H_FACTOR = 0.05;
     private static final double SCROLL_V_FACTOR = 0.05;
+    private static final int OFFSET = 30;
     private static GameScrollPane singleton;
     private List<Layer> layers;
 
@@ -108,29 +109,29 @@ public class GameScrollPane extends ScrollPane {
     }
 
     public void updatePos() {
-        if (!GameStage.get().isFullScreen()) {
-            return;
-        }
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
         int y = p.y;
-        double width = (int) getWidth();
+        int stageX = (int) GameStage.get().getX();
+        int stageY = (int) GameStage.get().getY();
+        int stageWidth = (int) GameStage.get().getWidth();
+        int stageRight = stageX + stageWidth;
+        int stageHeight = (int) GameStage.get().getHeight();
+        int stageBottom = stageY + stageHeight;
         double canvasWidth = Controller.get().getCurrentLocation().getWidth();
-        double height = (int) getHeight();
         double canvasHeight = Controller.get().getCurrentLocation().getHeight();
         double normalizedScrollHFactor = SCROLL_H_FACTOR * getWidth() / canvasWidth;
         double normalizedScrollVFactor = SCROLL_V_FACTOR * getHeight() / canvasHeight;
-
-        if (x < 10 && x >= 0) {
+        if (x < stageX+OFFSET && x >= stageX) {
             setHvalue(getHvalue() - normalizedScrollHFactor);
         } else
-        if (x > width - 10 && x <= width) {
+        if (x > stageRight-OFFSET && x <= stageRight) {
             setHvalue(getHvalue() + normalizedScrollHFactor);
         } else
-        if (y < 10 && y >= 0) {
+        if (y < stageY+OFFSET && y >= stageY) {
             setVvalue(getVvalue() - normalizedScrollVFactor);
         } else
-        if (y > height - 10 && y <= height) {
+        if (y > stageBottom-OFFSET && y <= stageBottom) {
             setVvalue(getVvalue() + normalizedScrollVFactor);
         }
     }
