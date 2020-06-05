@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.List;
 
-abstract class AssetStage extends ChildStage {
+public abstract class AssetStage extends ChildStage {
     protected Asset asset;
     protected final VBox container = new VBox(5);
     private final TextField nameInput = new TextField();
@@ -25,15 +25,17 @@ abstract class AssetStage extends ChildStage {
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
     private final ItemType type;
+    private boolean isContent;
     private String path;
 
-    AssetStage(Stage parent, Asset asset) {
+    public AssetStage(Stage parent, Asset asset, boolean isContent) {
         super(parent);
         this.type = asset.getType();
         this.asset = asset;
+        this.isContent = isContent;
     }
 
-    AssetStage(Stage parent, ItemType type) {
+    public AssetStage(Stage parent, ItemType type) {
         super(parent);
         this.type = type;
     }
@@ -70,6 +72,10 @@ abstract class AssetStage extends ChildStage {
         container.getChildren().addAll(nameInput, imageBox);
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
+        if (isContent) {
+            nameInput.setDisable(true);
+            imageButton.setDisable(true);
+        }
 
         hookupEvents();
     }

@@ -17,8 +17,8 @@ public class CreatureAssetStage extends AssetStage {
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final IntegerField speedInput = new IntegerField(0);
 
-    public CreatureAssetStage(Stage parent, Asset asset){
-        super(parent, asset);
+    public CreatureAssetStage(Stage parent, Asset asset, boolean isContent){
+        super(parent, asset, isContent);
         initWindow();
     }
 

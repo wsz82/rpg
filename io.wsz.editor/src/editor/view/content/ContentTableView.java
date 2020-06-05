@@ -1,10 +1,15 @@
 package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
+import editor.view.asset.AssetStage;
+import editor.view.asset.CreatureAssetStage;
+import editor.view.asset.TeleportAssetStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.ItemType;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -12,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
 import java.util.List;
@@ -158,5 +164,23 @@ public class ContentTableView extends TableView<Content> {
             c.getItem().getPos().setY(newPos.getY());
         }
         refresh();
+    }
+
+    public void editContent(Stage parent) {
+        Content c = getSelectionModel().getSelectedItem();
+        if (c == null) {
+            return;
+        }
+        Asset item = c.getItem();
+        ItemType type = item.getType();
+        AssetStage itemStage = switch (type) {
+            case CREATURE -> new CreatureAssetStage(parent, item, true);
+            case TELEPORT -> new TeleportAssetStage(parent, item, true);
+            default -> null;
+        };
+        if (itemStage == null) {
+            return;
+        }
+        itemStage.show();
     }
 }

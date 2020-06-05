@@ -24,12 +24,12 @@ public class TeleportAssetStage extends AssetStage {
     private final IntegerField inputY = new IntegerField(0);
     private final IntegerField inputLayer = new IntegerField();
 
-    TeleportAssetStage(Stage parent, Asset asset) {
-        super(parent, asset);
+    public TeleportAssetStage(Stage parent, Asset asset, boolean isContent) {
+        super(parent, asset, isContent);
         initWindow();
     }
 
-    TeleportAssetStage(Stage parent, ItemType type) {
+    public TeleportAssetStage(Stage parent, ItemType type) {
         super(parent, type);
         initWindow();
     }

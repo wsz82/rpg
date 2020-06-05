@@ -96,20 +96,20 @@ class AssetsTableView extends AssetsGenericTableView {
             return;
         }
         AssetStage assetStage = switch (itemType) {
-            case CREATURE -> new CreatureAssetStage(parent, assetToEdit);
-            case TELEPORT -> new TeleportAssetStage(parent, assetToEdit);
+            case CREATURE -> new CreatureAssetStage(parent, assetToEdit, false);
+            case TELEPORT -> new TeleportAssetStage(parent, assetToEdit, false);
             default -> new AssetStageImpl(parent, assetToEdit);
         };
         assetStage.show();
     }
 
-    void addItemsToStageAndContents(Coords pos) {
+    private void addItemsToStageAndContents(Coords pos) {
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
         List<Content> contents = AssetConverter.convertToContent(selectedAssets, pos);
         Controller.get().getCurrentLocation().getContent().addAll(contents);
     }
 
-    void addAsset() {
+    private void addAsset() {
         AssetStage assetStage = switch (itemType) {
             case CREATURE -> new CreatureAssetStage(parent, itemType);
             case TELEPORT -> new TeleportAssetStage(parent, itemType);
@@ -118,7 +118,7 @@ class AssetsTableView extends AssetsGenericTableView {
         assetStage.show();
     }
 
-    void removeAssets() {
+    private void removeAssets() {
         List<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
         removeContent(assetsToRemove);
         Controller.get().getAssetsList().removeAll(assetsToRemove);

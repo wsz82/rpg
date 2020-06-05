@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 class AssetStageImpl extends AssetStage {
 
     AssetStageImpl(Stage parent, Asset asset) {
-        super(parent, asset);
+        super(parent, asset, false);
         initWindow();
     }
 
