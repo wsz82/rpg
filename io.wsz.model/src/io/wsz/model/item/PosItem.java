@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -31,8 +30,6 @@ public abstract class PosItem extends Asset implements ItemUpdater {
         fromContent.remove(thisContent);
         target.getContents().get().add(thisContent);
 
-        Controller.get().getCurrentLocation().setLocation(target);
-        Controller.get().getCurrentLayer().setLayer(targetLayer);
         pos.setX(targetX);
         pos.setY(targetY);
         level = targetLayer.getLevel();

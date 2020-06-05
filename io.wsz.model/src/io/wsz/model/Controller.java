@@ -10,6 +10,7 @@ import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
 import io.wsz.model.stage.Board;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ScrollPane;
 
 import java.io.File;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class Controller {
     private static Controller singleton;
     private static File programDir;
+    private static ScrollPane scrollPane;
 
     public static Controller get() {
         if (singleton == null) {
@@ -84,5 +86,37 @@ public class Controller {
 
     public Board getBoard() {
         return Board.get();
+    }
+
+    public static ScrollPane getScrollPane() {
+        return scrollPane;
+    }
+
+    public static void setScrollPane(ScrollPane scrollPane) {
+        Controller.scrollPane = scrollPane;
+    }
+
+    public void centerScreenOn(double targetX, double targetY) {
+        ScrollPane sp = getScrollPane();
+        double width = sp.getWidth();
+        double height = sp.getHeight();
+        int locationWidth = getCurrentLocation().getWidth();
+        int locationHeight = getCurrentLocation().getHeight();
+        double screenPosX;
+        double screenPosY;
+        if (targetX > width/2) {
+            screenPosX = targetX + width/2;
+        } else {
+            screenPosX = targetX - width/2;
+        }
+        if (targetY > height/2) {
+            screenPosY = targetY + height/2;
+        } else {
+            screenPosY = targetY - height/2;
+        }
+        double hValue = screenPosX/locationWidth;
+        double vValue = screenPosY/locationHeight;
+        sp.setHvalue(hValue);
+        sp.setVvalue(vValue);
     }
 }

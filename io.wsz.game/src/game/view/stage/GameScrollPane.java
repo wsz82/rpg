@@ -29,6 +29,7 @@ public class GameScrollPane extends ScrollPane {
 
     private GameScrollPane(Node node){
         super(node);
+        Controller.setScrollPane(this);
 
         setSize();
 

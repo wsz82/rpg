@@ -163,8 +163,15 @@ public class Creature extends PosItem {
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();
             changeLocation(from, target, targetLayer, targetX, targetY);
+            Controller.get().getCurrentLocation().setLocation(target);
+            Controller.get().getCurrentLayer().setLayer(targetLayer);
+            centerScreenOn(targetX, targetY);
             dest = null;
         }
+    }
+
+    private void centerScreenOn(double targetX, double targetY) {
+        Controller.get().centerScreenOn(targetX, targetY);
     }
 
     private void interactWithCreature(Creature cr) {
