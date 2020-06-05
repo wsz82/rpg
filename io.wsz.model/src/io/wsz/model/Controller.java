@@ -52,12 +52,12 @@ public class Controller {
         AssetsList.get().setAll(plugin.getAssets());
     }
 
-    public Plugin loadPlugin(File pluginDir) {
-        if (pluginDir == null) {
+    public Plugin loadPlugin(String pluginName) {
+        if (pluginName == null) {
             return new Plugin();
         }
         PluginCaretaker pc = new PluginCaretaker();
-        return pc.load(pluginDir);
+        return pc.load(pluginName);
     }
 
     public void removeContent(Content content) {
@@ -96,7 +96,7 @@ public class Controller {
         Controller.scrollPane = scrollPane;
     }
 
-    public void centerScreenOn(double targetX, double targetY) {
+    public void centerScreenOn(double targetX, double targetY) {    //TODO correct centering
         ScrollPane sp = getScrollPane();
         double width = sp.getWidth();
         double height = sp.getHeight();

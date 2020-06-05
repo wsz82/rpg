@@ -3,11 +3,10 @@ package io.wsz.model.plugin;
 import io.wsz.model.item.Asset;
 import io.wsz.model.location.Location;
 
-import java.io.File;
 import java.util.List;
 
 public class Plugin {
-    private File file;
+    private String name;
     private List<Location> locations;
     private List<Asset> assets;
     private boolean active;
@@ -19,15 +18,15 @@ public class Plugin {
 
     public Plugin(){}
 
-    public Plugin(File file, List<Location> locations, List<Asset> assets) {
-        this.file = file;
+    public Plugin(String name, List<Location> locations, List<Asset> assets) {
+        this.name = name;
         this.locations = locations;
         this.assets = assets;
     }
 
-    public Plugin(File file, List<Location> locations, List<Asset> assets, boolean active,
+    public Plugin(String name, List<Location> locations, List<Asset> assets, boolean active,
                   boolean isStartingLocation, String startLocation, int startX, int startY, int startLayer) {
-        this.file = file;
+        this.name = name;
         this.locations = locations;
         this.assets = assets;
         this.active = active;
@@ -38,12 +37,12 @@ public class Plugin {
         this.startLayer = startLayer;
     }
 
-    public File getFile() {
-        return file;
+    public String getName() {
+        return name;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<Location> getLocations() {

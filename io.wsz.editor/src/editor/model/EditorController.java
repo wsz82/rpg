@@ -57,10 +57,10 @@ public class EditorController {
         pc.save(p);
     }
 
-    public void savePluginAs(File pluginDir) {
+    public void savePluginAs(String pluginName) {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = new Plugin();
-        p.setFile(pluginDir);
+        p.setName(pluginName);
         setPluginsParams(p);
         pc.saveAs(p);
         ActivePlugin.get().setPlugin(p);
@@ -81,9 +81,9 @@ public class EditorController {
         p.setStartLayer(startLayer);
     }
 
-    public void loadAndRestorePlugin(File pluginDir) {
+    public void loadAndRestorePlugin(String pluginName) {
         PluginCaretaker pc = new PluginCaretaker();
-        Plugin p = pc.load(pluginDir);
+        Plugin p = pc.load(pluginName);
         Controller.get().setActivePlugin(p);
         loadEditorActivePluginToLists();
         PluginSettingsStage.setStartingLocation(p.isStartingLocation());

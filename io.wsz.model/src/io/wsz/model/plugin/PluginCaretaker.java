@@ -1,5 +1,7 @@
 package io.wsz.model.plugin;
 
+import io.wsz.model.Controller;
+
 import java.io.*;
 
 public class PluginCaretaker {
@@ -16,10 +18,11 @@ public class PluginCaretaker {
     }
 
     private void serializePlugin(Plugin plugin) {
+        File file = Controller.getProgramDir();
         PluginSerializable ps = SerializableConverter.toPluginSerializable(plugin);
         try (
-            FileOutputStream fos = new FileOutputStream(plugin.getFile());
-            ObjectOutputStream oos = new ObjectOutputStream(fos)
+                FileOutputStream fos = new FileOutputStream(file + File.separator + plugin.getName());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(ps);
         } catch (IOException e) {
@@ -27,14 +30,15 @@ public class PluginCaretaker {
         }
     }
 
-    public Plugin load(File file) throws ClassCastException {
-        return deserializeAll(file);
+    public Plugin load(String name) {
+        return deserializeAll(name);
     }
 
-    private Plugin deserializeAll(File file) throws ClassCastException {
+    private Plugin deserializeAll(String name) {
+        File file = Controller.getProgramDir();
         Plugin plugin;
         try (
-            FileInputStream fos = new FileInputStream(file);
+            FileInputStream fos = new FileInputStream(file + File.separator + name);
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             PluginSerializable ps = (PluginSerializable) oos.readObject();

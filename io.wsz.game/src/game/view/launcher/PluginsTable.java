@@ -76,11 +76,24 @@ public class PluginsTable extends Stage {
     }
 
     private void setActivePlugin() {
-        File loadedFile = activePluginCB.getValue().getFile();
-        Plugin plugin = Controller.get().loadPlugin(loadedFile);
+        Plugin pluginToActivate = activePluginCB.getValue();
+        if (pluginToActivate == null) {
+            alertNoPluginToActivate();
+            return;
+        }
+        String loadedPlugin = pluginToActivate.getName();
+        Plugin plugin = Controller.get().loadPlugin(loadedPlugin);
         Controller.get().setActivePlugin(plugin);
         GameController.get().storeLastPlugin(plugin);
         close();
+    }
+
+    private void alertNoPluginToActivate() {
+        final Alert alert = new Alert(
+                Alert.AlertType.ERROR, "No starting plugin is chosen", ButtonType.CANCEL);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.CANCEL)
+                .ifPresent(r -> alert.close());
     }
 
     private void setUpChoiceBox(ChoiceBox<Plugin> activePluginCB) {
@@ -93,22 +106,22 @@ public class PluginsTable extends Stage {
         activePluginCB.setConverter(new StringConverter<>() {
             @Override
             public String toString(Plugin p) {
-                return p.getFile().getName();
+                return p.getName();
             }
 
             @Override
             public Plugin fromString(String s) {
                 List<Plugin> singlePlugin = pluginList.stream()
-                        .filter(p -> p.getFile().getName().equals(s))
+                        .filter(p -> p.getName().equals(s))
                         .collect(Collectors.toList());
                 return singlePlugin.get(0);
             }
         });
         Plugin active = Controller.get().getActivePlugin();
         if (active != null) {
-            String name = active.getFile().getName();
+            String name = active.getName();
             List<Plugin> singlePlugin = pluginList.stream()
-                    .filter(p -> p.getFile().getName().equals(name))
+                    .filter(p -> p.getName().equals(name))
                     .collect(Collectors.toList());
             activePluginCB.setValue(singlePlugin.get(0));
         }
@@ -125,7 +138,7 @@ public class PluginsTable extends Stage {
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getFile().getName();
+                return param.getValue().getName();
             }
         });
 
@@ -146,7 +159,7 @@ public class PluginsTable extends Stage {
         List<Plugin> plugins = new ArrayList<>(0);
         PluginCaretaker pc = new PluginCaretaker();
         for (File file : Objects.requireNonNull(files)) {
-            Plugin p = pc.load(file);
+            Plugin p = pc.load(file.getName());
             if (p == null) {
                 continue;
             }

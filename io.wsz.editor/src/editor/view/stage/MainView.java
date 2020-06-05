@@ -198,7 +198,7 @@ class MainView {
         if (loadedFile == null) {
             return;
         }
-        EditorController.get().loadAndRestorePlugin(loadedFile);
+        EditorController.get().loadAndRestorePlugin(loadedFile.getName());  //TODO pick up from list
     }
 
     private void saveAsFile() {
@@ -212,7 +212,7 @@ class MainView {
         if (saveFile == null) {
             return;
         }
-        EditorController.get().savePluginAs(saveFile);
+        EditorController.get().savePluginAs(saveFile.getName());    //TODO fill only name
     }
 
     private void saveFile() {

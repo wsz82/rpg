@@ -147,19 +147,21 @@ public abstract class AssetStage extends ChildStage {
     private boolean pathIsIncorrect(String path) {
         File selectedFile = new File(path);
         File parent = selectedFile.getParentFile();
+        String actualPath = parent.getAbsolutePath();
         File required = new File(
                 Controller.getProgramDir().getAbsolutePath() + Asset.getRelativeTypePath(type));
-        if (!parent.getAbsolutePath().equals(required.getAbsolutePath())) {
-            alertWrongDirectory();
+        String requiredPath = required.getAbsolutePath();
+        if (!actualPath.equals(requiredPath)) {
+            alertWrongDirectory(actualPath, requiredPath);
             return true;
         }
         return false;
     }
 
-    private void alertWrongDirectory() {
-        String required = Asset.createAssetTypeDir(type).getAbsolutePath();
+    private void alertWrongDirectory(String actualPath, String requiredPath) {
         final Alert alert = new Alert(
-                Alert.AlertType.ERROR, "Get image from directory: " + required, ButtonType.CANCEL);
+                Alert.AlertType.ERROR, "Get image from directory: " + requiredPath
+                + "\n" + "Actual: " + actualPath, ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());

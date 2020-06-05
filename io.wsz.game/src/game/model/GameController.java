@@ -55,8 +55,8 @@ public class GameController {
 
     public void restoreLastPlugin() {
         LastPluginCaretaker pc = new LastPluginCaretaker();
-        File lastPluginDir = pc.loadMemento(Main.getDir());
-        Plugin p = Controller.get().loadPlugin(lastPluginDir);
+        String lastPluginName = pc.loadMemento(Main.getDir());
+        Plugin p = Controller.get().loadPlugin(lastPluginName);
         if (p == null) {
             return;
         }
@@ -67,7 +67,7 @@ public class GameController {
 
     public void storeLastPlugin(Plugin p) {
         LastPluginCaretaker pc = new LastPluginCaretaker();
-        pc.saveMemento(Main.getDir(), p.getFile());
+        pc.saveMemento(Main.getDir(), p.getName());
     }
 
 

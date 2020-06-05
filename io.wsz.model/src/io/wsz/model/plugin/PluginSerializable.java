@@ -1,12 +1,11 @@
 package io.wsz.model.plugin;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
 public class PluginSerializable implements Serializable {
     //TODO versionUID
-    private File file;
+    private String name;
     private List<LocationSerializable> locations;
     private List<AssetSerializable> assets;
     private boolean active;
@@ -18,15 +17,15 @@ public class PluginSerializable implements Serializable {
 
     public PluginSerializable(){}
 
-    public PluginSerializable(File file, List<LocationSerializable> locations, List<AssetSerializable> assets) {
-        this.file = file;
+    public PluginSerializable(String name, List<LocationSerializable> locations, List<AssetSerializable> assets) {
+        this.name = name;
         this.locations = locations;
         this.assets = assets;
     }
 
-    public PluginSerializable(File file, List<LocationSerializable> locations, List<AssetSerializable> assets, boolean active,
+    public PluginSerializable(String name, List<LocationSerializable> locations, List<AssetSerializable> assets, boolean active,
                               boolean isStartingLocation, String startLocation, int startX, int startY, int startLayer) {
-        this.file = file;
+        this.name = name;
         this.locations = locations;
         this.assets = assets;
         this.active = active;
@@ -37,12 +36,12 @@ public class PluginSerializable implements Serializable {
         this.startLayer = startLayer;
     }
 
-    public File getFile() {
-        return file;
+    public String getName() {
+        return name;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<LocationSerializable> getLocations() {
