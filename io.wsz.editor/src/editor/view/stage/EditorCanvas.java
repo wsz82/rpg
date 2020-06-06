@@ -83,6 +83,9 @@ public class EditorCanvas extends Canvas {
                 return;
             }
             Image marker = pointer.getMarkerImage();
+            if (marker == null) {
+                return;
+            }
             int x = mark.getX() - (int) marker.getWidth()/2;
             int y = mark.getY() - (int) marker.getHeight()/2;
             gc.drawImage(marker, x, y);
