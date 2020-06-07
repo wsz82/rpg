@@ -5,10 +5,10 @@ import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentComparator;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -23,7 +23,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,16 +49,12 @@ public class EditorCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
+        List<Content> contents = Controller.get().getCurrentLocation().getContent();
         contents = contents.stream()
                 .filter(c -> c.isVisible())
                 .collect(Collectors.toList());
-        contents.sort(new ContentComparator() {
-            @Override
-            public int compare(Content c1, Content c2) {
-                return super.compare(c1, c2);
-            }
-        });
+        Board.get().sortContents(contents);
+
         boolean activeContentMarked = false;
         for (Content c : contents) {
             final PosItem item = c.getItem();

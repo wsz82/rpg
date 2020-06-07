@@ -65,4 +65,9 @@ public class Content {
     public int hashCode() {
         return Objects.hash(item, level, visible);
     }
+
+    @Override
+    public String toString() {
+        return item.get().getName();
+    }
 }

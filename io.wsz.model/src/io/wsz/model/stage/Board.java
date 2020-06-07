@@ -2,18 +2,21 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentComparator;
-import io.wsz.model.item.Cover;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.content.LookComparator;
+import io.wsz.model.item.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.wsz.model.stage.Comparator.Comparison;
+import static io.wsz.model.stage.Comparator.Comparison.GREAT;
+import static io.wsz.model.stage.Comparator.Comparison.LESS;
+import static io.wsz.model.stage.Comparator.compare;
 
 public class Board {
     private static Board singleton;
@@ -26,6 +29,73 @@ public class Board {
     }
 
     private Board(){}
+
+    public void sortContents(List<Content> contents) {
+        Graph graph = new Graph(new ArrayList<>(0));
+        List<Node> nodes = graph.getNodes();
+
+        if (contents == null || contents.isEmpty()) {
+            return;
+        }
+
+        for (Content c : contents) {
+            Node newNode = new Node(c, new LinkedList<>(), new LinkedList<>());
+
+            for (Node n : nodes) {
+                Comparison result = compare(c, n);
+
+                if (result.equals(GREAT)) {
+                    n.getGreater().push(newNode);
+                    newNode.getLesser().push(n);
+                } else if (result.equals(LESS)) {
+                    n.getLesser().push(newNode);
+                    newNode.getGreater().push(n);
+                }
+            }
+            nodes.add(newNode);
+        }
+
+        List<Content> sortedContent = new ArrayList<>(1);
+
+        if (!nodes.isEmpty()) {
+            Node n = nodes.get(0);
+            int size  = nodes.size();
+            while (size > 0) {
+                if (n == null) {
+                    n = nodes.get(0);
+                }
+                Node min = findMin(n);
+
+                sortedContent.add(min.getContent());
+                nodes.remove(min);
+
+                size = size - 1;
+
+                n = findFirstNotEmptyGreater(min);
+            }
+
+            contents.clear();
+            contents.addAll(sortedContent);
+        }
+    }
+
+    private Node findFirstNotEmptyGreater(Node last) {
+        LinkedList<Node> greater = last.getGreater();
+        return greater.isEmpty() ? null : greater.getFirst();
+    }
+
+    private Node findMin(Node n) {
+        LinkedList<Node> lesser = n.getLesser();
+        if (lesser.isEmpty()) {
+            for (Node greater : n.getGreater()) {
+                greater.getLesser().remove(n);
+            }
+            return n;
+        } else {
+            Node next = lesser.getFirst();
+            return findMin(next);
+        }
+    }
 
     public Content lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
         List<ItemType> typesList = new ArrayList<>(1);
@@ -47,7 +117,7 @@ public class Board {
         if (contents.isEmpty()) {
             return null;
         }
-        contents.sort(new ContentComparator() {
+        contents.sort(new LookComparator() {
             @Override
             public int compare(Content c1, Content c2) {
                 return super.compare(c2, c1);
@@ -91,8 +161,13 @@ public class Board {
         return null;
     }
 
-    public boolean isCovered(Creature cr, Cover cover) {
-        Coords[] poss = cr.getCorners();
+    public boolean isCovered(PosItem i, Cover cover) {
+        Coords[] poss;
+        if (i instanceof Creature) {
+            poss = ((Creature) i).getCorners();
+        } else {
+            poss = new Coords[] {i.getPos()};
+        }
         for (Coords pos : poss) {
             int x = pos.getX();
             int y = pos.getY();
@@ -123,22 +198,9 @@ public class Board {
         return false;
     }
 
+
+
     public Coords getFreePos(Coords[] poss, Content obstacle) {
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents = contents.stream()
-                .filter(c -> c.getItem().getType().equals(ItemType.OBSTACLE))
-                .filter(c -> c.isVisible())
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())
-                .collect(Collectors.toList());
-        if (contents.isEmpty()) {
-            return null;
-        }
-        contents.sort(new ContentComparator() {
-            @Override
-            public int compare(Content c1, Content c2) {
-                return super.compare(c2, c1);
-            }
-        });
         List<Coords> coordsList = new ArrayList<>();
         Collections.addAll(coordsList, poss);
         Collections.shuffle(coordsList);

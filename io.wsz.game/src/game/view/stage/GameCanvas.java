@@ -2,7 +2,6 @@ package game.view.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentComparator;
 import io.wsz.model.item.*;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
@@ -37,13 +36,7 @@ public class GameCanvas extends Canvas {
 
         synchronized (Controller.get().getCurrentLocation().getContent()) {
             List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-            contents.sort(new ContentComparator() {
-                @Override
-                public int compare(Content c1, Content c2) {
-                    return super.compare(c1, c2);
-                }
-            });
-
+            Board.get().sortContents(contents);
             contents = contents.stream()
                     .filter(c -> c.getItem().getType() != ItemType.OBSTACLE)
                     .filter(c -> c.isVisible())

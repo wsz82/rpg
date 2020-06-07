@@ -108,4 +108,9 @@ public class Asset {
     public void setImage(Image image) {
         this.image.set(image);
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
