@@ -161,9 +161,14 @@ public class ContentTableView extends TableView<Content> {
         Coords newPos = Pointer.get().getMark();
         for (Content c : contentsToMove) {
             c.getItem().getPos().setX(newPos.getX());
-            c.getItem().getPos().setY(newPos.getY());
+            int y = 0;
+            if (newPos.getY() != 0) {
+                y = newPos.getY() - (int) c.getItem().getImage().getHeight();
+            }
+            c.getItem().getPos().setY(y);
         }
         refresh();
+        EditorCanvas.get().refresh();
     }
 
     public void editContent(Stage parent) {
