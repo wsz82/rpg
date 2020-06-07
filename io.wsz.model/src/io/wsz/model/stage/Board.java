@@ -15,6 +15,7 @@ import static io.wsz.model.stage.Comparator.Comparison;
 import static io.wsz.model.stage.Comparator.Comparison.GREAT;
 import static io.wsz.model.stage.Comparator.Comparison.LESS;
 import static io.wsz.model.stage.Comparator.compare;
+import static java.lang.Math.pow;
 
 public class Board {
     private static Board singleton;
@@ -194,38 +195,38 @@ public class Board {
         return false;
     }
 
-
-
-    public Coords getFreePos(Coords[] poss, Content obstacle) {
+    public Coords getFreePos(Coords[] corners, Content c) {
         List<Coords> coordsList = new ArrayList<>();
-        Collections.addAll(coordsList, poss);
+        Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
             int x = pos.getX();
             int y = pos.getY();
+            PosItem i = c.getItem();
+            Coords oPos = i.getPos();
+            Image img = i.getImage();
 
-            int cX = obstacle.getItem().getPos().getX();
-            int cWidth = (int) obstacle.getItem().getImage().getWidth();
+            int cX = oPos.getX();
+            int cWidth = (int) img.getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            int cY = obstacle.getItem().getPos().getY();
-            int cHeight = (int) obstacle.getItem().getImage().getHeight();
+            int cY = oPos.getY();
+            int cHeight = (int) img.getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
                 return pos;
             }
 
-            Image img = obstacle.getItem().getImage();
             int imgX = x - cX;
             int imgY = y - cY;
             Color color;
             try {
                 color = img.getPixelReader().getColor(imgX, imgY);
             } catch (IndexOutOfBoundsException e) {
-                continue; //TODO return pos?
+                return pos;
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (isPixelTransparent) {
@@ -233,6 +234,55 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public Coords getFreePosCreature(Coords[] corners, Creature cr) {
+        List<Coords> coordsList = new ArrayList<>();
+        Collections.addAll(coordsList, corners);
+        Collections.shuffle(coordsList);
+        for (Coords pos : coordsList) {
+            int x = pos.getX();
+            int y = pos.getY();
+            Coords cPos = cr.getPos();
+            Image img = cr.getImage();
+
+            int cX = cPos.getX();
+            int cWidth = (int) img.getWidth();
+            boolean fitX = x >= cX && x <= cX + cWidth;
+            if (!fitX) {
+                return pos;
+            }
+
+            int cY = cPos.getY();
+            int cYbottom = cY + (int) img.getHeight();
+            int cSizeHeight = cr.getSize().getHeight()/2;
+            boolean fitY = y <= cYbottom && y >= cYbottom + cSizeHeight;
+            if (!fitY) {
+                return pos;
+            }
+
+            int imgX = x - cX;
+            int imgY = y - cY;
+            Color color;
+            try {
+                color = img.getPixelReader().getColor(imgX, imgY);
+            } catch (IndexOutOfBoundsException e) {
+                return pos;
+            }
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (isPixelTransparent) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+    public List<Creature> getCreatures() {
+        return Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())
+                .filter(c -> c.getItem().getType().equals(ItemType.CREATURE))
+                .map(c -> (Creature) c.getItem())
+                .collect(Collectors.toList());
     }
 
     public List<Creature> getControlledCreatures() {
@@ -244,5 +294,34 @@ public class Board {
                 })
                 .map(c -> (Creature) c.getItem())
                 .collect(Collectors.toList());
+    }
+
+    public Creature getCornersCreature(Coords[] corners, Creature cr) {
+        List<Creature> creatures = getCreatures();
+        if (creatures.isEmpty()) {
+            return null;
+        }
+
+        for (Creature c : creatures) {
+            if (cr.equals(c)) {
+                continue;
+            }
+            for (Coords pos : corners) {
+                int x = pos.getX();
+                int y = pos.getY();
+
+                Coords cPos = c.getCenterBottomPos();
+                int h = cPos.getX();
+                int k = cPos.getY();
+                int rx = c.getSize().getWidth()/2;
+                int ry = c.getSize().getHeight()/2;
+
+                double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
+                if (eq <= 1) {
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 }

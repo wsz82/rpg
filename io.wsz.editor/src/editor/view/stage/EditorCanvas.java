@@ -41,7 +41,6 @@ public class EditorCanvas extends Canvas {
     private EditorCanvas(){
         setSize();
         hookupEvents();
-        refresh();
     }
 
     public void refresh() {

@@ -9,6 +9,11 @@ import io.wsz.model.stage.Coords;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.item.CreatureControl.CONTROL;
+import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static io.wsz.model.item.ItemType.OBSTACLE;
+import static io.wsz.model.item.ItemType.TELEPORT;
+
 public class Creature extends PosItem {
     private volatile Coords dest;
     private volatile CreatureSize size;
@@ -29,16 +34,7 @@ public class Creature extends PosItem {
     }
 
     public void move() {
-        ItemType[] types = new ItemType[] {ItemType.OBSTACLE, ItemType.TELEPORT};
-        Content c = getCornersContent(types);
-        if (c != null) {
-            PosItem item = c.getItem();
-            ItemType type = item.getType();
-            switch (type) {
-                case OBSTACLE -> escapeObstacle(c);
-                case TELEPORT -> enterTeleport((Teleport) item);
-            }
-        }
+        checkSurrounding();
         if (dest == null) {
             return;
         }
@@ -59,6 +55,32 @@ public class Creature extends PosItem {
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         pos.setX(x3);
         pos.setY(y3);
+    }
+
+    private void checkSurrounding() {
+        ItemType[] types = new ItemType[] {OBSTACLE, TELEPORT};
+        Content c = getCornersContent(types);
+        if (c != null) {
+            PosItem item = c.getItem();
+            ItemType type = item.getType();
+            switch (type) {
+                case OBSTACLE, CREATURE -> escapeObstacle(c);
+                case TELEPORT -> enterTeleport((Teleport) item);
+            }
+        }
+        Creature cr = getCornersCreature(this);
+        if (cr != null) {
+            escapeCreature(cr);
+        }
+    }
+
+    private void escapeCreature(Creature cr) {
+        Coords free = Controller.get().getBoard().getFreePosCreature(getCorners(), cr);
+        setDest(calcDest(free));
+    }
+
+    private Creature getCornersCreature(Creature cr) {
+        return Controller.get().getBoard().getCornersCreature(getCorners(), cr);
     }
 
     private void escapeObstacle(Content c) {
@@ -96,19 +118,19 @@ public class Creature extends PosItem {
         Coords centerBottomPos = getCenterBottomPos();
         int centerX = centerBottomPos.getX();
         int centerY = centerBottomPos.getY();
-        Coords top = new Coords(centerX, centerY - halfHeight);
-        Coords bottom = new Coords(centerX, centerY + halfHeight);
-        Coords right = new Coords(centerX + halfWidth, centerY);
-        Coords left = new Coords(centerX - halfWidth, centerY);
-        return new Coords[] {top, bottom, right, left};
+        Coords N = new Coords(centerX, centerY - halfHeight);
+        Coords S = new Coords(centerX, centerY + halfHeight);
+        Coords W = new Coords(centerX - halfWidth, centerY);
+        Coords E = new Coords(centerX + halfWidth, centerY);
+        return new Coords[] {N, S, W, E};
     }
 
     public void interact() {
-        if (control == CreatureControl.CONTROL) {
-            setControl(CreatureControl.CONTROLLABLE);
-        } else if (control == CreatureControl.CONTROLLABLE) {
+        if (control == CONTROL) {
+            setControl(CONTROLLABLE);
+        } else if (control == CONTROLLABLE) {
             looseAllControl();
-            setControl(CreatureControl.CONTROL);
+            setControl(CONTROL);
         }
     }
 
@@ -118,7 +140,7 @@ public class Creature extends PosItem {
     }
 
     public void loseControl() {
-        setControl(CreatureControl.CONTROLLABLE);
+        setControl(CONTROLLABLE);
     }
 
     public void onInteractWith(Coords pos) {
@@ -176,9 +198,9 @@ public class Creature extends PosItem {
     }
 
     private void interactWithCreature(Creature cr) {
-        if (cr.getControl().equals(CreatureControl.CONTROLLABLE)) {
-            cr.setControl(CreatureControl.CONTROL);
-            this.setControl(CreatureControl.CONTROLLABLE);
+        if (cr.getControl().equals(CONTROLLABLE)) {
+            cr.setControl(CONTROL);
+            this.setControl(CONTROLLABLE);
         }
     }
 
