@@ -2,7 +2,6 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.content.LookComparator;
 import io.wsz.model.item.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -117,12 +116,9 @@ public class Board {
         if (contents.isEmpty()) {
             return null;
         }
-        contents.sort(new LookComparator() {
-            @Override
-            public int compare(Content c1, Content c2) {
-                return super.compare(c2, c1);
-            }
-        });
+        sortContents(contents);
+        Collections.reverse(contents);
+
         for (Content c : contents) {
             for (Coords pos : poss) {
                 int x = pos.getX();
