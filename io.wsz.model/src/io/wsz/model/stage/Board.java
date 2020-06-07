@@ -8,7 +8,6 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,25 +29,26 @@ public class Board {
     private Board(){}
 
     public void sortContents(List<Content> contents) {
-        Graph graph = new Graph(new ArrayList<>(0));
-        List<Node> nodes = graph.getNodes();
 
         if (contents == null || contents.isEmpty()) {
             return;
         }
 
+        Graph graph = new Graph(new ArrayList<>(0));
+        List<Node> nodes = graph.getNodes();
+
         for (Content c : contents) {
-            Node newNode = new Node(c, new LinkedList<>(), new LinkedList<>());
+            Node newNode = new Node(c, new ArrayList<>(0), new ArrayList<>(0));
 
             for (Node n : nodes) {
                 Comparison result = compare(c, n);
 
                 if (result.equals(GREAT)) {
-                    n.getGreater().push(newNode);
-                    newNode.getLesser().push(n);
+                    n.getGreater().add(newNode);
+                    newNode.getLesser().add(n);
                 } else if (result.equals(LESS)) {
-                    n.getLesser().push(newNode);
-                    newNode.getGreater().push(n);
+                    n.getLesser().add(newNode);
+                    newNode.getGreater().add(n);
                 }
             }
             nodes.add(newNode);
@@ -79,19 +79,19 @@ public class Board {
     }
 
     private Node findFirstNotEmptyGreater(Node last) {
-        LinkedList<Node> greater = last.getGreater();
-        return greater.isEmpty() ? null : greater.getFirst();
+        List<Node> greater = last.getGreater();
+        return greater.isEmpty() ? null : greater.get(0);
     }
 
     private Node findMin(Node n) {
-        LinkedList<Node> lesser = n.getLesser();
+        List<Node> lesser = n.getLesser();
         if (lesser.isEmpty()) {
             for (Node greater : n.getGreater()) {
                 greater.getLesser().remove(n);
             }
             return n;
         } else {
-            Node next = lesser.getFirst();
+            Node next = lesser.get(0);
             return findMin(next);
         }
     }

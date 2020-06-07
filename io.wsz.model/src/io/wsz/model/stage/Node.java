@@ -2,14 +2,14 @@ package io.wsz.model.stage;
 
 import io.wsz.model.content.Content;
 
-import java.util.LinkedList;
+import java.util.List;
 
 public class Node {
     private Content content;
-    private LinkedList<Node> greater;
-    private LinkedList<Node> lesser;
+    private List<Node> greater;
+    private List<Node> lesser;
 
-    public Node(Content content, LinkedList<Node> greater, LinkedList<Node> lesser) {
+    public Node(Content content, List<Node> greater, List<Node> lesser) {
         this.content = content;
         this.greater = greater;
         this.lesser = lesser;
@@ -23,19 +23,19 @@ public class Node {
         this.content = content;
     }
 
-    public LinkedList<Node> getGreater() {
+    public List<Node> getGreater() {
         return greater;
     }
 
-    public void setGreater(LinkedList<Node> greater) {
+    public void setGreater(List<Node> greater) {
         this.greater = greater;
     }
 
-    public LinkedList<Node> getLesser() {
+    public List<Node> getLesser() {
         return lesser;
     }
 
-    public void setLesser(LinkedList<Node> lesser) {
+    public void setLesser(List<Node> lesser) {
         this.lesser = lesser;
     }
 
