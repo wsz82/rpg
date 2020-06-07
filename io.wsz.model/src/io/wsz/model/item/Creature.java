@@ -4,6 +4,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
+import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 import java.util.List;
@@ -53,18 +54,25 @@ public class Creature extends PosItem {
         }
         int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
+        Coords nextPos = new Coords(x3, y3);
+        Coords[] poss = getCorners(getCenterBottomPos(nextPos));
+        ItemType[] types = new ItemType[] {OBSTACLE};
+        Content c = Board.get().lookForContent(poss, types, false);
+        if (c != null) {
+            dest = null;
+            return;
+        }
         pos.setX(x3);
         pos.setY(y3);
     }
 
     private void checkSurrounding() {
-        ItemType[] types = new ItemType[] {OBSTACLE, TELEPORT};
+        ItemType[] types = new ItemType[] {TELEPORT};
         Content c = getCornersContent(types);
         if (c != null) {
             PosItem item = c.getItem();
             ItemType type = item.getType();
             switch (type) {
-                case OBSTACLE, CREATURE -> escapeObstacle(c);
                 case TELEPORT -> enterTeleport((Teleport) item);
             }
         }
@@ -94,6 +102,10 @@ public class Creature extends PosItem {
     }
 
     public Coords getCenterBottomPos() {
+        return getCenterBottomPos(pos);
+    }
+
+    public Coords getCenterBottomPos(Coords pos) {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
         int x = pos.getX() + (int) (width/2);
@@ -113,11 +125,15 @@ public class Creature extends PosItem {
     }
 
     public Coords[] getCorners() {
+        Coords centerBottomPos = getCenterBottomPos();
+        return getCorners(centerBottomPos);
+    }
+
+    public Coords[] getCorners(Coords pos) {
         int halfWidth = size.getWidth()/2;
         int halfHeight = size.getHeight()/2;
-        Coords centerBottomPos = getCenterBottomPos();
-        int centerX = centerBottomPos.getX();
-        int centerY = centerBottomPos.getY();
+        int centerX = pos.getX();
+        int centerY = pos.getY();
         Coords N = new Coords(centerX, centerY - halfHeight);
         Coords S = new Coords(centerX, centerY + halfHeight);
         Coords W = new Coords(centerX - halfWidth, centerY);
