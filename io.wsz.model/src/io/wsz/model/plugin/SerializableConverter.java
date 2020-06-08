@@ -213,7 +213,8 @@ public class SerializableConverter {
         String name = asset.getName();
         ItemType type = asset.getType();
         String path = asset.getRelativePath();
-        return toConcreteItemSerializable(asset, name, type, path, null, 0, null);
+        Coords[] coverLine = asset.getCoverLine();
+        return toConcreteItemSerializable(asset, name, type, path, null, 0, coverLine);
     }
 
     private static List<Asset> toAssets(List<AssetSerializable> input) {
@@ -229,6 +230,7 @@ public class SerializableConverter {
         ItemType type = as.getType();
         String name = as.getName();
         String path = as.getPath();
-        return toConcreteItem(as, type, name, path, null, 0, null);
+        Coords[] coverLine = as.getCoverLine();
+        return toConcreteItem(as, type, name, path, null, 0, coverLine);
     }
 }

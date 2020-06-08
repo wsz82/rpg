@@ -1,6 +1,7 @@
 package io.wsz.model.plugin;
 
 import io.wsz.model.item.ItemType;
+import io.wsz.model.stage.Coords;
 
 import java.io.Serializable;
 
@@ -8,11 +9,13 @@ public class AssetSerializable implements Serializable {
     private String name;
     private ItemType type;
     private String path;
+    protected Coords[] coverLine;
 
-    public AssetSerializable(String name, ItemType type, String path) {
+    public AssetSerializable(String name, ItemType type, String path, Coords[] coverLine) {
         this.name = name;
         this.type = type;
         this.path = path;
+        this.coverLine = coverLine;
     }
 
     public String getName() {
@@ -37,6 +40,14 @@ public class AssetSerializable implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Coords[] getCoverLine() {
+        return coverLine;
+    }
+
+    public void setCoverLine(Coords[] coverLine) {
+        this.coverLine = coverLine;
     }
 
     @Override

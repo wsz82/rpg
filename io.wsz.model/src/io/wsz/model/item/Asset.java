@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.stage.Coords;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,11 +18,13 @@ public class Asset {
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
     protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
+    protected Coords[] coverLine;
 
-    public Asset(String name, ItemType type, String relativePath) {
+    public Asset(String name, ItemType type, String relativePath, Coords[] coverLine) {
         this.name.set(name);
         this.type.set(type);
         this.relativePath.set(relativePath);
+        this.coverLine = coverLine;
     }
 
     public static File createAssetTypeDir(ItemType type) {
@@ -107,6 +110,14 @@ public class Asset {
 
     public void setImage(Image image) {
         this.image.set(image);
+    }
+
+    public Coords[] getCoverLine() {
+        return coverLine;
+    }
+
+    public void setCoverLine(Coords[] coverLine) {
+        this.coverLine = coverLine;
     }
 
     @Override

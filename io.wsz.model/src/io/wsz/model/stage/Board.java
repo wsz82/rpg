@@ -2,12 +2,16 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.ItemType;
+import io.wsz.model.item.PosItem;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -158,41 +162,107 @@ public class Board {
         return null;
     }
 
-    public boolean isCovered(PosItem i, Cover cover) {
-        Coords[] poss;
-        if (i instanceof Creature) {
-            poss = ((Creature) i).getCorners();
+    public boolean isCovered(PosItem i1, PosItem i2) {
+        final Coords[] i1_cl = i1.getCoverLine();
+        final Coords i1_pos = i1.getPos();
+        final Image i1_img = i1.getImage();
+        final int i1_posX = i1_pos.getX();
+        final int i1_posY = i1_pos.getY();
+        final int i1_imgWidth = (int) i1_img.getWidth();
+        final int i1_imgHeight = (int) i1_img.getHeight();
+        final LinkedList<Coords> i1_list = new LinkedList<>();
+        if (i1_cl != null) {
+            addCoordsToList(i1_cl, i1_list);
+            translateCoords(i1_list, i1_posX, i1_posY);
         } else {
-            poss = new Coords[] {i.getPos()};
+            Coords SW = new Coords(i1_posX, i1_posY+i1_imgHeight);
+            Coords SE = new Coords(i1_posX+i1_imgWidth, i1_posY+i1_imgHeight);
+            i1_list.add(SW);
+            i1_list.add(SE);
         }
-        for (Coords pos : poss) {
-            int x = pos.getX();
-            int y = pos.getY();
 
-            int cX = cover.getPos().getX();
-            int cWidth = (int) cover.getImage().getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
+        final Coords[] i2_cl = i2.getCoverLine();
+        final Coords i2_pos = i2.getPos();
+        final Image i2_img = i2.getImage();
+        final int i2_posX = i2_pos.getX();
+        final int i2_posY = i2_pos.getY();
+        final int i2_imgWidth = (int) i2_img.getWidth();
+        final int i2_imgHeight = (int) i2_img.getHeight();
+        final LinkedList<Coords> i2_list = new LinkedList<>();
+        if (i2_cl != null) {
+            addCoordsToList(i2_cl, i2_list);
+            translateCoords(i2_list, i2_posX, i2_posY);
+            addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
+        } else {
+            Coords SW = new Coords(i2_posX, i2_posY+i2_imgHeight);
+            Coords SE = new Coords(i2_posX+i2_imgWidth, i2_posY+i2_imgHeight);
+            i2_list.add(SW);
+            i2_list.add(SE);
+        }
+
+        return isCoverLineAbove(i1_list, i2_list);
+    }
+
+    private void addCoordsToList(Coords[] i1_cl, LinkedList<Coords> i1_list) {
+        for (Coords pos : i1_cl) {
+            Coords newPos = new Coords(pos.getX(), pos.getY());
+            i1_list.add(newPos);
+        }
+    }
+
+    private boolean isCoverLineAbove(LinkedList<Coords> i1_list, LinkedList<Coords> i2_list) {
+        for (int i = 0; i < i2_list.size() - 1; i++) {
+            Coords first = i2_list.get(i);
+            int x1 = first.getX();
+            int y1 = first.getY();
+            Coords second = i2_list.get(i+1);
+            int x2 = second.getX();
+            int y2 = second.getY();
+
+            if (x1 == x2) {
                 continue;
             }
 
-            int cY = cover.getPos().getY();
-
-            Image img = cover.getImage();
-            int imgX = x - cX;
-            int imgY = y - cY;
-            Color color;
-            try {
-                color = img.getPixelReader().getColor(imgX, imgY);
-            } catch (IndexOutOfBoundsException e) {
-                continue;
-            }
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (!isPixelTransparent) {
-                return  true;
+            for (int j = 0; j < i1_list.size(); j++) {
+                Coords compared = i1_list.get(j);
+                int x = compared.getX();
+                if (x == x1) {
+                    continue;
+                }
+                boolean xIsBetweenLine = x >= x1 && x <= x2;
+                if (!xIsBetweenLine) {
+                    continue;
+                }
+                int y = compared.getY();
+                double func = (x*y1 - x*y2 + x1*y2 - x2*y1) / (double) (x1 - x2);
+                if (y > func) {
+                    return false;
+                }
             }
         }
-        return false;
+        return true;
+    }
+
+    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, int i2_posX, int i2_imgWidth) {
+        Coords first = linkedCoords.getFirst();
+        if (first.getX() != i2_posX) {
+            Coords left = new Coords(i2_posX, first.getY());
+            linkedCoords.addFirst(left);
+        }
+
+        Coords last = linkedCoords.getLast();
+        int rightX = i2_posX + i2_imgWidth;
+        if (last.getX() != rightX) {
+            Coords right = new Coords(rightX, last.getY());
+            linkedCoords.addLast(right);
+        }
+    }
+
+    private void translateCoords(LinkedList<Coords> linkedCoords, int i2_posX, int i2_posY) {
+        linkedCoords.forEach(c -> {
+                    c.setX(i2_posX + c.getX());
+                    c.setY(i2_posY + c.getY());
+                });
     }
 
     public Coords getFreePos(Coords[] corners, Content c) {
