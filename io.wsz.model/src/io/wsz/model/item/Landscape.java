@@ -4,8 +4,8 @@ import io.wsz.model.stage.Coords;
 
 public class Landscape extends PosItem {
 
-    public Landscape(String name, ItemType type, String path, Coords pos, int level) {
-        super(name, type, path, pos, level);
+    public Landscape(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
+        super(name, type, path, pos, level, coverLine);
     }
 
     @Override

@@ -21,6 +21,7 @@ public abstract class AssetStage extends ChildStage {
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
+    private final Button coverButton = new Button("Cover");
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
@@ -51,30 +52,33 @@ public abstract class AssetStage extends ChildStage {
 
         final HBox buttons = new HBox(10);
         buttons.getChildren().add(cancel);
-        if (asset != null) {
+        if (asset == null) {
+            coverButton.setVisible(false);
+            buttons.getChildren().add(create);
+            create.setDefaultButton(true);
+            create.setOnAction(event -> {
+                onCreate();
+            });
+        } else {
             buttons.getChildren().add(ok);
             ok.setDefaultButton(true);
             ok.setOnAction(event -> {
                 onEdit();
             });
             nameInput.setDisable(true);
-        } else {
-            buttons.getChildren().add(create);
-            create.setDefaultButton(true);
-            create.setOnAction(event -> {
-                onCreate();
-            });
         }
 
         nameInput.setPromptText("Name");
-        HBox imageBox = new HBox(10);
+        final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
-        container.getChildren().addAll(nameInput, imageBox);
+        container.getChildren().addAll(nameInput, imageBox, coverButton);
+
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
         if (isContent) {
             nameInput.setDisable(true);
             imageButton.setDisable(true);
+            coverButton.setDisable(true);
         }
 
         hookupEvents();
@@ -90,7 +94,7 @@ public abstract class AssetStage extends ChildStage {
     }
 
     private void hookupEvents() {
-        imageButton.setOnAction(event -> {
+        imageButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose image for asset");
             fileChooser.setInitialDirectory(Asset.createAssetTypeDir(type));
@@ -106,8 +110,17 @@ public abstract class AssetStage extends ChildStage {
             path = Asset.convertToRelativeFilePath(selectedFilePath, type);
             imageLabel.setText(path);
         });
+        coverButton.setOnAction(e -> openCoverEdit());
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
+    }
+
+    private void openCoverEdit() {
+        if (asset.getImage() == null) {
+            return;
+        }
+        Stage coverEdit = new CoverEditStage(this, asset);
+        coverEdit.show();
     }
 
     protected void onEdit() {
@@ -171,12 +184,11 @@ public abstract class AssetStage extends ChildStage {
         String name = nameInput.getText();
         String relativePath = Asset.convertToRelativeFilePath(path, type);
         asset = switch (type) {
-            case COVER -> new Cover(name, type, relativePath, null, 0);
-            case CREATURE -> new Creature(name, type, relativePath, null, 0);
-            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0);
-            case FLY_ZONE -> new FlyZone(name, type, relativePath, null, 0);
-            case OBSTACLE -> new Obstacle(name, type, relativePath, null, 0);
-            case TELEPORT -> new Teleport(name, type, relativePath, null, 0);
+            case COVER -> new Cover(name, type, relativePath, null, 0, null);
+            case CREATURE -> new Creature(name, type, relativePath, null, 0, null);
+            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0, null);
+            case OBSTACLE -> new Obstacle(name, type, relativePath, null, 0, null);
+            case TELEPORT -> new Teleport(name, type, relativePath, null, 0, null);
         };
         Controller.get().getAssetsList().add(asset);
     }

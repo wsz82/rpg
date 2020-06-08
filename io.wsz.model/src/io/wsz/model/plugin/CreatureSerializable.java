@@ -11,17 +11,13 @@ public class CreatureSerializable extends PosItemSerializable {
     protected CreatureControl control;
     protected int speed;
 
-    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level,
+    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine,
                                 Coords dest, CreatureSize size, CreatureControl control, int speed) {
-        super(name, type, path, pos, level);
+        super(name, type, path, pos, level, coverLine);
         this.dest = dest;
         this.size = size;
         this.control = control;
         this.speed = speed;
-    }
-
-    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level) {
-        super(name, type, path, pos, level);
     }
 
     public Coords getDest() {

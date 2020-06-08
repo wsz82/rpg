@@ -8,13 +8,9 @@ public class TeleportSerializable extends PosItemSerializable {
     private Coords exit;
     private int exitLevel;
 
-    public TeleportSerializable(String name, ItemType type, String path, Coords exit, int exitLevel) {
-        super(name, type, path, exit, exitLevel);
-    }
-
-    public TeleportSerializable(String name, ItemType type, String path, Coords exit, int exitLevel,
+    public TeleportSerializable(String name, ItemType type, String path, Coords exit, int exitLevel, Coords[] coverLine,
                                 String locationName, Coords pos1, int level1) {
-        super(name, type, path, exit, exitLevel);
+        super(name, type, path, exit, exitLevel, coverLine);
         this.locationName = locationName;
         this.exit = pos1;
         this.exitLevel = level1;

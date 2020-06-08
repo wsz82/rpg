@@ -9,13 +9,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class PosItem extends Asset implements ItemUpdater {
-    protected volatile Coords pos;
-    protected volatile int level;
+    protected Coords pos;
+    protected int level;
+    protected Coords[] coverLine;
 
-    public PosItem(String name, ItemType type, String path, Coords pos, int level) {
+    public PosItem(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
         super(name, type, path);
         this.pos = pos;
         this.level = level;
+        this.coverLine = coverLine;
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
@@ -49,5 +51,13 @@ public abstract class PosItem extends Asset implements ItemUpdater {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public Coords[] getCoverLine() {
+        return coverLine;
+    }
+
+    public void setCoverLine(Coords[] coverLine) {
+        this.coverLine = coverLine;
     }
 }

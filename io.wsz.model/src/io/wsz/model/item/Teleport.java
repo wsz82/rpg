@@ -7,13 +7,13 @@ public class Teleport extends PosItem {
     private volatile Coords exit;
     private volatile int exitLevel;
 
-    public Teleport(String name, ItemType type, String path, Coords pos, int level) {
-        super(name, type, path, pos, level);
+    public Teleport(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
+        super(name, type, path, pos, level, coverLine);
     }
 
-    public Teleport(String name, ItemType type, String path, Coords pos, int level,
+    public Teleport(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine,
                     String locationName, Coords exitPos, int exitLevel) {
-        super(name, type, path, pos, level);
+        super(name, type, path, pos, level, coverLine);
         this.locationName = locationName;
         this.exit = exitPos;
         this.exitLevel = exitLevel;

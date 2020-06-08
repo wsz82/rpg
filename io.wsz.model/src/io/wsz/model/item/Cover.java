@@ -4,8 +4,8 @@ import io.wsz.model.stage.Coords;
 
 public class Cover extends PosItem {
 
-    public Cover(String name, ItemType type, String path, Coords pos, int level) {
-        super(name, type, path, pos, level);
+    public Cover(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
+        super(name, type, path, pos, level, coverLine);
     }
 
     @Override

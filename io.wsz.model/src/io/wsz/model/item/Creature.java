@@ -21,13 +21,13 @@ public class Creature extends PosItem {
     private volatile CreatureControl control;
     private volatile int speed;
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level) {
-        super(name, type, path, pos, level);
+    public Creature(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
+        super(name, type, path, pos, level, coverLine);
     }
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level,
+    public Creature(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine,
                     Coords dest, CreatureSize size, CreatureControl control, int speed) {
-        super(name, type, path, pos, level);
+        super(name, type, path, pos, level, coverLine);
         this.dest = dest;
         this.size = size;
         this.control = control;
