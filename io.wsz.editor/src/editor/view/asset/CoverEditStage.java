@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
+import io.wsz.model.Controller;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -173,7 +174,14 @@ public class CoverEditStage extends ChildStage {
             coordsList.toArray(coverLine);
             PosItem i = (PosItem) asset;
             i.setCoverLine(coverLine);
+            updateCoverLineForContents(asset.getName(), coverLine);
         }
         close();
+    }
+
+    private void updateCoverLineForContents(String name, Coords[] coverLine) {
+        Controller.get().getCurrentLocation().getContent().stream()
+                .filter(c -> c.getItem().getName().equals(name))
+                .forEach(c -> c.getItem().setCoverLine(coverLine));
     }
 }
