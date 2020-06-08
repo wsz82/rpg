@@ -47,7 +47,6 @@ public abstract class AssetStage extends ChildStage {
         final VBox containerWithButtons = new VBox(5);
         containerWithButtons.setPadding(new Insets(10));
         final Scene scene = new Scene(root);
-        initOwner(parent);
         setScene(scene);
 
         final HBox buttons = new HBox(10);
@@ -160,11 +159,11 @@ public abstract class AssetStage extends ChildStage {
     private boolean pathIsIncorrect(String path) {
         File selectedFile = new File(path);
         File parent = selectedFile.getParentFile();
-        String actualPath = parent.getAbsolutePath();
+        String actualPath = parent.getAbsolutePath().toLowerCase();
         File required = new File(
-                Controller.getProgramDir().getAbsolutePath() + Asset.getRelativeTypePath(type));
-        String requiredPath = required.getAbsolutePath();
-        if (!actualPath.equals(requiredPath)) {
+                Controller.getProgramDir() + Asset.getRelativeTypePath(type));
+        String requiredPath = required.getAbsolutePath().toLowerCase();
+        if (!parent.equals(required)) {
             alertWrongDirectory(actualPath, requiredPath);
             return true;
         }
