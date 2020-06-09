@@ -36,7 +36,6 @@ public class Creature extends PosItem {
     }
 
     public void move() {
-        checkSurrounding();
         if (dest == null) {
             return;
         }
@@ -56,14 +55,19 @@ public class Creature extends PosItem {
         int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         Coords nextPos = new Coords(x3, y3);
-        Coords[] poss = getCorners(getCenterBottomPos(nextPos));
+        if (isColliding(nextPos)) return;
+        pos = nextPos;
+    }
+
+    private boolean isColliding(Coords nextPos) {
+
+        Coords[] poss = getCorners(posToCenter(nextPos));
         Content c = Board.get().lookForObstacle(poss);
         if (c != null) {
             dest = null;
-            return;
+            return true;
         }
-        pos.x = x3;
-        pos.y = y3;
+        return false;
     }
 
     private void checkSurrounding() {
@@ -84,7 +88,7 @@ public class Creature extends PosItem {
 
     private void escapeCreature(Creature cr) {
         Coords free = Controller.get().getBoard().getFreePosCreature(getCorners(), cr);
-        setDest(calcDest(free));
+        setDest(centerToPos(free));
     }
 
     private Creature getCornersCreature(Creature cr) {
@@ -96,11 +100,11 @@ public class Creature extends PosItem {
         return Controller.get().getBoard().lookForContent(poss, types, false);
     }
 
-    public Coords getCenterBottomPos() {
-        return getCenterBottomPos(pos);
+    public Coords posToCenter() {
+        return posToCenter(pos);
     }
 
-    public Coords getCenterBottomPos(Coords pos) {
+    public Coords posToCenter(Coords pos) {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
         int x = pos.x + (int) (width/2);
@@ -108,7 +112,7 @@ public class Creature extends PosItem {
         return new Coords(x, y);
     }
 
-    public Coords calcDest(Coords difPos) {
+    public Coords centerToPos(Coords difPos) {
         if (difPos == null) {
             return null;
         }
@@ -120,7 +124,7 @@ public class Creature extends PosItem {
     }
 
     public Coords[] getCorners() {
-        Coords centerBottomPos = getCenterBottomPos();
+        Coords centerBottomPos = posToCenter();
         return getCorners(centerBottomPos);
     }
 
@@ -165,7 +169,7 @@ public class Creature extends PosItem {
         ItemType type = item.getType();
         switch (type) {
             case CREATURE -> interactWithCreature((Creature) item);
-            default -> setDest(calcDest(pos));
+            default -> setDest(centerToPos(pos));
         }
     }
 
@@ -193,9 +197,11 @@ public class Creature extends PosItem {
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();
             changeLocation(from, target, targetLayer, targetX, targetY);
-            Controller.get().getCurrentLocation().setLocation(target);
-            Controller.get().getCurrentLayer().setLayer(targetLayer);
-            centerScreenOn(targetX, targetY);
+            if (control.equals(CONTROL)) {
+                Controller.get().getCurrentLocation().setLocation(target);
+                Controller.get().getCurrentLayer().setLayer(targetLayer);
+                centerScreenOn(targetX, targetY);
+            }
             dest = null;
         }
     }
@@ -244,7 +250,14 @@ public class Creature extends PosItem {
     }
 
     @Override
+    public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
+        super.changeLocation(from, target, targetLayer, targetX, targetY);
+        pos = centerToPos(new Coords(targetX, targetY));
+    }
+
+    @Override
     public void update() {
+        checkSurrounding();
         move();
     }
 }

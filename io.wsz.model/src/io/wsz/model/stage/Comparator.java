@@ -119,7 +119,7 @@ public class Comparator {
     }
 
     private static Comparison isCreatureAbove(Creature cr, Cover c) {
-        Coords pos = cr.getCenterBottomPos();
+        Coords pos = cr.posToCenter();
         int crX = pos.x;
         int crTopSizeY = pos.y - cr.getSize().getHeight()/2;
         int crBottomSizeY = pos.y + cr.getSize().getHeight()/2;

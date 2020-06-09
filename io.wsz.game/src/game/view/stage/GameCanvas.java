@@ -67,7 +67,7 @@ public class GameCanvas extends Canvas {
             return;
         }
         CreatureSize size = cr.getSize();
-        Coords centerBottomPos = cr.getCenterBottomPos();
+        Coords centerBottomPos = cr.posToCenter();
         int x = centerBottomPos.x;
         int y = centerBottomPos.y;
         switch (control) {

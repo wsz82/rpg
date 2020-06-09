@@ -388,7 +388,7 @@ public class Board {
                 int x = pos.x;
                 int y = pos.y;
 
-                Coords cPos = c.getCenterBottomPos();
+                Coords cPos = c.posToCenter();
                 int h = cPos.x;
                 int k = cPos.y;
                 int rx = c.getSize().getWidth()/2;
