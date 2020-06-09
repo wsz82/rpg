@@ -89,15 +89,14 @@ public class Board {
 
     private Node findMin(Node n) {
         List<Node> lesser = n.getLesser();
-        if (lesser.isEmpty()) {
-            for (Node greater : n.getGreater()) {
-                greater.getLesser().remove(n);
-            }
-            return n;
-        } else {
-            Node next = lesser.get(0);
-            return findMin(next);
+        while (!lesser.isEmpty()) {
+            n = lesser.get(0);
+            lesser = n.getLesser();
         }
+        for (Node greater : n.getGreater()) {
+            greater.getLesser().remove(n);
+        }
+        return n;
     }
 
     public Comparison isCovered(PosItem i1, PosItem i2) {

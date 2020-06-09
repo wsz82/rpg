@@ -55,19 +55,17 @@ public class Creature extends PosItem {
         int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         Coords nextPos = new Coords(x3, y3);
-        if (isColliding(nextPos)) return;
+        Content c = getCollision(nextPos);
+        if (c != null) {
+            dest = null;
+            return;
+        }
         pos = nextPos;
     }
 
-    private boolean isColliding(Coords nextPos) {
-
+    private Content getCollision(Coords nextPos) {
         Coords[] poss = getCorners(posToCenter(nextPos));
-        Content c = Board.get().lookForObstacle(poss);
-        if (c != null) {
-            dest = null;
-            return true;
-        }
-        return false;
+        return Board.get().lookForObstacle(poss);
     }
 
     private void checkSurrounding() {
