@@ -104,8 +104,8 @@ public class Board {
         final Coords[] i1_cl = i1.getCoverLine();
         final Coords i1_pos = i1.getPos();
         final Image i1_img = i1.getImage();
-        final int i1_posX = i1_pos.getX();
-        final int i1_posY = i1_pos.getY();
+        final int i1_posX = i1_pos.x;
+        final int i1_posY = i1_pos.y;
         final int i1_imgWidth = (int) i1_img.getWidth();
         final int i1_imgHeight = (int) i1_img.getHeight();
         final LinkedList<Coords> i1_list = new LinkedList<>();
@@ -122,8 +122,8 @@ public class Board {
         final Coords[] i2_cl = i2.getCoverLine();
         final Coords i2_pos = i2.getPos();
         final Image i2_img = i2.getImage();
-        final int i2_posX = i2_pos.getX();
-        final int i2_posY = i2_pos.getY();
+        final int i2_posX = i2_pos.x;
+        final int i2_posY = i2_pos.y;
         final int i2_imgWidth = (int) i2_img.getWidth();
         final int i2_imgHeight = (int) i2_img.getHeight();
         final LinkedList<Coords> i2_list = new LinkedList<>();
@@ -144,11 +144,11 @@ public class Board {
     private Comparison isCoverLineAbove(LinkedList<Coords> i1_list, LinkedList<Coords> i2_list) {
         for (int i = 0; i < i2_list.size() - 1; i++) {
             Coords first = i2_list.get(i);
-            int x1 = first.getX();
-            int y1 = first.getY();
+            int x1 = first.x;
+            int y1 = first.y;
             Coords second = i2_list.get(i+1);
-            int x2 = second.getX();
-            int y2 = second.getY();
+            int x2 = second.x;
+            int y2 = second.y;
 
             if (x1 == x2) {
                 continue;
@@ -156,7 +156,7 @@ public class Board {
 
             for (int j = 0; j < i1_list.size(); j++) {
                 Coords compared = i1_list.get(j);
-                int x = compared.getX();
+                int x = compared.x;
                 if (x == x1) {
                     continue;
                 }
@@ -164,7 +164,7 @@ public class Board {
                 if (!xIsBetweenLine) {
                     continue;
                 }
-                int y = compared.getY();
+                int y = compared.y;
                 double func = (x*y1 - x*y2 + x1*y2 - x2*y1) / (double) (x1 - x2);
                 if (y > func) {
                     return GREAT;
@@ -201,17 +201,17 @@ public class Board {
 
         for (Content c : contents) {
             for (Coords pos : poss) {
-                int x = pos.getX();
-                int y = pos.getY();
+                int x = pos.x;
+                int y = pos.y;
 
-                int cX = c.getItem().getPos().getX();
+                int cX = c.getItem().getPos().x;
                 int cWidth = (int) c.getItem().getImage().getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = c.getItem().getPos().getY();
+                int cY = c.getItem().getPos().y;
                 int cHeight = (int) c.getItem().getImage().getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
@@ -239,37 +239,37 @@ public class Board {
 
     private void addCoordsToList(Coords[] from, List<Coords> to) {
         for (Coords pos : from) {
-            Coords newPos = new Coords(pos.getX(), pos.getY());
+            Coords newPos = new Coords(pos.x, pos.y);
             to.add(newPos);
         }
     }
 
     private void addCoordsToList(List<Coords> from, List<Coords> to) {
         for (Coords pos : from) {
-            Coords newPos = new Coords(pos.getX(), pos.getY());
+            Coords newPos = new Coords(pos.x, pos.y);
             to.add(newPos);
         }
     }
 
     private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, int i2_posX, int i2_imgWidth) {
         Coords first = linkedCoords.getFirst();
-        if (first.getX() != i2_posX) {
-            Coords left = new Coords(i2_posX, first.getY());
+        if (first.x != i2_posX) {
+            Coords left = new Coords(i2_posX, first.y);
             linkedCoords.addFirst(left);
         }
 
         Coords last = linkedCoords.getLast();
         int rightX = i2_posX + i2_imgWidth;
-        if (last.getX() != rightX) {
-            Coords right = new Coords(rightX, last.getY());
+        if (last.x != rightX) {
+            Coords right = new Coords(rightX, last.y);
             linkedCoords.addLast(right);
         }
     }
 
     private void translateCoords(List<Coords> list, int i2_posX, int i2_posY) {
         list.forEach(c -> {
-                    c.setX(i2_posX + c.getX());
-                    c.setY(i2_posY + c.getY());
+                    c.x = i2_posX + c.x;
+                    c.y = i2_posY + c.y;
                 });
     }
 
@@ -278,20 +278,20 @@ public class Board {
         Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
-            int x = pos.getX();
-            int y = pos.getY();
+            int x = pos.x;
+            int y = pos.y;
             PosItem i = c.getItem();
             Coords oPos = i.getPos();
             Image img = i.getImage();
 
-            int cX = oPos.getX();
+            int cX = oPos.x;
             int cWidth = (int) img.getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            int cY = oPos.getY();
+            int cY = oPos.y;
             int cHeight = (int) img.getHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) {
@@ -319,19 +319,19 @@ public class Board {
         Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
-            int x = pos.getX();
-            int y = pos.getY();
+            int x = pos.x;
+            int y = pos.y;
             Coords cPos = cr.getPos();
             Image img = cr.getImage();
 
-            int cX = cPos.getX();
+            int cX = cPos.x;
             int cWidth = (int) img.getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            int cY = cPos.getY();
+            int cY = cPos.y;
             int cYbottom = cY + (int) img.getHeight();
             int cSizeHeight = cr.getSize().getHeight()/2;
             boolean fitY = y <= cYbottom && y >= cYbottom + cSizeHeight;
@@ -385,12 +385,12 @@ public class Board {
                 continue;
             }
             for (Coords pos : corners) {
-                int x = pos.getX();
-                int y = pos.getY();
+                int x = pos.x;
+                int y = pos.y;
 
                 Coords cPos = c.getCenterBottomPos();
-                int h = cPos.getX();
-                int k = cPos.getY();
+                int h = cPos.x;
+                int k = cPos.y;
                 int rx = c.getSize().getWidth()/2;
                 int ry = c.getSize().getHeight()/2;
 
@@ -416,20 +416,20 @@ public class Board {
 
         for (Content c : contents) {
             for (Coords pos : poss) {
-                int x = pos.getX();
-                int y = pos.getY();
+                int x = pos.x;
+                int y = pos.y;
 
                 final PosItem it = c.getItem();
                 final Image img = it.getImage();
                 final Coords cPos = it.getPos();
-                int cX = cPos.getX();
+                int cX = cPos.x;
                 int cWidth = (int) img.getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = cPos.getY();
+                int cY = cPos.y;
                 int cHeight = (int) img.getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {

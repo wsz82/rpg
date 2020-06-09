@@ -40,10 +40,10 @@ public class Creature extends PosItem {
         if (dest == null) {
             return;
         }
-        int x1 = pos.getX();
-        int x2 = dest.getX();
-        int y1 = pos.getY();
-        int y2 = dest.getY();
+        int x1 = pos.x;
+        int x2 = dest.x;
+        int y1 = pos.y;
+        int y2 = dest.y;
         if (x1 == x2 && y1 == y2) {
             dest = null;
             return;
@@ -62,8 +62,8 @@ public class Creature extends PosItem {
             dest = null;
             return;
         }
-        pos.setX(x3);
-        pos.setY(y3);
+        pos.x = x3;
+        pos.y = y3;
     }
 
     private void checkSurrounding() {
@@ -103,8 +103,8 @@ public class Creature extends PosItem {
     public Coords getCenterBottomPos(Coords pos) {
         double width = getImage().getWidth();
         double height = getImage().getHeight();
-        int x = pos.getX() + (int) (width/2);
-        int y = pos.getY() + (int) height;
+        int x = pos.x + (int) (width/2);
+        int y = pos.y + (int) height;
         return new Coords(x, y);
     }
 
@@ -114,8 +114,8 @@ public class Creature extends PosItem {
         }
         double width = getImage().getWidth();
         double height = getImage().getHeight();
-        int x = difPos.getX() - (int) (width/2);
-        int y = difPos.getY() - (int) height;
+        int x = difPos.x - (int) (width/2);
+        int y = difPos.y - (int) height;
         return new Coords(x, y);
     }
 
@@ -127,8 +127,8 @@ public class Creature extends PosItem {
     public Coords[] getCorners(Coords pos) {
         int halfWidth = size.getWidth()/2;
         int halfHeight = size.getHeight()/2;
-        int centerX = pos.getX();
-        int centerY = pos.getY();
+        int centerX = pos.x;
+        int centerY = pos.y;
         Coords N = new Coords(centerX, centerY - halfHeight);
         Coords S = new Coords(centerX, centerY + halfHeight);
         Coords W = new Coords(centerX - halfWidth, centerY);
@@ -186,9 +186,9 @@ public class Creature extends PosItem {
             return;
         }
         Coords targetPos = t.getExit();
-        int targetX = targetPos.getX();
+        int targetX = targetPos.x;
         int targetWidth = target.getWidth();
-        int targetY = targetPos.getY();
+        int targetY = targetPos.y;
         int targetHeight = target.getHeight();
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();

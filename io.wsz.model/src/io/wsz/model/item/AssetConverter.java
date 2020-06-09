@@ -14,10 +14,10 @@ public class AssetConverter {
         List<Content> contents = new ArrayList<>(assets.size());
         for (Asset asset
                 : assets) {
-            Coords newPos = new Coords(pos.getX(), pos.getY());
+            Coords newPos = new Coords(pos.x, pos.y);
             if (!pos.is0()) {
                 double height = asset.getImage().getHeight();
-                newPos.setY(pos.getY() - (int) height);
+                newPos.y = pos.y - (int) height;
             }
             Content content = convertToContent(asset, newPos, Controller.get().getCurrentLayer().getLevel());
             contents.add(content);

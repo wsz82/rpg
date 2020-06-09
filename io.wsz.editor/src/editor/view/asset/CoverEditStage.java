@@ -79,8 +79,8 @@ public class CoverEditStage extends ChildStage {
         int size = coverLine.length * 2;
         List<Double> points = new ArrayList<>(size);
         for (Coords pos : coverLine) {
-            double x = pos.getX();
-            double y = pos.getY();
+            double x = pos.x;
+            double y = pos.y;
             points.add(x);
             points.add(y);
         }
@@ -127,7 +127,7 @@ public class CoverEditStage extends ChildStage {
 
         List<Double> points = polyline.getPoints();
         List<Coords> coordsList = doublesToCoords(points);
-        coordsList.sort(Comparator.comparingInt(Coords::getX));
+        coordsList.sort(Comparator.comparingInt(c -> c.x));
 
         List<Double> doubles = coordsToDoubles(coordsList);
         points.clear();
@@ -138,7 +138,7 @@ public class CoverEditStage extends ChildStage {
         List<Double> doubles = polyline.getPoints();
         List<Coords> coords = doublesToCoords(doubles);
         return coords.stream()
-                .anyMatch(c -> c.getX() == x);
+                .anyMatch(c -> c.x == x);
     }
 
     private List<Coords> doublesToCoords(List<Double> points) {
@@ -158,8 +158,8 @@ public class CoverEditStage extends ChildStage {
         size = coordsList.size() * 2;
         List<Double> doubles = new ArrayList<>(size);
         for (Coords pos : coordsList) {
-            double px = pos.getX();
-            double py = pos.getY();
+            double px = pos.x;
+            double py = pos.y;
             doubles.add(px);
             doubles.add(py);
         }

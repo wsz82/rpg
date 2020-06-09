@@ -106,8 +106,8 @@ public class TeleportAssetStage extends AssetStage {
         inputLayer.setText(""+t.getExitLevel());
         Coords exitPos = t.getExit();
         if (exitPos != null) {
-            int x = exitPos.getX();
-            int y = exitPos.getY();
+            int x = exitPos.x;
+            int y = exitPos.y;
             inputX.setText(""+x);
             inputY.setText(""+y);
         }

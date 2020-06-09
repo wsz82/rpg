@@ -100,13 +100,13 @@ public class ContentTableView extends TableView<Content> {
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getItem().getPos().getX();
+                return param.getValue().getItem().getPos().x;
             }
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         xCol.setOnEditCommit(t -> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            c.getItem().getPos().setX(t.getNewValue());
+            c.getItem().getPos().x = t.getNewValue();
             refresh();
             EditorCanvas.get().refresh();
         });
@@ -116,13 +116,13 @@ public class ContentTableView extends TableView<Content> {
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getItem().getPos().getY();
+                return param.getValue().getItem().getPos().y;
             }
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         yCol.setOnEditCommit(t -> {
             Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            c.getItem().getPos().setY(t.getNewValue());
+            c.getItem().getPos().y = t.getNewValue();
             refresh();
             EditorCanvas.get().refresh();
         });
@@ -160,12 +160,12 @@ public class ContentTableView extends TableView<Content> {
         List<Content> contentsToMove = getSelectionModel().getSelectedItems();
         Coords newPos = Pointer.get().getMark();
         for (Content c : contentsToMove) {
-            c.getItem().getPos().setX(newPos.getX());
+            c.getItem().getPos().x = newPos.x;
             int y = 0;
-            if (newPos.getY() != 0) {
-                y = newPos.getY() - (int) c.getItem().getImage().getHeight();
+            if (newPos.y != 0) {
+                y = newPos.y - (int) c.getItem().getImage().getHeight();
             }
-            c.getItem().getPos().setY(y);
+            c.getItem().getPos().y = y;
         }
         refresh();
         EditorCanvas.get().refresh();

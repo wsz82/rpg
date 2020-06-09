@@ -58,8 +58,8 @@ public class EditorCanvas extends Canvas {
         for (Content c : contents) {
             final PosItem item = c.getItem();
             final Coords pos = item.getPos();
-            final int x = pos.getX();
-            final int y = pos.getY();
+            final int x = pos.x;
+            final int y = pos.y;
 
             if (c.isVisible()) {
                 gc.drawImage(item.getImage(), x, y);
@@ -80,16 +80,16 @@ public class EditorCanvas extends Canvas {
             if (marker == null) {
                 return;
             }
-            int x = mark.getX() - (int) marker.getWidth()/2;
-            int y = mark.getY() - (int) marker.getHeight()/2;
+            int x = mark.x - (int) marker.getWidth()/2;
+            int y = mark.y - (int) marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
     }
 
     private void drawActiveContentRectangle(GraphicsContext gc, Content c) {
         PosItem item = c.getItem();
-        int x = item.getPos().getX();
-        int y = item.getPos().getY();
+        int x = item.getPos().x;
+        int y = item.getPos().y;
         double width = item.getImage().getWidth();
         double height = item.getImage().getHeight();
         gc.setStroke(Color.RED);
@@ -267,10 +267,10 @@ public class EditorCanvas extends Canvas {
 
     private void updatePos(KeyCode keyCode, Coords pos) {
         switch (keyCode) {
-            case UP -> pos.setY(pos.getY() - 1);
-            case LEFT -> pos.setX(pos.getX() - 1);
-            case DOWN -> pos.setY(pos.getY() + 1);
-            case RIGHT -> pos.setX(pos.getX() + 1);
+            case UP -> pos.y = pos.y - 1;
+            case LEFT -> pos.x = pos.x - 1;
+            case DOWN -> pos.y = pos.y + 1;
+            case RIGHT -> pos.x = pos.x + 1;
         }
         refresh();
     }
@@ -278,12 +278,12 @@ public class EditorCanvas extends Canvas {
     private void moveToPointer(Content c) {
         Coords pos = c.getItem().getPos();
         Coords newPos = pointer.getMark();
-        pos.setX(newPos.getX());
+        pos.x = newPos.x;
         int y = 0;
-        if (newPos.getY() != 0) {
-            y = newPos.getY() - (int) c.getItem().getImage().getHeight();
+        if (newPos.y != 0) {
+            y = newPos.y - (int) c.getItem().getImage().getHeight();
         }
-        pos.setY(y);
+        pos.y = y;
         ContentTableView.get().refresh();
         refresh();
     }

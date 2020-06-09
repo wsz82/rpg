@@ -100,11 +100,11 @@ public class CollisionEditStage extends ChildStage {
         for (List<Coords> poss : collisionPolygons) {
             Polygon p = new Polygon();
             Coords first = poss.get(0);
-            int firstX = first.getX();
-            int firstY = first.getY();
+            int firstX = first.x;
+            int firstY = first.y;
             for (Coords pos : poss) {
-                int x = pos.getX();
-                int y = pos.getY();
+                int x = pos.x;
+                int y = pos.y;
                 p.getPoints().add((double) x);
                 p.getPoints().add((double) y);
             }

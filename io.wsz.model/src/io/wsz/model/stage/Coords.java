@@ -16,22 +16,6 @@ public class Coords implements Serializable {
         return x == 0 && y == 0;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
     public boolean isInsidePolygon(List<Coords> polygon, int maxX) {
         int n = polygon.size();
         if (n < 3) {

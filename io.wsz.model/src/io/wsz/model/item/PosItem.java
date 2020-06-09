@@ -31,8 +31,8 @@ public abstract class PosItem extends Asset implements ItemUpdater {
         fromContent.remove(thisContent);
         target.getContents().get().add(thisContent);
 
-        pos.setX(targetX);
-        pos.setY(targetY);
+        pos.x = targetX;
+        pos.y = targetY;
         level = targetLayer.getLevel();
     }
 

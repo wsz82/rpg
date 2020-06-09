@@ -45,8 +45,8 @@ public class GameCanvas extends Canvas {
                 final PosItem item = content.getItem();
                 final ItemType type = content.getItem().getType();
                 final Coords pos = item.getPos();
-                final int x = pos.getX();
-                final int y = pos.getY();
+                final int x = pos.x;
+                final int y = pos.y;
 
                 if (content.isVisible()) {
                     switch (type) {
@@ -68,8 +68,8 @@ public class GameCanvas extends Canvas {
         }
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenterBottomPos();
-        int x = centerBottomPos.getX();
-        int y = centerBottomPos.getY();
+        int x = centerBottomPos.x;
+        int y = centerBottomPos.y;
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
