@@ -469,8 +469,8 @@ public class Board {
                         continue;
                     }
 
-                    boolean pointIsInside = Geometry.isInside(tc, pos, maxObstacleX);
-                    if (pointIsInside) {
+                    boolean isInsidePolygon = pos.isInsidePolygon(tc, maxObstacleX);
+                    if (isInsidePolygon) {
                         return c;
                     }
                 }
