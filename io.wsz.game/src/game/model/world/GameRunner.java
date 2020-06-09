@@ -38,7 +38,7 @@ public class GameRunner {
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
-                synchronized (Controller.get().getCurrentLocation().getContent()) { //TODO make the list Concurrent
+                synchronized (Controller.get().getCurrentLocation().getContent()) {
                     List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
 
                     for (Content c : contents) {

@@ -131,11 +131,16 @@ public class Creature extends PosItem {
         int halfHeight = size.getHeight()/2;
         int centerX = pos.x;
         int centerY = pos.y;
+
         Coords N = new Coords(centerX, centerY - halfHeight);
-        Coords S = new Coords(centerX, centerY + halfHeight);
         Coords W = new Coords(centerX - halfWidth, centerY);
+        Coords S = new Coords(centerX, centerY + halfHeight);
         Coords E = new Coords(centerX + halfWidth, centerY);
-        return new Coords[] {N, S, W, E};
+        Coords NE = new Coords(centerX + (int) (3/5.0*halfWidth), centerY - (int) (2/3.0*halfHeight));
+        Coords NW = new Coords(centerX - (int) (3/5.0*halfWidth), centerY - (int) (2/3.0*halfHeight));
+        Coords SE = new Coords(centerX + (int) (3/5.0*halfWidth), centerY + (int) (2/3.0*halfHeight));
+        Coords SW = new Coords(centerX - (int) (3/5.0*halfWidth), centerY + (int) (2/3.0*halfHeight));
+        return new Coords[] {N, NW, W, SW, S, SE, E, NE};
     }
 
     public void interact() {

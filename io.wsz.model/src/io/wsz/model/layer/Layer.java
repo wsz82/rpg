@@ -62,4 +62,9 @@ public class Layer {
     public int hashCode() {
         return Objects.hash(level, name);
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
