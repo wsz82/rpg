@@ -9,5 +9,6 @@ public class ChildStage extends Stage {
     public ChildStage(Stage parent) {
         super(StageStyle.UTILITY);
         this.parent = parent;
+        initOwner(parent);
     }
 }

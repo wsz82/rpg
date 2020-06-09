@@ -38,7 +38,6 @@ public class GameCanvas extends Canvas {
             List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
             Board.get().sortContents(contents);
             contents = contents.stream()
-                    .filter(c -> c.getItem().getType() != ItemType.OBSTACLE)
                     .filter(c -> c.isVisible())
                     .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                     .collect(Collectors.toList());

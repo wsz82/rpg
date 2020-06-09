@@ -22,6 +22,7 @@ public abstract class AssetStage extends ChildStage {
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
     private final Button coverButton = new Button("Cover");
+    private final Button collisionButton = new Button("Collision");
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
@@ -53,6 +54,7 @@ public abstract class AssetStage extends ChildStage {
         buttons.getChildren().add(cancel);
         if (asset == null) {
             coverButton.setVisible(false);
+            collisionButton.setVisible(false);
             buttons.getChildren().add(create);
             create.setDefaultButton(true);
             create.setOnAction(event -> {
@@ -70,14 +72,13 @@ public abstract class AssetStage extends ChildStage {
         nameInput.setPromptText("Name");
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
-        container.getChildren().addAll(nameInput, imageBox, coverButton);
+        container.getChildren().addAll(nameInput, imageBox, coverButton, collisionButton);
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
         if (isContent) {
             nameInput.setDisable(true);
             imageButton.setDisable(true);
-            coverButton.setDisable(true);
         }
 
         hookupEvents();
@@ -110,8 +111,17 @@ public abstract class AssetStage extends ChildStage {
             imageLabel.setText(path);
         });
         coverButton.setOnAction(e -> openCoverEdit());
+        collisionButton.setOnAction(e -> openCollisionEdit());
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
+    }
+
+    private void openCollisionEdit() {
+        if (asset.getImage() == null) {
+            return;
+        }
+        Stage coverEdit = new CollisionEditStage(this, asset);
+        coverEdit.show();
     }
 
     private void openCoverEdit() {
@@ -183,11 +193,10 @@ public abstract class AssetStage extends ChildStage {
         String name = nameInput.getText();
         String relativePath = Asset.convertToRelativeFilePath(path, type);
         asset = switch (type) {
-            case COVER -> new Cover(name, type, relativePath, null, 0, null);
-            case CREATURE -> new Creature(name, type, relativePath, null, 0, null);
-            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0, null);
-            case OBSTACLE -> new Obstacle(name, type, relativePath, null, 0, null);
-            case TELEPORT -> new Teleport(name, type, relativePath, null, 0, null);
+            case COVER -> new Cover(name, type, relativePath, null, 0, null, null);
+            case CREATURE -> new Creature(name, type, relativePath, null, 0, null, null);
+            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0, null, null);
+            case TELEPORT -> new Teleport(name, type, relativePath, null, 0, null, null);
         };
         Controller.get().getAssetsList().add(asset);
     }

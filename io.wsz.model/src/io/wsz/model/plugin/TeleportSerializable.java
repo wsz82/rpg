@@ -3,17 +3,20 @@ package io.wsz.model.plugin;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 
+import java.util.List;
+
 public class TeleportSerializable extends PosItemSerializable {
     private String locationName;
     private Coords exit;
     private int exitLevel;
 
-    public TeleportSerializable(String name, ItemType type, String path, Coords exit, int exitLevel, Coords[] coverLine,
-                                String locationName, Coords pos1, int level1) {
-        super(name, type, path, exit, exitLevel, coverLine);
+    public TeleportSerializable(String name, ItemType type, String path, Coords pos, int level,
+                                Coords[] coverLine, List<List<Coords>> collisionPolygons,
+                                String locationName, Coords exit, int exitLevel) {
+        super(name, type, path, pos, level, coverLine, collisionPolygons);
         this.locationName = locationName;
-        this.exit = pos1;
-        this.exitLevel = level1;
+        this.exit = exit;
+        this.exitLevel = exitLevel;
     }
 
     public String getLocationName() {

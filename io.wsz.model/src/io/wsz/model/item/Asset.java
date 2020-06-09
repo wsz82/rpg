@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class Asset {
@@ -18,13 +19,16 @@ public class Asset {
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
     protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
-    protected Coords[] coverLine;
+    protected volatile Coords[] coverLine;
+    protected volatile List<List<Coords>> collisionPolygons;
 
-    public Asset(String name, ItemType type, String relativePath, Coords[] coverLine) {
+    public Asset(String name, ItemType type, String relativePath,
+                 Coords[] coverLine, List<List<Coords>> collisionPolygons) {
         this.name.set(name);
         this.type.set(type);
         this.relativePath.set(relativePath);
         this.coverLine = coverLine;
+        this.collisionPolygons = collisionPolygons;
     }
 
     public static File createAssetTypeDir(ItemType type) {
@@ -118,6 +122,14 @@ public class Asset {
 
     public void setCoverLine(Coords[] coverLine) {
         this.coverLine = coverLine;
+    }
+
+    public List<List<Coords>> getCollisionPolygons() {
+        return collisionPolygons;
+    }
+
+    public void setCollisionPolygons(List<List<Coords>> collisionPolygons) {
+        this.collisionPolygons = collisionPolygons;
     }
 
     @Override

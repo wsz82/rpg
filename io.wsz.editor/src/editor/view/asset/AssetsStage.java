@@ -20,7 +20,6 @@ public class AssetsStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        initOwner(parent);
         setTitle(ASSETS);
         setScene(scene);
 

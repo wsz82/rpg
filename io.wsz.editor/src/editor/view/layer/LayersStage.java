@@ -23,7 +23,6 @@ public class LayersStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        initOwner(parent);
         setTitle(LAYERS);
         setScene(scene);
         setUpContextMenu();

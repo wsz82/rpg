@@ -26,7 +26,6 @@ public class LocationParametersStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        initOwner(parent);
         setTitle("Parameters");
         setScene(scene);
         setHeight(200);

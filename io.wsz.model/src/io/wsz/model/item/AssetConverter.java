@@ -36,7 +36,6 @@ public class AssetConverter {
         return switch (asset.getType()) {
             case LANDSCAPE -> new Content(convertToLandscape(name, type, path, pos, level, asset));
             case COVER -> new Content(convertToCover(name, type, path, pos, level, asset));
-            case OBSTACLE -> new Content(convertObstacle(name, type, path, pos, level, asset));
             case CREATURE -> new Content(convertToCreature(name, type, path, pos, level, asset));
             case TELEPORT -> new Content(convertToTeleport(name, type, path, pos, level, asset));
         };
@@ -44,33 +43,27 @@ public class AssetConverter {
 
     private static PosItem convertToTeleport(String name, ItemType type, String path, Coords pos, int level,
                                              Asset asset) {
-        Teleport origin = (Teleport) asset;
-        return new Teleport(name, type, path, pos, level, origin.getCoverLine(),
-                origin.getLocationName(), origin.getExit(), origin.getExitLevel());
+        Teleport o = (Teleport) asset;
+        return new Teleport(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons(),
+                o.getLocationName(), o.getExit(), o.getExitLevel());
     }
 
     public static Creature convertToCreature(String name, ItemType type, String path, Coords pos, int level,
                                              Asset asset) {
-        Creature origin = (Creature) asset;
-        return new Creature(name, type, path, pos, level, origin.getCoverLine(),
-                origin.getDest(), origin.getSize(), origin.getControl(), origin.getSpeed());
+        Creature o = (Creature) asset;
+        return new Creature(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons(),
+                o.getDest(), o.getSize(), o.getControl(), o.getSpeed());
     }
 
     public static Landscape convertToLandscape(String name, ItemType type, String path, Coords pos, int level,
                                                Asset asset) {
-        Landscape origin = (Landscape) asset;
-        return new Landscape(name, type, path, pos, level, origin.getCoverLine());
+        Landscape o = (Landscape) asset;
+        return new Landscape(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons());
     }
 
     public static Cover convertToCover(String name, ItemType type, String path, Coords pos, int level,
                                        Asset asset) {
-        Cover origin = (Cover) asset;
-        return new Cover(name, type, path, pos, level, origin.getCoverLine());
-    }
-
-    public static Obstacle convertObstacle(String name, ItemType type, String path, Coords pos, int level,
-                                           Asset asset) {
-        Obstacle origin = (Obstacle) asset;
-        return new Obstacle(name, type, path, pos, level, origin.getCoverLine());
+        Cover o = (Cover) asset;
+        return new Cover(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons());
     }
 }

@@ -7,5 +7,4 @@ public enum ItemType {
     CREATURE,
     TELEPORT,
     LANDSCAPE,
-    OBSTACLE
 }

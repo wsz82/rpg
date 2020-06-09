@@ -73,43 +73,44 @@ public class SerializableConverter {
     }
 
     private static PosItemSerializable toPosItemSerializable(PosItem item) {
-        String name = item.getName();
-        ItemType type = item.getType();
-        String path = item.getRelativePath();
-        Coords pos = item.getPos();
-        Coords[] coverLine = item.getCoverLine();
-        int level = item.getLevel();
-        return toConcreteItemSerializable(item, name, type, path, pos, level, coverLine);
+        return toConcreteItemSerializable(item);
     }
 
-    private static PosItemSerializable toConcreteItemSerializable(
-            Asset asset, String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
+    private static PosItemSerializable toConcreteItemSerializable(Asset a) {
+        String name = a.getName();
+        ItemType type = a.getType();
+        String path = a.getRelativePath();
+        Coords pos = ((PosItem) a).getPos();
+        int level = ((PosItem) a).getLevel();
         return  switch (type) {
-            case CREATURE -> toCreatureSerializable(name, type, path, pos, level, coverLine, asset);
-            case TELEPORT -> toTeleportSerializable(name, type, path, pos, level, coverLine, asset);
-            default -> toPosItemSerializable(name, type, path, pos, level, coverLine);
+            case CREATURE -> toCreatureSerializable(name, type, path, pos, level, a);
+            case TELEPORT -> toTeleportSerializable(name, type, path, pos, level, a);
+            default -> toPosItemSerializable(name, type, path, pos, level, a);
         };
     }
 
-    private static PosItemSerializable toTeleportSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine, Asset asset) {
-        Teleport t = (Teleport) asset;
+    private static TeleportSerializable toTeleportSerializable(
+            String name, ItemType type, String path, Coords pos, int level, Asset a) {
+        Teleport t = (Teleport) a;
         return new TeleportSerializable(
-                name, type, path, pos, level, coverLine,
+                name, type, path, pos, level,
+                a.getCoverLine(), t.getCollisionPolygons(),
                 t.getLocationName(), t.getExit(), t.getExitLevel());
     }
 
     private static PosItemSerializable toPosItemSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
-        return new PosItemSerializable(name, type, path, pos, level, coverLine);
+            String name, ItemType type, String path, Coords pos, int level, Asset a) {
+        return new PosItemSerializable(name, type, path, pos, level,
+                a.getCoverLine(), a.getCollisionPolygons());
     }
 
     private static CreatureSerializable toCreatureSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine, Asset asset) {
-        Creature cr = (Creature) asset;
+            String name, ItemType type, String path, Coords pos, int level, Asset a) {
+        Creature cr = (Creature) a;
         Coords dest = cr.getDest();
         return new CreatureSerializable(
-                name, type, path, pos, level, coverLine,
+                name, type, path, pos, level,
+                a.getCoverLine(), a.getCollisionPolygons(),
                 dest, cr.getSize(), cr.getControl(), cr.getSpeed());
     }
 
@@ -166,37 +167,36 @@ public class SerializableConverter {
     }
 
     private static PosItem toPosItem(PosItemSerializable is) {
-        ItemType type = is.getType();
-        String name = is.getName();
-        String path = is.getPath();
-        Coords pos = is.getPos();
-        Coords[] coverLine = is.getCoverLine();
-        int level = is.getLevel();
-        return toConcreteItem(is, type, name, path, pos, level, coverLine);
+        return toConcreteItem(is);
     }
 
-    private static PosItem toConcreteItem(AssetSerializable as, ItemType type, String name, String path,
-                                          Coords pos, int level, Coords[] coverLine) {
+    private static PosItem toConcreteItem(AssetSerializable as) {
+        ItemType type = as.getType();
+        String name = as.getName();
+        String path = as.getPath();
+        Coords pos = ((PosItemSerializable) as).getPos();
+        int level = ((PosItemSerializable) as).getLevel();
         return switch (type) {
-            case CREATURE -> toCreature(name, type, path, pos, level, coverLine, as);
-            case COVER -> new Cover(name, type, path, pos, level, coverLine);
-            case LANDSCAPE -> new Landscape(name, type, path, pos, level, coverLine);
-            case OBSTACLE -> new Obstacle(name, type, path, pos, level, coverLine);
-            case TELEPORT -> toTeleport(name, type, path, pos, level, coverLine, as);
+            case CREATURE -> toCreature(name, type, path, pos, level, as);
+            case COVER -> new Cover(name, type, path, pos, level, as.getCoverLine(), as.getCollisionPolygons());
+            case LANDSCAPE -> new Landscape(name, type, path, pos, level, as.getCoverLine(), as.getCollisionPolygons());
+            case TELEPORT -> toTeleport(name, type, path, pos, level, as);
         };
     }
 
     private static Teleport toTeleport(String name, ItemType type, String path, Coords pos, int level,
-                                       Coords[] coverLine, AssetSerializable as) {
+                                       AssetSerializable as) {
         TeleportSerializable ts = (TeleportSerializable) as;
-        return new Teleport(name, type, path, pos, level, coverLine,
+        return new Teleport(name, type, path, pos, level,
+                as.getCoverLine(), as.getCollisionPolygons(),
                 ts.getLocationName(), ts.getExit(), ts.getExitLevel());
     }
 
     private static Creature toCreature(String name, ItemType type, String path, Coords pos, int level,
-                                       Coords[] coverLine, AssetSerializable as) {
+                                       AssetSerializable as) {
         CreatureSerializable cs = (CreatureSerializable) as;
-        return new Creature(name, type, path, pos, level, coverLine,
+        return new Creature(name, type, path, pos, level,
+                as.getCoverLine(), as.getCollisionPolygons(),
                 cs.getDest(), cs.getSize(), cs.getControl(), cs.getSpeed());
     }
 
@@ -209,28 +209,16 @@ public class SerializableConverter {
         return output;
     }
 
-    private static AssetSerializable toAssetSerializable(Asset asset) {
-        String name = asset.getName();
-        ItemType type = asset.getType();
-        String path = asset.getRelativePath();
-        Coords[] coverLine = asset.getCoverLine();
-        return toConcreteItemSerializable(asset, name, type, path, null, 0, coverLine);
+    private static AssetSerializable toAssetSerializable(Asset a) {
+        return toConcreteItemSerializable(a);
     }
 
     private static List<Asset> toAssets(List<AssetSerializable> input) {
         List<Asset> output = FXCollections.observableArrayList();
         for (AssetSerializable as : input) {
-            Asset asset = toAsset(as);
-            output.add(asset);
+            Asset a = toConcreteItem(as);
+            output.add(a);
         }
         return output;
-    }
-
-    private static Asset toAsset(AssetSerializable as) {
-        ItemType type = as.getType();
-        String name = as.getName();
-        String path = as.getPath();
-        Coords[] coverLine = as.getCoverLine();
-        return toConcreteItem(as, type, name, path, null, 0, coverLine);
     }
 }

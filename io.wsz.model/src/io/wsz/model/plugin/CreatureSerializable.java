@@ -5,15 +5,18 @@ import io.wsz.model.item.CreatureSize;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 
+import java.util.List;
+
 public class CreatureSerializable extends PosItemSerializable {
     protected Coords dest;
     protected CreatureSize size;
     protected CreatureControl control;
     protected int speed;
 
-    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine,
+    public CreatureSerializable(String name, ItemType type, String path, Coords pos, int level,
+                                Coords[] coverLine, List<List<Coords>> collisionPolygons,
                                 Coords dest, CreatureSize size, CreatureControl control, int speed) {
-        super(name, type, path, pos, level, coverLine);
+        super(name, type, path, pos, level, coverLine, collisionPolygons);
         this.dest = dest;
         this.size = size;
         this.control = control;

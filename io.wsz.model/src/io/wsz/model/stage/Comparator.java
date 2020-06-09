@@ -64,25 +64,13 @@ public class Comparator {
 
                 else if ((t1.equals(CREATURE))) {
 
-                    boolean isCovered = Board.get().isCovered(i1, i2);
-
-                    if (isCovered) {
-                        return LESS;
-                    } else {
-                        return GREAT;
-                    }
+                    return Board.get().isCovered(i1, i2);
 
                 }
 
                 else if (t1.equals(COVER)) {
 
-                    boolean isCovered = Board.get().isCovered(i1, i2);
-
-                    if (isCovered) {
-                        return LESS;
-                    } else {
-                        return GREAT;
-                    }
+                    return Board.get().isCovered(i1, i2);
 
                 }
 
@@ -90,24 +78,20 @@ public class Comparator {
 
             else if ((t1.equals(CREATURE) && t2.equals(COVER))) {
 
-                boolean isCovered = Board.get().isCovered(i1, i2);
-
-                if (isCovered) {
-                    return LESS;
-                } else {
-                    return GREAT;
-                }
+                return Board.get().isCovered(i1, i2);
 
             }
 
             else if ((t1.equals(COVER) && t2.equals(CREATURE))) {
 
-                boolean isCovered = Board.get().isCovered(i2, i1);
+                Comparison isCovered = Board.get().isCovered(i2, i1);
 
-                if (isCovered) {
+                if (isCovered.equals(LESS)) {
                     return GREAT;
-                } else {
+                } else if (isCovered.equals(GREAT)) {
                     return LESS;
+                } else {
+                    return INCOMPARABLE;
                 }
 
             }

@@ -64,10 +64,10 @@ public class CoverEditStage extends ChildStage {
         final Scene scene = new Scene(r);
         setScene(scene);
         hookupEvents();
-        drawLine();
+        restoreLine();
     }
 
-    private void drawLine() {
+    private void restoreLine() {
         PosItem item = (PosItem) asset;
         Coords[] coverLine = item.getCoverLine();
         if (coverLine == null) {

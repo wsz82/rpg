@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
-import static io.wsz.model.item.ItemType.OBSTACLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem {
@@ -21,13 +20,15 @@ public class Creature extends PosItem {
     private volatile CreatureControl control;
     private volatile int speed;
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
-        super(name, type, path, pos, level, coverLine);
+    public Creature(String name, ItemType type, String path, Coords pos, int level,
+                    Coords[] coverLine, List<List<Coords>> collisionPolygons) {
+        super(name, type, path, pos, level, coverLine, collisionPolygons);
     }
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine,
+    public Creature(String name, ItemType type, String path, Coords pos, int level,
+                    Coords[] coverLine, List<List<Coords>> collisionPolygons,
                     Coords dest, CreatureSize size, CreatureControl control, int speed) {
-        super(name, type, path, pos, level, coverLine);
+        super(name, type, path, pos, level, coverLine, collisionPolygons);
         this.dest = dest;
         this.size = size;
         this.control = control;
@@ -56,8 +57,7 @@ public class Creature extends PosItem {
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         Coords nextPos = new Coords(x3, y3);
         Coords[] poss = getCorners(getCenterBottomPos(nextPos));
-        ItemType[] types = new ItemType[] {OBSTACLE};
-        Content c = Board.get().lookForContent(poss, types, false);
+        Content c = Board.get().lookForObstacle(poss);
         if (c != null) {
             dest = null;
             return;
@@ -89,11 +89,6 @@ public class Creature extends PosItem {
 
     private Creature getCornersCreature(Creature cr) {
         return Controller.get().getBoard().getCornersCreature(getCorners(), cr);
-    }
-
-    private void escapeObstacle(Content c) {
-        Coords free = Controller.get().getBoard().getFreePos(getCorners(), c);
-        setDest(calcDest(free));
     }
 
     private Content getCornersContent(ItemType[] types) {
@@ -170,12 +165,8 @@ public class Creature extends PosItem {
         ItemType type = item.getType();
         switch (type) {
             case CREATURE -> interactWithCreature((Creature) item);
-            case OBSTACLE -> doNothing();
             default -> setDest(calcDest(pos));
         }
-    }
-
-    private void doNothing() {
     }
 
     private void enterTeleport(Teleport t) {

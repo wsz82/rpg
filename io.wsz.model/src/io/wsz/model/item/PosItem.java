@@ -12,8 +12,9 @@ public abstract class PosItem extends Asset implements ItemUpdater {
     protected Coords pos;
     protected int level;
 
-    public PosItem(String name, ItemType type, String path, Coords pos, int level, Coords[] coverLine) {
-        super(name, type, path, coverLine);
+    public PosItem(String name, ItemType type, String path, Coords pos, int level,
+                   Coords[] coverLine, List<List<Coords>> collisionPolygons) {
+        super(name, type, path, coverLine, collisionPolygons);
         this.pos = pos;
         this.level = level;
     }

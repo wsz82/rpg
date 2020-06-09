@@ -3,8 +3,8 @@ package io.wsz.model.stage;
 import java.io.Serializable;
 
 public class Coords implements Serializable {
-    private volatile int x;
-    private volatile int y;
+    public volatile int x;
+    public volatile int y;
 
     public Coords(int x, int y) {
         this.x = x;

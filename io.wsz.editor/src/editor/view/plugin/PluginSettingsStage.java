@@ -37,7 +37,6 @@ public class PluginSettingsStage extends ChildStage {
 
     private void initWindow() {
         Scene scene = new Scene(root);
-        initOwner(parent);
         setTitle(TITLE);
         setScene(scene);
 
