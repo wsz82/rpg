@@ -22,7 +22,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.File;
 
@@ -65,15 +64,36 @@ class MainView {
         stage.setScene(scene);
 
         restoreSettings(Main.getDir());
-        stage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
-            storeSettings(Main.getDir());
-        });
 
         stage.show();
         layersWindow.show();
         assetsWindow.show();
         contentsWindow.show();
         locationsWindow.show();
+
+        hookUpEvents();
+    }
+
+    private void hookUpEvents() {
+        stage.setOnCloseRequest(event -> {
+            onCloseRequest();
+        });
+    }
+
+    private void onCloseRequest() {
+        askForSave();
+        storeSettings(Main.getDir());
+    }
+
+    private void askForSave() {
+        final Alert alert = new Alert(
+                Alert.AlertType.CONFIRMATION, "Would you like to save?", ButtonType.NO, ButtonType.YES);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.YES)
+                .ifPresent(r -> {
+                    saveFile();
+                    alert.close();
+                });
     }
 
     private void setUpScrollPane() {
@@ -154,7 +174,10 @@ class MainView {
         saveAs.setOnAction(event -> saveAsFile());
         plugins.setOnAction(event -> openPluginsTable());
         plugin.setOnAction(e -> openPluginSettings());
-        exit.setOnAction(e -> stage.close());
+        exit.setOnAction(e -> {
+            onCloseRequest();
+            stage.close();
+        });
         file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
 
         Menu view = new Menu("View");
