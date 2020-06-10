@@ -126,7 +126,7 @@ public class Board {
         final int i2_imgWidth = (int) i2_img.getWidth();
         final int i2_imgHeight = (int) i2_img.getHeight();
         final LinkedList<Coords> i2_list = new LinkedList<>();
-        if (i2_cl != null) {
+        if (!i2_cl.isEmpty()) {
             looseCoordsReference(i2_cl, i2_list);
             translateCoords(i2_list, i2_posX, i2_posY);
             addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
@@ -153,8 +153,7 @@ public class Board {
                 continue;
             }
 
-            for (int j = 0; j < i1_list.size(); j++) {
-                Coords compared = i1_list.get(j);
+            for (Coords compared : i1_list) {
                 int x = compared.x;
                 if (x == x1) {
                     continue;
@@ -164,7 +163,7 @@ public class Board {
                     continue;
                 }
                 int y = compared.y;
-                double func = (x*y1 - x*y2 + x1*y2 - x2*y1) / (double) (x1 - x2);
+                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (double) (x1 - x2);
                 if (y > func) {
                     return GREAT;
                 } else {
@@ -234,13 +233,6 @@ public class Board {
             }
         }
         return null;
-    }
-
-    private void looseCoordsReference(Coords[] from, List<Coords> to) {
-        for (Coords pos : from) {
-            Coords newPos = new Coords(pos.x, pos.y);
-            to.add(newPos);
-        }
     }
 
     private void looseCoordsReference(List<Coords> from, List<Coords> to) {

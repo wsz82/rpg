@@ -1,8 +1,12 @@
 package io.wsz.model.location;
 
+import io.wsz.model.content.Content;
 import io.wsz.model.content.ContentList;
 import io.wsz.model.layer.LayersList;
 import javafx.beans.property.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Location {
     private final StringProperty name = new SimpleStringProperty(this, "name");
@@ -10,6 +14,8 @@ public class Location {
     private final IntegerProperty height = new SimpleIntegerProperty(this, "height");
     private final ObjectProperty<LayersList> layers = new SimpleObjectProperty<>(this, "layers");
     private final ObjectProperty<ContentList> contents = new SimpleObjectProperty<>(this, "contents");
+    private final List<Content> contentToRemove = new ArrayList<>(0);
+    private final List<Content> contentToAdd = new ArrayList<>(0);
 
     public Location(){}
 
@@ -85,5 +91,13 @@ public class Location {
 
     public void setContents(ContentList contents) {
         this.contents.set(contents);
+    }
+
+    public List<Content> getContentToRemove() {
+        return contentToRemove;
+    }
+
+    public List<Content> getContentToAdd() {
+        return contentToAdd;
     }
 }

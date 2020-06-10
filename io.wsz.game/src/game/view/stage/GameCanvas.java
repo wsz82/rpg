@@ -10,7 +10,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,28 +33,26 @@ public class GameCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        synchronized (Controller.get().getCurrentLocation().getContent()) {
-            List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-            Board.get().sortContents(contents);
-            contents = contents.stream()
-                    .filter(c -> c.isVisible())
-                    .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
-                    .collect(Collectors.toList());
-            for (Content content : contents) {
-                final PosItem item = content.getItem();
-                final ItemType type = content.getItem().getType();
-                final Coords pos = item.getPos();
-                final int x = pos.x;
-                final int y = pos.y;
+        List<Content> contents = Controller.get().getCurrentLocation().getContent();
+        Board.get().sortContents(contents);
+        contents = contents.stream()
+                .filter(Content::isVisible)
+                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
+                .collect(Collectors.toList());
+        for (Content content : contents) {
+            final PosItem item = content.getItem();
+            final ItemType type = content.getItem().getType();
+            final Coords pos = item.getPos();
+            final int x = pos.x;
+            final int y = pos.y;
 
-                if (content.isVisible()) {
-                    switch (type) {
-                        case CREATURE -> {
-                            drawCreatureSize((Creature) item, gc);
-                        }
+            if (content.isVisible()) {
+                switch (type) {
+                    case CREATURE -> {
+                        drawCreatureSize((Creature) item, gc);
                     }
-                    gc.drawImage(item.getImage(), x, y);
                 }
+                gc.drawImage(item.getImage(), x, y);
             }
         }
     }

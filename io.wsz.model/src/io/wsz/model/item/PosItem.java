@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public abstract class PosItem extends Asset implements ItemUpdater {
     protected volatile boolean generic;
-    protected Coords pos;
-    protected int level;
+    protected volatile Coords pos;
+    protected volatile int level;
     protected volatile List<Coords> coverLine;
     protected volatile List<List<Coords>> collisionPolygons;
 
@@ -35,8 +35,8 @@ public abstract class PosItem extends Asset implements ItemUpdater {
             return;
         }
         Content thisContent = singleContent.get(0);
-        fromContent.remove(thisContent);
-        target.getContents().get().add(thisContent);
+        from.getContentToRemove().add(thisContent);
+        target.getContentToAdd().add(thisContent);
 
         pos.x = targetX;
         pos.y = targetY;

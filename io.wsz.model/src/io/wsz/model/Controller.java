@@ -19,6 +19,7 @@ public class Controller {
     private static Controller singleton;
     private static File programDir;
     private static ScrollPane scrollPane;
+    private volatile Location locationToUpdate;
 
     public static Controller get() {
         if (singleton == null) {
@@ -123,5 +124,14 @@ public class Controller {
     public Plugin loadPluginMetadata(String name) {
         PluginCaretaker pc = new PluginCaretaker();
         return pc.getPluginMetadata(name);
+    }
+
+
+    public Location getUpdatedLocation() {
+        return locationToUpdate;
+    }
+
+    public void setUpdatedLocation(Location locationToUpdate) {
+        this.locationToUpdate = locationToUpdate;
     }
 }

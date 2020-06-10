@@ -202,7 +202,7 @@ public class Creature extends PosItem {
             Location from = Controller.get().getCurrentLocation().getLocation();
             changeLocation(from, target, targetLayer, targetX, targetY);
             if (control.equals(CONTROL)) {
-                Controller.get().getCurrentLocation().setLocation(target);
+                Controller.get().setUpdatedLocation(target);
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
                 centerScreenOn(targetX, targetY);
             }
