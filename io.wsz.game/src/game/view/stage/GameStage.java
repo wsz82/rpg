@@ -88,7 +88,7 @@ public class GameStage extends Stage {
         Button openSettings = new Button("Settings");
         openSettings.setOnAction(event -> openSettings(mainMenuReturn));
         Button exit = new Button("Exit");
-        exit.setOnAction(event -> leaveGame());
+        exit.setOnAction(event -> close());
 
         menu.setAlignment(Pos.CENTER);
         menu.getChildren().addAll(newGame, loadGame, openSettings, exit);
@@ -108,11 +108,6 @@ public class GameStage extends Stage {
         gameRoot = new Group();
         gameScrollPane = GameScrollPane.get();
         gameRoot.getChildren().addAll(gameScrollPane);
-    }
-
-    private void leaveGame() {
-        //TODO ask for save
-        close();
     }
 
     private void showGameMenu() {

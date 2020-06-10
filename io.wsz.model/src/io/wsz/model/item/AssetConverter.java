@@ -13,14 +13,15 @@ public class AssetConverter {
         if (a == null) {
             throw new NoSuchElementException("Asset is null");
         }
+        PosItem pi = (PosItem) a;
         Coords clonePos = new Coords(pos.x, pos.y);
         List<Coords> coverLine = new ArrayList<>();
-        if (a.getCoverLine() != null) {
-            coverLine.addAll(a.getCoverLine());
+        if (pi.getCoverLine() != null) {
+            coverLine.addAll(pi.getCoverLine());
         }
         List<List<Coords>> collisionPolygons = new ArrayList<>();
-        if (a.getCollisionPolygons() != null) {
-            collisionPolygons.addAll(a.getCollisionPolygons());
+        if (pi.getCollisionPolygons() != null) {
+            collisionPolygons.addAll(pi.getCollisionPolygons());
         }
 
         String name = a.getName();

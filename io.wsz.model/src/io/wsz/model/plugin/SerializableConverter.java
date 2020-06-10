@@ -96,15 +96,16 @@ public class SerializableConverter {
         Teleport t = (Teleport) a;
         return new TeleportSerializable(
                 name, type, path, pos, level, generic,
-                a.getCoverLine(), t.getCollisionPolygons(),
+                t.getCoverLine(), t.getCollisionPolygons(),
                 t.getLocationName(), t.getExit(), t.getExitLevel());
     }
 
     private static PosItemSerializable toPosItemSerializable(
             String name, ItemType type, String path, Coords pos, int level, boolean generic, Asset a) {
+        PosItem pi = (PosItem) a;
         return new PosItemSerializable(
                 name, type, path, pos, level, generic,
-                a.getCoverLine(), a.getCollisionPolygons());
+                pi.getCoverLine(), pi.getCollisionPolygons());
     }
 
     private static CreatureSerializable toCreatureSerializable(
@@ -114,7 +115,7 @@ public class SerializableConverter {
         Coords dest = cr.getDest();
         return new CreatureSerializable(
                 name, type, path, pos, level, generic,
-                a.getCoverLine(), a.getCollisionPolygons(),
+                cr.getCoverLine(), cr.getCollisionPolygons(),
                 dest, cr.getSize(), cr.getControl(), cr.getSpeed());
     }
 
