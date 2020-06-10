@@ -61,6 +61,19 @@ public class TeleportAssetStage extends AssetStage {
         fillInputs();
     }
 
+    @Override
+    protected void bindProperties() {
+        super.bindProperties();
+        inputX.disableProperty()
+                .bind(genericCheck.selectedProperty());
+        inputY.disableProperty()
+                .bind(genericCheck.selectedProperty());
+        inputLayer.disableProperty()
+                .bind(genericCheck.selectedProperty());
+        locationChoice.disableProperty()
+                .bind(genericCheck.selectedProperty());
+    }
+
     private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {
         locationChoice.setConverter(new StringConverter<>() {
             @Override
@@ -114,28 +127,27 @@ public class TeleportAssetStage extends AssetStage {
     }
 
     @Override
-    protected void onEdit() {
-        super.onEdit();
-        defineAsset();
-    }
-
-    @Override
-    protected void onCreate() {
-        super.onCreate();
-        defineAsset();
-    }
-
-    private void defineAsset() {
+    protected void defineAsset() {
         Teleport t = (Teleport) asset;
-        if (locationChoice.getValue() != null) {
-            String locationName = locationChoice.getValue().getName();
-            t.setLocationName(locationName);
+        if (t.isGeneric()) {
+            List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
+                    .filter(a -> a.getName().equals(asset.getName()))
+                    .collect(Collectors.toList());
+            Teleport prototype = (Teleport) correspondingAsset.get(0);
+            t.setLocationName(prototype.getLocationName());
+            t.setExit(prototype.getExit());
+            t.setExitLevel(prototype.getExitLevel());
+        } else {
+            if (locationChoice.getValue() != null) {
+                String locationName = locationChoice.getValue().getName();
+                t.setLocationName(locationName);
+            }
+            int layer = Integer.parseInt(inputLayer.getText());
+            t.setExitLevel(layer);
+            int x = Integer.parseInt(inputX.getText());
+            int y = Integer.parseInt(inputY.getText());
+            Coords exitPos = new Coords(x, y);
+            t.setExit(exitPos);
         }
-        int layer = Integer.parseInt(inputLayer.getText());
-        t.setExitLevel(layer);
-        int x = Integer.parseInt(inputX.getText());
-        int y = Integer.parseInt(inputY.getText());
-        Coords exitPos = new Coords(x, y);
-        t.setExit(exitPos);
     }
 }

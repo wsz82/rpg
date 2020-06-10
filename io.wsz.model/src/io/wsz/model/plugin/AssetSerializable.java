@@ -10,11 +10,11 @@ public class AssetSerializable implements Serializable {
     private String name;
     private ItemType type;
     private String path;
-    private Coords[] coverLine;
+    private List<Coords> coverLine;
     private List<List<Coords>> collisionPolygons;
 
     public AssetSerializable(String name, ItemType type, String path,
-                             Coords[] coverLine, List<List<Coords>> collisionPolygons) {
+                             List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         this.name = name;
         this.type = type;
         this.path = path;
@@ -46,11 +46,11 @@ public class AssetSerializable implements Serializable {
         this.path = path;
     }
 
-    public Coords[] getCoverLine() {
+    public List<Coords> getCoverLine() {
         return coverLine;
     }
 
-    public void setCoverLine(Coords[] coverLine) {
+    public void setCoverLine(List<Coords> coverLine) {
         this.coverLine = coverLine;
     }
 

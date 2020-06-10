@@ -100,7 +100,7 @@ public class Board {
     }
 
     public Comparison isCovered(PosItem i1, PosItem i2) {
-        final Coords[] i1_cl = i1.getCoverLine();
+        final List<Coords> i1_cl = i1.getCoverLine();
         final Coords i1_pos = i1.getPos();
         final Image i1_img = i1.getImage();
         final int i1_posX = i1_pos.x;
@@ -108,8 +108,8 @@ public class Board {
         final int i1_imgWidth = (int) i1_img.getWidth();
         final int i1_imgHeight = (int) i1_img.getHeight();
         final LinkedList<Coords> i1_list = new LinkedList<>();
-        if (i1_cl != null) {
-            addCoordsToList(i1_cl, i1_list);
+        if (!i1_cl.isEmpty()) {
+            looseCoordsReference(i1_cl, i1_list);
             translateCoords(i1_list, i1_posX, i1_posY);
         } else {
             Coords SW = new Coords(i1_posX, i1_posY+i1_imgHeight);
@@ -118,7 +118,7 @@ public class Board {
             i1_list.add(SE);
         }
 
-        final Coords[] i2_cl = i2.getCoverLine();
+        final List<Coords> i2_cl = i2.getCoverLine();
         final Coords i2_pos = i2.getPos();
         final Image i2_img = i2.getImage();
         final int i2_posX = i2_pos.x;
@@ -127,7 +127,7 @@ public class Board {
         final int i2_imgHeight = (int) i2_img.getHeight();
         final LinkedList<Coords> i2_list = new LinkedList<>();
         if (i2_cl != null) {
-            addCoordsToList(i2_cl, i2_list);
+            looseCoordsReference(i2_cl, i2_list);
             translateCoords(i2_list, i2_posX, i2_posY);
             addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
         } else {
@@ -236,14 +236,14 @@ public class Board {
         return null;
     }
 
-    private void addCoordsToList(Coords[] from, List<Coords> to) {
+    private void looseCoordsReference(Coords[] from, List<Coords> to) {
         for (Coords pos : from) {
             Coords newPos = new Coords(pos.x, pos.y);
             to.add(newPos);
         }
     }
 
-    private void addCoordsToList(List<Coords> from, List<Coords> to) {
+    private void looseCoordsReference(List<Coords> from, List<Coords> to) {
         for (Coords pos : from) {
             Coords newPos = new Coords(pos.x, pos.y);
             to.add(newPos);
@@ -438,7 +438,7 @@ public class Board {
                 final List<List<Coords>> cp = it.getCollisionPolygons();
                 for (final List<Coords> polygon : cp) {
                     List<Coords> tc = new ArrayList<>();
-                    addCoordsToList(polygon, tc);
+                    looseCoordsReference(polygon, tc);
                     translateCoords(tc, cX, cY);
 
 

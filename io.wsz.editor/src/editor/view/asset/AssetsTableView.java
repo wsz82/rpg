@@ -96,26 +96,40 @@ class AssetsTableView extends AssetsGenericTableView {
             return;
         }
         AssetStage assetStage = switch (itemType) {
-            case CREATURE -> new CreatureAssetStage(parent, assetToEdit, false);
-            case TELEPORT -> new TeleportAssetStage(parent, assetToEdit, false);
-            default -> new AssetStageImpl(parent, assetToEdit);
+            case CREATURE ->
+                    new CreatureAssetStage(parent, assetToEdit, false);
+            case TELEPORT ->
+                    new TeleportAssetStage(parent, assetToEdit, false);
+            default ->
+                    new AssetStageImpl(parent, assetToEdit, false);
         };
         assetStage.show();
     }
 
     private void addItemsToStageAndContents(Coords pos) {
         List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
-        List<Content> contents = AssetConverter.convertToContent(selectedAssets, pos);
-        Controller.get().getCurrentLocation().getContent().addAll(contents);
+        int level = Controller.get().getCurrentLayer().getLevel();
+        for (Asset a
+                : selectedAssets) {
+            if (!pos.is0()) {
+                double height = a.getImage().getHeight();
+                pos.y = pos.y - (int) height;
+            }
+            Content c = AssetConverter.convertToContent(a, pos, level);
+            Controller.get().getCurrentLocation().getContent().add(c);
+        }
     }
 
     private void addAsset() {
-        AssetStage assetStage = switch (itemType) {
-            case CREATURE -> new CreatureAssetStage(parent, itemType);
-            case TELEPORT -> new TeleportAssetStage(parent, itemType);
-            default -> new AssetStageImpl(parent, itemType);
+        AssetStage as = switch (itemType) {
+            case CREATURE ->
+                    new CreatureAssetStage(parent, itemType);
+            case TELEPORT ->
+                    new TeleportAssetStage(parent, itemType);
+            default ->
+                    new AssetStageImpl(parent, itemType);
         };
-        assetStage.show();
+        as.show();
     }
 
     private void removeAssets() {
@@ -128,12 +142,14 @@ class AssetsTableView extends AssetsGenericTableView {
         List<String> assetsNames = assetsToRemove.stream()
                 .map(a -> a.getName())
                 .collect(Collectors.toList());
-        List<Content> contentToRemove = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> {
-                    String name = c.getItem().getName();
-                    return assetsNames.contains(name);
-                })
-                .collect(Collectors.toList());
-        Controller.get().getCurrentLocation().getContent().removeAll(contentToRemove);
+       Controller.get().getLocationsList().forEach(l -> {
+           List<Content> contentToRemove = l.getContents().get().stream()
+                    .filter(c -> {
+                        String name = c.getItem().getName();
+                        return assetsNames.contains(name);
+                    })
+                    .collect(Collectors.toList());
+           l.getContents().get().removeAll(contentToRemove);
+        });
     }
 }

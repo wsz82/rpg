@@ -1,7 +1,6 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
-import io.wsz.model.Controller;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -69,14 +68,14 @@ public class CoverEditStage extends ChildStage {
 
     private void restoreLine() {
         PosItem item = (PosItem) asset;
-        Coords[] coverLine = item.getCoverLine();
+        List<Coords> coverLine = item.getCoverLine();
         if (coverLine == null) {
             return;
         }
-        if (coverLine.length < 2) {
+        if (coverLine.size() < 2) {
             return;
         }
-        int size = coverLine.length * 2;
+        int size = coverLine.size() * 2;
         List<Double> points = new ArrayList<>(size);
         for (Coords pos : coverLine) {
             double x = pos.x;
@@ -169,19 +168,10 @@ public class CoverEditStage extends ChildStage {
     private void saveLine() {
         List<Double> points = polyline.getPoints();
         if (!points.isEmpty()) {
-            List<Coords> coordsList = doublesToCoords(points);
-            Coords[] coverLine = new Coords[coordsList.size()];
-            coordsList.toArray(coverLine);
+            List<Coords> coverLine = doublesToCoords(points);
             PosItem i = (PosItem) asset;
             i.setCoverLine(coverLine);
-            updateCoverLineForContents(asset.getName(), coverLine);
         }
         close();
-    }
-
-    private void updateCoverLineForContents(String name, Coords[] coverLine) {
-        Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getName().equals(name))
-                .forEach(c -> c.getItem().setCoverLine(coverLine));
     }
 }

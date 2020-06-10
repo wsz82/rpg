@@ -82,34 +82,38 @@ public class SerializableConverter {
         String path = a.getRelativePath();
         Coords pos = ((PosItem) a).getPos();
         int level = ((PosItem) a).getLevel();
+        boolean generic = ((PosItem) a).isGeneric();
         return  switch (type) {
-            case CREATURE -> toCreatureSerializable(name, type, path, pos, level, a);
-            case TELEPORT -> toTeleportSerializable(name, type, path, pos, level, a);
-            default -> toPosItemSerializable(name, type, path, pos, level, a);
+            case CREATURE -> toCreatureSerializable(name, type, path, pos, level, generic, a);
+            case TELEPORT -> toTeleportSerializable(name, type, path, pos, level, generic, a);
+            default -> toPosItemSerializable(name, type, path, pos, level, generic, a);
         };
     }
 
     private static TeleportSerializable toTeleportSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Asset a) {
+            String name, ItemType type, String path, Coords pos, int level, boolean generic,
+            Asset a) {
         Teleport t = (Teleport) a;
         return new TeleportSerializable(
-                name, type, path, pos, level,
+                name, type, path, pos, level, generic,
                 a.getCoverLine(), t.getCollisionPolygons(),
                 t.getLocationName(), t.getExit(), t.getExitLevel());
     }
 
     private static PosItemSerializable toPosItemSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Asset a) {
-        return new PosItemSerializable(name, type, path, pos, level,
+            String name, ItemType type, String path, Coords pos, int level, boolean generic, Asset a) {
+        return new PosItemSerializable(
+                name, type, path, pos, level, generic,
                 a.getCoverLine(), a.getCollisionPolygons());
     }
 
     private static CreatureSerializable toCreatureSerializable(
-            String name, ItemType type, String path, Coords pos, int level, Asset a) {
+            String name, ItemType type, String path, Coords pos, int level, boolean generic,
+            Asset a) {
         Creature cr = (Creature) a;
         Coords dest = cr.getDest();
         return new CreatureSerializable(
-                name, type, path, pos, level,
+                name, type, path, pos, level, generic,
                 a.getCoverLine(), a.getCollisionPolygons(),
                 dest, cr.getSize(), cr.getControl(), cr.getSpeed());
     }
@@ -159,7 +163,8 @@ public class SerializableConverter {
             PosItemSerializable is = cs.getItem();
             PosItem item = toPosItem(is);
 
-            Content content = AssetConverter.convertToContent(item, item.getPos(), item.getLevel());
+            Content content = AssetConverter.convertToContent(
+                    item, item.getPos(), item.getLevel());
             content.setVisible(cs.isVisible());
             output.add(content);
         }
@@ -176,26 +181,31 @@ public class SerializableConverter {
         String path = as.getPath();
         Coords pos = ((PosItemSerializable) as).getPos();
         int level = ((PosItemSerializable) as).getLevel();
+        boolean generic = ((PosItemSerializable) as).isGeneric();
         return switch (type) {
-            case CREATURE -> toCreature(name, type, path, pos, level, as);
-            case COVER -> new Cover(name, type, path, pos, level, as.getCoverLine(), as.getCollisionPolygons());
-            case LANDSCAPE -> new Landscape(name, type, path, pos, level, as.getCoverLine(), as.getCollisionPolygons());
-            case TELEPORT -> toTeleport(name, type, path, pos, level, as);
+            case CREATURE -> toCreature(name, type, path, pos, level, generic, as);
+            case COVER -> new Cover(
+                    name, type, path, pos, level, generic,
+                    as.getCoverLine(), as.getCollisionPolygons());
+            case LANDSCAPE -> new Landscape(
+                    name, type, path, pos, level, generic,
+                    as.getCoverLine(), as.getCollisionPolygons());
+            case TELEPORT -> toTeleport(name, type, path, pos, level, generic, as);
         };
     }
 
-    private static Teleport toTeleport(String name, ItemType type, String path, Coords pos, int level,
+    private static Teleport toTeleport(String name, ItemType type, String path, Coords pos, int level, boolean generic,
                                        AssetSerializable as) {
         TeleportSerializable ts = (TeleportSerializable) as;
-        return new Teleport(name, type, path, pos, level,
+        return new Teleport(name, type, path, pos, level, generic,
                 as.getCoverLine(), as.getCollisionPolygons(),
                 ts.getLocationName(), ts.getExit(), ts.getExitLevel());
     }
 
-    private static Creature toCreature(String name, ItemType type, String path, Coords pos, int level,
+    private static Creature toCreature(String name, ItemType type, String path, Coords pos, int level, boolean generic,
                                        AssetSerializable as) {
         CreatureSerializable cs = (CreatureSerializable) as;
-        return new Creature(name, type, path, pos, level,
+        return new Creature(name, type, path, pos, level, generic,
                 as.getCoverLine(), as.getCollisionPolygons(),
                 cs.getDest(), cs.getSize(), cs.getControl(), cs.getSpeed());
     }

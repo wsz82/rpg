@@ -11,12 +11,14 @@ import java.util.stream.Collectors;
 public abstract class PosItem extends Asset implements ItemUpdater {
     protected Coords pos;
     protected int level;
+    protected volatile boolean generic;
 
-    public PosItem(String name, ItemType type, String path, Coords pos, int level,
-                   Coords[] coverLine, List<List<Coords>> collisionPolygons) {
+    public PosItem(String name, ItemType type, String path, Coords pos, int level, boolean generic,
+                   List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(name, type, path, coverLine, collisionPolygons);
         this.pos = pos;
         this.level = level;
+        this.generic = generic;
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
@@ -50,5 +52,13 @@ public abstract class PosItem extends Asset implements ItemUpdater {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public boolean isGeneric() {
+        return generic;
+    }
+
+    public void setGeneric(boolean generic) {
+        this.generic = generic;
     }
 }

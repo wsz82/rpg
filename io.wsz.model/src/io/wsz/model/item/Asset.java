@@ -13,17 +13,17 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class Asset {
+public abstract class Asset {
     private static final String ASSETS_DIR = File.separator + "assets";
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
     protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
-    protected volatile Coords[] coverLine;
+    protected volatile List<Coords> coverLine;
     protected volatile List<List<Coords>> collisionPolygons;
 
     public Asset(String name, ItemType type, String relativePath,
-                 Coords[] coverLine, List<List<Coords>> collisionPolygons) {
+                 List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         this.name.set(name);
         this.type.set(type);
         this.relativePath.set(relativePath);
@@ -82,11 +82,22 @@ public class Asset {
 
     public void setRelativePath(String relativePath) {
         this.relativePath.set(relativePath);
+        if (this instanceof PosItem) {
+            if (((PosItem) this).getPos() != null) {
+                return;
+            }
+            Controller.get().getLocationsList().forEach(l -> {
+                l.getContents().get().stream()
+                        .filter(c -> c.getItem().getName().equals(getName()))
+                        .filter(c -> c.getItem().isGeneric())
+                        .forEach(c -> c.getItem().setRelativePath(relativePath));
+            });
+        }
     }
 
     public Image getImage() {
         if (this.image.get() == null) {
-            this.image.set(loadImageFromPath());
+            setImage(loadImageFromPath());
         }
         return image.get();
     }
@@ -114,14 +125,36 @@ public class Asset {
 
     public void setImage(Image image) {
         this.image.set(image);
+        if (this instanceof PosItem) {
+            if (((PosItem) this).getPos() != null) {
+                return;
+            }
+            Controller.get().getLocationsList().forEach(l -> {
+                l.getContents().get().stream()
+                        .filter(c -> c.getItem().getName().equals(getName()))
+                        .filter(c -> c.getItem().isGeneric())
+                        .forEach(c -> c.getItem().setImage(image));
+            });
+        }
     }
 
-    public Coords[] getCoverLine() {
+    public List<Coords> getCoverLine() {
         return coverLine;
     }
 
-    public void setCoverLine(Coords[] coverLine) {
+    public void setCoverLine(List<Coords> coverLine) {
         this.coverLine = coverLine;
+        if (this instanceof PosItem) {
+            if (((PosItem) this).getPos() != null) {
+                return;
+            }
+            Controller.get().getLocationsList().forEach(l -> {
+                l.getContents().get().stream()
+                        .filter(c -> c.getItem().getName().equals(getName()))
+                        .filter(c -> c.getItem().isGeneric())
+                        .forEach(c -> c.getItem().setCoverLine(coverLine));
+            });
+        }
     }
 
     public List<List<Coords>> getCollisionPolygons() {
@@ -130,6 +163,17 @@ public class Asset {
 
     public void setCollisionPolygons(List<List<Coords>> collisionPolygons) {
         this.collisionPolygons = collisionPolygons;
+        if (this instanceof PosItem) {
+            if (((PosItem) this).getPos() != null) {
+                return;
+            }
+            Controller.get().getLocationsList().forEach(l -> {
+                l.getContents().get().stream()
+                        .filter(c -> c.getItem().getName().equals(getName()))
+                        .filter(c -> c.getItem().isGeneric())
+                        .forEach(c -> c.getItem().setCollisionPolygons(collisionPolygons));
+            });
+        }
     }
 
     @Override

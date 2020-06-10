@@ -2,6 +2,7 @@ package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
 import editor.view.asset.AssetStage;
+import editor.view.asset.AssetStageImpl;
 import editor.view.asset.CreatureAssetStage;
 import editor.view.asset.TeleportAssetStage;
 import editor.view.stage.EditorCanvas;
@@ -185,7 +186,7 @@ public class ContentTableView extends TableView<Content> {
         AssetStage itemStage = switch (type) {
             case CREATURE -> new CreatureAssetStage(parent, item, true);
             case TELEPORT -> new TeleportAssetStage(parent, item, true);
-            default -> null;
+            default -> new AssetStageImpl(parent, item, true);
         };
         if (itemStage == null) {
             return;

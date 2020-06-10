@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.stage.Coords;
 
@@ -10,60 +9,85 @@ import java.util.NoSuchElementException;
 
 public class AssetConverter {
 
-    public static List<Content> convertToContent(List<Asset> assets, Coords pos) {
-        List<Content> contents = new ArrayList<>(assets.size());
-        for (Asset asset
-                : assets) {
-            Coords newPos = new Coords(pos.x, pos.y);
-            if (!pos.is0()) {
-                double height = asset.getImage().getHeight();
-                newPos.y = pos.y - (int) height;
-            }
-            Content content = convertToContent(asset, newPos, Controller.get().getCurrentLayer().getLevel());
-            contents.add(content);
-        }
-        return contents;
-    }
-
-    public static Content convertToContent(Asset asset, Coords pos, int level) {
-        if (asset == null) {
+    public static Content convertToContent(Asset a, Coords pos, int level) {
+        if (a == null) {
             throw new NoSuchElementException("Asset is null");
         }
-        String name = asset.getName();
-        ItemType type = asset.getType();
-        String path = asset.getRelativePath();
+        Coords clonePos = new Coords(pos.x, pos.y);
+        List<Coords> coverLine = new ArrayList<>();
+        if (a.getCoverLine() != null) {
+            coverLine.addAll(a.getCoverLine());
+        }
+        List<List<Coords>> collisionPolygons = new ArrayList<>();
+        if (a.getCollisionPolygons() != null) {
+            collisionPolygons.addAll(a.getCollisionPolygons());
+        }
 
-        return switch (asset.getType()) {
-            case LANDSCAPE -> new Content(convertToLandscape(name, type, path, pos, level, asset));
-            case COVER -> new Content(convertToCover(name, type, path, pos, level, asset));
-            case CREATURE -> new Content(convertToCreature(name, type, path, pos, level, asset));
-            case TELEPORT -> new Content(convertToTeleport(name, type, path, pos, level, asset));
+        String name = a.getName();
+        ItemType type = a.getType();
+        String path = a.getRelativePath();
+
+        return switch (a.getType()) {
+            case LANDSCAPE -> new Content(convertToLandscape(
+                    name, type, path, clonePos, level, coverLine, collisionPolygons, a));
+            case COVER -> new Content(convertToCover(
+                    name, type, path, clonePos, level, coverLine, collisionPolygons, a));
+            case CREATURE -> new Content(convertToCreature(
+                    name, type, path, clonePos, level, coverLine, collisionPolygons, a));
+            case TELEPORT -> new Content(convertToTeleport(
+                    name, type, path, clonePos, level, coverLine, collisionPolygons, a));
         };
     }
 
-    private static PosItem convertToTeleport(String name, ItemType type, String path, Coords pos, int level,
-                                             Asset asset) {
+    private static PosItem convertToTeleport(
+            String name, ItemType type, String path, Coords pos, int level,
+            List<Coords> coverLine, List<List<Coords>> collisionPolygons,
+            Asset asset) {
         Teleport o = (Teleport) asset;
-        return new Teleport(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons(),
-                o.getLocationName(), o.getExit(), o.getExitLevel());
+        Coords exit = o.getExit();
+        Coords cloneExit = null;
+        if (exit != null) {
+            cloneExit = new Coords(exit.x, exit.y);
+        }
+        return new Teleport(
+                name, type, path, pos, level, true,
+                coverLine, collisionPolygons,
+                o.getLocationName(), cloneExit, o.getExitLevel());
     }
 
-    public static Creature convertToCreature(String name, ItemType type, String path, Coords pos, int level,
-                                             Asset asset) {
+    public static Creature convertToCreature(
+            String name, ItemType type, String path, Coords pos, int level,
+            List<Coords> coverLine, List<List<Coords>> collisionPolygons,
+            Asset asset) {
         Creature o = (Creature) asset;
-        return new Creature(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons(),
-                o.getDest(), o.getSize(), o.getControl(), o.getSpeed());
+        Coords dest = o.getDest();
+        Coords cloneDest = null;
+        if (dest != null) {
+            cloneDest = new Coords(dest.x, dest.y);
+        }
+        return new Creature(
+                name, type, path, pos, level, true,
+                coverLine, collisionPolygons,
+                cloneDest, o.getSize(), o.getControl(), o.getSpeed());
     }
 
-    public static Landscape convertToLandscape(String name, ItemType type, String path, Coords pos, int level,
-                                               Asset asset) {
+    public static Landscape convertToLandscape(
+            String name, ItemType type, String path, Coords pos, int level,
+            List<Coords> coverLine, List<List<Coords>> collisionPolygons,
+            Asset asset) {
         Landscape o = (Landscape) asset;
-        return new Landscape(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons());
+        return new Landscape(
+                name, type, path, pos, level, true,
+                coverLine, collisionPolygons);
     }
 
-    public static Cover convertToCover(String name, ItemType type, String path, Coords pos, int level,
-                                       Asset asset) {
+    public static Cover convertToCover(
+            String name, ItemType type, String path, Coords pos, int level,
+            List<Coords> coverLine, List<List<Coords>> collisionPolygons,
+            Asset asset) {
         Cover o = (Cover) asset;
-        return new Cover(name, type, path, pos, level, o.getCoverLine(), o.getCollisionPolygons());
+        return new Cover(
+                name, type, path, pos, level, true,
+                coverLine, collisionPolygons);
     }
 }

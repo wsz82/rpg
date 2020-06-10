@@ -18,6 +18,7 @@ import java.util.List;
 public abstract class AssetStage extends ChildStage {
     protected Asset asset;
     protected final VBox container = new VBox(5);
+    protected final CheckBox genericCheck = new CheckBox();
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -53,8 +54,8 @@ public abstract class AssetStage extends ChildStage {
         final HBox buttons = new HBox(10);
         buttons.getChildren().add(cancel);
         if (asset == null) {
-            coverButton.setVisible(false);
-            collisionButton.setVisible(false);
+            coverButton.setDisable(true);
+            collisionButton.setDisable(true);
             buttons.getChildren().add(create);
             create.setDefaultButton(true);
             create.setOnAction(event -> {
@@ -72,16 +73,32 @@ public abstract class AssetStage extends ChildStage {
         nameInput.setPromptText("Name");
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
-        container.getChildren().addAll(nameInput, imageBox, coverButton, collisionButton);
+
+        final HBox genericBox = new HBox(10);
+        final Label genericLabel = new Label("Set generic");
+        genericBox.getChildren().addAll(genericLabel, genericCheck);
+
+        container.getChildren().addAll(nameInput, imageBox, genericBox, coverButton, collisionButton);
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
         if (isContent) {
             nameInput.setDisable(true);
             imageButton.setDisable(true);
+        } else {
+            genericBox.setVisible(false);
         }
-
+        bindProperties();
         hookupEvents();
+    }
+
+    protected void bindProperties() {
+        if (isContent) {
+            coverButton.disableProperty()
+                    .bind(genericCheck.selectedProperty());
+            collisionButton.disableProperty()
+                    .bind(genericCheck.selectedProperty());
+        }
     }
 
     protected void fillInputs() {
@@ -91,6 +108,39 @@ public abstract class AssetStage extends ChildStage {
         nameInput.setText(asset.getName());
         path = asset.getRelativePath();
         imageLabel.setText(asset.getRelativePath());
+        if (isContent) {
+            genericCheck.setSelected(((PosItem) asset).isGeneric());
+        }
+    }
+
+    protected abstract void defineAsset();
+
+    private void onCreate() {
+        String name = nameInput.getText();
+        boolean inputNameIsEmpty = name.equals("");
+        boolean inputFileIsEmpty = path == null || path.isEmpty();
+        if (inputNameIsEmpty || inputFileIsEmpty) {
+            return;
+        }
+        List<Asset> assets = Controller.get().getAssetsList();
+        boolean assetNameAlreadyExists = assets.stream()
+                .anyMatch(a -> a.getName().equals(name));
+        if (assetNameAlreadyExists) {
+            alertOfNameExisting();
+            return;
+        }
+        close();
+        addNewAsset();
+        defineAsset();
+    }
+
+    private void onEdit() {
+        boolean inputFileIsEmpty = path == null || path.isEmpty();
+        if (inputFileIsEmpty) {
+            return;
+        }
+        editAsset();
+        defineAsset();
     }
 
     private void hookupEvents() {
@@ -132,38 +182,10 @@ public abstract class AssetStage extends ChildStage {
         coverEdit.show();
     }
 
-    protected void onEdit() {
-        String name = nameInput.getText();
-        boolean inputNameIsEmpty = name.equals("");
-        boolean inputFileIsEmpty = path == null || path.isEmpty();
-        if (inputNameIsEmpty || inputFileIsEmpty) {
-            return;
-        }
-        editAsset();
-    }
-
     private void editAsset() {
-        asset.setName(nameInput.getText());
         asset.setRelativePath(path);
+        ((PosItem) asset).setGeneric(genericCheck.isSelected());
         close();
-    }
-
-    protected void onCreate() {
-        String name = nameInput.getText();
-        boolean inputNameIsEmpty = name.equals("");
-        boolean inputFileIsEmpty = path == null || path.isEmpty();
-        if (inputNameIsEmpty || inputFileIsEmpty) {
-            return;
-        }
-        List<Asset> assets = Controller.get().getAssetsList();
-        boolean assetNameAlreadyExists = assets.stream()
-                .anyMatch(a -> a.getName().equals(name));
-        if (assetNameAlreadyExists) {
-            alertOfNameExisting();
-            return;
-        }
-        close();
-        addNewAsset();
     }
 
     private boolean pathIsIncorrect(String path) {
@@ -193,16 +215,21 @@ public abstract class AssetStage extends ChildStage {
         String name = nameInput.getText();
         String relativePath = Asset.convertToRelativeFilePath(path, type);
         asset = switch (type) {
-            case COVER -> new Cover(name, type, relativePath, null, 0, null, null);
-            case CREATURE -> new Creature(name, type, relativePath, null, 0, null, null);
-            case LANDSCAPE -> new Landscape(name, type, relativePath, null, 0, null, null);
-            case TELEPORT -> new Teleport(name, type, relativePath, null, 0, null, null);
+            case COVER -> new Cover(
+                    name, type, relativePath, null, 0, false, null, null);
+            case CREATURE -> new Creature(
+                    name, type, relativePath, null, 0, false, null, null);
+            case LANDSCAPE -> new Landscape(
+                    name, type, relativePath, null, 0, false, null, null);
+            case TELEPORT -> new Teleport(
+                    name, type, relativePath, null, 0, false, null, null);
         };
         Controller.get().getAssetsList().add(asset);
     }
 
     private void alertOfNameExisting() {
-        final Alert alert = new Alert(Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
+        final Alert alert = new Alert(
+                Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());

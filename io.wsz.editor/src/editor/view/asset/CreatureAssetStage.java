@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.view.IntegerField;
+import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,6 +11,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreatureAssetStage extends AssetStage {
     private static final String TITLE = "Creature asset";
@@ -72,21 +75,31 @@ public class CreatureAssetStage extends AssetStage {
     }
 
     @Override
-    protected void onCreate() {
-        super.onCreate();
-        defineAsset();
+    protected void bindProperties() {
+        super.bindProperties();
+        sizeCB.disableProperty()
+                .bind(genericCheck.selectedProperty());
+        controlCB.disableProperty()
+                .bind(genericCheck.selectedProperty());
+        speedInput.disableProperty()
+                .bind(genericCheck.selectedProperty());
     }
 
     @Override
-    protected void onEdit() {
-        super.onEdit();
-        defineAsset();
-    }
-
-    private void defineAsset() {
+    protected void defineAsset() {
         Creature cr = (Creature) asset;
-        cr.setSize(sizeCB.getValue());
-        cr.setControl(controlCB.getValue());
-        cr.setSpeed(Integer.parseInt(speedInput.getText()));
+        if (cr.isGeneric()) {
+            List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
+                    .filter(a -> a.getName().equals(asset.getName()))
+                    .collect(Collectors.toList());
+            Creature prototype = (Creature) correspondingAsset.get(0);
+            cr.setSize(prototype.getSize());
+            cr.setControl(prototype.getControl());
+            cr.setSpeed(prototype.getSpeed());
+        } else {
+            cr.setSize(sizeCB.getValue());
+            cr.setControl(controlCB.getValue());
+            cr.setSpeed(Integer.parseInt(speedInput.getText()));
+        }
     }
 }

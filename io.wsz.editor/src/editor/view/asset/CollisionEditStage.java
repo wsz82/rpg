@@ -1,7 +1,6 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
-import io.wsz.model.Controller;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -206,7 +205,6 @@ public class CollisionEditStage extends ChildStage {
             List<List<Coords>> cp = polygonsToCoords(polygons);
             PosItem i = (PosItem) asset;
             i.setCollisionPolygons(cp);
-            updateCollisionPolygonsForContents(asset.getName(), cp);
         }
         close();
     }
@@ -219,11 +217,5 @@ public class CollisionEditStage extends ChildStage {
             cp.add(poss);
         }
         return cp;
-    }
-
-    private void updateCollisionPolygonsForContents(String name, List<List<Coords>> collisionPolygons) {
-        Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getName().equals(name))
-                .forEach(c -> c.getItem().setCollisionPolygons(collisionPolygons));
     }
 }

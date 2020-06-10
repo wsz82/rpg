@@ -5,7 +5,6 @@ import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.item.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Board;
@@ -205,18 +204,6 @@ public class EditorCanvas extends Canvas {
         for (Content con : addedContent) {
             con.visibleProperty().addListener((observable, oldValue, newValue) -> {
                 refresh();
-            });
-            List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
-                    .filter(a -> a.getName().equals(con.getItem().getName()))
-                    .collect(Collectors.toList());
-            correspondingAsset.get(0).relativePathProperty().addListener((observable, oldValue, newValue) -> {
-                con.getItem().setRelativePath(newValue);
-                con.getItem().setImage(correspondingAsset.get(0).loadImageFromPath());
-                refresh();
-            });
-            correspondingAsset.get(0).nameProperty().addListener((observable, oldValue, newValue) -> {
-                con.getItem().setName(newValue);
-                ContentTableView.get().refresh();
             });
         }
         refresh();
