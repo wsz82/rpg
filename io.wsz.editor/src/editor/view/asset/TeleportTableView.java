@@ -27,7 +27,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         });
         toCol.setCellFactory(TextFieldTableCell.forTableColumn());
         toCol.setEditable(false);
-        getColumns().add(2, toCol);
+        getColumns().add(toCol);
 
         TableColumn<Teleport, String> posCol = new TableColumn<>("To pos");
         posCol.setCellValueFactory(p -> new ObjectBinding<>() {
@@ -38,7 +38,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         });
         posCol.setCellFactory(TextFieldTableCell.forTableColumn());
         posCol.setEditable(false);
-        getColumns().add(3, posCol);
+        getColumns().add(posCol);
 
         TableColumn<Teleport, String> levCol = new TableColumn<>("To level");
         levCol.setCellValueFactory(p -> new ObjectBinding<>() {
@@ -49,7 +49,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         });
         levCol.setCellFactory(TextFieldTableCell.forTableColumn());
         levCol.setEditable(false);
-        getColumns().add(4, levCol);
+        getColumns().add(levCol);
     }
 
     @Override
