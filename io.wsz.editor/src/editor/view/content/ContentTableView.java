@@ -189,9 +189,6 @@ public class ContentTableView extends TableView<Content> {
             case COVER -> new CoverAssetStage(
                     parent, (Cover) item, true);
         };
-        if (itemStage == null) {
-            return;
-        }
         itemStage.show();
     }
 }

@@ -2,7 +2,10 @@ package editor.view.asset;
 
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
+import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -11,6 +14,42 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
 
     TeleportTableView(Stage parent, ObservableList<Teleport> assets) {
         super(parent, assets);
+        initTeleportTable();
+    }
+
+    private void initTeleportTable() {
+        TableColumn<Teleport, String> toCol = new TableColumn<>("To");
+        toCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getLocationName();
+            }
+        });
+        toCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        toCol.setEditable(false);
+        getColumns().add(2, toCol);
+
+        TableColumn<Teleport, String> posCol = new TableColumn<>("To pos");
+        posCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getExit().toString();
+            }
+        });
+        posCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        posCol.setEditable(false);
+        getColumns().add(3, posCol);
+
+        TableColumn<Teleport, String> levCol = new TableColumn<>("To level");
+        levCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getExitLevel().toString();
+            }
+        });
+        levCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        levCol.setEditable(false);
+        getColumns().add(4, levCol);
     }
 
     @Override
