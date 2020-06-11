@@ -8,9 +8,10 @@ public class LocationSerializable implements Serializable {
     private int width;
     private int height;
     private List<LayerSerializable> layers;
-    private List<ContentSerializable> contents;
+    private List<PosItemSerializable> contents;
 
-    public LocationSerializable(String name, int width, int height, List<LayerSerializable> layers, List<ContentSerializable> contents) {
+    public LocationSerializable(String name, int width, int height,
+                                List<LayerSerializable> layers, List<PosItemSerializable> contents) {
         this.name = name;
         this.width = width;
         this.height = height;
@@ -50,11 +51,11 @@ public class LocationSerializable implements Serializable {
         this.layers = layers;
     }
 
-    List<ContentSerializable> getContents() {
+    List<PosItemSerializable> getItems() {
         return contents;
     }
 
-    void setContents(List<ContentSerializable> contents) {
-        this.contents = contents;
+    void setItems(List<PosItemSerializable> items) {
+        this.contents = items;
     }
 }

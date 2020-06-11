@@ -1,24 +1,28 @@
 package io.wsz.model.item;
 
-import io.wsz.model.content.Content;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
-public abstract class PosItem extends Asset implements ItemUpdater {
-    protected volatile Asset prototype;
+public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
+    protected volatile A prototype;
+    protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
     protected volatile Coords pos;
     protected volatile Integer level;
     protected volatile List<Coords> coverLine;
     protected volatile List<List<Coords>> collisionPolygons;
 
-    public PosItem(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public PosItem(A prototype, String name, ItemType type, String path,
+                   Boolean visible, Coords pos, Integer level,
                    List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(name, type, path);
         this.prototype = prototype;
+        this.visible.set(visible);
         this.pos = pos;
         this.level = level;
         this.coverLine = coverLine;
@@ -26,20 +30,24 @@ public abstract class PosItem extends Asset implements ItemUpdater {
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
-        List<Content> fromContent = from.getContents().get();
-        List<Content> singleContent = fromContent.stream()
-                .filter(c -> c.getItem().equals(this))
-                .collect(Collectors.toList());
-        if (singleContent.isEmpty()) {
-            return;
-        }
-        Content thisContent = singleContent.get(0);
-        from.getContentToRemove().add(thisContent);
-        target.getContentToAdd().add(thisContent);
+        from.getItemsToRemove().add(this);
+        target.getItemsToAdd().add(this);
 
         pos.x = targetX;
         pos.y = targetY;
         level = targetLayer.getLevel();
+    }
+
+    public Boolean getVisible() {
+        return visible.get();
+    }
+
+    public BooleanProperty visibleProperty() {
+        return visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible.set(visible);
     }
 
     public Coords getPos() {
@@ -74,11 +82,34 @@ public abstract class PosItem extends Asset implements ItemUpdater {
         this.collisionPolygons = collisionPolygons;
     }
 
-    public Asset getPrototype() {
+    public A getPrototype() {
         return prototype;
     }
 
-    public void setPrototype(Asset prototype) {
+    public void setPrototype(A prototype) {
         this.prototype = prototype;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PosItem<?> item = (PosItem<?>) o;
+        return Objects.equals(prototype, item.prototype) &&
+                Objects.equals(visible, item.visible) &&
+                Objects.equals(pos, item.pos) &&
+                Objects.equals(level, item.level) &&
+                Objects.equals(coverLine, item.coverLine) &&
+                Objects.equals(collisionPolygons, item.collisionPolygons);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(prototype, visible, pos, level, coverLine, collisionPolygons);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

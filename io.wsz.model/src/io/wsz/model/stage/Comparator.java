@@ -1,6 +1,5 @@
 package io.wsz.model.stage;
 
-import io.wsz.model.content.Content;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.ItemType;
@@ -14,10 +13,8 @@ import static io.wsz.model.stage.Comparator.Comparison.*;
 
 public class Comparator {
 
-    public static Comparison compare(Content c1, Node n) {
-        Content c2 = n.getContent();
-        PosItem i1 = c1.getItem();
-        PosItem i2 = c2.getItem();
+    public static Comparison compare(PosItem i1, Node n) {
+        PosItem i2 = n.getItem();
         int o1level = i1.getLevel();
         int o2level = i2.getLevel();
         ItemType t1 = i1.getType();

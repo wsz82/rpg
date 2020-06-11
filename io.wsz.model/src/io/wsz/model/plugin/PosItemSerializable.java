@@ -7,12 +7,15 @@ import java.util.List;
 
 public class PosItemSerializable extends AssetSerializable {
     protected String prototype;
+    protected Boolean visible;
     protected Coords pos;
     protected Integer level;
 
-    public PosItemSerializable(String prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public PosItemSerializable(String prototype, String name, ItemType type, String path,
+                              Boolean visible, Coords pos, Integer level,
                                List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(name, type, path, coverLine, collisionPolygons);
+        this.visible = visible;
         this.pos = pos;
         this.level = level;
         this.prototype = prototype;
@@ -40,5 +43,13 @@ public class PosItemSerializable extends AssetSerializable {
 
     public void setPrototype(String prototype) {
         this.prototype = prototype;
+    }
+
+    public Boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
     }
 }

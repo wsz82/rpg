@@ -1,7 +1,6 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Board;
@@ -14,21 +13,27 @@ import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
-public class Creature extends PosItem {
+public class Creature extends PosItem<Creature> {
     private volatile Coords dest;
     private volatile CreatureSize size;
     private volatile CreatureControl control;
     private volatile Integer speed;
 
-    public Creature(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public Creature(Creature prototype, String name, ItemType type, String path,
+                    Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, pos, level,
+                coverLine, collisionPolygons);
     }
 
-    public Creature(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public Creature(Creature prototype, String name, ItemType type, String path,
+                    Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons,
                     Coords dest, CreatureSize size, CreatureControl control, Integer speed) {
-        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, pos, level,
+                coverLine, collisionPolygons);
         this.dest = dest;
         this.size = size;
         this.control = control;
@@ -48,34 +53,33 @@ public class Creature extends PosItem {
             return;
         }
         double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        double moveDist = speed;
-        if (dist < speed) {
+        double moveDist = getSpeed();
+        if (dist < getSpeed()) {
             moveDist = dist;
         }
         int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
         int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
         Coords nextPos = new Coords(x3, y3);
-        Content c = getCollision(nextPos);
-        if (c != null) {
+        PosItem pi = getCollision(nextPos);
+        if (pi != null) {
             dest = null;
             return;
         }
         pos = nextPos;
     }
 
-    private Content getCollision(Coords nextPos) {
+    private PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(posToCenter(nextPos));
         return Board.get().lookForObstacle(poss);
     }
 
     private void checkSurrounding() {
         ItemType[] types = new ItemType[] {TELEPORT};
-        Content c = getCornersContent(types);
-        if (c != null) {
-            PosItem item = c.getItem();
-            ItemType type = item.getType();
+        PosItem pi = getCornersContent(types);
+        if (pi != null) {
+            ItemType type = pi.getType();
             switch (type) {
-                case TELEPORT -> enterTeleport((Teleport) item);
+                case TELEPORT -> enterTeleport((Teleport) pi);
             }
         }
         Creature cr = getCornersCreature(this);
@@ -93,7 +97,7 @@ public class Creature extends PosItem {
         return Controller.get().getBoard().getCornersCreature(getCorners(), cr);
     }
 
-    private Content getCornersContent(ItemType[] types) {
+    private PosItem getCornersContent(ItemType[] types) {
         Coords[] poss = getCorners();
         return Controller.get().getBoard().lookForContent(poss, types, false);
     }
@@ -127,8 +131,8 @@ public class Creature extends PosItem {
     }
 
     public Coords[] getCorners(Coords pos) {
-        int halfWidth = size.getWidth()/2;
-        int halfHeight = size.getHeight()/2;
+        int halfWidth = getSize().getWidth()/2;
+        int halfHeight = getSize().getHeight()/2;
         int centerX = pos.x;
         int centerY = pos.y;
 
@@ -144,9 +148,9 @@ public class Creature extends PosItem {
     }
 
     public void interact() {
-        if (control == CONTROL) {
+        if (getControl() == CONTROL) {
             setControl(CONTROLLABLE);
-        } else if (control == CONTROLLABLE) {
+        } else if (getControl() == CONTROLLABLE) {
             looseAllControl();
             setControl(CONTROL);
         }
@@ -164,14 +168,13 @@ public class Creature extends PosItem {
     public void onInteractWith(Coords pos) {
         Coords[] poss = new Coords[] {pos};
         ItemType[] types = ItemType.values();
-        Content c = Controller.get().getBoard().lookForContent(poss, types, true);
-        if (c == null) {
+        PosItem pi = Controller.get().getBoard().lookForContent(poss, types, true);
+        if (pi == null) {
             return;
         }
-        PosItem item = c.getItem(); //TODO other types
-        ItemType type = item.getType();
+        ItemType type = pi.getType();
         switch (type) {
-            case CREATURE -> interactWithCreature((Creature) item);
+            case CREATURE -> interactWithCreature((Creature) pi);
             default -> setDest(centerToPos(pos));
         }
     }
@@ -200,7 +203,7 @@ public class Creature extends PosItem {
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();
             changeLocation(from, target, targetLayer, targetX, targetY);
-            if (control.equals(CONTROL)) {
+            if (getControl().equals(CONTROL)) {
                 Controller.get().setUpdatedLocation(target);
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
                 centerScreenOn(targetX, targetY);
@@ -229,7 +232,11 @@ public class Creature extends PosItem {
     }
 
     public Integer getSpeed() {
-        return speed;
+        if (speed == null) {
+            return prototype.speed;
+        } else {
+            return speed;
+        }
     }
 
     public void setSpeed(Integer speed) {
@@ -237,7 +244,11 @@ public class Creature extends PosItem {
     }
 
     public CreatureSize getSize() {
-        return size;
+        if (size == null) {
+            return prototype.size;
+        } else {
+            return size;
+        }
     }
 
     public void setSize(CreatureSize size) {
@@ -245,7 +256,11 @@ public class Creature extends PosItem {
     }
 
     public CreatureControl getControl() {
-        return control;
+        if (control == null) {
+            return prototype.getControl();
+        } else {
+            return control;
+        }
     }
 
     public void setControl(CreatureControl control) {

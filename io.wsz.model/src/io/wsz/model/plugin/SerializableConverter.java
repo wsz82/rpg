@@ -1,7 +1,6 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentList;
+import io.wsz.model.content.ItemList;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.layer.LayersList;
@@ -38,9 +37,9 @@ public class SerializableConverter {
             int width = location.getWidth();
             int height = location.getHeight();
             List<LayerSerializable> layers = toSerializableLayers(location);
-            List<ContentSerializable> contents = toSerializableContents(location);
+            List<PosItemSerializable> items = toSerializableItems(location);
 
-            LocationSerializable ls = new LocationSerializable(name, width, height, layers, contents);
+            LocationSerializable ls = new LocationSerializable(name, width, height, layers, items);
             output.add(ls);
         }
         return output;
@@ -59,21 +58,18 @@ public class SerializableConverter {
         return output;
     }
 
-    private static List<ContentSerializable> toSerializableContents(Location location) {
-        List<ContentSerializable> output = new ArrayList<>(0);
-        List<Content> input = location.getContents().get();
-        for (Content content : input) {
-            PosItemSerializable item = toPosItemSerializable(content.getItem());
-            boolean visible = content.isVisible();
-
-            ContentSerializable cs = new ContentSerializable(item, visible);
-            output.add(cs);
+    private static List<PosItemSerializable> toSerializableItems(Location location) {
+        List<PosItemSerializable> output = new ArrayList<>(0);
+        List<PosItem> input = location.getItems().get();
+        for (PosItem pi : input) {
+            PosItemSerializable pis = toPosItemSerializable(pi);
+            output.add(pis);
         }
         return output;
     }
 
-    private static PosItemSerializable toPosItemSerializable(PosItem item) {
-        return toConcreteItemSerializable(item);
+    private static PosItemSerializable toPosItemSerializable(PosItem pi) {
+        return toConcreteItemSerializable(pi);
     }
 
     private static PosItemSerializable toConcreteItemSerializable(Asset a) {
@@ -86,6 +82,7 @@ public class SerializableConverter {
         String name = a.getName();
         ItemType type = a.getType();
         String path = a.getRelativePath();
+        Boolean visible = pi.getVisible();
         Coords pos = pi.getPos();
         Integer level = null;
         if (pi.getLevel() != null) {
@@ -93,39 +90,45 @@ public class SerializableConverter {
         }
         return  switch (type) {
             case CREATURE -> toCreatureSerializable(
-                    prName, name, type, path, pos, level, a);
+                    prName, name, type, path, visible, pos, level, a);
             case TELEPORT -> toTeleportSerializable(
-                    prName, name, type, path, pos, level, a);
+                    prName, name, type, path, visible, pos, level, a);
             default -> toPosItemSerializable(
-                    prName, name, type, path, pos, level, a);
+                    prName, name, type, path, visible, pos, level, a);
         };
     }
 
     private static TeleportSerializable toTeleportSerializable(
-            String prototype, String name, ItemType type, String path, Coords pos, Integer level,
+            String prototype, String name, ItemType type, String path,
+            Boolean visible, Coords pos, Integer level,
             Asset a) {
         Teleport t = (Teleport) a;
         return new TeleportSerializable(
-                prototype, name, type, path, pos, level,
+                prototype, name, type, path,
+                visible, pos, level,
                 t.getCoverLine(), t.getCollisionPolygons(),
                 t.getLocationName(), t.getExit(), t.getExitLevel());
     }
 
     private static PosItemSerializable toPosItemSerializable(
-            String prototype, String name, ItemType type, String path, Coords pos, Integer level, Asset a) {
+            String prototype, String name, ItemType type, String path,
+            Boolean visible, Coords pos, Integer level,
+            Asset a) {
         PosItem pi = (PosItem) a;
         return new PosItemSerializable(
-                prototype, name, type, path, pos, level,
+                prototype, name, type, path,
+                visible, pos, level,
                 pi.getCoverLine(), pi.getCollisionPolygons());
     }
 
     private static CreatureSerializable toCreatureSerializable(
-            String prototype, String name, ItemType type, String path, Coords pos, Integer level,
+            String prototype, String name, ItemType type, String path, Boolean visible, Coords pos, Integer level,
             Asset a) {
         Creature cr = (Creature) a;
         Coords dest = cr.getDest();
         return new CreatureSerializable(
-                prototype, name, type, path, pos, level,
+                prototype, name, type, path,
+                visible, pos, level,
                 cr.getCoverLine(), cr.getCollisionPolygons(),
                 dest, cr.getSize(), cr.getControl(), cr.getSpeed());
     }
@@ -142,9 +145,9 @@ public class SerializableConverter {
             layersList.get().setAll(toLayers(ls.getLayers()));
             location.setLayers(layersList);
 
-            ContentList contentList = new ContentList();
-            contentList.get().setAll(toContents(ls.getContents(), assets));
-            location.setContents(contentList);
+            ItemList itemList = new ItemList();
+            itemList.get().setAll(toItems(ls.getItems(), assets));
+            location.setItems(itemList);
 
             output.add(location);
         }
@@ -163,19 +166,16 @@ public class SerializableConverter {
         return output;
     }
 
-    private static List<Content> toContents(List<ContentSerializable> input, List<Asset> assets) {
+    private static List<PosItem> toItems(List<PosItemSerializable> input, List<Asset> assets) {
         if (input.isEmpty()) {
             return new ArrayList<>(0);
         }
-        List<Content> output = FXCollections.observableArrayList();
-        for (ContentSerializable cs : input) {
-            PosItemSerializable is = cs.getItem();
-            PosItem item = toPosItem(is, assets);
+        List<PosItem> output = FXCollections.observableArrayList();
+        for (PosItemSerializable pis : input) {
+            PosItem pi = toPosItem(pis, assets);
 
-            Content content = AssetConverter.convertToContent(
-                    item, item.getPos(), item.getLevel());
-            content.setVisible(cs.isVisible());
-            output.add(content);
+            pi.setVisible(pis.getVisible());
+            output.add(pi);
         }
         return output;
     }
@@ -190,6 +190,7 @@ public class SerializableConverter {
         String path = as.getPath();
         PosItemSerializable pis = (PosItemSerializable) as;
         String prototypeName = pis.getPrototype();
+        Boolean visible = pis.getVisible();
         Coords pos = pis.getPos();
         Integer level = pis.getLevel();
         Asset prototype = null;
@@ -201,32 +202,40 @@ public class SerializableConverter {
         }
         return switch (type) {
             case CREATURE -> toCreature(
-                    prototype, name, type, path, pos, level, as);
+                    (Creature) prototype, name, type, path,
+                    visible, pos, level, as);
             case COVER -> new Cover(
-                    prototype, name, type, path, pos, level,
+                    (Cover) prototype, name, type, path,
+                    visible, pos, level,
                     as.getCoverLine(), as.getCollisionPolygons());
             case LANDSCAPE -> new Landscape(
-                    prototype, name, type, path, pos, level,
+                    (Landscape) prototype, name, type, path,
+                    visible, pos, level,
                     as.getCoverLine(), as.getCollisionPolygons());
             case TELEPORT -> toTeleport(
-                    prototype, name, type, path, pos, level, as);
+                    (Teleport) prototype, name, type, path,
+                    visible, pos, level, as);
         };
     }
 
-    private static Teleport toTeleport(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    private static Teleport toTeleport(Teleport prototype, String name, ItemType type, String path,
+                                       Boolean visible, Coords pos, Integer level,
                                        AssetSerializable as) {
         TeleportSerializable ts = (TeleportSerializable) as;
         return new Teleport(
-                prototype, name, type, path, pos, level,
+                prototype, name, type, path,
+                visible, pos, level,
                 as.getCoverLine(), as.getCollisionPolygons(),
                 ts.getLocationName(), ts.getExit(), ts.getExitLevel());
     }
 
-    private static Creature toCreature(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    private static Creature toCreature(Creature prototype, String name, ItemType type, String path,
+                                       Boolean visible, Coords pos, Integer level,
                                        AssetSerializable as) {
         CreatureSerializable cs = (CreatureSerializable) as;
         return new Creature(
-                prototype, name, type, path, pos, level,
+                prototype, name, type, path,
+                visible, pos, level,
                 as.getCoverLine(), as.getCollisionPolygons(),
                 cs.getDest(), cs.getSize(), cs.getControl(), cs.getSpeed());
     }

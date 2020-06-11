@@ -4,11 +4,14 @@ import io.wsz.model.stage.Coords;
 
 import java.util.List;
 
-public class Landscape extends PosItem {
+public class Landscape extends PosItem<Landscape> {
 
-    public Landscape(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public Landscape(Landscape prototype, String name, ItemType type, String path,
+                     Boolean visible, Coords pos, Integer level,
                      List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, pos, level,
+                coverLine, collisionPolygons);
     }
 
     @Override

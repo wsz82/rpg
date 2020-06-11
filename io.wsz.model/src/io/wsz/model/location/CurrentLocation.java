@@ -1,7 +1,7 @@
 package io.wsz.model.location;
 
-import io.wsz.model.content.Content;
-import io.wsz.model.content.ContentList;
+import io.wsz.model.content.ItemList;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.layer.LayersList;
 import javafx.beans.property.*;
@@ -32,12 +32,12 @@ public class CurrentLocation {
         return getLocation().getLayers();
     }
 
-    public ObservableList<Content> getContent() {
-        return getLocation().getContents().get();
+    public ObservableList<PosItem> getItems() {
+        return getLocation().getItems().get();
     }
 
-    public ContentList getContentList() {
-        return getLocation().getContents();
+    public ItemList getContentList() {
+        return getLocation().getItems();
     }
 
     public void setLocation(Location location) {

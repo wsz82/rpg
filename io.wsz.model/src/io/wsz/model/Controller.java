@@ -1,8 +1,8 @@
 package io.wsz.model;
 
-import io.wsz.model.content.Content;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.AssetsList;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -61,8 +61,8 @@ public class Controller {
         return pc.load(pluginName);
     }
 
-    public void removeContent(Content content) {
-        CurrentLocation.get().getContent().remove(content);
+    public void removeItem(PosItem pi) {
+        CurrentLocation.get().getItems().remove(pi);
     }
 
     public CurrentLayer getCurrentLayer() {

@@ -1,7 +1,6 @@
 package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.ItemType;
@@ -32,20 +31,20 @@ public class Board {
 
     private Board(){}
 
-    public void sortContents(List<Content> contents) {
+    public void sortItems(List<PosItem> items) {
 
-        if (contents == null || contents.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             return;
         }
 
         Graph graph = new Graph(new ArrayList<>(0));
         List<Node> nodes = graph.getNodes();
 
-        for (Content c : contents) {
-            Node newNode = new Node(c, new ArrayList<>(0), new ArrayList<>(0));
+        for (PosItem pi : items) {
+            Node newNode = new Node(pi, new ArrayList<>(0), new ArrayList<>(0));
 
             for (Node n : nodes) {
-                Comparison result = compare(c, n);
+                Comparison result = compare(pi, n);
 
                 if (result.equals(GREAT)) {
                     n.getGreater().add(newNode);
@@ -58,7 +57,7 @@ public class Board {
             nodes.add(newNode);
         }
 
-        List<Content> sortedContent = new ArrayList<>(1);
+        List<PosItem> sortedItems = new ArrayList<>(1);
 
         if (!nodes.isEmpty()) {
             Node n = nodes.get(0);
@@ -69,7 +68,7 @@ public class Board {
                 }
                 Node min = findMin(n);
 
-                sortedContent.add(min.getContent());
+                sortedItems.add(min.getItem());
                 nodes.remove(min);
 
                 size = size - 1;
@@ -77,8 +76,8 @@ public class Board {
                 n = findFirstNotEmptyGreater(min);
             }
 
-            contents.clear();
-            contents.addAll(sortedContent);
+            items.clear();
+            items.addAll(sortedItems);
         }
     }
 
@@ -174,15 +173,15 @@ public class Board {
         return INCOMPARABLE;
     }
 
-    public Content lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
+    public PosItem lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
         List<ItemType> typesList = new ArrayList<>(1);
         Collections.addAll(typesList, types);
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents = contents.stream()
-                .filter(c -> typesList.contains(c.getItem().getType()))
-                .filter(c -> c.isVisible())
-                .filter(c -> {
-                    int level = c.getItem().getLevel();
+        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
+        items = items.stream()
+                .filter(pi -> typesList.contains(pi.getType()))
+                .filter(pi -> pi.getVisible())
+                .filter(pi -> {
+                    int level = pi.getLevel();
                     int actualLevel = Controller.get().getCurrentLayer().getLevel();
                     if (includeLevelsBelow) {
                         return level <= actualLevel;
@@ -191,32 +190,32 @@ public class Board {
                     }
                 })
                 .collect(Collectors.toList());
-        if (contents.isEmpty()) {
+        if (items.isEmpty()) {
             return null;
         }
-        sortContents(contents);
-        Collections.reverse(contents);
+        sortItems(items);
+        Collections.reverse(items);
 
-        for (Content c : contents) {
+        for (PosItem pi : items) {
             for (Coords pos : poss) {
                 int x = pos.x;
                 int y = pos.y;
 
-                int cX = c.getItem().getPos().x;
-                int cWidth = (int) c.getItem().getImage().getWidth();
+                int cX = pi.getPos().x;
+                int cWidth = (int) pi.getImage().getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = c.getItem().getPos().y;
-                int cHeight = (int) c.getItem().getImage().getHeight();
+                int cY = pi.getPos().y;
+                int cHeight = (int) pi.getImage().getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
                     continue;
                 }
 
-                Image img = c.getItem().getImage();
+                Image img = pi.getImage();
                 int imgX = x - cX;
                 int imgY = y - cY;
                 Color color;
@@ -229,7 +228,7 @@ public class Board {
                 if (isPixelTransparent) {
                     continue;
                 }
-                return c;
+                return pi;
             }
         }
         return null;
@@ -264,16 +263,15 @@ public class Board {
                 });
     }
 
-    public Coords getFreePos(Coords[] corners, Content c) {
+    public Coords getFreePos(Coords[] corners, PosItem pi) {
         List<Coords> coordsList = new ArrayList<>();
         Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
             int x = pos.x;
             int y = pos.y;
-            PosItem i = c.getItem();
-            Coords oPos = i.getPos();
-            Image img = i.getImage();
+            Coords oPos = pi.getPos();
+            Image img = pi.getImage();
 
             int cX = oPos.x;
             int cWidth = (int) img.getWidth();
@@ -347,21 +345,21 @@ public class Board {
     }
 
     public List<Creature> getCreatures() {
-        return Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())
-                .filter(c -> c.getItem().getType().equals(ItemType.CREATURE))
-                .map(c -> (Creature) c.getItem())
+        return Controller.get().getCurrentLocation().getItems().stream()
+                .filter(pi -> pi.getLevel() == Controller.get().getCurrentLayer().getLevel())
+                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .map(pi -> (Creature) pi)
                 .collect(Collectors.toList());
     }
 
     public List<Creature> getControlledCreatures() {
-        return Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> c.getItem().getType().equals(ItemType.CREATURE))
-                .filter(c -> {
-                    Creature cr = (Creature) c.getItem();
+        return Controller.get().getCurrentLocation().getItems().stream()
+                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .filter(pi -> {
+                    Creature cr = (Creature) pi;
                     return cr.getControl().equals(CreatureControl.CONTROL);
                 })
-                .map(c -> (Creature) c.getItem())
+                .map(pi -> (Creature) pi)
                 .collect(Collectors.toList());
     }
 
@@ -394,25 +392,24 @@ public class Board {
         return null;
     }
 
-    public Content lookForObstacle(Coords[] poss) {
-        List<Content> contents = new ArrayList<>(Controller.get().getCurrentLocation().getContent());
-        contents = contents.stream()
-                .filter(c -> c.getItem().getCollisionPolygons() != null)
-                .filter(Content::isVisible)
-                .filter(c -> c.getItem().getLevel() == Controller.get().getCurrentLayer().getLevel())
+    public PosItem lookForObstacle(Coords[] poss) {
+        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
+        items = items.stream()
+                .filter(pi -> pi.getCollisionPolygons() != null)
+                .filter(PosItem::getVisible)
+                .filter(pi -> pi.getLevel() == Controller.get().getCurrentLayer().getLevel())
                 .collect(Collectors.toList());
-        if (contents.isEmpty()) {
+        if (items.isEmpty()) {
             return null;
         }
 
-        for (Content c : contents) {
+        for (PosItem pi : items) {
             for (Coords pos : poss) {
                 int x = pos.x;
                 int y = pos.y;
 
-                final PosItem it = c.getItem();
-                final Image img = it.getImage();
-                final Coords cPos = it.getPos();
+                final Image img = pi.getImage();
+                final Coords cPos = pi.getPos();
                 int cX = cPos.x;
                 int cWidth = (int) img.getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
@@ -427,7 +424,7 @@ public class Board {
                     continue;
                 }
 
-                final List<List<Coords>> cp = it.getCollisionPolygons();
+                final List<List<Coords>> cp = pi.getCollisionPolygons();
                 for (final List<Coords> polygon : cp) {
                     List<Coords> tc = new ArrayList<>();
                     looseCoordsReference(polygon, tc);
@@ -462,7 +459,7 @@ public class Board {
 
                     boolean isInsidePolygon = pos.isInsidePolygon(tc, maxObstacleX);
                     if (isInsidePolygon) {
-                        return c;
+                        return pi;
                     }
                 }
             }

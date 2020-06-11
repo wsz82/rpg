@@ -3,7 +3,7 @@ package game.model.world;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import javafx.application.Platform;
@@ -40,10 +40,10 @@ public class GameRunner {
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
                 synchronized (this) {
-                    List<Content> contents = Controller.get().getCurrentLocation().getContent();
+                    List<PosItem> contents = Controller.get().getCurrentLocation().getItems();
 
-                    for (Content c : contents) {
-                        c.getItem().update();
+                    for (PosItem pi : contents) {
+                        pi.update();
                     }
                     for (Location l : Controller.get().getLocationsList()) {
                         addContent(l);
@@ -70,21 +70,21 @@ public class GameRunner {
     }
 
     private void addContent(Location l) {
-        List<Content> c = l.getContentToAdd();
-        if (c.isEmpty()) {
+        List<PosItem> p = l.getItemsToAdd();
+        if (p.isEmpty()) {
             return;
         }
-        l.getContents().get().addAll(c);
-        c.clear();
+        l.getItems().get().addAll(p);
+        p.clear();
     }
 
     private void removeContent(Location l) {
-        List<Content> c = l.getContentToRemove();
-        if (c.isEmpty()) {
+        List<PosItem> p = l.getItemsToRemove();
+        if (p.isEmpty()) {
             return;
         }
-        l.getContents().get().removeAll(c);
-        c.clear();
+        l.getItems().get().removeAll(p);
+        p.clear();
     }
 
     private void updateLocation() {

@@ -1,25 +1,25 @@
 package io.wsz.model.stage;
 
-import io.wsz.model.content.Content;
+import io.wsz.model.item.PosItem;
 
 import java.util.List;
 
 public class Node {
-    private Content content;
+    private PosItem content;
     private List<Node> greater;
     private List<Node> lesser;
 
-    public Node(Content content, List<Node> greater, List<Node> lesser) {
+    public Node(PosItem content, List<Node> greater, List<Node> lesser) {
         this.content = content;
         this.greater = greater;
         this.lesser = lesser;
     }
 
-    public Content getContent() {
+    public PosItem getItem() {
         return content;
     }
 
-    public void setContent(Content content) {
+    public void setContent(PosItem content) {
         this.content = content;
     }
 
@@ -41,6 +41,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return getContent().getItem().getName();
+        return getItem().getName();
     }
 }

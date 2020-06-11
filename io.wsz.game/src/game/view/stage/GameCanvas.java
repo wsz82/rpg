@@ -1,7 +1,6 @@
 package game.view.stage;
 
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
 import io.wsz.model.item.*;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
@@ -33,26 +32,25 @@ public class GameCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        List<Content> contents = Controller.get().getCurrentLocation().getContent();
-        Board.get().sortContents(contents);
-        contents = contents.stream()
-                .filter(Content::isVisible)
-                .filter(c -> c.getItem().getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
+        List<PosItem> items = Controller.get().getCurrentLocation().getItems();
+        Board.get().sortItems(items);
+        items = items.stream()
+                .filter(PosItem::getVisible)
+                .filter(pi -> pi.getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
-        for (Content content : contents) {
-            final PosItem item = content.getItem();
-            final ItemType type = content.getItem().getType();
-            final Coords pos = item.getPos();
+        for (PosItem pi : items) {
+            final ItemType type = pi.getType();
+            final Coords pos = pi.getPos();
             final int x = pos.x;
             final int y = pos.y;
 
-            if (content.isVisible()) {
+            if (pi.getVisible()) {
                 switch (type) {
                     case CREATURE -> {
-                        drawCreatureSize((Creature) item, gc);
+                        drawCreatureSize((Creature) pi, gc);
                     }
                 }
-                gc.drawImage(item.getImage(), x, y);
+                gc.drawImage(pi.getImage(), x, y);
             }
         }
     }
@@ -82,12 +80,11 @@ public class GameCanvas extends Canvas {
                 Coords pos = new Coords((int) e.getX(), (int) e.getY());
                 Coords[] poss = new Coords[] {pos};
                 ItemType[] types = new ItemType[] {ItemType.CREATURE};
-                Content c = Controller.get().getBoard().lookForContent(poss, types, true);
-                if (c != null) {
-                    PosItem item = c.getItem();
-                    ItemType type = item.getType();
+                PosItem pi = Controller.get().getBoard().lookForContent(poss, types, true);
+                if (pi != null) {
+                    ItemType type = pi.getType();
                     switch (type) {
-                        case CREATURE -> ((Creature) item).interact();
+                        case CREATURE -> ((Creature) pi).interact();
                     }
                 } else {
                     commandControllable(pos);

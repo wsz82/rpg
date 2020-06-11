@@ -69,7 +69,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         sizeCB.setValue(size);
         CreatureControl control = asset.getControl();
         controlCB.setValue(control);
-        int speed = asset.getSpeed();
+        Integer speed = asset.getSpeed();
         speedInput.setText(String.valueOf(speed));
     }
 
@@ -87,7 +87,9 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected Creature createNewAsset(String name, String relativePath) {
-        return new Creature(null, name, getType(), relativePath, null, null, null, null);
+        return new Creature(
+                null, name, getType(), relativePath,
+                true, null, null, null, null);
     }
 
     @Override

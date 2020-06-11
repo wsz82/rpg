@@ -4,7 +4,11 @@ import editor.view.SafeIntegerStringConverter;
 import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
-import io.wsz.model.content.*;
+import io.wsz.model.content.LevelValueListener;
+import io.wsz.model.content.LevelValueObservable;
+import io.wsz.model.content.VisibleValueListener;
+import io.wsz.model.content.VisibleValueObservable;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import javafx.collections.ObservableList;
@@ -123,10 +127,10 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         List<Integer> levelsToRemove = layersToRemove.stream()
                 .map(l -> l.getLevel())
                 .collect(Collectors.toList());
-        List<Content> contentsToRemove = Controller.get().getCurrentLocation().getContent().stream()
-                .filter(c -> levelsToRemove.contains(c.getItem().getLevel()))
+        List<PosItem> itemsToRemove = Controller.get().getCurrentLocation().getItems().stream()
+                .filter(pi -> levelsToRemove.contains(pi.getLevel()))
                 .collect(Collectors.toList());
-        Controller.get().getCurrentLocation().getContent().removeAll(contentsToRemove);
+        Controller.get().getCurrentLocation().getItems().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {

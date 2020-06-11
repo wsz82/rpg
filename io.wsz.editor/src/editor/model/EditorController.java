@@ -29,8 +29,8 @@ public class EditorController {
 
     private EditorController(){}
 
-    public ActiveContent getActiveContent() {
-        return ActiveContent.get();
+    public ActiveItem getActiveContent() {
+        return ActiveItem.get();
     }
 
     public SettingsMemento restoreSettings(File programDir) {

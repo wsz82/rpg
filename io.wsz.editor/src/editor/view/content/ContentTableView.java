@@ -5,7 +5,6 @@ import editor.view.asset.*;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
@@ -13,6 +12,7 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
@@ -20,7 +20,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ContentTableView extends TableView<Content> {
+public class ContentTableView extends TableView<PosItem> {
     private static ContentTableView singleton;
 
     public static ContentTableView get() {
@@ -36,96 +36,96 @@ public class ContentTableView extends TableView<Content> {
     }
 
     private void initTable() {
-        setItems(CurrentLocation.get().getContent());
+        setItems(CurrentLocation.get().getItems());
         CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            setItems(newValue.getContents().get());
+            setItems(newValue.getItems().get());
         });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
 
-        TableColumn<Content, String> nameCol = new TableColumn<>("Name");
+        TableColumn<PosItem, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getItem().getName();
+                return param.getValue().getName();
             }
         });
-        TableColumn<Content, String> typeCol = new TableColumn<>("Type");
+        TableColumn<PosItem, String> typeCol = new TableColumn<>("Type");
         typeCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getItem().getType().toString();
+                return param.getValue().getType().toString();
             }
         });
-        TableColumn<Content, Integer> levelCol = new TableColumn<>("Level");
+        TableColumn<PosItem, Integer> levelCol = new TableColumn<>("Level");
         levelCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getItem().getLevel();
+                return param.getValue().getLevel();
             }
         });
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
             int level = t.getNewValue();
-            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
 
             List<Integer> levels = Controller.get().getCurrentLocation().getLayers().stream()
                     .map(l -> l.getLevel())
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {
                 alertLayerNotExisting(level);
-                c.getItem().setLevel(t.getOldValue());
+                pi.setLevel(t.getOldValue());
             } else {
-                c.getItem().setLevel(level);
+                pi.setLevel(level);
                 EditorCanvas.get().refresh();
             }
             refresh();
         });
 
-        TableColumn<Content, Boolean> visibilityCol = new TableColumn<>("Visibility");
-        visibilityCol.setCellValueFactory(param -> param.getValue().visibleProperty());
-        visibilityCol.setEditable(true);
+        TableColumn<PosItem, Boolean> visibilityCol = new TableColumn<>("Visibility");
+        visibilityCol.setCellValueFactory(new PropertyValueFactory<>("visible"));
         visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
+        visibilityCol.setEditable(true);
 
-        TableColumn<Content, Integer> posCol = new TableColumn<>("Position");
+        TableColumn<PosItem, Integer> posCol = new TableColumn<>("Position");
         posCol.setEditable(true);
 
-        TableColumn<Content, Integer> xCol = new TableColumn<>("X");
+        TableColumn<PosItem, Integer> xCol = new TableColumn<>("X");
         xCol.setEditable(true);
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getItem().getPos().x;
+                return param.getValue().getPos().x;
             }
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         xCol.setOnEditCommit(t -> {
-            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            c.getItem().getPos().x = t.getNewValue();
+            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            pi.getPos().x = t.getNewValue();
             refresh();
             EditorCanvas.get().refresh();
         });
 
-        TableColumn<Content, Integer> yCol = new TableColumn<>("Y");
+        TableColumn<PosItem, Integer> yCol = new TableColumn<>("Y");
         yCol.setEditable(true);
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getItem().getPos().y;
+                return param.getValue().getPos().y;
             }
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         yCol.setOnEditCommit(t -> {
-            Content c = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            c.getItem().getPos().y = t.getNewValue();
+            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            pi.getPos().y = t.getNewValue();
             refresh();
             EditorCanvas.get().refresh();
         });
         posCol.getColumns().addAll(xCol, yCol);
 
-        ObservableList<TableColumn<Content, ?>> columns = getColumns();
+        ObservableList<TableColumn<PosItem, ?>> columns = getColumns();
         columns.add(0, nameCol);
         columns.add(1, typeCol);
         columns.add(2, levelCol);
@@ -142,52 +142,51 @@ public class ContentTableView extends TableView<Content> {
     }
 
     void removeContents() {
-        ObservableList<Content> contentsToRemove = getSelectionModel().getSelectedItems();
-        CurrentLocation.get().getContent().removeAll(contentsToRemove);
+        ObservableList<PosItem> itemsToRemove = getSelectionModel().getSelectedItems();
+        CurrentLocation.get().getItems().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {
-        List<Content> contentsToChange = getSelectionModel().getSelectedItems();
-        for (Content content : contentsToChange) {
-            content.setVisible(!content.isVisible());
+        List<PosItem> itemsToChange = getSelectionModel().getSelectedItems();
+        for (PosItem pi : itemsToChange) {
+            pi.setVisible(!pi.getVisible());
         }
     }
 
     public void moveToPointer() {
-        List<Content> contentsToMove = getSelectionModel().getSelectedItems();
+        List<PosItem> itemsToMove = getSelectionModel().getSelectedItems();
         Coords newPos = Pointer.get().getMark();
-        for (Content c : contentsToMove) {
-            c.getItem().getPos().x = newPos.x;
+        for (PosItem pi : itemsToMove) {
+            pi.getPos().x = newPos.x;
             int y = 0;
             if (newPos.y != 0) {
-                y = newPos.y - (int) c.getItem().getImage().getHeight();
+                y = newPos.y - (int) pi.getImage().getHeight();
             }
-            c.getItem().getPos().y = y;
+            pi.getPos().y = y;
         }
         refresh();
         EditorCanvas.get().refresh();
     }
 
-    public void editContent(Stage parent) {
-        Content c = getSelectionModel().getSelectedItem();
-        openEditWindow(parent, c);
+    public void editItem(Stage parent) {
+        PosItem pi = getSelectionModel().getSelectedItem();
+        openEditWindow(parent, pi);
     }
 
-    public void openEditWindow(Stage parent, Content c) {
-        if (c == null) {
+    public void openEditWindow(Stage parent, PosItem pi) {
+        if (pi == null) {
             return;
         }
-        Asset item = c.getItem();
-        ItemType type = item.getType();
+        ItemType type = pi.getType();
         AssetStage itemStage = switch (type) {
             case CREATURE -> new CreatureAssetStage(
-                    parent, (Creature) item, true);
+                    parent, (Creature) pi, true);
             case TELEPORT -> new TeleportAssetStage(
-                    parent, (Teleport) item, true);
+                    parent, (Teleport) pi, true);
             case LANDSCAPE -> new LandscapeAssetStage(
-                    parent, (Landscape) item, true);
+                    parent, (Landscape) pi, true);
             case COVER -> new CoverAssetStage(
-                    parent, (Cover) item, true);
+                    parent, (Cover) pi, true);
         };
         itemStage.show();
     }

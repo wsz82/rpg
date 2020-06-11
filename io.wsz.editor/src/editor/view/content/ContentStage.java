@@ -44,7 +44,7 @@ public class ContentStage extends ChildStage {
     }
 
     private void editContent() {
-        table.editContent(this);
+        table.editItem(this);
     }
 
     private void changeVisibility() {

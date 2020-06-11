@@ -1,11 +1,11 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
-import io.wsz.model.content.Content;
 import io.wsz.model.item.Asset;
-import io.wsz.model.item.AssetConverter;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-abstract class AssetsTableView<A extends Asset> extends TableView<A> {
+abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     protected final Stage parent;
     protected final ObservableList<A> assets;
 
@@ -76,7 +76,8 @@ abstract class AssetsTableView<A extends Asset> extends TableView<A> {
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
             Coords mark = Pointer.get().getMark();
-            addItemsToStageAndContents(mark);
+            addToStage(mark);
+            EditorCanvas.get().refresh();
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {
@@ -84,19 +85,7 @@ abstract class AssetsTableView<A extends Asset> extends TableView<A> {
         });
     }
 
-    private void addItemsToStageAndContents(Coords pos) {
-        List<A> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
-        for (Asset a
-                : selectedAssets) {
-            if (!pos.is0()) {
-                double height = a.getImage().getHeight();
-                pos.y = pos.y - (int) height;
-            }
-            Content c = AssetConverter.convertToContent(a, pos, level);
-            Controller.get().getCurrentLocation().getContent().add(c);
-        }
-    }
+    protected abstract void addToStage(Coords pos);
 
     private void removeAssets() {
         List<A> assetsToRemove = getSelectionModel().getSelectedItems();
@@ -111,13 +100,13 @@ abstract class AssetsTableView<A extends Asset> extends TableView<A> {
                 .map(Asset::getName)
                 .collect(Collectors.toList());
        Controller.get().getLocationsList().forEach(l -> {
-           List<Content> contentToRemove = l.getContents().get().stream()
-                    .filter(c -> {
-                        String name = c.getItem().getName();
+           List<PosItem> contentToRemove = l.getItems().get().stream()
+                    .filter(p -> {
+                        String name = p.getName();
                         return assetsNames.contains(name);
                     })
                     .collect(Collectors.toList());
-           l.getContents().get().removeAll(contentToRemove);
+           l.getItems().get().removeAll(contentToRemove);
         });
     }
 

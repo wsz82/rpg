@@ -4,27 +4,37 @@ import io.wsz.model.stage.Coords;
 
 import java.util.List;
 
-public class Teleport extends PosItem {
+public class Teleport extends PosItem<Teleport> {
     private volatile String locationName;
     private volatile Coords exit;
     private volatile Integer exitLevel;
 
-    public Teleport(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public Teleport(Teleport prototype, String name, ItemType type, String path,
+                    Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, pos, level,
+                coverLine, collisionPolygons);
     }
 
-    public Teleport(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
+    public Teleport(Teleport prototype, String name, ItemType type, String path,
+                    Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons,
                     String locationName, Coords exitPos, Integer exitLevel) {
-        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, pos, level,
+                coverLine, collisionPolygons);
         this.locationName = locationName;
         this.exit = exitPos;
         this.exitLevel = exitLevel;
     }
 
     public String getLocationName() {
-        return locationName;
+        if (locationName == null) {
+            return prototype.locationName;
+        } else {
+            return locationName;
+        }
     }
 
     public void setLocationName(String locationName) {
@@ -32,7 +42,11 @@ public class Teleport extends PosItem {
     }
 
     public Coords getExit() {
-        return exit;
+        if (exit == null) {
+            return prototype.exit;
+        } else {
+            return exit;
+        }
     }
 
     public void setExit(Coords exit) {
@@ -40,7 +54,11 @@ public class Teleport extends PosItem {
     }
 
     public Integer getExitLevel() {
-        return exitLevel;
+        if (exitLevel == null) {
+            return prototype.exitLevel;
+        } else {
+            return exitLevel;
+        }
     }
 
     public void setExitLevel(Integer exitLevel) {

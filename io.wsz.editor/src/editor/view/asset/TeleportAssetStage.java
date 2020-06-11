@@ -132,7 +132,9 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected Teleport createNewAsset(String name, String relativePath) {
-        return new Teleport(null, name, getType(), relativePath, null, null, null, null);
+        return new Teleport(
+                null, name, getType(), relativePath,
+                true, null, null, null, null);
     }
 
     @Override
