@@ -20,23 +20,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EditorCanvas extends Canvas {
-    private static EditorCanvas singleton;
-    private final Pointer pointer = Pointer.get();
+    private final Stage stage;
     private EventHandler<KeyEvent> arrowsEvent;
+    private ContentTableView contentTableView;
+    private final Pointer pointer;
 
-    public static EditorCanvas get() {
-        if (singleton == null) {
-            singleton = new EditorCanvas();
-        }
-        return singleton;
-    }
-
-    private EditorCanvas(){
+    public EditorCanvas(Stage stage, Pointer pointer){
+        this.stage = stage;
+        this.pointer = pointer;
         setSize();
         hookupEvents();
     }
@@ -190,7 +187,7 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.LEFT) {
                 PosItem active = EditorController.get().getActiveContent().getItems();
                 moveContent(e.getCode(), active);
-                ContentTableView.get().refresh();
+                contentTableView.refresh();
                 refresh();
             }
         };
@@ -224,7 +221,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void edit(PosItem pi) {
-        ContentTableView.get().openEditWindow(Main.getStage(), pi);
+        contentTableView.openEditWindow(stage, pi);
     }
 
     private void setSize() {
@@ -268,7 +265,7 @@ public class EditorCanvas extends Canvas {
             y = newPos.y - (int) pi.getImage().getHeight();
         }
         pos.y = y;
-        ContentTableView.get().refresh();
+        contentTableView.refresh();
         refresh();
     }
 
@@ -280,5 +277,9 @@ public class EditorCanvas extends Canvas {
     private void removeItem(PosItem pi) {
         Controller.get().removeItem(pi);
         refresh();
+    }
+
+    public void setContentTableView(ContentTableView table) {
+        this.contentTableView = table;
     }
 }

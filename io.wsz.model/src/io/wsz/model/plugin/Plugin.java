@@ -1,6 +1,6 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.item.Asset;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
 
 import java.util.List;

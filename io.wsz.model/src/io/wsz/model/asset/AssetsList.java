@@ -1,4 +1,4 @@
-package io.wsz.model.item;
+package io.wsz.model.asset;
 
 import java.util.ArrayList;
 import java.util.List;

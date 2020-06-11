@@ -1,9 +1,8 @@
 package editor.view.asset;
 
-import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Asset;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -16,9 +15,10 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
+public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     protected final Stage parent;
     protected final ObservableList<A> assets;
+    private static Pointer pointer;
 
     AssetsTableView(Stage parent, ObservableList<A> assets) {
         super();
@@ -75,9 +75,8 @@ abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         editAsset.setOnAction(event -> editAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
-            Coords mark = Pointer.get().getMark();
+            Coords mark = pointer.getMark();
             addToStage(mark);
-            EditorCanvas.get().refresh();
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {
@@ -111,4 +110,8 @@ abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     protected abstract ItemType getType();
+
+    public static void setPointer(Pointer p) {
+        pointer = p;
+    }
 }

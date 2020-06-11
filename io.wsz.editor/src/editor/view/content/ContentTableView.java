@@ -21,17 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ContentTableView extends TableView<PosItem> {
-    private static ContentTableView singleton;
+    private final EditorCanvas editorCanvas;
+    private Pointer pointer;
 
-    public static ContentTableView get() {
-        if (singleton == null) {
-            singleton = new ContentTableView();
-        }
-        return singleton;
-    }
-
-    private ContentTableView() {
+    public ContentTableView(EditorCanvas editorCanvas) {
         super();
+        this.editorCanvas = editorCanvas;
         initTable();
     }
 
@@ -79,7 +74,7 @@ public class ContentTableView extends TableView<PosItem> {
                 pi.setLevel(t.getOldValue());
             } else {
                 pi.setLevel(level);
-                EditorCanvas.get().refresh();
+                editorCanvas.refresh();
             }
             refresh();
         });
@@ -105,7 +100,7 @@ public class ContentTableView extends TableView<PosItem> {
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
             pi.getPos().x = t.getNewValue();
             refresh();
-            EditorCanvas.get().refresh();
+            editorCanvas.refresh();
         });
 
         TableColumn<PosItem, Integer> yCol = new TableColumn<>("Y");
@@ -121,7 +116,7 @@ public class ContentTableView extends TableView<PosItem> {
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
             pi.getPos().y = t.getNewValue();
             refresh();
-            EditorCanvas.get().refresh();
+            editorCanvas.refresh();
         });
         posCol.getColumns().addAll(xCol, yCol);
 
@@ -155,7 +150,7 @@ public class ContentTableView extends TableView<PosItem> {
 
     public void moveToPointer() {
         List<PosItem> itemsToMove = getSelectionModel().getSelectedItems();
-        Coords newPos = Pointer.get().getMark();
+        Coords newPos = pointer.getMark();
         for (PosItem pi : itemsToMove) {
             pi.getPos().x = newPos.x;
             int y = 0;
@@ -165,7 +160,7 @@ public class ContentTableView extends TableView<PosItem> {
             pi.getPos().y = y;
         }
         refresh();
-        EditorCanvas.get().refresh();
+        editorCanvas.refresh();
     }
 
     public void editItem(Stage parent) {
@@ -189,5 +184,9 @@ public class ContentTableView extends TableView<PosItem> {
                     parent, (Cover) pi, true);
         };
         itemStage.show();
+    }
+
+    public void setPointer(Pointer pointer) {
+        this.pointer = pointer;
     }
 }

@@ -11,7 +11,6 @@ import game.view.launcher.Main;
 import game.view.stage.GameCanvas;
 import game.view.stage.GameScrollPane;
 import io.wsz.model.Controller;
-import io.wsz.model.item.AssetsList;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -129,14 +128,14 @@ public class GameController {
     }
 
     public void loadSaveToLists(SaveMemento m) {
-        if (AssetsList.get().isEmpty()) {
+        if (Controller.get().getAssetsList().isEmpty()) {
             Controller.get().loadAssetsToList();
         }
 
         Controller.get().getLocationsList().clear();
 
         List<LocationSerializable> lsList = m.getLocations();
-        List<Location> locations = SerializableConverter.toLocation(lsList, AssetsList.get());
+        List<Location> locations = SerializableConverter.toLocation(lsList, Controller.get().getAssetsList());
         Controller.get().getLocationsList().setAll(locations);
 
         List<Location> singleLocation = locations.stream()

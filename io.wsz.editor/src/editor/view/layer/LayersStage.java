@@ -1,6 +1,8 @@
 package editor.view.layer;
 
+import editor.view.content.ContentTableView;
 import editor.view.stage.ChildStage;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import javafx.scene.Scene;
@@ -14,10 +16,11 @@ import java.util.List;
 public class LayersStage extends ChildStage {
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
-    private final LayersTableView table = new LayersTableView();
+    private final LayersTableView table;
 
-    public LayersStage(Stage parent) {
+    public LayersStage(Stage parent, ContentTableView contentTableView, EditorCanvas editorCanvas) {
         super(parent);
+        table = new LayersTableView(contentTableView, editorCanvas);
         initWindow();
     }
 

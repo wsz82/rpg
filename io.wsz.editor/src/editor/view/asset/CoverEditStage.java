@@ -1,7 +1,7 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
-import io.wsz.model.item.Asset;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import javafx.scene.Scene;

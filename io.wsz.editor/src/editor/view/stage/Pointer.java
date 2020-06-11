@@ -10,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import java.util.Objects;
 
 public class Pointer {
-    private static Pointer singleton;
     private final EventHandler<MouseEvent> clickEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
@@ -20,23 +19,16 @@ public class Pointer {
                 if (markerImage == null) {
                     loadMarkerImage();
                 }
-                EditorCanvas.get().refresh();
+                editorCanvas.refresh();
             }
         }
     };
     private Coords mark;
     private boolean active;
     private Image markerImage;
+    private EditorCanvas editorCanvas;
 
-    public static Pointer get() {
-        if (singleton == null) {
-            singleton = new Pointer();
-        }
-        return singleton;
-}
-
-    private Pointer() {
-    }
+    public Pointer() {}
 
     private void loadMarkerImage() {
         markerImage = new Image(
@@ -46,15 +38,15 @@ public class Pointer {
 
     void activate() {
         active = true;
-        EditorCanvas.get().setCursor(Cursor.CROSSHAIR);
-        EditorCanvas.get().addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        editorCanvas.setCursor(Cursor.CROSSHAIR);
+        editorCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
     }
 
     void deactivate() {
         active = false;
-        EditorCanvas.get().setCursor(Cursor.DEFAULT);
-        EditorCanvas.get().removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
-        EditorCanvas.get().refresh();
+        editorCanvas.setCursor(Cursor.DEFAULT);
+        editorCanvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        editorCanvas.refresh();
     }
 
     public Coords getMark() {
@@ -79,5 +71,9 @@ public class Pointer {
 
     public Image getMarkerImage() {
         return markerImage;
+    }
+
+    public void setEditorCanvas(EditorCanvas editorCanvas) {
+        this.editorCanvas = editorCanvas;
     }
 }

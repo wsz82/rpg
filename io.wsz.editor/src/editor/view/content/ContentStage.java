@@ -1,6 +1,8 @@
 package editor.view.content;
 
 import editor.view.stage.ChildStage;
+import editor.view.stage.EditorCanvas;
+import editor.view.stage.Pointer;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -10,11 +12,16 @@ import javafx.stage.Stage;
 public class ContentStage extends ChildStage {
     private static final String TITLE = "Content";
     private final StackPane root = new StackPane();
-    private final ContentTableView table = ContentTableView.get();
+    private final ContentTableView table;
 
-    public ContentStage(Stage parent) {
+    public ContentStage(Stage parent, EditorCanvas editorCanvas) {
         super(parent);
+        table = new ContentTableView(editorCanvas);
         initWindow();
+    }
+
+    public ContentTableView getTable() {
+        return table;
     }
 
     private void initWindow() {
@@ -57,5 +64,9 @@ public class ContentStage extends ChildStage {
 
     private void removeContents() {
         table.removeContents();
+    }
+
+    public void setPointer(Pointer pointer) {
+        table.setPointer(pointer);
     }
 }

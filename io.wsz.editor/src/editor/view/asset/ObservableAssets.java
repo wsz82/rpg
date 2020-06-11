@@ -1,6 +1,10 @@
 package editor.view.asset;
 
-import io.wsz.model.item.*;
+import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Cover;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.Landscape;
+import io.wsz.model.item.Teleport;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

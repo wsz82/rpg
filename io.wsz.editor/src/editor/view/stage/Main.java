@@ -9,12 +9,10 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 public class Main extends Application {
-    private static Stage mainStage;
     private static File programDir;
 
     @Override
     public void start(Stage stage) {
-        mainStage = stage;
         EditorController.get().initNewPlugin();
 
         setProgramDir();
@@ -39,10 +37,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         Application.launch();
-    }
-
-    public static Stage getStage() {
-        return mainStage;
     }
 
     public static File getDir() {

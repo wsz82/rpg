@@ -3,7 +3,9 @@ package editor.view.stage;
 import editor.model.EditorController;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.AssetsStage;
+import editor.view.asset.AssetsTableView;
 import editor.view.content.ContentStage;
+import editor.view.content.ContentTableView;
 import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
@@ -12,7 +14,6 @@ import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.plugin.ActivePlugin;
 import javafx.event.Event;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -28,7 +29,7 @@ import java.io.File;
 class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
-    private static final Canvas EDITOR_CANVAS = EditorCanvas.get();
+    private final EditorCanvas editorCanvas;
     private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
     private final ContentStage contentsWindow;
@@ -36,11 +37,16 @@ class MainView {
     private final AssetsStage assetsWindow;
     private final LocationsStage locationsWindow;
     private final PluginSettingsStage pss;
+    private final Pointer pointer;
 
     MainView(Stage stage) {
         this.stage = stage;
-        contentsWindow = new ContentStage(stage);
-        layersWindow = new LayersStage(stage);
+        pointer = new Pointer();
+        editorCanvas = new EditorCanvas(stage, pointer);
+        contentsWindow = new ContentStage(stage, editorCanvas);
+        ContentTableView ctv = contentsWindow.getTable();
+        editorCanvas.setContentTableView(ctv);
+        layersWindow = new LayersStage(stage, ctv, editorCanvas);
         assetsWindow = new AssetsStage(stage);
         locationsWindow = new LocationsStage(stage);
         pss = new PluginSettingsStage(stage);
@@ -99,7 +105,7 @@ class MainView {
     private void setUpScrollPane() {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setContent(EDITOR_CANVAS);
+        scrollPane.setContent(editorCanvas);
         scrollPane.setPannable(true);
         scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
         scrollPane.addEventFilter(MouseEvent.ANY, event -> {
@@ -146,14 +152,21 @@ class MainView {
 
     private void setTopContent(VBox topBar) {
         MenuBar menuBar = getMenuBar();
-        ToolBar toolBar = new EditorToolBar();
+        ToolBar toolBar = getToolBar();
         topBar.getChildren().addAll(menuBar, toolBar);
+    }
+
+    private ToolBar getToolBar() {
+        pointer.setEditorCanvas(editorCanvas);
+        contentsWindow.setPointer(pointer);
+        AssetsTableView.setPointer(pointer);
+        return new EditorToolBar(pointer);
     }
 
     private void setBottomContent(VBox bottom) {
         HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        CoordinatesBox coordinatesBox = new CoordinatesBox(EDITOR_CANVAS);
+        CoordinatesBox coordinatesBox = new CoordinatesBox(editorCanvas);
         CurrentLocationBox currentLocationBox = new CurrentLocationBox();
         CurrentLayerBox currentLayerBox = new CurrentLayerBox();
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);
@@ -212,7 +225,7 @@ class MainView {
     }
 
     private void openPluginsTable() {
-        Stage plugins = new EditorPluginsTable();
+        Stage plugins = new EditorPluginsTable(pss);
         plugins.initOwner(stage);
         plugins.show();
     }
@@ -224,16 +237,16 @@ class MainView {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
-        File saveFile = fileChooser.showSaveDialog(Main.getStage());
+        File saveFile = fileChooser.showSaveDialog(stage);
         if (saveFile == null) {
             return;
         }
-        EditorController.get().savePluginAs(saveFile.getName());    //TODO fill only name
+        EditorController.get().savePluginAs(saveFile.getName(), pss);    //TODO fill only name
     }
 
     private void saveFile() {
         if (ActivePlugin.get().getPlugin() != null) {
-            EditorController.get().saveActivePlugin();
+            EditorController.get().saveActivePlugin(pss);
         } else {
             saveAsFile();
         }

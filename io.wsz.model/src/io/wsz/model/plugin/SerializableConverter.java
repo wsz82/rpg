@@ -1,5 +1,6 @@
 package io.wsz.model.plugin;
 
+import io.wsz.model.asset.Asset;
 import io.wsz.model.content.ItemList;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;

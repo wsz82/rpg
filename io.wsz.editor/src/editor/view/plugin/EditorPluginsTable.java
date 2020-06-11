@@ -24,10 +24,12 @@ import java.util.Objects;
 
 public class EditorPluginsTable extends Stage {
     private final ObservableList<Plugin> pluginList = FXCollections.observableArrayList();
-    final TableView<Plugin> table = new TableView<>();
+    private final TableView<Plugin> table = new TableView<>();
+    private final PluginSettingsStage pss;
 
-    public EditorPluginsTable() {
+    public EditorPluginsTable(PluginSettingsStage pss) {
         super(StageStyle.UTILITY);
+        this.pss = pss;
         pluginList.addAll(getPlugins());
         initWindow();
     }
@@ -82,7 +84,7 @@ public class EditorPluginsTable extends Stage {
             alertNoPluginChosen();
             return;
         }
-        EditorController.get().loadAndRestorePlugin(plugin.getName());
+        EditorController.get().loadAndRestorePlugin(plugin.getName(), pss);
         close();
     }
 

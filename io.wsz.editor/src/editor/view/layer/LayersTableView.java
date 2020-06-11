@@ -27,9 +27,13 @@ import java.util.stream.Collectors;
 class LayersTableView extends TableView<Layer> implements LevelValueObservable, VisibleValueObservable {
     private final Set<LevelValueListener> levelValueListeners = new HashSet<>();
     private final Set<VisibleValueListener> visibleValueListeners = new HashSet<>();
+    private final ContentTableView contentTableView;
+    private final EditorCanvas editorCanvas;
 
-    LayersTableView() {
+    LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas) {
         super();
+        this.contentTableView = contentTableView;
+        this.editorCanvas = editorCanvas;
         initTable();
     }
 
@@ -54,8 +58,8 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
             if (isLevelUnique(level)) {
                 layer.setLevel(level);
                 Controller.get().getCurrentLayer().setLayer(layer);
-                ContentTableView.get().refresh();
-                EditorCanvas.get().refresh();
+                contentTableView.refresh();
+                editorCanvas.refresh();
             } else {
                 layer.setLevel(t.getOldValue());
             }

@@ -16,8 +16,8 @@ class EditorToolBar extends ToolBar {
     private final ToggleButton pointerButton = new ToggleButton();
     private final Slider opacitySlider = new Slider(0.1, 1, 1);
 
-    EditorToolBar() {
-        createPointerTool();
+    EditorToolBar(Pointer pointer) {
+        createPointerTool(pointer);
         VBox opacityBox = createOpacityTool();
 
         getItems().addAll(pointerButton, opacityBox);
@@ -52,13 +52,13 @@ class EditorToolBar extends ToolBar {
         });
     }
 
-    private void createPointerTool() {
+    private void createPointerTool(Pointer pointer) {
         pointerButton.setGraphic(new ImageView(getPointerIcon()));
         pointerButton.setOnAction(event -> {
             if (pointerButton.isSelected()) {
-                Pointer.get().activate();
+                pointer.activate();
             } else {
-                Pointer.get().deactivate();
+                pointer.deactivate();
             }
         });
     }

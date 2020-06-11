@@ -5,8 +5,8 @@ import editor.model.settings.SettingsMemento;
 import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Asset;
-import io.wsz.model.item.AssetsList;
+import io.wsz.model.asset.Asset;
+import io.wsz.model.asset.AssetsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
@@ -53,11 +53,11 @@ public class EditorController {
         Controller.get().getCurrentLayer().setLayer(layer);
     }
 
-    public void saveActivePlugin() {
+    public void saveActivePlugin(PluginSettingsStage pss) {
         mergeAssetsLists();
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = ActivePlugin.get().getPlugin();
-        setPluginsParams(p);
+        setPluginsParams(p, pss);
         pc.save(p);
     }
 
@@ -66,41 +66,41 @@ public class EditorController {
         Controller.get().getAssetsList().addAll(ObservableAssets.get().merge());
     }
 
-    public void savePluginAs(String pluginName) {
+    public void savePluginAs(String pluginName, PluginSettingsStage pss) {
         mergeAssetsLists();
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = new Plugin();
         p.setName(pluginName);
-        setPluginsParams(p);
+        setPluginsParams(p, pss);
         pc.saveAs(p);
         ActivePlugin.get().setPlugin(p);
     }
 
-    private void setPluginsParams(Plugin p) {
+    private void setPluginsParams(Plugin p, PluginSettingsStage pss) {
         p.setAssets(AssetsList.get());
         p.setLocations(LocationsList.get());
-        boolean isStartingLocation = PluginSettingsStage.isStartingLocation();
+        boolean isStartingLocation = pss.isStartingLocation();
         p.setStartingLocation(isStartingLocation);
-        String startLocation = PluginSettingsStage.getStartLocationName();
+        String startLocation = pss.getStartLocationName();
         p.setStartLocation(startLocation);
-        int startX = PluginSettingsStage.getStartX();
+        int startX = pss.getStartX();
         p.setStartX(startX);
-        int startY = PluginSettingsStage.getStartY();
+        int startY = pss.getStartY();
         p.setStartY(startY);
-        int startLayer = PluginSettingsStage.getStartLayer();
+        int startLayer = pss.getStartLayer();
         p.setStartLayer(startLayer);
     }
 
-    public void loadAndRestorePlugin(String pluginName) {
+    public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = pc.load(pluginName);
         Controller.get().setActivePlugin(p);
         loadEditorActivePluginToLists();
-        PluginSettingsStage.setStartingLocation(p.isStartingLocation());
-        PluginSettingsStage.setStartLocationName(p.getStartLocation());
-        PluginSettingsStage.setStartX(p.getStartX());
-        PluginSettingsStage.setStartY(p.getStartY());
-        PluginSettingsStage.setStartLayer(p.getStartLayer());
+        pss.setStartingLocation(p.isStartingLocation());
+        pss.setStartLocationName(p.getStartLocation());
+        pss.setStartX(p.getStartX());
+        pss.setStartY(p.getStartY());
+        pss.setStartLayer(p.getStartLayer());
     }
 
     public void loadEditorActivePluginToLists() {

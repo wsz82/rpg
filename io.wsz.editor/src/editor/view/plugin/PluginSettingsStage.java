@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PluginSettingsStage extends ChildStage {
-    private static final String TITLE = "Plugin settings";
-    private static final BooleanProperty startingLocation = new SimpleBooleanProperty();
-    private static final ObjectProperty<String> startLocationName = new SimpleObjectProperty<>();
-    private static final IntegerProperty startX = new SimpleIntegerProperty();
-    private static final IntegerProperty startY = new SimpleIntegerProperty();
-    private static final IntegerProperty startLayer = new SimpleIntegerProperty();
+    private final String TITLE = "Plugin settings";
+    private final BooleanProperty startingLocation = new SimpleBooleanProperty();
+    private final ObjectProperty<String> startLocationName = new SimpleObjectProperty<>();
+    private final IntegerProperty startX = new SimpleIntegerProperty();
+    private final IntegerProperty startY = new SimpleIntegerProperty();
+    private final IntegerProperty startLayer = new SimpleIntegerProperty();
     private final StackPane root = new StackPane();
 
     public PluginSettingsStage(Stage parent){
@@ -139,63 +139,43 @@ public class PluginSettingsStage extends ChildStage {
         show();
     }
 
-    public static boolean isStartingLocation() {
+    public boolean isStartingLocation() {
         return startingLocation.get();
     }
 
-    public static BooleanProperty startingLocationProperty() {
-        return startingLocation;
+    public void setStartingLocation(boolean startingLocation) {
+        this.startingLocation.set(startingLocation);
     }
 
-    public static void setStartingLocation(boolean startingLocation) {
-        PluginSettingsStage.startingLocation.set(startingLocation);
-    }
-
-    public static String getStartLocationName() {
+    public String getStartLocationName() {
         return startLocationName.get();
     }
 
-    public static ObjectProperty<String> startLocationProperty() {
-        return startLocationName;
+    public void setStartLocationName(String startLocationName) {
+        this.startLocationName.set(startLocationName);
     }
 
-    public static void setStartLocationName(String startLocationName) {
-        PluginSettingsStage.startLocationName.set(startLocationName);
-    }
-
-    public static int getStartX() {
+    public int getStartX() {
         return startX.get();
     }
 
-    public static IntegerProperty startXProperty() {
-        return startX;
+    public void setStartX(int startX) {
+        this.startX.set(startX);
     }
 
-    public static void setStartX(int startX) {
-        PluginSettingsStage.startX.set(startX);
-    }
-
-    public static int getStartY() {
+    public int getStartY() {
         return startY.get();
     }
 
-    public static IntegerProperty startYProperty() {
-        return startY;
+    public void setStartY(int startY) {
+        this.startY.set(startY);
     }
 
-    public static void setStartY(int startY) {
-        PluginSettingsStage.startY.set(startY);
-    }
-
-    public static int getStartLayer() {
+    public int getStartLayer() {
         return startLayer.get();
     }
 
-    public static IntegerProperty startLayerProperty() {
-        return startLayer;
-    }
-
-    public static void setStartLayer(int startLayer) {
-        PluginSettingsStage.startLayer.set(startLayer);
+    public void setStartLayer(int startLayer) {
+        this.startLayer.set(startLayer);
     }
 }

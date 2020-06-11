@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.asset.Asset;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;

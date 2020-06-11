@@ -2,7 +2,7 @@ package editor.view.asset;
 
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Asset;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import javafx.geometry.Insets;
@@ -18,8 +18,8 @@ import java.io.File;
 import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
-    protected A asset;
     protected final VBox container = new VBox(5);
+    protected A asset;
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();

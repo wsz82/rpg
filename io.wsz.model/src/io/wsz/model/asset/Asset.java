@@ -1,6 +1,7 @@
-package io.wsz.model.item;
+package io.wsz.model.asset;
 
 import io.wsz.model.Controller;
+import io.wsz.model.item.ItemType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
