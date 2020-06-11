@@ -1,7 +1,8 @@
 package editor.view.asset;
 
 import editor.view.stage.ChildStage;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -32,7 +33,25 @@ public class AssetsStage extends ChildStage {
 
         for (ItemType itemType:
              itemTypes) {
-            AssetsTableView table = new AssetsTableView(this, itemType);
+            AssetsTableView table = null;
+            switch (itemType) {
+                case CREATURE -> {
+                    ObservableList<Creature> creatures = ObservableAssets.get().getCreatures();
+                    table = new CreatureTableView(this, creatures);
+                }
+                case COVER -> {
+                    ObservableList<Cover> covers = ObservableAssets.get().getCovers();
+                    table = new CoverTableView(this, covers);
+                }
+                case LANDSCAPE -> {
+                    ObservableList<Landscape> landscapes = ObservableAssets.get().getLandscapes();
+                    table = new LandscapeTableView(this, landscapes);
+                }
+                case TELEPORT -> {
+                    ObservableList<Teleport> teleports = ObservableAssets.get().getTeleports();
+                    table = new TeleportTableView(this, teleports);
+                }
+            }
             String tabName = itemType.toString();
             Tab tab = new Tab();
             tab.setText(tabName);

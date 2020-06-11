@@ -1,14 +1,14 @@
 package io.wsz.model.item;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssetsList {
-    private static ObservableList<Asset> assets;
+    private static List<Asset> assets;
 
-    public static ObservableList<Asset> get() {
+    public static List<Asset> get() {
         if (assets == null) {
-            assets = FXCollections.observableArrayList();
+            assets = new ArrayList<>(0);
         }
         return assets;
     }

@@ -50,7 +50,7 @@ public class Controller {
         Plugin plugin = ActivePlugin.get().getPlugin();
 
         AssetsList.get().clear();
-        AssetsList.get().setAll(plugin.getAssets());
+        AssetsList.get().addAll(plugin.getAssets());
     }
 
     public Plugin loadPlugin(String pluginName) {
@@ -81,7 +81,7 @@ public class Controller {
         return LocationsList.get();
     }
 
-    public ObservableList<Asset> getAssetsList() {
+    public List<Asset> getAssetsList() {
         return AssetsList.get();
     }
 

@@ -1,16 +1,12 @@
 package editor.view.content;
 
 import editor.view.SafeIntegerStringConverter;
-import editor.view.asset.AssetStage;
-import editor.view.asset.AssetStageImpl;
-import editor.view.asset.CreatureAssetStage;
-import editor.view.asset.TeleportAssetStage;
+import editor.view.asset.*;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
-import io.wsz.model.item.Asset;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -184,9 +180,14 @@ public class ContentTableView extends TableView<Content> {
         Asset item = c.getItem();
         ItemType type = item.getType();
         AssetStage itemStage = switch (type) {
-            case CREATURE -> new CreatureAssetStage(parent, item, true);
-            case TELEPORT -> new TeleportAssetStage(parent, item, true);
-            default -> new AssetStageImpl(parent, item, true);
+            case CREATURE -> new CreatureAssetStage(
+                    parent, (Creature) item, true);
+            case TELEPORT -> new TeleportAssetStage(
+                    parent, (Teleport) item, true);
+            case LANDSCAPE -> new LandscapeAssetStage(
+                    parent, (Landscape) item, true);
+            case COVER -> new CoverAssetStage(
+                    parent, (Cover) item, true);
         };
         if (itemStage == null) {
             return;

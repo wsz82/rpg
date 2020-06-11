@@ -5,14 +5,10 @@ import io.wsz.model.Controller;
 import io.wsz.model.content.Content;
 import io.wsz.model.item.Asset;
 import io.wsz.model.item.AssetConverter;
-import io.wsz.model.item.AssetsList;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
@@ -20,22 +16,27 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class AssetsTableView extends AssetsGenericTableView {
-    private final ItemType itemType;
-    private final Stage parent;
+abstract class AssetsTableView<A extends Asset> extends TableView<A> {
+    protected final Stage parent;
+    protected final ObservableList<A> assets;
 
-    AssetsTableView(Stage parent, ItemType itemType) {
+    AssetsTableView(Stage parent, ObservableList<A> assets) {
         super();
-        this.itemType = itemType;
         this.parent = parent;
+        this.assets = assets;
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         initTable();
-        setFilteredItems();
+        setItems(assets);
         setUpContextMenu();
         setEditable(true);
     }
 
+    protected abstract void editAsset();
+
+    protected abstract void addAsset();
+
     private void initTable() {
-        TableColumn<Asset, String> nameCol = new TableColumn<>("Name");
+        TableColumn<A, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -50,25 +51,18 @@ class AssetsTableView extends AssetsGenericTableView {
             refresh();
         });
 
-        TableColumn<Asset, String> pathCol = new TableColumn<>("Path");
+        TableColumn<A, String> pathCol = new TableColumn<>("Path");
         pathCol.setCellValueFactory(new PropertyValueFactory<>("relativePath"));
         pathCol.setEditable(false);
         pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        ObservableList<TableColumn<Asset, ?>> columns = getColumns();
+        ObservableList<TableColumn<A, ?>> columns = getColumns();
         columns.addAll(nameCol, pathCol);
     }
 
     private boolean assetNameIsNotUnique(String newValue) {
         return Controller.get().getAssetsList().stream()
                 .anyMatch(p -> p.getName().equals(newValue));
-    }
-
-    private void setFilteredItems() {
-        ObservableList<Asset> assets = AssetsList.get();
-        FilteredList<Asset> filteredList = new FilteredList<>(assets);
-        filteredList.setPredicate(asset -> asset.getType() == itemType);
-        setItems(filteredList);
     }
 
     private void setUpContextMenu() {
@@ -90,24 +84,8 @@ class AssetsTableView extends AssetsGenericTableView {
         });
     }
 
-    private void editAsset() {
-        Asset assetToEdit = getSelectionModel().getSelectedItem();
-        if (assetToEdit == null) {
-            return;
-        }
-        AssetStage assetStage = switch (itemType) {
-            case CREATURE ->
-                    new CreatureAssetStage(parent, assetToEdit, false);
-            case TELEPORT ->
-                    new TeleportAssetStage(parent, assetToEdit, false);
-            default ->
-                    new AssetStageImpl(parent, assetToEdit, false);
-        };
-        assetStage.show();
-    }
-
     private void addItemsToStageAndContents(Coords pos) {
-        List<Asset> selectedAssets = getSelectionModel().getSelectedItems();
+        List<A> selectedAssets = getSelectionModel().getSelectedItems();
         int level = Controller.get().getCurrentLayer().getLevel();
         for (Asset a
                 : selectedAssets) {
@@ -120,27 +98,17 @@ class AssetsTableView extends AssetsGenericTableView {
         }
     }
 
-    private void addAsset() {
-        AssetStage as = switch (itemType) {
-            case CREATURE ->
-                    new CreatureAssetStage(parent, itemType);
-            case TELEPORT ->
-                    new TeleportAssetStage(parent, itemType);
-            default ->
-                    new AssetStageImpl(parent, itemType);
-        };
-        as.show();
-    }
-
     private void removeAssets() {
-        List<Asset> assetsToRemove = getSelectionModel().getSelectedItems();
+        List<A> assetsToRemove = getSelectionModel().getSelectedItems();
         removeContent(assetsToRemove);
-        Controller.get().getAssetsList().removeAll(assetsToRemove);
+        removeAssetFromList(assetsToRemove);
     }
 
-    private void removeContent(List<Asset> assetsToRemove) {
+    protected abstract void removeAssetFromList(List<A> assetsToRemove);
+
+    private void removeContent(List<A> assetsToRemove) {
         List<String> assetsNames = assetsToRemove.stream()
-                .map(a -> a.getName())
+                .map(Asset::getName)
                 .collect(Collectors.toList());
        Controller.get().getLocationsList().forEach(l -> {
            List<Content> contentToRemove = l.getContents().get().stream()
@@ -152,4 +120,6 @@ class AssetsTableView extends AssetsGenericTableView {
            l.getContents().get().removeAll(contentToRemove);
         });
     }
+
+    protected abstract ItemType getType();
 }

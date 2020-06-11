@@ -2,7 +2,6 @@ package editor.view.asset;
 
 import editor.view.IntegerField;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.location.Location;
@@ -17,20 +16,20 @@ import javafx.util.StringConverter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TeleportAssetStage extends AssetStage {
+public class TeleportAssetStage extends AssetStage<Teleport> {
     private static final String TITLE = "Teleport asset";
     private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
     private final IntegerField inputX = new IntegerField(0);
     private final IntegerField inputY = new IntegerField(0);
     private final IntegerField inputLayer = new IntegerField();
 
-    public TeleportAssetStage(Stage parent, Asset asset, boolean isContent) {
+    public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent) {
         super(parent, asset, isContent);
         initWindow();
     }
 
-    public TeleportAssetStage(Stage parent, ItemType type) {
-        super(parent, type);
+    public TeleportAssetStage(Stage parent) {
+        super(parent);
         initWindow();
     }
 
@@ -59,19 +58,6 @@ public class TeleportAssetStage extends AssetStage {
 
         setUpLocationChoice(locationChoice);
         fillInputs();
-    }
-
-    @Override
-    protected void bindProperties() {
-        super.bindProperties();
-        inputX.disableProperty()
-                .bind(genericCheck.selectedProperty());
-        inputY.disableProperty()
-                .bind(genericCheck.selectedProperty());
-        inputLayer.disableProperty()
-                .bind(genericCheck.selectedProperty());
-        locationChoice.disableProperty()
-                .bind(genericCheck.selectedProperty());
     }
 
     private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {
@@ -111,13 +97,12 @@ public class TeleportAssetStage extends AssetStage {
         if (asset == null) {
             return;
         }
-        Teleport t = (Teleport) asset;
-        String locationName = t.getLocationName();
+        String locationName = asset.getLocationName();
         if (locationName != null) {
             locationChoice.setValue(getLocation(locationName));
         }
-        inputLayer.setText(""+t.getExitLevel());
-        Coords exitPos = t.getExit();
+        inputLayer.setText(""+asset.getExitLevel());
+        Coords exitPos = asset.getExit();
         if (exitPos != null) {
             int x = exitPos.x;
             int y = exitPos.y;
@@ -128,26 +113,30 @@ public class TeleportAssetStage extends AssetStage {
 
     @Override
     protected void defineAsset() {
-        Teleport t = (Teleport) asset;
-        if (t.isGeneric()) {
-            List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
-                    .filter(a -> a.getName().equals(asset.getName()))
-                    .collect(Collectors.toList());
-            Teleport prototype = (Teleport) correspondingAsset.get(0);
-            t.setLocationName(prototype.getLocationName());
-            t.setExit(prototype.getExit());
-            t.setExitLevel(prototype.getExitLevel());
-        } else {
-            if (locationChoice.getValue() != null) {
-                String locationName = locationChoice.getValue().getName();
-                t.setLocationName(locationName);
-            }
-            int layer = Integer.parseInt(inputLayer.getText());
-            t.setExitLevel(layer);
-            int x = Integer.parseInt(inputX.getText());
-            int y = Integer.parseInt(inputY.getText());
-            Coords exitPos = new Coords(x, y);
-            t.setExit(exitPos);
+        if (locationChoice.getValue() != null) {
+            String locationName = locationChoice.getValue().getName();
+            asset.setLocationName(locationName);
         }
+        int layer = Integer.parseInt(inputLayer.getText());
+        asset.setExitLevel(layer);
+        int x = Integer.parseInt(inputX.getText());
+        int y = Integer.parseInt(inputY.getText());
+        Coords exitPos = new Coords(x, y);
+        asset.setExit(exitPos);
+    }
+
+    @Override
+    protected void addAssetToList(Teleport asset) {
+        ObservableAssets.get().getTeleports().add(asset);
+    }
+
+    @Override
+    protected Teleport createNewAsset(String name, String relativePath) {
+        return new Teleport(null, name, getType(), relativePath, null, null, null, null);
+    }
+
+    @Override
+    protected ItemType getType() {
+        return ItemType.TELEPORT;
     }
 }

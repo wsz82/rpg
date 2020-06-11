@@ -12,24 +12,23 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
-import static io.wsz.model.item.ItemType.CREATURE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem {
     private volatile Coords dest;
     private volatile CreatureSize size;
     private volatile CreatureControl control;
-    private volatile int speed;
+    private volatile Integer speed;
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level, boolean generic,
+    public Creature(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(name, type, path, pos, level, generic, coverLine, collisionPolygons);
+        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
     }
 
-    public Creature(String name, ItemType type, String path, Coords pos, int level, boolean generic,
+    public Creature(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                    Coords dest, CreatureSize size, CreatureControl control, int speed) {
-        super(name, type, path, pos, level, generic, coverLine, collisionPolygons);
+                    Coords dest, CreatureSize size, CreatureControl control, Integer speed) {
+        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
         this.dest = dest;
         this.size = size;
         this.control = control;
@@ -229,22 +228,12 @@ public class Creature extends PosItem {
         this.dest = pos;
     }
 
-    public int getSpeed() {
+    public Integer getSpeed() {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(Integer speed) {
         this.speed = speed;
-        if (getPos() != null) {
-            return;
-        }
-        Controller.get().getLocationsList().forEach(l -> {
-            l.getContents().get().stream()
-                    .filter(c -> c.getItem().getType().equals(CREATURE))
-                    .filter(c -> c.getItem().getName().equals(getName()))
-                    .filter(c -> c.getItem().isGeneric())
-                    .forEach(c -> ((Creature) c.getItem()).setSpeed(speed));
-        });
     }
 
     public CreatureSize getSize() {
@@ -253,16 +242,6 @@ public class Creature extends PosItem {
 
     public void setSize(CreatureSize size) {
         this.size = size;
-        if (getPos() != null) {
-            return;
-        }
-        Controller.get().getLocationsList().forEach(l -> {
-            l.getContents().get().stream()
-                    .filter(c -> c.getItem().getType().equals(CREATURE))
-                    .filter(c -> c.getItem().getName().equals(getName()))
-                    .filter(c -> c.getItem().isGeneric())
-                    .forEach(c -> ((Creature) c.getItem()).setSize(size));
-        });
     }
 
     public CreatureControl getControl() {
@@ -271,16 +250,6 @@ public class Creature extends PosItem {
 
     public void setControl(CreatureControl control) {
         this.control = control;
-        if (getPos() != null) {
-            return;
-        }
-        Controller.get().getLocationsList().forEach(l -> {
-            l.getContents().get().stream()
-                    .filter(c -> c.getItem().getType().equals(CREATURE))
-                    .filter(c -> c.getItem().getName().equals(getName()))
-                    .filter(c -> c.getItem().isGeneric())
-                    .forEach(c -> ((Creature) c.getItem()).setControl(control));
-        });
     }
 
     @Override

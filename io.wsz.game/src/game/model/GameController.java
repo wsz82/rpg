@@ -173,7 +173,7 @@ public class GameController {
             CurrentLayer.get().setLayer(startLayer.get(0));
         }
 
-        Controller.get().getAssetsList().setAll(p.getAssets());
+        Controller.get().getAssetsList().addAll(p.getAssets());
         Controller.get().getLocationsList().setAll(p.getLocations());
     }
 

@@ -6,16 +6,16 @@ import io.wsz.model.stage.Coords;
 import java.util.List;
 
 public class PosItemSerializable extends AssetSerializable {
+    protected String prototype;
     protected Coords pos;
-    protected int level;
-    protected boolean generic;
+    protected Integer level;
 
-    public PosItemSerializable(String name, ItemType type, String path, Coords pos, int level, boolean generic,
+    public PosItemSerializable(String prototype, String name, ItemType type, String path, Coords pos, Integer level,
                                List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(name, type, path, coverLine, collisionPolygons);
         this.pos = pos;
         this.level = level;
-        this.generic = generic;
+        this.prototype = prototype;
     }
 
     public Coords getPos() {
@@ -26,19 +26,19 @@ public class PosItemSerializable extends AssetSerializable {
         this.pos = pos;
     }
 
-    public int getLevel() {
+    public Integer getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(Integer level) {
         this.level = level;
     }
 
-    public boolean isGeneric() {
-        return generic;
+    public String getPrototype() {
+        return prototype;
     }
 
-    public void setGeneric(boolean generic) {
-        this.generic = generic;
+    public void setPrototype(String prototype) {
+        this.prototype = prototype;
     }
 }

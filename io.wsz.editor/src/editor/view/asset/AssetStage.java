@@ -2,7 +2,9 @@ package editor.view.asset;
 
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Asset;
+import io.wsz.model.item.ItemType;
+import io.wsz.model.item.PosItem;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -15,10 +17,9 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.List;
 
-public abstract class AssetStage extends ChildStage {
-    protected Asset asset;
+public abstract class AssetStage<A extends PosItem> extends ChildStage {
+    protected A asset;
     protected final VBox container = new VBox(5);
-    protected final CheckBox genericCheck = new CheckBox();
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -27,24 +28,21 @@ public abstract class AssetStage extends ChildStage {
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
-    private final ItemType type;
     private boolean isContent;
     private String path;
 
-    public AssetStage(Stage parent, Asset asset, boolean isContent) {
+    public AssetStage(Stage parent, A asset, boolean isContent) {
         super(parent);
-        this.type = asset.getType();
         this.asset = asset;
         this.isContent = isContent;
     }
 
-    public AssetStage(Stage parent, ItemType type) {
+    public AssetStage(Stage parent) {
         super(parent);
-        this.type = type;
     }
 
     protected void initWindow() {
-        setTitle(type.toString().toLowerCase() + " asset");
+        setTitle(getType().toString().toLowerCase() + " asset");
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
         containerWithButtons.setPadding(new Insets(10));
@@ -74,31 +72,15 @@ public abstract class AssetStage extends ChildStage {
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
 
-        final HBox genericBox = new HBox(10);
-        final Label genericLabel = new Label("Set generic");
-        genericBox.getChildren().addAll(genericLabel, genericCheck);
-
-        container.getChildren().addAll(nameInput, imageBox, genericBox, coverButton, collisionButton);
+        container.getChildren().addAll(nameInput, imageBox, coverButton, collisionButton);
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
         if (isContent) {
             nameInput.setDisable(true);
             imageButton.setDisable(true);
-        } else {
-            genericBox.setVisible(false);
         }
-        bindProperties();
         hookupEvents();
-    }
-
-    protected void bindProperties() {
-        if (isContent) {
-            coverButton.disableProperty()
-                    .bind(genericCheck.selectedProperty());
-            collisionButton.disableProperty()
-                    .bind(genericCheck.selectedProperty());
-        }
     }
 
     protected void fillInputs() {
@@ -108,9 +90,6 @@ public abstract class AssetStage extends ChildStage {
         nameInput.setText(asset.getName());
         path = asset.getRelativePath();
         imageLabel.setText(asset.getRelativePath());
-        if (isContent) {
-            genericCheck.setSelected(((PosItem) asset).isGeneric());
-        }
     }
 
     protected abstract void defineAsset();
@@ -147,7 +126,7 @@ public abstract class AssetStage extends ChildStage {
         imageButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose image for asset");
-            fileChooser.setInitialDirectory(Asset.createAssetTypeDir(type));
+            fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
             );
@@ -157,7 +136,7 @@ public abstract class AssetStage extends ChildStage {
             }
             String selectedFilePath = selectedFile.getAbsolutePath();
             if (pathIsIncorrect(selectedFilePath)) return;
-            path = Asset.convertToRelativeFilePath(selectedFilePath, type);
+            path = Asset.convertToRelativeFilePath(selectedFilePath, getType());
             imageLabel.setText(path);
         });
         coverButton.setOnAction(e -> openCoverEdit());
@@ -184,7 +163,6 @@ public abstract class AssetStage extends ChildStage {
 
     private void editAsset() {
         asset.setRelativePath(path);
-        ((PosItem) asset).setGeneric(genericCheck.isSelected());
         close();
     }
 
@@ -193,7 +171,7 @@ public abstract class AssetStage extends ChildStage {
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
         File required = new File(
-                Controller.getProgramDir() + Asset.getRelativeTypePath(type));
+                Controller.getProgramDir() + Asset.getRelativeTypePath(getType()));
         String requiredPath = required.getAbsolutePath().toLowerCase();
         if (!parent.equals(required)) {
             alertWrongDirectory(actualPath, requiredPath);
@@ -213,19 +191,16 @@ public abstract class AssetStage extends ChildStage {
 
     private void addNewAsset() {
         String name = nameInput.getText();
-        String relativePath = Asset.convertToRelativeFilePath(path, type);
-        asset = switch (type) {
-            case COVER -> new Cover(
-                    name, type, relativePath, null, 0, false, null, null);
-            case CREATURE -> new Creature(
-                    name, type, relativePath, null, 0, false, null, null);
-            case LANDSCAPE -> new Landscape(
-                    name, type, relativePath, null, 0, false, null, null);
-            case TELEPORT -> new Teleport(
-                    name, type, relativePath, null, 0, false, null, null);
-        };
-        Controller.get().getAssetsList().add(asset);
+        String relativePath = Asset.convertToRelativeFilePath(path, getType());
+        asset = createNewAsset(name, relativePath);
+        addAssetToList(asset);
     }
+
+    protected abstract void addAssetToList(A asset);
+
+    protected abstract A createNewAsset(String name, String relativePath);
+
+    protected abstract ItemType getType();
 
     private void alertOfNameExisting() {
         final Alert alert = new Alert(

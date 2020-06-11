@@ -2,8 +2,10 @@ package editor.model;
 
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
+import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
+import io.wsz.model.item.Asset;
 import io.wsz.model.item.AssetsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -13,6 +15,7 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 
 import java.io.File;
+import java.util.List;
 
 public class EditorController {
     private static EditorController singleton;
@@ -51,13 +54,20 @@ public class EditorController {
     }
 
     public void saveActivePlugin() {
+        mergeAssetsLists();
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = ActivePlugin.get().getPlugin();
         setPluginsParams(p);
         pc.save(p);
     }
 
+    private void mergeAssetsLists() {
+        Controller.get().getAssetsList().clear();
+        Controller.get().getAssetsList().addAll(ObservableAssets.get().merge());
+    }
+
     public void savePluginAs(String pluginName) {
+        mergeAssetsLists();
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = new Plugin();
         p.setName(pluginName);
@@ -98,6 +108,7 @@ public class EditorController {
             return;
         }
         Controller.get().getAssetsList().clear();
+        ObservableAssets.get().clearLists();
         Controller.get().getLocationsList().clear();
 
         Plugin p = ActivePlugin.get().getPlugin();
@@ -111,7 +122,9 @@ public class EditorController {
     }
 
     private boolean loadLists(Plugin p) {
-        Controller.get().getAssetsList().setAll(p.getAssets());
+        List<Asset> assets = Controller.get().getAssetsList();
+        assets.addAll(p.getAssets());
+        ObservableAssets.get().fillLists(assets);
         Controller.get().getLocationsList().setAll(p.getLocations());
         return true;
     }

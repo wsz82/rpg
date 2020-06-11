@@ -45,20 +45,12 @@ public abstract class Asset {
         return name.get();
     }
 
-    public StringProperty nameProperty() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name.set(name);
     }
 
     public ItemType getType() {
         return type.get();
-    }
-
-    public ObjectProperty<ItemType> typeProperty() {
-        return type;
     }
 
     public void setType(ItemType type) {
@@ -69,23 +61,8 @@ public abstract class Asset {
         return relativePath.get();
     }
 
-    public StringProperty relativePathProperty() {
-        return relativePath;
-    }
-
     public void setRelativePath(String relativePath) {
         this.relativePath.set(relativePath);
-        if (this instanceof PosItem) {
-            if (((PosItem) this).getPos() != null) {
-                return;
-            }
-            Controller.get().getLocationsList().forEach(l -> {
-                l.getContents().get().stream()
-                        .filter(c -> c.getItem().getName().equals(getName()))
-                        .filter(c -> c.getItem().isGeneric())
-                        .forEach(c -> c.getItem().setRelativePath(relativePath));
-            });
-        }
     }
 
     public Image getImage() {
@@ -112,23 +89,8 @@ public abstract class Asset {
         return new Image(url);
     }
 
-    public ObjectProperty<Image> imageProperty() {
-        return image;
-    }
-
     public void setImage(Image image) {
         this.image.set(image);
-        if (this instanceof PosItem) {
-            if (((PosItem) this).getPos() != null) {
-                return;
-            }
-            Controller.get().getLocationsList().forEach(l -> {
-                l.getContents().get().stream()
-                        .filter(c -> c.getItem().getName().equals(getName()))
-                        .filter(c -> c.getItem().isGeneric())
-                        .forEach(c -> c.getItem().setImage(image));
-            });
-        }
     }
 
     @Override

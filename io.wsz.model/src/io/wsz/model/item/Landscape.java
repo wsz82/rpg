@@ -6,9 +6,9 @@ import java.util.List;
 
 public class Landscape extends PosItem {
 
-    public Landscape(String name, ItemType type, String path, Coords pos, int level, boolean generic,
+    public Landscape(Asset prototype, String name, ItemType type, String path, Coords pos, Integer level,
                      List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(name, type, path, pos, level, generic, coverLine, collisionPolygons);
+        super(prototype, name, type, path, pos, level, coverLine, collisionPolygons);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package editor.view.asset;
 
 import editor.view.IntegerField;
-import io.wsz.model.Controller;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.CreatureSize;
+import io.wsz.model.item.ItemType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -11,22 +13,20 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class CreatureAssetStage extends AssetStage {
+public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final IntegerField speedInput = new IntegerField(0);
 
-    public CreatureAssetStage(Stage parent, Asset asset, boolean isContent){
+    public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
         initWindow();
     }
 
-    public CreatureAssetStage(Stage parent, ItemType itemType){
-        super(parent, itemType);
+    public CreatureAssetStage(Stage parent){
+        super(parent);
         initWindow();
     }
 
@@ -65,41 +65,33 @@ public class CreatureAssetStage extends AssetStage {
         if (asset == null) {
             return;
         }
-        Creature cr = (Creature) asset;
-        CreatureSize size = cr.getSize();
+        CreatureSize size = asset.getSize();
         sizeCB.setValue(size);
-        CreatureControl control = cr.getControl();
+        CreatureControl control = asset.getControl();
         controlCB.setValue(control);
-        int speed = cr.getSpeed();
+        int speed = asset.getSpeed();
         speedInput.setText(String.valueOf(speed));
     }
 
     @Override
-    protected void bindProperties() {
-        super.bindProperties();
-        sizeCB.disableProperty()
-                .bind(genericCheck.selectedProperty());
-        controlCB.disableProperty()
-                .bind(genericCheck.selectedProperty());
-        speedInput.disableProperty()
-                .bind(genericCheck.selectedProperty());
+    protected void defineAsset() {
+        asset.setSize(sizeCB.getValue());
+        asset.setControl(controlCB.getValue());
+        asset.setSpeed(Integer.parseInt(speedInput.getText()));
     }
 
     @Override
-    protected void defineAsset() {
-        Creature cr = (Creature) asset;
-        if (cr.isGeneric()) {
-            List<Asset> correspondingAsset = Controller.get().getAssetsList().stream()
-                    .filter(a -> a.getName().equals(asset.getName()))
-                    .collect(Collectors.toList());
-            Creature prototype = (Creature) correspondingAsset.get(0);
-            cr.setSize(prototype.getSize());
-            cr.setControl(prototype.getControl());
-            cr.setSpeed(prototype.getSpeed());
-        } else {
-            cr.setSize(sizeCB.getValue());
-            cr.setControl(controlCB.getValue());
-            cr.setSpeed(Integer.parseInt(speedInput.getText()));
-        }
+    protected void addAssetToList(Creature asset) {
+        ObservableAssets.get().getCreatures().add(asset);
+    }
+
+    @Override
+    protected Creature createNewAsset(String name, String relativePath) {
+        return new Creature(null, name, getType(), relativePath, null, null, null, null);
+    }
+
+    @Override
+    protected ItemType getType() {
+        return ItemType.CREATURE;
     }
 }
