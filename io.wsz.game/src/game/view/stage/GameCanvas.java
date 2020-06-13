@@ -269,11 +269,13 @@ public class GameCanvas extends Canvas {
             setWidth(maxWidth);
         } else {
             setWidth(locWidth);
+            setTranslateX((maxWidth - locWidth)/2);
         }
         if (locHeight >= maxHeight) {
             setHeight(maxHeight);
         } else {
             setHeight(locHeight);
+            setTranslateY((maxHeight - locHeight)/2);
         }
     }
 
