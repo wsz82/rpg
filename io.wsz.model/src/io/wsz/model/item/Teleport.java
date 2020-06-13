@@ -1,8 +1,14 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
+import io.wsz.model.layer.Layer;
+import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static io.wsz.model.item.CreatureControl.CONTROL;
 
 public class Teleport extends PosItem<Teleport> {
     private volatile String locationName;
@@ -27,6 +33,39 @@ public class Teleport extends PosItem<Teleport> {
         this.locationName = locationName;
         this.exit = exitPos;
         this.exitLevel = exitLevel;
+    }
+
+    public void enter(Creature cr) {
+        List<Location> singleLocation = Controller.get().getLocationsList().stream()
+                .filter(l -> l.getName().equals(getLocationName()))
+                .collect(Collectors.toList());
+        Location target = singleLocation.get(0);
+        if (target == null) {
+            return;
+        }
+        int targetLevel = getExitLevel();
+        List<Layer> singleLayer = target.getLayers().get().stream()
+                .filter(l -> l.getLevel() == targetLevel)
+                .collect(Collectors.toList());
+        Layer targetLayer = singleLayer.get(0);
+        if (targetLayer == null) {
+            return;
+        }
+        Coords targetPos = getExit();
+        int targetX = targetPos.x;
+        int targetWidth = target.getWidth();
+        int targetY = targetPos.y;
+        int targetHeight = target.getHeight();
+        if (targetX < targetWidth && targetY < targetHeight) {
+            Location from = Controller.get().getCurrentLocation().getLocation();
+            cr.changeLocation(from, target, targetLayer, targetX, targetY);
+            if (cr.getControl().equals(CONTROL)) {
+                Controller.get().setUpdatedLocation(target);
+                Controller.get().getCurrentLayer().setLayer(targetLayer);
+                cr.centerScreenOn(targetPos);
+            }
+            cr.setDest(null);
+        }
     }
 
     public String getLocationName() {

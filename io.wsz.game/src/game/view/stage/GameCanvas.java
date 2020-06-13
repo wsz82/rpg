@@ -202,8 +202,18 @@ public class GameCanvas extends Canvas {
         Controller.get().centerPosProperty().addListener((observable, oldValue, newValue) -> {
             int x = newValue.x - (int) getWidth()/2;
             int y = newValue.y - (int) getHeight()/2;
-            currentPos.x = x;
-            currentPos.y = y;
+            int locWidth = Controller.get().getCurrentLocation().getWidth();
+            int locHeight = Controller.get().getCurrentLocation().getHeight();
+            if (x > locWidth - getWidth()) {
+                currentPos.x = locWidth - (int) getWidth();
+            } else {
+                currentPos.x = Math.max(x, 0);
+            }
+            if (y > locHeight - getHeight()) {
+                currentPos.y = locHeight - (int) getHeight();
+            } else {
+                currentPos.y = Math.max(y, 0);
+            }
         });
 
         CurrentLocation.get().locationProperty().addListener(observable -> {

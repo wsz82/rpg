@@ -7,7 +7,6 @@ import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.CreatureSize.M;
@@ -79,7 +78,7 @@ public class Creature extends PosItem<Creature> {
         if (pi != null) {
             ItemType type = pi.getType();
             switch (type) {
-                case TELEPORT -> enterTeleport((Teleport) pi);
+                case TELEPORT -> ((Teleport) pi).enter(this);
             }
         }
         Creature cr = getCornersCreature(this);
@@ -177,43 +176,6 @@ public class Creature extends PosItem<Creature> {
             case CREATURE -> interactWithCreature((Creature) pi);
             default -> setDest(centerToPos(pos));
         }
-    }
-
-    private void enterTeleport(Teleport t) {
-        List<Location> singleLocation = Controller.get().getLocationsList().stream()
-                .filter(l -> l.getName().equals(t.getLocationName()))
-                .collect(Collectors.toList());
-        Location target = singleLocation.get(0);
-        if (target == null) {
-            return;
-        }
-        int targetLevel = t.getExitLevel();
-        List<Layer> singleLayer = target.getLayers().get().stream()
-                .filter(l -> l.getLevel() == targetLevel)
-                .collect(Collectors.toList());
-        Layer targetLayer = singleLayer.get(0);
-        if (targetLayer == null) {
-            return;
-        }
-        Coords targetPos = t.getExit();
-        int targetX = targetPos.x;
-        int targetWidth = target.getWidth();
-        int targetY = targetPos.y;
-        int targetHeight = target.getHeight();
-        if (targetX < targetWidth && targetY < targetHeight) {
-            Location from = Controller.get().getCurrentLocation().getLocation();
-            changeLocation(from, target, targetLayer, targetX, targetY);
-            if (getControl().equals(CONTROL)) {
-                Controller.get().setUpdatedLocation(target);
-                Controller.get().getCurrentLayer().setLayer(targetLayer);
-                centerScreenOn(targetPos);
-            }
-            dest = null;
-        }
-    }
-
-    private void centerScreenOn(Coords targetPos) {
-        Controller.get().setCenterPos(targetPos);
     }
 
     private void interactWithCreature(Creature cr) {

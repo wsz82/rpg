@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -30,9 +31,15 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.collisionPolygons = collisionPolygons;
     }
 
+    public void centerScreenOn(Coords targetPos) {
+        Controller.get().setCenterPos(targetPos);
+    }
+
     public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
-        from.getItemsToRemove().add(this);
-        target.getItemsToAdd().add(this);
+        if (!from.equals(target)) {
+            from.getItemsToRemove().add(this);
+            target.getItemsToAdd().add(this);
+        }
 
         pos.x = targetX;
         pos.y = targetY;
