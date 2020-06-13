@@ -55,7 +55,7 @@ public class GameStage extends Stage {
     private ListView<String> loadsView;
 
     public GameStage() {
-        super(StageStyle.UNDECORATED);
+        super(StageStyle.DECORATED);
         this.gameCanvas = new GameCanvas(this);
         GameController.get().setGameCanvas(gameCanvas);
     }
