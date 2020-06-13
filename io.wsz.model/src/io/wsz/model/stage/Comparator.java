@@ -107,7 +107,7 @@ public class Comparator {
         return INCOMPARABLE;
     }
 
-    private static boolean doOverlap(int o1x_left, int o1y_top, int o1x_right, int o1y_bottom,
+    public static boolean doOverlap(int o1x_left, int o1y_top, int o1x_right, int o1y_bottom,
                                      int o2x_left, int o2y_top, int o2x_right, int o2y_bottom) {
         if (o1x_left > o2x_right || o2x_left > o1x_right) {
             return false;

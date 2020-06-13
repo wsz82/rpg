@@ -8,6 +8,7 @@ import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.BoardPos;
+import io.wsz.model.stage.Comparator;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -45,8 +46,22 @@ public class EditorCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
+        int leftX = -currentPos.x;
+        int rightX = leftX + (int) getWidth();
+        int topY = -currentPos.y;
+        int bottomY = topY + (int) getHeight();
+
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
         items = items.stream()
+                .filter(pi -> {
+                    Coords pos = pi.getPos();
+                    Image img = pi.getImage();
+                    int piLeftX = pos.x;
+                    int piRightX = piLeftX + (int) img.getWidth();
+                    int piTopY = pos.y;
+                    int piBottomY = piTopY + (int) img.getHeight();
+                    return Comparator.doOverlap(leftX, topY, rightX, bottomY, piLeftX, piTopY, piRightX, piBottomY);
+                })
                 .filter(PosItem::getVisible)
                 .collect(Collectors.toList());
         Board.get().sortItems(items);
