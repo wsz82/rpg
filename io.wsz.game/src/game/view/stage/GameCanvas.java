@@ -6,6 +6,7 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -81,17 +82,20 @@ public class GameCanvas extends Canvas {
     }
 
     private void updatePos() {
+        Bounds b = localToScreen(getBoundsInLocal());
+        if (b == null) {
+            return;
+        }
+        int stageX = (int) b.getMinX();
+        int stageY = (int) b.getMinY();
+        int stageXRight = (int) b.getMaxX();
+        int stageYBottom = (int) b.getMaxY();
+        int locWidth = Controller.get().getCurrentLocation().getWidth();
+        int locHeight = Controller.get().getCurrentLocation().getHeight();
+
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
         int y = p.y;
-        int stageX = (int) gameStage.getX();
-        int stageY = (int) gameStage.getY();
-        int stageWidth = (int) gameStage.getWidth();
-        int stageXRight = stageX + stageWidth;
-        int stageHeight = (int) gameStage.getHeight();
-        int stageYBottom = stageY + stageHeight;
-        int locWidth = Controller.get().getCurrentLocation().getWidth();
-        int locHeight = Controller.get().getCurrentLocation().getHeight();
 
         if (x < stageX+OFFSET && x >= stageX) {
             int newX = currentPos.x - SCROLL;
