@@ -76,7 +76,8 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
             Coords mark = pointer.getMark();
-            addToStage(mark);
+            Coords clone = mark.clone();
+            addToStage(clone);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {

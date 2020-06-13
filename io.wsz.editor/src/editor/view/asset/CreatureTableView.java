@@ -75,7 +75,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = new Coords(pos.x, pos.y);
+            Coords clone = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -87,7 +87,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
 
             Creature cr = new Creature(
                     p, name, type, path,
-                    true, clonePos, level,
+                    true, clone, level,
                     coverLine, collisionPolygons);
             Controller.get().getCurrentLocation().getItems().add(cr);
         }

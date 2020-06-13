@@ -16,15 +16,19 @@ public class Coords implements Serializable {
         return x == 0 && y == 0;
     }
 
-    public Coords add(Coords pos1, Coords pos2) {
-           int x = pos1.x + pos2.x;
-           int y = pos1.y + pos2.y;
+    public Coords clone() {
+        return new Coords(this.x, this.y);
+    }
+
+    public Coords add(Coords pos2) {
+           int x = this.x + pos2.x;
+           int y = this.y + pos2.y;
            return new Coords(x, y);
     }
 
-    public Coords subtract(Coords pos1, Coords pos2) {
-        int x = pos1.x - pos2.x;
-        int y = pos1.y - pos2.y;
+    public Coords subtract(Coords pos2) {
+        int x = this.x - pos2.x;
+        int y = this.y - pos2.y;
         return new Coords(x, y);
     }
 

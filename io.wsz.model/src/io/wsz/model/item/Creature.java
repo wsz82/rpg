@@ -9,8 +9,8 @@ import io.wsz.model.stage.Coords;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.item.CreatureControl.CONTROL;
-import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static io.wsz.model.item.CreatureControl.*;
+import static io.wsz.model.item.CreatureSize.M;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> {
@@ -233,6 +233,9 @@ public class Creature extends PosItem<Creature> {
 
     public Integer getSpeed() {
         if (speed == null) {
+            if (prototype == null) {
+                return 0;
+            }
             return prototype.speed;
         } else {
             return speed;
@@ -245,6 +248,9 @@ public class Creature extends PosItem<Creature> {
 
     public CreatureSize getSize() {
         if (size == null) {
+            if (prototype == null) {
+                return M;
+            }
             return prototype.size;
         } else {
             return size;
@@ -257,6 +263,9 @@ public class Creature extends PosItem<Creature> {
 
     public CreatureControl getControl() {
         if (control == null) {
+            if (prototype == null) {
+                return NEUTRAL;
+            }
             return prototype.getControl();
         } else {
             return control;

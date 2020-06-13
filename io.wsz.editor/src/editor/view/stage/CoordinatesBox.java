@@ -1,35 +1,38 @@
 package editor.view.stage;
 
+import io.wsz.model.stage.BoardPos;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 
 class CoordinatesBox extends HBox {
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                Coords coords = new Coords((int) event.getX(), (int) event.getY());
-                mouseX.setText("X: " + coords.x);
-                mouseY.setText("Y: " + coords.y);
+                Coords mousePos = new Coords((int) event.getX(), (int) event.getY());
+                Coords boardPos = BoardPos.getBoardPos();
+                Coords translated = mousePos.subtract(boardPos);
+                mouseX.setText("X: " + translated.x);
+                mouseY.setText("Y: " + translated.y);
             }
         }
     };
     private final Label mouseX = new Label();
     private final Label mouseY = new Label();
-    private final Canvas canvas;
+    private final Pane center;
 
-    CoordinatesBox(Canvas canvas) {
-        this.canvas = canvas;
-        create();
+    CoordinatesBox(Pane center) {
+        this.center = center;
+        init();
     }
 
-    private void create() {
-        canvas.addEventHandler(MouseEvent.MOUSE_MOVED, moveEvent);
+    private void init() {
+        center.addEventHandler(MouseEvent.MOUSE_MOVED, moveEvent);
         getChildren().addAll(mouseX, mouseY);
         setAlignment(Pos.BOTTOM_LEFT);
         setSpacing(5);

@@ -12,14 +12,11 @@ import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.plugin.ActivePlugin;
-import javafx.event.Event;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,8 +27,8 @@ class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
     private final EditorCanvas editorCanvas;
-    private final ScrollPane scrollPane = new ScrollPane();
     private final Stage stage;
+    private final Pane center;
     private final ContentStage contentsWindow;
     private final LayersStage layersWindow;
     private final AssetsStage assetsWindow;
@@ -41,10 +38,12 @@ class MainView {
 
     MainView(Stage stage) {
         this.stage = stage;
+        this.center = new Pane();
         pointer = new Pointer();
-        editorCanvas = new EditorCanvas(stage, pointer);
+        editorCanvas = new EditorCanvas(stage, center, pointer);
+        center.getChildren().add(editorCanvas);
         contentsWindow = new ContentStage(stage, editorCanvas);
-        ContentTableView ctv = contentsWindow.getTable();
+        final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(stage, ctv, editorCanvas);
         assetsWindow = new AssetsStage(stage);
@@ -53,20 +52,18 @@ class MainView {
     }
 
     void show() {
-        BorderPane borderPane = new BorderPane();
-        VBox topBar = new VBox();
-        VBox bottomBar = new VBox();
-
-        setUpScrollPane();
+        final BorderPane borderPane = new BorderPane();
+        final VBox topBar = new VBox();
+        final VBox bottomBar = new VBox();
 
         borderPane.setTop(topBar);
-        borderPane.setCenter(scrollPane);
+        borderPane.setCenter(center);
         borderPane.setBottom(bottomBar);
 
         setTopContent(topBar);
         setBottomContent(bottomBar);
 
-        Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
+        final Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         stage.setScene(scene);
 
         restoreSettings(Main.getDir());
@@ -100,19 +97,6 @@ class MainView {
                     saveFile();
                     alert.close();
                 });
-    }
-
-    private void setUpScrollPane() {
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setContent(editorCanvas);
-        scrollPane.setPannable(true);
-        scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
-        scrollPane.addEventFilter(MouseEvent.ANY, event -> {
-            if (!event.getEventType().equals(MouseEvent.MOUSE_MOVED)
-                    && !event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
-                    && event.getButton() != MouseButton.MIDDLE) event.consume();
-        });
     }
 
     private void storeSettings(File programDir) {
@@ -151,8 +135,8 @@ class MainView {
     }
 
     private void setTopContent(VBox topBar) {
-        MenuBar menuBar = getMenuBar();
-        ToolBar toolBar = getToolBar();
+        final MenuBar menuBar = getMenuBar();
+        final ToolBar toolBar = getToolBar();
         topBar.getChildren().addAll(menuBar, toolBar);
     }
 
@@ -164,23 +148,23 @@ class MainView {
     }
 
     private void setBottomContent(VBox bottom) {
-        HBox bottomHorizontalBar = new HBox();
+        final HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        CoordinatesBox coordinatesBox = new CoordinatesBox(editorCanvas);
-        CurrentLocationBox currentLocationBox = new CurrentLocationBox();
-        CurrentLayerBox currentLayerBox = new CurrentLayerBox();
+        final CoordinatesBox coordinatesBox = new CoordinatesBox(center);
+        final CurrentLocationBox currentLocationBox = new CurrentLocationBox();
+        final CurrentLayerBox currentLayerBox = new CurrentLayerBox();
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);
         bottom.getChildren().addAll(bottomHorizontalBar);
     }
 
     private MenuBar getMenuBar() {
-        Menu file = new Menu("File");
-        MenuItem newPlugin = new MenuItem("New");
-        MenuItem save = new MenuItem("Save");
-        MenuItem saveAs = new MenuItem("Save as");
-        MenuItem plugins = new MenuItem("Plugins");
-        MenuItem plugin = new MenuItem("Plugin settings");
-        MenuItem exit = new MenuItem("Exit");
+        final Menu file = new Menu("File");
+        final MenuItem newPlugin = new MenuItem("New");
+        final MenuItem save = new MenuItem("Save");
+        final MenuItem saveAs = new MenuItem("Save as");
+        final MenuItem plugins = new MenuItem("Plugins");
+        final MenuItem plugin = new MenuItem("Plugin settings");
+        final MenuItem exit = new MenuItem("Exit");
 
         newPlugin.setOnAction(event -> createNewPlugin());
         save.setOnAction(event -> saveFile());
@@ -193,11 +177,11 @@ class MainView {
         });
         file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
 
-        Menu view = new Menu("View");
-        CheckMenuItem contents = new CheckMenuItem("Contents");
-        CheckMenuItem layers = new CheckMenuItem("Layers");
-        CheckMenuItem assets = new CheckMenuItem("Assets");
-        CheckMenuItem locations = new CheckMenuItem("Locations");
+        final Menu view = new Menu("View");
+        final CheckMenuItem contents = new CheckMenuItem("Contents");
+        final CheckMenuItem layers = new CheckMenuItem("Layers");
+        final CheckMenuItem assets = new CheckMenuItem("Assets");
+        final CheckMenuItem locations = new CheckMenuItem("Locations");
 
         setViewItemOnAction(contentsWindow, contents);
         setViewItemOnAction(layersWindow, layers);
@@ -205,8 +189,8 @@ class MainView {
         setViewItemOnAction(locationsWindow, locations);
         view.getItems().addAll(contents, layers, assets, locations);
 
-        Menu location = new Menu("Location");
-        MenuItem parameters = new MenuItem("Parameters");
+        final Menu location = new Menu("Location");
+        final MenuItem parameters = new MenuItem("Parameters");
         parameters.setOnAction(event -> {
             LocationParametersStage locationParametersStage = new LocationParametersStage(stage);
             locationParametersStage.show();
@@ -225,19 +209,19 @@ class MainView {
     }
 
     private void openPluginsTable() {
-        Stage plugins = new EditorPluginsTable(pss);
+        final Stage plugins = new EditorPluginsTable(pss);
         plugins.initOwner(stage);
         plugins.show();
     }
 
     private void saveAsFile() {
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save plugin");
         fileChooser.setInitialDirectory(Main.getDir());
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
-        File saveFile = fileChooser.showSaveDialog(stage);
+        final File saveFile = fileChooser.showSaveDialog(stage);
         if (saveFile == null) {
             return;
         }

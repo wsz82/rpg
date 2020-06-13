@@ -7,6 +7,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Board;
+import io.wsz.model.stage.BoardPos;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -15,10 +16,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -27,13 +26,16 @@ import java.util.stream.Collectors;
 
 public class EditorCanvas extends Canvas {
     private final Stage stage;
+    private final Pointer pointer;
+    private final Pane parent;
+    private final Coords currentPos = BoardPos.getBoardPos();
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
-    private final Pointer pointer;
 
-    public EditorCanvas(Stage stage, Pointer pointer){
+    public EditorCanvas(Stage stage, Pane parent, Pointer pointer){
         this.stage = stage;
         this.pointer = pointer;
+        this.parent = parent;
         setSize();
         hookupEvents();
     }
@@ -45,15 +47,16 @@ public class EditorCanvas extends Canvas {
 
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
         items = items.stream()
-                .filter(pi -> pi.getVisible())
+                .filter(PosItem::getVisible)
                 .collect(Collectors.toList());
         Board.get().sortItems(items);
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
             final Coords pos = pi.getPos();
-            final int x = pos.x;
-            final int y = pos.y;
+            Coords translated = pos.add(currentPos);
+            final int x = translated.x;
+            final int y = translated.y;
 
             if (pi.getVisible()) {
                 gc.drawImage(pi.getImage(), x, y);
@@ -70,12 +73,13 @@ public class EditorCanvas extends Canvas {
             if (mark == null) {
                 return;
             }
+            Coords translated = mark.add(currentPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
                 return;
             }
-            int x = mark.x - (int) marker.getWidth()/2;
-            int y = mark.y - (int) marker.getHeight()/2;
+            int x = translated.x - (int) marker.getWidth()/2;
+            int y = translated.y - (int) marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
     }
@@ -83,15 +87,60 @@ public class EditorCanvas extends Canvas {
     private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
         int x = pi.getPos().x;
         int y = pi.getPos().y;
+        Coords translated = new Coords(x, y).add(currentPos);
         double width = pi.getImage().getWidth();
         double height = pi.getImage().getHeight();
         gc.setStroke(Color.RED);
         gc.setLineWidth(0.5);
         gc.setLineDashes(20);
-        gc.strokeRect(x, y, width, height);
+        gc.strokeRect(translated.x, translated.y, width, height);
     }
 
     private void hookupEvents() {
+        double[] dx = new double[2];
+        double[] dy = new double[2];
+
+        EventHandler<MouseEvent> startDrag = e -> {
+            e.consume();
+            this.startFullDrag();
+            dx[0] = e.getX();
+            dy[0] = e.getY();
+        };
+        EventHandler<MouseEvent> progressDrag = e -> {
+            e.consume();
+            dx[1] = e.getX();
+            dy[1] = e.getY();
+            int dX = (int) (dx[1] - dx[0]);
+            int dY = (int) (dy[1] - dy[0]);
+            int newX = currentPos.x + dX;
+            int newY = currentPos.y + dY;
+            int maxX = Controller.get().getCurrentLocation().getWidth();
+            int maxY = Controller.get().getCurrentLocation().getHeight();
+
+            if (-newX + (int) getWidth() <= maxX) {
+                currentPos.x = Math.min(newX, 0);
+            } else {
+                currentPos.x = -maxX + (int) getWidth();
+            }
+            if (-newY + (int) getHeight() <= maxY) {
+                currentPos.y = Math.min(newY, 0);
+            } else {
+                currentPos.y = -maxY + (int) getHeight();
+            }
+
+            refresh();
+        };
+        addEventHandler(MouseDragEvent.DRAG_DETECTED, startDrag);
+        addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressDrag);
+
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
+            currentPos.x = 0;
+            refresh();
+        });
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
+            currentPos.y = 0;
+            refresh();
+        });
         ListChangeListener<? super PosItem> locationListener = c -> {
             if (!c.next()) {
                 return;
@@ -128,7 +177,9 @@ public class EditorCanvas extends Canvas {
                 }
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    Coords[] poss = new Coords[]{new Coords((int) e.getX(), (int) e.getY())};
+                    Coords pos = new Coords((int) e.getX(), (int) e.getY());
+                    Coords translated = pos.subtract(currentPos);
+                    Coords[] poss = new Coords[]{translated};
                     ItemType[] types = ItemType.values();
                     pi = Controller.get().getBoard().lookForContent(poss, types, true);
                 }
@@ -225,15 +276,33 @@ public class EditorCanvas extends Canvas {
     }
 
     private void setSize() {
-        int width = Controller.get().getCurrentLocation().getWidth();
-        int height = Controller.get().getCurrentLocation().getHeight();
-        setWidth(width);
-        setHeight(height);
+        int locWidth = Controller.get().getCurrentLocation().getWidth();
+        int locHeight = Controller.get().getCurrentLocation().getHeight();
+        double maxWidth = parent.getWidth();
+        double maxHeight = parent.getHeight();
+        if (locWidth >= maxWidth) {
+            setWidth(maxWidth);
+        } else {
+            if (currentPos.x > 0) {
+                setWidth(locWidth + currentPos.x);
+            } else {
+                setWidth(locWidth);
+            }
+        }
+        if (locHeight >= maxHeight) {
+            setHeight(maxHeight);
+        } else {
+            if (currentPos.y > 0) {
+                setHeight(locHeight + currentPos.y);
+            } else {
+                setHeight(locHeight);
+            }
+        }
     }
 
     private void clear(GraphicsContext gc) {
         gc.setFill(Color.LIGHTGREY);
-        gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        gc.fillRect(0, 0, getWidth(), getHeight());
     }
 
     private void moveContent(KeyCode keyCode, PosItem pi){
