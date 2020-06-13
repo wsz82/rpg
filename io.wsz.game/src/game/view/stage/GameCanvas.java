@@ -86,10 +86,10 @@ public class GameCanvas extends Canvas {
         if (b == null) {
             return;
         }
-        int stageX = (int) b.getMinX();
-        int stageY = (int) b.getMinY();
-        int stageXRight = (int) b.getMaxX();
-        int stageYBottom = (int) b.getMaxY();
+        int leftX = (int) b.getMinX();
+        int topY = (int) b.getMinY();
+        int rightX = (int) b.getMaxX();
+        int bottomY = (int) b.getMaxY();
         int locWidth = Controller.get().getCurrentLocation().getWidth();
         int locHeight = Controller.get().getCurrentLocation().getHeight();
 
@@ -97,22 +97,62 @@ public class GameCanvas extends Canvas {
         int x = p.x;
         int y = p.y;
 
-        if (x < stageX+OFFSET && x >= stageX) {
-            int newX = currentPos.x - SCROLL;
-            currentPos.x = Math.max(newX, 0);
+        if (x < leftX+OFFSET && x >= leftX
+                && y > topY + OFFSET && y < bottomY - OFFSET) {
+            scrollLeft();
         } else
-        if (x > stageXRight-OFFSET && x <= stageXRight) {
-            int newX = currentPos.x + SCROLL;
-            currentPos.x = Math.min(newX, locWidth - (int) getWidth());
+        if (x > rightX-OFFSET && x <= rightX
+                && y > topY + OFFSET && y < bottomY - OFFSET) {
+            scrollRight(locWidth);
         } else
-        if (y < stageY+OFFSET && y >= stageY) {
-            int newY = currentPos.y = currentPos.y - SCROLL;
-            currentPos.y = Math.max(newY, 0);
+        if (y < topY+OFFSET && y >= topY
+                && x > leftX + OFFSET && x < rightX - OFFSET) {
+            scrollUp();
         } else
-        if (y > stageYBottom-OFFSET && y <= stageYBottom) {
-            int newY = currentPos.y = currentPos.y + SCROLL;
-            currentPos.y = Math.min(newY, locHeight - (int) getHeight());
+        if (y > bottomY-OFFSET && y <= bottomY
+                && x > leftX + OFFSET && x < rightX - OFFSET) {
+            scrollDown(locHeight);
+        } else
+        if (x < leftX+OFFSET && x >= leftX
+                && y >= topY && y < topY+OFFSET) {
+            scrollLeft();
+            scrollUp();
+        } else
+        if (x > rightX-OFFSET && x <= rightX
+                && y >= topY && y < topY+OFFSET) {
+            scrollRight(locWidth);
+            scrollUp();
+        } else
+        if (x < leftX+OFFSET && x >= leftX
+                && y >= bottomY - OFFSET && y < bottomY) {
+            scrollLeft();
+            scrollDown(locHeight);
+        } else
+        if (x > rightX-OFFSET && x <= rightX
+                && y >= bottomY - OFFSET && y < bottomY) {
+            scrollRight(locWidth);
+            scrollDown(locHeight);
         }
+    }
+
+    private void scrollDown(int locHeight) {
+        int newY = currentPos.y = currentPos.y + SCROLL;
+        currentPos.y = Math.min(newY, locHeight - (int) getHeight());
+    }
+
+    private void scrollUp() {
+        int newY = currentPos.y = currentPos.y - SCROLL;
+        currentPos.y = Math.max(newY, 0);
+    }
+
+    private void scrollRight(int locWidth) {
+        int newX = currentPos.x + SCROLL;
+        currentPos.x = Math.min(newX, locWidth - (int) getWidth());
+    }
+
+    private void scrollLeft() {
+        int newX = currentPos.x - SCROLL;
+        currentPos.x = Math.max(newX, 0);
     }
 
     private void drawCreatureSize(Creature cr, GraphicsContext gc) {
