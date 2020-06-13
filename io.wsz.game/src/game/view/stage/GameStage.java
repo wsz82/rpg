@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
+import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -43,26 +44,20 @@ public class GameStage extends Stage {
             resumeGame();
         }
     };
+    private final GameCanvas gameCanvas;
+    private final Button cancel = new Button("Cancel");
+    private StackPane mainMenuRoot;
     private StackPane gameMenuRoot;
     private Group gameRoot;
-    private ScrollPane gameScrollPane;
-    private StackPane mainMenuRoot;
     private StackPane savesRoot;
     private StackPane loadsRoot;
-    private final Button cancel = new Button("Cancel");
     private ListView<String> savesView;
     private ListView<String> loadsView;
-    private static GameStage singleton;
 
-    public static GameStage get() {
-        if (singleton == null) {
-            singleton = new GameStage();
-        }
-        return singleton;
-    }
-
-    private GameStage(){
+    public GameStage() {
         super(StageStyle.UNDECORATED);
+        this.gameCanvas = new GameCanvas(this);
+        GameController.get().setGameCanvas(gameCanvas);
     }
 
     private void showMainMenu() {
@@ -96,7 +91,8 @@ public class GameStage extends Stage {
     }
 
     private void openSettings(EventHandler<KeyEvent> returnEvent) {
-        SettingsMenu.get().open(getScene(), returnEvent);
+        SettingsMenu settingsMenu = new SettingsMenu(this);
+        settingsMenu.open(getScene(), returnEvent);
     }
 
     private void startNewGame() {
@@ -106,8 +102,7 @@ public class GameStage extends Stage {
 
     private void initGameRoot() {
         gameRoot = new Group();
-        gameScrollPane = GameScrollPane.get();
-        gameRoot.getChildren().addAll(gameScrollPane);
+        gameRoot.getChildren().addAll(gameCanvas);
     }
 
     private void showGameMenu() {
@@ -317,9 +312,8 @@ public class GameStage extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        double hvalue = gameScrollPane.getHvalue();
-        double vvalue = gameScrollPane.getVvalue();
-        GameController.get().saveGame(overwrite, name, hvalue, vvalue, Main.getDir());
+        Coords currentPos = gameCanvas.getCurrentPos();
+        GameController.get().saveGame(overwrite, name, currentPos, Main.getDir());
         resumeGame();
     }
 

@@ -9,7 +9,6 @@ import game.model.setting.SettingMemento;
 import game.model.world.GameRunner;
 import game.view.launcher.Main;
 import game.view.stage.GameCanvas;
-import game.view.stage.GameScrollPane;
 import io.wsz.model.Controller;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
@@ -18,8 +17,8 @@ import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.LocationSerializable;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.SerializableConverter;
+import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ScrollPane;
 
 import java.io.File;
 import java.util.List;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 public class GameController {
     private static GameController singleton;
     private volatile boolean isGame; //TODO make atomic?
+    private GameCanvas gameCanvas;
 
     public static GameController get() {
         if (singleton == null) {
@@ -84,7 +84,7 @@ public class GameController {
         getSavesList().remove(name);
     }
 
-    public void saveGame(boolean overwrite, String name, double hvalue, double vvalue, File programDir) {
+    public void saveGame(boolean overwrite, String name, Coords savedPos, File programDir) {
         if (name == null || name.equals("")) {
             return;
         }
@@ -94,7 +94,7 @@ public class GameController {
         }
         String currentLocationName = Controller.get().getCurrentLocation().getName();
         int currentLayer = Controller.get().getCurrentLayer().getLevel();
-        SaveMemento memento = new SaveMemento(name, hvalue, vvalue, currentLocationName, currentLayer);
+        SaveMemento memento = new SaveMemento(name, savedPos, currentLocationName, currentLayer);
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.createSave(memento);
     }
@@ -176,12 +176,12 @@ public class GameController {
         Controller.get().getLocationsList().setAll(p.getLocations());
     }
 
-    public GameCanvas getGameCanvas() {
-        return GameCanvas.get();
+    public void setGameCanvas(GameCanvas gameCanvas) {
+        this.gameCanvas = gameCanvas;
     }
 
-    public GameScrollPane getScrollPane() {
-        return GameScrollPane.get();
+    public GameCanvas getGameCanvas() {
+        return gameCanvas;
     }
 
     public boolean isGame() {
@@ -193,29 +193,22 @@ public class GameController {
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
-        ScrollPane gameScrollPane = getScrollPane();
-        gameScrollPane.setHvalue(memento.gethValue());
-        gameScrollPane.setVvalue(memento.getvValue());
+        Coords currentPos = gameCanvas.getCurrentPos();
+        Coords loadedPos = memento.getLastPos();
+        currentPos.x = loadedPos.x;
+        currentPos.y = loadedPos.y;
     }
 
     public void initNewGameSettings() {
         Plugin p = Controller.get().getActivePlugin();
         int startX = p.getStartX();
         int startY = p.getStartY();
-        double width = Controller.get().getCurrentLocation().getWidth();
-        double height = Controller.get().getCurrentLocation().getHeight();
-        ScrollPane gameScrollPane = getScrollPane();
-        gameScrollPane.setHvalue((double)startX/width);
-        gameScrollPane.setVvalue((double)startY/height);
+        Coords currentPos = gameCanvas.getCurrentPos();
+        currentPos.x = startX;
+        currentPos.y = startY;
     }
 
     public void showGame() {
         getGameCanvas().refresh();
-        getScrollPane().updatePos();
-    }
-
-    public void focusGameScrollPane() {
-        getScrollPane().requestFocus();
-        getScrollPane().setFocusTraversable(false);
     }
 }

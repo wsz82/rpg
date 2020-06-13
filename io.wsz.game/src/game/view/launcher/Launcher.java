@@ -42,7 +42,7 @@ class Launcher {
     }
 
     private void play() {
-        GameStage gameStage = GameStage.get();
+        GameStage gameStage = new GameStage();
         gameStage.open();
         stage.close();
     }
@@ -51,26 +51,6 @@ class Launcher {
         Stage plugins = new GamePluginsTable();
         plugins.initOwner(stage);
         plugins.show();
-//        FileChooser fileChooser = new FileChooser();
-//        fileChooser.setTitle("Choose plugin");
-//        Plugin active = ActivePlugin.get().getPlugin();
-//        File initial;
-//        if (active != null) {
-//            initial = active.getFile().getParentFile();
-//        } else {
-//            initial = Main.getDir();
-//        }
-//        fileChooser.setInitialDirectory(initial);
-//        fileChooser.getExtensionFilters().addAll(
-//                new FileChooser.ExtensionFilter("Plugin file", "*.rpg"));
-//        File loadedFile = fileChooser.showOpenDialog(stage);
-//
-//        if (loadedFile == null) {
-//            return;
-//        }
-//        Plugin plugin = Controller.get().loadPlugin(loadedFile);
-//        Controller.get().setActivePlugin(plugin);
-//        GameController.get().storeLastPlugin(plugin);
     }
 
     private void exit() {

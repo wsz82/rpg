@@ -1,5 +1,7 @@
 package game.view.stage;
 
+import game.model.GameController;
+import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,25 +13,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 class SettingsMenu extends StackPane {
-    private static SettingsMenu singleton;
     private final EventHandler<KeyEvent> settingsReturn = event -> {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
             goBackToSettings();
         }
     };
+    private final GameStage gameStage;
     private Scene scene;
     private EventHandler<KeyEvent> menuReturn;
     private StackPane graphicsRoot;
 
-    static SettingsMenu get() {
-        if (singleton == null) {
-            singleton = new SettingsMenu();
-        }
-        return singleton;
-    }
-
-    private SettingsMenu(){
+    public SettingsMenu(GameStage gameStage){
+        this.gameStage = gameStage;
         VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
@@ -48,8 +44,8 @@ class SettingsMenu extends StackPane {
     }
 
     private void openGraphicsSettings() {
-        GameStage.get().removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
-        GameStage.get().addEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
+        gameStage.removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
         if (graphicsRoot == null) {
             initGraphicsSettings();
         }
@@ -62,7 +58,7 @@ class SettingsMenu extends StackPane {
         VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
         CheckBox fullScreen = new CheckBox("Full screen");
-        fullScreen.setSelected(GameStage.get().isFullScreen());
+        fullScreen.setSelected(gameStage.isFullScreen());
         fullScreen.setOnAction(event -> {
             changeFullScreenSetting(fullScreen.isSelected()
             );
@@ -76,17 +72,20 @@ class SettingsMenu extends StackPane {
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
-        GameStage.get().setFullScreen(isSelected);
+        gameStage.setFullScreen(isSelected);
+        Coords current = GameController.get().getGameCanvas().getCurrentPos();
+        current.x = 0;
+        current.y = 0;
     }
 
     void goBackToSettings(){
-        GameStage.get().removeEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
-        GameStage.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        gameStage.removeEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
+        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
         scene.setRoot(this);
     }
 
     void open(Scene scene, EventHandler<KeyEvent> menuReturn){
-        GameStage.get().addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
+        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
         this.scene = scene;
         this.menuReturn = menuReturn;
         scene.setRoot(this);

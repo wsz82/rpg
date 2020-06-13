@@ -7,7 +7,6 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Board;
-import io.wsz.model.stage.BoardPos;
 import io.wsz.model.stage.Comparator;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
@@ -29,7 +28,7 @@ public class EditorCanvas extends Canvas {
     private final Stage stage;
     private final Pointer pointer;
     private final Pane parent;
-    private final Coords currentPos = BoardPos.getBoardPos();
+    private final Coords currentPos = Controller.get().getBoardPos();
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
 
@@ -46,9 +45,9 @@ public class EditorCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        int leftX = -currentPos.x;
+        int leftX = currentPos.x;
         int rightX = leftX + (int) getWidth();
-        int topY = -currentPos.y;
+        int topY = currentPos.y;
         int bottomY = topY + (int) getHeight();
 
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
@@ -60,7 +59,9 @@ public class EditorCanvas extends Canvas {
                     int piRightX = piLeftX + (int) img.getWidth();
                     int piTopY = pos.y;
                     int piBottomY = piTopY + (int) img.getHeight();
-                    return Comparator.doOverlap(leftX, topY, rightX, bottomY, piLeftX, piTopY, piRightX, piBottomY);
+                    return Comparator.doOverlap(
+                            leftX, topY, rightX, bottomY,
+                            piLeftX, piTopY, piRightX, piBottomY);
                 })
                 .filter(PosItem::getVisible)
                 .collect(Collectors.toList());
@@ -69,7 +70,7 @@ public class EditorCanvas extends Canvas {
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
             final Coords pos = pi.getPos();
-            Coords translated = pos.add(currentPos);
+            Coords translated = pos.subtract(currentPos);
             final int x = translated.x;
             final int y = translated.y;
 
@@ -88,7 +89,7 @@ public class EditorCanvas extends Canvas {
             if (mark == null) {
                 return;
             }
-            Coords translated = mark.add(currentPos);
+            Coords translated = mark.subtract(currentPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
                 return;
@@ -102,7 +103,7 @@ public class EditorCanvas extends Canvas {
     private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
         int x = pi.getPos().x;
         int y = pi.getPos().y;
-        Coords translated = new Coords(x, y).add(currentPos);
+        Coords translated = new Coords(x, y).subtract(currentPos);
         double width = pi.getImage().getWidth();
         double height = pi.getImage().getHeight();
         gc.setStroke(Color.RED);
@@ -127,20 +128,21 @@ public class EditorCanvas extends Canvas {
             dy[1] = e.getY();
             int dX = (int) (dx[1] - dx[0]);
             int dY = (int) (dy[1] - dy[0]);
-            int newX = currentPos.x + dX;
-            int newY = currentPos.y + dY;
-            int maxX = Controller.get().getCurrentLocation().getWidth();
-            int maxY = Controller.get().getCurrentLocation().getHeight();
+            int newX = currentPos.x - dX;
+            int newY = currentPos.y - dY;
+            int locWidth = Controller.get().getCurrentLocation().getWidth();
+            int locHeight = Controller.get().getCurrentLocation().getHeight();
 
-            if (-newX + (int) getWidth() <= maxX) {
-                currentPos.x = Math.min(newX, 0);
+            if (newX + (int) getWidth() <= locWidth) {
+                currentPos.x = Math.max(newX, 0);
             } else {
-                currentPos.x = -maxX + (int) getWidth();
+                currentPos.x = locWidth - (int) getWidth();
             }
-            if (-newY + (int) getHeight() <= maxY) {
-                currentPos.y = Math.min(newY, 0);
+
+            if (newY + (int) getHeight() <= locHeight) {
+                currentPos.y = Math.max(newY, 0);
             } else {
-                currentPos.y = -maxY + (int) getHeight();
+                currentPos.y = locHeight - (int) getHeight();
             }
 
             refresh();
@@ -193,7 +195,7 @@ public class EditorCanvas extends Canvas {
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
                     Coords pos = new Coords((int) e.getX(), (int) e.getY());
-                    Coords translated = pos.subtract(currentPos);
+                    Coords translated = pos.add(currentPos);
                     Coords[] poss = new Coords[]{translated};
                     ItemType[] types = ItemType.values();
                     pi = Controller.get().getBoard().lookForContent(poss, types, true);

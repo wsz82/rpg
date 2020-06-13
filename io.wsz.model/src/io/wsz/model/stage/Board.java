@@ -21,6 +21,7 @@ import static java.lang.Math.pow;
 
 public class Board {
     private static Board singleton;
+    private final Coords boardPos = new Coords(0, 0);
 
     public static Board get() {
         if (singleton == null) {
@@ -30,6 +31,10 @@ public class Board {
     }
 
     private Board(){}
+
+    public Coords getBoardPos() {
+        return boardPos;
+    }
 
     public void sortItems(List<PosItem> items) {
 

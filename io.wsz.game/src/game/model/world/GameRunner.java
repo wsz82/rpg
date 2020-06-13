@@ -35,7 +35,6 @@ public class GameRunner {
 
     private void runGameThread() {
         showGame();
-        GameController.get().focusGameScrollPane();
 
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {

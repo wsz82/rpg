@@ -206,14 +206,14 @@ public class Creature extends PosItem<Creature> {
             if (getControl().equals(CONTROL)) {
                 Controller.get().setUpdatedLocation(target);
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
-                centerScreenOn(targetX, targetY);
+                centerScreenOn(targetPos);
             }
             dest = null;
         }
     }
 
-    private void centerScreenOn(double targetX, double targetY) {
-        Controller.get().centerScreenOn(targetX, targetY);
+    private void centerScreenOn(Coords targetPos) {
+        Controller.get().setCenterPos(targetPos);
     }
 
     private void interactWithCreature(Creature cr) {

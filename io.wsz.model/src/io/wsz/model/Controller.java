@@ -9,8 +9,10 @@ import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
 import io.wsz.model.stage.Board;
+import io.wsz.model.stage.Coords;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ScrollPane;
 
 import java.io.File;
 import java.util.List;
@@ -18,8 +20,8 @@ import java.util.List;
 public class Controller {
     private static Controller singleton;
     private static File programDir;
-    private static ScrollPane scrollPane;
     private volatile Location locationToUpdate;
+    private final ObjectProperty<Coords> centerPos = new SimpleObjectProperty<>();
 
     public static Controller get() {
         if (singleton == null) {
@@ -89,36 +91,16 @@ public class Controller {
         return Board.get();
     }
 
-    public static ScrollPane getScrollPane() {
-        return scrollPane;
+    public Coords getCenterPos() {
+        return centerPos.get();
     }
 
-    public static void setScrollPane(ScrollPane scrollPane) {
-        Controller.scrollPane = scrollPane;
+    public ObjectProperty<Coords> centerPosProperty() {
+        return centerPos;
     }
 
-    public void centerScreenOn(double targetX, double targetY) {    //TODO correct centering
-        ScrollPane sp = getScrollPane();
-        double width = sp.getWidth();
-        double height = sp.getHeight();
-        int locationWidth = getCurrentLocation().getWidth();
-        int locationHeight = getCurrentLocation().getHeight();
-        double screenPosX;
-        double screenPosY;
-        if (targetX > width/2) {
-            screenPosX = targetX + width/2;
-        } else {
-            screenPosX = targetX - width/2;
-        }
-        if (targetY > height/2) {
-            screenPosY = targetY + height/2;
-        } else {
-            screenPosY = targetY - height/2;
-        }
-        double hValue = screenPosX/locationWidth;
-        double vValue = screenPosY/locationHeight;
-        sp.setHvalue(hValue);
-        sp.setVvalue(vValue);
+    public void setCenterPos(Coords centerPos) {
+        this.centerPos.set(centerPos);
     }
 
     public Plugin loadPluginMetadata(String name) {
@@ -133,5 +115,9 @@ public class Controller {
 
     public void setUpdatedLocation(Location locationToUpdate) {
         this.locationToUpdate = locationToUpdate;
+    }
+
+    public Coords getBoardPos() {
+        return Board.get().getBoardPos();
     }
 }

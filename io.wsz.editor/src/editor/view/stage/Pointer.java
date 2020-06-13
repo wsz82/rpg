@@ -1,6 +1,6 @@
 package editor.view.stage;
 
-import io.wsz.model.stage.BoardPos;
+import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -17,7 +17,7 @@ public class Pointer {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 Coords mousePos = new Coords((int) event.getX(), (int) event.getY());
-                Coords translated = mousePos.subtract(BoardPos.getBoardPos());
+                Coords translated = mousePos.add(Controller.get().getBoardPos());
                 mark = translated;
                 if (markerImage == null) {
                     loadMarkerImage();

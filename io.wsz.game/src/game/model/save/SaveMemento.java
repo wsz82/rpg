@@ -1,24 +1,23 @@
 package game.model.save;
 
 import io.wsz.model.plugin.LocationSerializable;
+import io.wsz.model.stage.Coords;
 
 import java.io.Serializable;
 import java.util.List;
 
 public class SaveMemento implements Serializable {
     private String name;
-    private double hValue;
-    private double vValue;
+    private Coords lastPos;
     private List<LocationSerializable> locations;
     private String currentLocationName;
     private int currentLayer;
 
-    public SaveMemento(){}
+    public SaveMemento() {}
 
-    public SaveMemento(String name, double hValue, double vValue, String currentLocationName, int currentLayer) {
+    public SaveMemento(String name, Coords lastPos, String currentLocationName, int currentLayer) {
         this.name = name;
-        this.hValue = hValue;
-        this.vValue = vValue;
+        this.lastPos = lastPos;
         this.currentLocationName = currentLocationName;
         this.currentLayer = currentLayer;
     }
@@ -31,20 +30,12 @@ public class SaveMemento implements Serializable {
         this.name = name;
     }
 
-    public double gethValue() {
-        return hValue;
+    public Coords getLastPos() {
+        return lastPos;
     }
 
-    public void sethValue(double hValue) {
-        this.hValue = hValue;
-    }
-
-    public double getvValue() {
-        return vValue;
-    }
-
-    public void setvValue(double vValue) {
-        this.vValue = vValue;
+    public void setLastPos(Coords lastPos) {
+        this.lastPos = lastPos;
     }
 
     public List<LocationSerializable> getLocations() {
