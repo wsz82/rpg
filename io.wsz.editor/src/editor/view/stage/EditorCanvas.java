@@ -24,6 +24,8 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.Constants.METER;
+
 public class EditorCanvas extends Canvas {
     private final Stage stage;
     private final Pointer pointer;
@@ -45,10 +47,10 @@ public class EditorCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        int leftX = currentPos.x;
-        int rightX = leftX + (int) getWidth();
-        int topY = currentPos.y;
-        int bottomY = topY + (int) getHeight();
+        double leftX = currentPos.x;
+        double rightX = leftX + getWidth()/METER;
+        double topY = currentPos.y;
+        double bottomY = topY + getHeight()/METER;
 
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
         items = items.stream()
@@ -56,10 +58,10 @@ public class EditorCanvas extends Canvas {
                 .filter(pi -> {
                     Coords pos = pi.getPos();
                     Image img = pi.getImage();
-                    int piLeftX = pos.x;
-                    int piRightX = piLeftX + (int) img.getWidth();
-                    int piTopY = pos.y;
-                    int piBottomY = piTopY + (int) img.getHeight();
+                    double piLeftX = pos.x;
+                    double piRightX = piLeftX + img.getWidth()/METER;
+                    double piTopY = pos.y;
+                    double piBottomY = piTopY + img.getHeight()/METER;
                     return Comparator.doOverlap(
                     leftX, topY, rightX, bottomY,
                     piLeftX, piTopY, piRightX, piBottomY);
@@ -69,43 +71,40 @@ public class EditorCanvas extends Canvas {
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
-            final Coords pos = pi.getPos();
+            Coords pos = pi.getPos();
             Coords translated = pos.subtract(currentPos);
-            final int x = translated.x;
-            final int y = translated.y;
+            int x = (int) (translated.x * METER);
+            int y = (int) (translated.y * METER);
 
-            if (pi.getVisible()) {
+            Image img = pi.getImage();
+            double width = img.getWidth();
+            double height = img.getHeight();
 
-                Image img = pi.getImage();
-                double width = img.getWidth();
-                double height = img.getHeight();
+            int startX = 0;
+            if (x < 0) {
+                startX = -x;
+                width = x + width;
+            }
+            int startY = 0;
+            if (y < 0) {
+                startY = -y;
+                height = y + height;
+            }
 
-                int startX = 0;
-                if (x < 0) {
-                    startX = -x;
-                    width = x + width;
-                }
-                int startY = 0;
-                if (y < 0) {
-                    startY = -y;
-                    height = y + height;
-                }
+            int destX = 0;
+            if (x > 0) {
+                destX = x;
+            }
+            int destY = 0;
+            if (y > 0) {
+                destY = y;
+            }
+            gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
-                int destX = 0;
-                if (x > 0) {
-                    destX = x;
-                }
-                int destY = 0;
-                if (y > 0) {
-                    destY = y;
-                }
-                gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
-
-                if (!activeContentMarked
-                        && pi.equals(EditorController.get().getActiveContent().getItems())) {
-                    activeContentMarked = true;
-                    drawActiveContentRectangle(gc, pi);
-                }
+            if (!activeContentMarked
+                    && pi.equals(EditorController.get().getActiveContent().getItems())) {
+                activeContentMarked = true;
+                drawActiveContentRectangle(gc, pi);
             }
         }
 
@@ -119,22 +118,20 @@ public class EditorCanvas extends Canvas {
             if (marker == null) {
                 return;
             }
-            int x = translated.x - (int) marker.getWidth()/2;
-            int y = translated.y - (int) marker.getHeight()/2;
+            double x = translated.x * METER - marker.getWidth()/2;
+            double y = translated.y * METER - marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
     }
 
     private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
-        int x = pi.getPos().x;
-        int y = pi.getPos().y;
-        Coords translated = new Coords(x, y).subtract(currentPos);
+        Coords translated = pi.getPos().subtract(currentPos);
         double width = pi.getImage().getWidth();
         double height = pi.getImage().getHeight();
         gc.setStroke(Color.RED);
         gc.setLineWidth(0.5);
         gc.setLineDashes(20);
-        gc.strokeRect(translated.x, translated.y, width, height);
+        gc.strokeRect(translated.x * METER, translated.y * METER, width, height);
     }
 
     private void hookupEvents() {
@@ -151,23 +148,23 @@ public class EditorCanvas extends Canvas {
             e.consume();
             dx[1] = e.getX();
             dy[1] = e.getY();
-            int dX = (int) (dx[1] - dx[0]);
-            int dY = (int) (dy[1] - dy[0]);
-            int newX = currentPos.x - dX;
-            int newY = currentPos.y - dY;
-            int locWidth = Controller.get().getCurrentLocation().getWidth();
-            int locHeight = Controller.get().getCurrentLocation().getHeight();
+            double dX = dx[1] - dx[0];
+            double dY = dy[1] - dy[0];
+            double newX = currentPos.x * METER - dX;
+            double newY = currentPos.y * METER - dY;
+            double locWidth = Controller.get().getCurrentLocation().getWidth() * METER;
+            double locHeight = Controller.get().getCurrentLocation().getHeight() * METER;
 
-            if (newX + (int) getWidth() <= locWidth) {
-                currentPos.x = Math.max(newX, 0);
+            if (newX + getWidth() <= locWidth) {
+                currentPos.x = Math.max(newX, 0) / METER;
             } else {
-                currentPos.x = locWidth - (int) getWidth();
+                currentPos.x = (locWidth - getWidth()) / METER;
             }
 
-            if (newY + (int) getHeight() <= locHeight) {
-                currentPos.y = Math.max(newY, 0);
+            if (newY + getHeight() <= locHeight) {
+                currentPos.y = Math.max(newY, 0) / METER;
             } else {
-                currentPos.y = locHeight - (int) getHeight();
+                currentPos.y = (locHeight - getHeight()) / METER;
             }
 
             refresh();
@@ -220,7 +217,7 @@ public class EditorCanvas extends Canvas {
                 }
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    Coords pos = new Coords((int) e.getX(), (int) e.getY());
+                    Coords pos = new Coords(e.getX() / METER, e.getY() / METER);
                     Coords translated = pos.add(currentPos);
                     Coords[] poss = new Coords[]{translated};
                     ItemType[] types = ItemType.values();
@@ -318,8 +315,8 @@ public class EditorCanvas extends Canvas {
     }
 
     private void setSize() {
-        int locWidth = Controller.get().getCurrentLocation().getWidth();
-        int locHeight = Controller.get().getCurrentLocation().getHeight();
+        double locWidth = Controller.get().getCurrentLocation().getWidth() * METER;
+        double locHeight = Controller.get().getCurrentLocation().getHeight() * METER;
         double maxWidth = parent.getWidth();
         double maxHeight = parent.getHeight();
         if (locWidth >= maxWidth) {
@@ -350,22 +347,22 @@ public class EditorCanvas extends Canvas {
     }
 
     private void updatePos(KeyCode keyCode, Coords pos) {
+        double dif = METER/100.0;
         switch (keyCode) {
-            case UP -> pos.y = pos.y - 1;
-            case LEFT -> pos.x = pos.x - 1;
-            case DOWN -> pos.y = pos.y + 1;
-            case RIGHT -> pos.x = pos.x + 1;
+            case UP -> pos.y = pos.y - dif;
+            case LEFT -> pos.x = pos.x - dif;
+            case DOWN -> pos.y = pos.y + dif;
+            case RIGHT -> pos.x = pos.x + dif;
         }
-        refresh();
     }
 
     private void moveToPointer(PosItem pi) {
         Coords pos = pi.getPos();
         Coords newPos = pointer.getMark();
         pos.x = newPos.x;
-        int y = 0;
+        double y = 0;
         if (newPos.y != 0) {
-            y = newPos.y - (int) pi.getImage().getHeight();
+            y = newPos.y - pi.getImage().getHeight() / METER;
         }
         pos.y = y;
         contentTableView.refresh();

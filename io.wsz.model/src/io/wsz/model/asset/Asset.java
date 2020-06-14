@@ -87,7 +87,7 @@ public abstract class Asset {
         if (url == null) {
             return null;
         }
-        return new Image(url, true);
+        return new Image(url);
     }
 
     public void setImage(Image image) {

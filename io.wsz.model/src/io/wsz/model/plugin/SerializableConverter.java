@@ -35,8 +35,8 @@ public class SerializableConverter {
         List<LocationSerializable> output = new ArrayList<>(0);
         for (Location location : input) {
             String name = location.getName();
-            int width = location.getWidth();
-            int height = location.getHeight();
+            double width = location.getWidth();
+            double height = location.getHeight();
             List<LayerSerializable> layers = toSerializableLayers(location);
             List<PosItemSerializable> items = toSerializableItems(location);
 

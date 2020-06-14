@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.DoubleField;
 import editor.view.IntegerField;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
@@ -19,8 +20,8 @@ import java.util.stream.Collectors;
 public class TeleportAssetStage extends AssetStage<Teleport> {
     private static final String TITLE = "Teleport asset";
     private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
-    private final IntegerField inputX = new IntegerField(0);
-    private final IntegerField inputY = new IntegerField(0);
+    private final DoubleField inputX = new DoubleField(0.0);
+    private final DoubleField inputY = new DoubleField(0.0);
     private final IntegerField inputLayer = new IntegerField();
 
     public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent) {
@@ -104,8 +105,8 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         inputLayer.setText(""+asset.getExitLevel());
         Coords exitPos = asset.getExit();
         if (exitPos != null) {
-            int x = exitPos.x;
-            int y = exitPos.y;
+            double x = exitPos.x;
+            double y = exitPos.y;
             inputX.setText(""+x);
             inputY.setText(""+y);
         }

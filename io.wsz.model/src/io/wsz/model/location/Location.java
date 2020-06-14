@@ -10,8 +10,8 @@ import java.util.List;
 
 public class Location {
     private final StringProperty name = new SimpleStringProperty(this, "name");
-    private final IntegerProperty width = new SimpleIntegerProperty(this, "width");
-    private final IntegerProperty height = new SimpleIntegerProperty(this, "height");
+    private final DoubleProperty width = new SimpleDoubleProperty(this, "width");
+    private final DoubleProperty height = new SimpleDoubleProperty(this, "height");
     private final ObjectProperty<LayersList> layers = new SimpleObjectProperty<>(this, "layers");
     private final ObjectProperty<ItemList> items = new SimpleObjectProperty<>(this, "contents");
     private final List<PosItem> itemsToRemove = new ArrayList<>(0);
@@ -41,19 +41,19 @@ public class Location {
         this.name.set(name);
     }
 
-    public int getWidth() {
+    public double getWidth() {
         return width.get();
     }
 
-    public void setWidth(int width) {
+    public void setWidth(double width) {
         this.width.set(width);
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height.get();
     }
 
-    public void setHeight(int height) {
+    public void setHeight(double height) {
         this.height.set(height);
     }
 

@@ -35,7 +35,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         Controller.get().setCenterPos(targetPos);
     }
 
-    public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
+    public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         if (!from.equals(target)) {
             from.getItemsToRemove().add(this);
             target.getItemsToAdd().add(this);

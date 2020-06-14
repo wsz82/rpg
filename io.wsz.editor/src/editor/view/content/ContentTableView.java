@@ -15,10 +15,12 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
-import javafx.util.converter.IntegerStringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.wsz.model.Constants.METER;
 
 public class ContentTableView extends TableView<PosItem> {
     private final EditorCanvas editorCanvas;
@@ -84,18 +86,18 @@ public class ContentTableView extends TableView<PosItem> {
         visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
         visibilityCol.setEditable(true);
 
-        TableColumn<PosItem, Integer> posCol = new TableColumn<>("Position");
+        TableColumn<PosItem, Double> posCol = new TableColumn<>("Position");
         posCol.setEditable(true);
 
-        TableColumn<PosItem, Integer> xCol = new TableColumn<>("X");
+        TableColumn<PosItem, Double> xCol = new TableColumn<>("X");
         xCol.setEditable(true);
         xCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
-            protected Integer computeValue() {
+            protected Double computeValue() {
                 return param.getValue().getPos().x;
             }
         });
-        xCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         xCol.setOnEditCommit(t -> {
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
             pi.getPos().x = t.getNewValue();
@@ -103,15 +105,15 @@ public class ContentTableView extends TableView<PosItem> {
             editorCanvas.refresh();
         });
 
-        TableColumn<PosItem, Integer> yCol = new TableColumn<>("Y");
+        TableColumn<PosItem, Double> yCol = new TableColumn<>("Y");
         yCol.setEditable(true);
         yCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
-            protected Integer computeValue() {
+            protected Double computeValue() {
                 return param.getValue().getPos().y;
             }
         });
-        yCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         yCol.setOnEditCommit(t -> {
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
             pi.getPos().y = t.getNewValue();
@@ -153,9 +155,9 @@ public class ContentTableView extends TableView<PosItem> {
         Coords newPos = pointer.getMark();
         for (PosItem pi : itemsToMove) {
             pi.getPos().x = newPos.x;
-            int y = 0;
+            double y = 0;
             if (newPos.y != 0) {
-                y = newPos.y - (int) pi.getImage().getHeight();
+                y = newPos.y - pi.getImage().getHeight() / METER;
             }
             pi.getPos().y = y;
         }

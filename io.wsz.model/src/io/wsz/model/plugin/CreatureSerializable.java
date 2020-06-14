@@ -11,12 +11,12 @@ public class CreatureSerializable extends PosItemSerializable {
     protected Coords dest;
     protected CreatureSize size;
     protected CreatureControl control;
-    protected Integer speed;
+    protected Double speed;
 
     public CreatureSerializable(String prototype, String name, ItemType type, String path,
                                 Boolean visible, Coords pos, Integer level,
                                 List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                                Coords dest, CreatureSize size, CreatureControl control, Integer speed) {
+                                Coords dest, CreatureSize size, CreatureControl control, Double speed) {
         super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
         this.dest = dest;
         this.size = size;
@@ -48,11 +48,11 @@ public class CreatureSerializable extends PosItemSerializable {
         this.control = control;
     }
 
-    public Integer getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Integer speed) {
+    public void setSpeed(Double speed) {
         this.speed = speed;
     }
 }

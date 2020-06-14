@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.Constants.METER;
+
 class CreatureTableView extends AssetsTableView<Creature> {
 
     CreatureTableView(Stage parent, ObservableList<Creature> assets) {
@@ -67,8 +69,8 @@ class CreatureTableView extends AssetsTableView<Creature> {
         for (Creature p
                 : selectedAssets) {
             if (!pos.is0()) {
-                double height = p.getImage().getHeight();
-                pos.y = pos.y - (int) height;
+                double height = p.getImage().getHeight() / METER;
+                pos.y = pos.y - height;
             }
 
             String name = p.getName();

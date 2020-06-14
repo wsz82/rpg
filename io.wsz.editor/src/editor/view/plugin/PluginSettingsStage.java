@@ -1,5 +1,6 @@
 package editor.view.plugin;
 
+import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
@@ -58,9 +59,9 @@ public class PluginSettingsStage extends ChildStage {
         final Label xLabel = new Label("X:");
         final Label yLabel = new Label("Y:");
         final Label layerLabel = new Label("Layer:");
-        final IntegerField inputX = new IntegerField(0);
+        final DoubleField inputX = new DoubleField(0.0);
         inputX.setPrefWidth(50);
-        final IntegerField inputY = new IntegerField(0);
+        final DoubleField inputY = new DoubleField(0.0);
         inputY.setPrefWidth(50);
         final IntegerField inputLayer = new IntegerField();
         inputLayer.setText("0");

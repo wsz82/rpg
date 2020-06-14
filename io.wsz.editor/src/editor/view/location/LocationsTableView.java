@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.converter.IntegerStringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,12 +48,12 @@ public class LocationsTableView extends TableView<Location> {
         });
         nameCol.setPrefWidth(100);
 
-        TableColumn<Location, Integer> widthCol = new TableColumn<>("Width");
+        TableColumn<Location, Double> widthCol = new TableColumn<>("Width");
         widthCol.setCellValueFactory(new PropertyValueFactory<>("width"));
         widthCol.setEditable(true);
-        widthCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        widthCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         widthCol.setOnEditCommit(t -> {
-            int newWidth = t.getNewValue();
+            double newWidth = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setWidth(newWidth);
             Location currentLocation = CurrentLocation.get().getLocation();
@@ -63,12 +63,12 @@ public class LocationsTableView extends TableView<Location> {
             refresh();
         });
 
-        TableColumn<Location, Integer> heightCol = new TableColumn<>("Height");
+        TableColumn<Location, Double> heightCol = new TableColumn<>("Height");
         heightCol.setCellValueFactory(new PropertyValueFactory<>("height"));
         heightCol.setEditable(true);
-        heightCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        heightCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         heightCol.setOnEditCommit(t -> {
-            int newHeight = t.getNewValue();
+            double newHeight = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setHeight(t.getNewValue());
             Location currentLocation = CurrentLocation.get().getLocation();

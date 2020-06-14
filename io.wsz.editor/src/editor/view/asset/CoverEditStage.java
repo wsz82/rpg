@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static io.wsz.model.Constants.METER;
+
 public class CoverEditStage extends ChildStage {
     private final Polyline polyline = new Polyline();
     private final Pane pane = new Pane();
@@ -78,8 +80,8 @@ public class CoverEditStage extends ChildStage {
         int size = coverLine.size() * 2;
         List<Double> points = new ArrayList<>(size);
         for (Coords pos : coverLine) {
-            double x = pos.x;
-            double y = pos.y;
+            double x = pos.x * 100;
+            double y = pos.y * 100;
             points.add(x);
             points.add(y);
         }
@@ -100,7 +102,7 @@ public class CoverEditStage extends ChildStage {
         pane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                 && e.getClickCount() == 2) {
-                addPoint((int) e.getX(), (int) e.getY());
+                addPoint(e.getX(), e.getY());
             }
         });
     }
@@ -108,8 +110,8 @@ public class CoverEditStage extends ChildStage {
     private void openContextMenu(ContextMenu cm, MenuItem addPoint, ContextMenuEvent e) {
         cm.show(iv, e.getScreenX(), e.getScreenY());
         addPoint.setOnAction(ev -> {
-            int x = (int) e.getX();
-            int y = (int) e.getY();
+            double x = e.getX();
+            double y = e.getY();
             addPoint(x, y);
         });
     }
@@ -118,47 +120,49 @@ public class CoverEditStage extends ChildStage {
         polyline.getPoints().clear();
     }
 
-    private void addPoint(int x, int y) {
+    private void addPoint(double x, double y) {
         if (xAlreadyExists(x)) {
             return;
         }
-        polyline.getPoints().addAll((double)x, (double)y);
+        polyline.getPoints().addAll(x, y);
 
         List<Double> points = polyline.getPoints();
-        List<Coords> coordsList = doublesToCoords(points);
-        coordsList.sort(Comparator.comparingInt(c -> c.x));
+        List<Coords> coordsList = pointsToCoords(points);
+        coordsList.sort(Comparator.comparingDouble(c -> c.x));
 
-        List<Double> doubles = coordsToDoubles(coordsList);
+        List<Double> doubles = coordsToPoints(coordsList);
         points.clear();
         points.addAll(doubles);
     }
 
-    private boolean xAlreadyExists(int x) {
+    private boolean xAlreadyExists(double x) {
         List<Double> doubles = polyline.getPoints();
-        List<Coords> coords = doublesToCoords(doubles);
+        List<Coords> coords = pointsToCoords(doubles);
         return coords.stream()
-                .anyMatch(c -> c.x == x);
+                .anyMatch(c ->
+                        x/METER > c.x - 1.0/METER
+                        && x/METER < c.x + 1.0/METER
+                );
     }
 
-    private List<Coords> doublesToCoords(List<Double> points) {
+    private List<Coords> pointsToCoords(List<Double> points) {
         int size = points.size();
         List<Coords> coordsList = new ArrayList<>(size / 2);
         for (int i = 0; i < size - 1; i = i + 2) {
-            int px = points.get(i).intValue();
-            int py = points.get(i + 1).intValue();
+            double px = points.get(i) / METER;
+            double py = points.get(i + 1) / METER;
             Coords point = new Coords(px, py);
             coordsList.add(point);
         }
         return coordsList;
     }
 
-    private List<Double> coordsToDoubles(List<Coords> coordsList) {
-        int size;
-        size = coordsList.size() * 2;
+    private List<Double> coordsToPoints(List<Coords> coordsList) {
+        int size = coordsList.size() * 2;
         List<Double> doubles = new ArrayList<>(size);
         for (Coords pos : coordsList) {
-            double px = pos.x;
-            double py = pos.y;
+            double px = pos.x * METER;
+            double py = pos.y * METER;
             doubles.add(px);
             doubles.add(py);
         }
@@ -168,7 +172,7 @@ public class CoverEditStage extends ChildStage {
     private void saveLine() {
         List<Double> points = polyline.getPoints();
         if (!points.isEmpty()) {
-            List<Coords> coverLine = doublesToCoords(points);
+            List<Coords> coverLine = pointsToCoords(points);
             PosItem i = (PosItem) asset;
             i.setCoverLine(coverLine);
         }

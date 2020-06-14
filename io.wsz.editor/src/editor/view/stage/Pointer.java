@@ -10,15 +10,16 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+import static io.wsz.model.Constants.METER;
+
 public class Pointer {
     private final EventHandler<MouseEvent> clickEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                Coords mousePos = new Coords((int) event.getX(), (int) event.getY());
-                Coords translated = mousePos.add(Controller.get().getBoardPos());
-                mark = translated;
+                Coords mousePos = new Coords(event.getX() / METER, event.getY() / METER);
+                mark = mousePos.add(Controller.get().getBoardPos());
                 if (markerImage == null) {
                     loadMarkerImage();
                 }

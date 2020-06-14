@@ -22,16 +22,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.Constants.METER;
+
 public class GameCanvas extends Canvas {
-    private static final int OFFSET = 30;
-    private static final int SCROLL = 20;
+    private static final double OFFSET = 0.3 * METER;
+    private static final double SCROLL = 0.2;
     private final Board board = Controller.get().getBoard();
     private final Coords currentPos = Controller.get().getBoardPos();
-    private final GameStage gameStage;
     private List<Layer> layers;
 
-    public GameCanvas(GameStage gameStage){
-        this.gameStage = gameStage;
+    public GameCanvas() {
         hookupEvents();
     }
 
@@ -41,10 +41,10 @@ public class GameCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        int leftX = currentPos.x;
-        int rightX = leftX + (int) getWidth();
-        int topY = currentPos.y;
-        int bottomY = topY + (int) getHeight();
+        double leftX = currentPos.x;
+        double rightX = leftX + getWidth()/METER;
+        double topY = currentPos.y;
+        double bottomY = topY + getHeight()/METER;
 
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
         Board.get().sortItems(items);
@@ -53,10 +53,10 @@ public class GameCanvas extends Canvas {
                 .filter(pi -> {
                     Coords pos = pi.getPos();
                     Image img = pi.getImage();
-                    int piLeftX = pos.x;
-                    int piRightX = piLeftX + (int) img.getWidth();
-                    int piTopY = pos.y;
-                    int piBottomY = piTopY + (int) img.getHeight();
+                    double piLeftX = pos.x;
+                    double piRightX = piLeftX + img.getWidth();
+                    double piTopY = pos.y;
+                    double piBottomY = piTopY + img.getHeight();
                     return io.wsz.model.stage.Comparator.doOverlap(
                             leftX, topY, rightX, bottomY,
                             piLeftX, piTopY, piRightX, piBottomY);
@@ -67,8 +67,8 @@ public class GameCanvas extends Canvas {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
             Coords translated = pos.subtract(currentPos);
-            final int x = translated.x;
-            final int y = translated.y;
+            final int x = (int) (translated.x * METER);
+            final int y = (int) (translated.y * METER);
 
             if (pi.getVisible()) {
                 switch (type) {
@@ -77,8 +77,8 @@ public class GameCanvas extends Canvas {
                     }
                 }
                 Image img = pi.getImage();
-                double width = img.getWidth();
-                double height = img.getHeight();
+                int width = (int) img.getWidth();
+                int height = (int) img.getHeight();
 
                 int startX = 0;
                 if (x < 0) {
@@ -113,8 +113,8 @@ public class GameCanvas extends Canvas {
         int topY = (int) b.getMinY();
         int rightX = (int) b.getMaxX();
         int bottomY = (int) b.getMaxY();
-        int locWidth = Controller.get().getCurrentLocation().getWidth();
-        int locHeight = Controller.get().getCurrentLocation().getHeight();
+        double locWidth = Controller.get().getCurrentLocation().getWidth();
+        double locHeight = Controller.get().getCurrentLocation().getHeight();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
@@ -158,23 +158,23 @@ public class GameCanvas extends Canvas {
         }
     }
 
-    private void scrollDown(int locHeight) {
-        int newY = currentPos.y = currentPos.y + SCROLL;
-        currentPos.y = Math.min(newY, locHeight - (int) getHeight());
+    private void scrollDown(double locHeight) {
+        double newY = currentPos.y = currentPos.y + SCROLL;
+        currentPos.y = Math.min(newY, locHeight - getHeight()/METER);
     }
 
     private void scrollUp() {
-        int newY = currentPos.y = currentPos.y - SCROLL;
+        double newY = currentPos.y = currentPos.y - SCROLL;
         currentPos.y = Math.max(newY, 0);
     }
 
-    private void scrollRight(int locWidth) {
-        int newX = currentPos.x + SCROLL;
-        currentPos.x = Math.min(newX, locWidth - (int) getWidth());
+    private void scrollRight(double locWidth) {
+        double newX = currentPos.x + SCROLL;
+        currentPos.x = Math.min(newX, locWidth - getWidth()/METER);
     }
 
     private void scrollLeft() {
-        int newX = currentPos.x - SCROLL;
+        double newX = currentPos.x - SCROLL;
         currentPos.x = Math.max(newX, 0);
     }
 
@@ -187,14 +187,15 @@ public class GameCanvas extends Canvas {
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.posToCenter();
         Coords translated = centerBottomPos.subtract(currentPos);
-        int x = translated.x;
-        int y = translated.y;
+        double x = translated.x * METER;
+        double y = translated.y * METER;
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
         }
         gc.setLineWidth(1.5);
-        gc.strokeOval(x - size.getWidth()/2.0, y - size.getHeight()/2.0, size.getWidth(), size.getHeight());
+        gc.strokeOval(x - size.getWidth()/2.0 * METER, y - size.getHeight()/2.0 * METER,
+                size.getWidth() * METER, size.getHeight() * METER);
     }
 
     private void hookupEvents() {
@@ -202,7 +203,7 @@ public class GameCanvas extends Canvas {
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 e.consume();
-                Coords pos = new Coords((int) e.getX(), (int) e.getY());
+                Coords pos = new Coords(e.getX() / METER, e.getY() / METER);
                 Coords translated = pos.add(currentPos);
                 Coords[] poss = new Coords[] {translated};
                 ItemType[] types = new ItemType[] {ItemType.CREATURE};
@@ -223,17 +224,17 @@ public class GameCanvas extends Canvas {
         });
 
         Controller.get().centerPosProperty().addListener((observable, oldValue, newValue) -> {
-            int x = newValue.x - (int) getWidth()/2;
-            int y = newValue.y - (int) getHeight()/2;
-            int locWidth = Controller.get().getCurrentLocation().getWidth();
-            int locHeight = Controller.get().getCurrentLocation().getHeight();
+            double x = newValue.x - (getWidth() / 2)/METER;
+            double y = newValue.y - (getHeight() / 2)/METER;
+            double locWidth = Controller.get().getCurrentLocation().getWidth();
+            double locHeight = Controller.get().getCurrentLocation().getHeight();
             if (x > locWidth - getWidth()) {
-                currentPos.x = locWidth - (int) getWidth();
+                currentPos.x = locWidth - getWidth()/METER;
             } else {
                 currentPos.x = Math.max(x, 0);
             }
             if (y > locHeight - getHeight()) {
-                currentPos.y = locHeight - (int) getHeight();
+                currentPos.y = locHeight - getHeight()/METER;
             } else {
                 currentPos.y = Math.max(y, 0);
             }
@@ -284,8 +285,8 @@ public class GameCanvas extends Canvas {
         if (scene == null) {
             return;
         }
-        int locWidth = Controller.get().getCurrentLocation().getWidth();
-        int locHeight = Controller.get().getCurrentLocation().getHeight();
+        double locWidth = Controller.get().getCurrentLocation().getWidth() * METER;
+        double locHeight = Controller.get().getCurrentLocation().getHeight() * METER;
         double maxWidth = getScene().getWidth();
         double maxHeight = getScene().getHeight();
         if (locWidth >= maxWidth) {

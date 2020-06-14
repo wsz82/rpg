@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.Constants.METER;
+
 public class CollisionEditStage extends ChildStage {
     private final ObservableList<Polygon> polygons = FXCollections.observableArrayList();
     private final ChoiceBox<Polygon> polygonsCB = new ChoiceBox<>(polygons);
@@ -99,13 +101,13 @@ public class CollisionEditStage extends ChildStage {
         for (List<Coords> poss : collisionPolygons) {
             Polygon p = new Polygon();
             Coords first = poss.get(0);
-            int firstX = first.x;
-            int firstY = first.y;
+            double firstX = first.x;
+            double firstY = first.y;
             for (Coords pos : poss) {
-                int x = pos.x;
-                int y = pos.y;
-                p.getPoints().add((double) x);
-                p.getPoints().add((double) y);
+                double x = pos.x * METER;
+                double y = pos.y * METER;
+                p.getPoints().add(x);
+                p.getPoints().add(y);
             }
             setUpPolygon(firstX, firstY, p);
             polygons.add(p);
@@ -130,7 +132,7 @@ public class CollisionEditStage extends ChildStage {
         ivPane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                     && e.getClickCount() == 2) {
-                addPoint((int) e.getX(), (int) e.getY());
+                addPoint(e.getX(), e.getY());
             }
         });
     }
@@ -146,8 +148,8 @@ public class CollisionEditStage extends ChildStage {
 
     private void openContextMenu(ContextMenu cm, MenuItem addPoint, MenuItem addPolygon, ContextMenuEvent e) {
         cm.show(ivPane, e.getScreenX(), e.getScreenY());
-        int x = (int) e.getX();
-        int y = (int) e.getY();
+        double x = e.getX();
+        double y = e.getY();
         addPoint.setOnAction(ev -> addPoint(x, y));
         addPolygon.setOnAction(ev -> addNewPolygon(x, y));
     }
@@ -162,16 +164,16 @@ public class CollisionEditStage extends ChildStage {
         refreshPolygons();
     }
 
-    private void addPoint(int x, int y) {
+    private void addPoint(double x, double y) {
         Polygon p = polygonsCB.getValue();
         if (p == null) {
             return;
         }
-        p.getPoints().addAll((double)x, (double)y);
+        p.getPoints().addAll(x, y);
         refreshPolygons();
     }
 
-    private void addNewPolygon(int x, int y) {
+    private void addNewPolygon(double x, double y) {
         Polygon p = new Polygon();
         setUpPolygon(x, y, p);
         polygons.add(p);
@@ -181,19 +183,19 @@ public class CollisionEditStage extends ChildStage {
         refreshPolygons();
     }
 
-    private void setUpPolygon(int x, int y, Polygon p) {
+    private void setUpPolygon(double x, double y, Polygon p) {
         p.setStroke(Color.RED);
         p.setStrokeWidth(1);
         p.setOpacity(0.5);
-        p.setId(x + ", " + y);
+        p.setId(String.format("%.2f", x/METER) + "; " + String.format("%.2f", y/METER));
     }
 
-    private List<Coords> doublesToCoords(List<Double> points) {
+    private List<Coords> pointsToCoords(List<Double> points) {
         int size = points.size();
         List<Coords> coordsList = new ArrayList<>(size / 2);
         for (int i = 0; i < size - 1; i = i + 2) {
-            int px = points.get(i).intValue();
-            int py = points.get(i + 1).intValue();
+            double px = points.get(i) / METER;
+            double py = points.get(i + 1) / METER;
             Coords point = new Coords(px, py);
             coordsList.add(point);
         }
@@ -213,7 +215,7 @@ public class CollisionEditStage extends ChildStage {
         List<List<Coords>> cp = new ArrayList<>(ps.size()/2);
         for (Polygon p : ps) {
             List<Double> doubles = p.getPoints();
-            List<Coords> poss = doublesToCoords(doubles);
+            List<Coords> poss = pointsToCoords(doubles);
             cp.add(poss);
         }
         return cp;

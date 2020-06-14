@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Coords implements Serializable {
-    public volatile int x;
-    public volatile int y;
+    public double x;
+    public double y;
 
-    public Coords(int x, int y) {
+    public Coords(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -21,18 +21,18 @@ public class Coords implements Serializable {
     }
 
     public Coords add(Coords pos2) {
-           int x = this.x + pos2.x;
-           int y = this.y + pos2.y;
-           return new Coords(x, y);
-    }
-
-    public Coords subtract(Coords pos2) {
-        int x = this.x - pos2.x;
-        int y = this.y - pos2.y;
+        double x = this.x + pos2.x;
+        double y = this.y + pos2.y;
         return new Coords(x, y);
     }
 
-    public boolean isInsidePolygon(List<Coords> polygon, int maxX) {
+    public Coords subtract(Coords pos2) {
+        double x = this.x - pos2.x;
+        double y = this.y - pos2.y;
+        return new Coords(x, y);
+    }
+
+    public boolean isInsidePolygon(List<Coords> polygon, double maxX) {
         int n = polygon.size();
         if (n < 3) {
             return false;
@@ -75,7 +75,7 @@ public class Coords implements Serializable {
     }
 
     private int orientation(Coords p, Coords q, Coords r) {
-        int val = (q.y - p.y) * (r.x - q.x)
+        double val = (q.y - p.y) * (r.x - q.x)
                 - (q.x - p.x) * (r.y - q.y);
 
         if (val == 0) {

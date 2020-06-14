@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.Constants.METER;
+
 class LandscapeTableView extends AssetsTableView<Landscape> {
 
     LandscapeTableView(Stage parent, ObservableList<Landscape> assets) {
@@ -39,15 +41,15 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
         for (Landscape p
                 : selectedAssets) {
             if (!pos.is0()) {
-                double height = p.getImage().getHeight();
-                pos.y = pos.y - (int) height;
+                double height = p.getImage().getHeight() / METER;
+                pos.y = pos.y - height;
             }
 
             String name = p.getName();
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = new Coords(pos.x, pos.y);
+            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());

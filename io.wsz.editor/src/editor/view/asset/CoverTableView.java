@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.Constants.METER;
+
 public class CoverTableView extends AssetsTableView<Cover> {
 
     CoverTableView(Stage parent, ObservableList<Cover> assets) {
@@ -39,15 +41,15 @@ public class CoverTableView extends AssetsTableView<Cover> {
         for (Cover c
                 : selectedAssets) {
             if (!pos.is0()) {
-                double height = c.getImage().getHeight();
-                pos.y = pos.y - (int) height;
+                double height = c.getImage().getHeight() / METER;
+                pos.y = pos.y - height;
             }
 
             String name = c.getName();
             ItemType type = c.getType();
             String path = c.getRelativePath();
 
-            Coords clonePos = new Coords(pos.x, pos.y);
+            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (c.getCoverLine() != null) {
                 coverLine.addAll(c.getCoverLine());

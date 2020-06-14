@@ -10,8 +10,8 @@ import javafx.collections.ObservableList;
 public class CurrentLocation {
     private static CurrentLocation singleton;
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
-    private final IntegerProperty width = new SimpleIntegerProperty();
-    private final IntegerProperty height = new SimpleIntegerProperty();
+    private final DoubleProperty width = new SimpleDoubleProperty();
+    private final DoubleProperty height = new SimpleDoubleProperty();
     private final StringProperty name = new SimpleStringProperty();
 
     public static CurrentLocation get() {
@@ -55,28 +55,28 @@ public class CurrentLocation {
         return locationProperty;
     }
 
-    public int getWidth() {
+    public double getWidth() {
         return width.get();
     }
 
-    public IntegerProperty widthProperty() {
+    public DoubleProperty widthProperty() {
         return width;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height.get();
     }
 
-    public IntegerProperty heightProperty() {
+    public DoubleProperty heightProperty() {
         return height;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(double width) {
         this.locationProperty.get().setWidth(width);
         this.width.set(width);
     }
 
-    public void setHeight(int height) {
+    public void setHeight(double height) {
         this.locationProperty.get().setHeight(height);
         this.height.set(height);
     }

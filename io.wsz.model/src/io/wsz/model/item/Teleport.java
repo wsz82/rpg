@@ -52,10 +52,10 @@ public class Teleport extends PosItem<Teleport> {
             return;
         }
         Coords targetPos = getExit();
-        int targetX = targetPos.x;
-        int targetWidth = target.getWidth();
-        int targetY = targetPos.y;
-        int targetHeight = target.getHeight();
+        double targetX = targetPos.x;
+        double targetWidth = target.getWidth();
+        double targetY = targetPos.y;
+        double targetHeight = target.getHeight();
         if (targetX < targetWidth && targetY < targetHeight) {
             Location from = Controller.get().getCurrentLocation().getLocation();
             cr.changeLocation(from, target, targetLayer, targetX, targetY);

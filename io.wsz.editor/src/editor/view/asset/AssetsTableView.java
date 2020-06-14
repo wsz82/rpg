@@ -61,7 +61,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private boolean assetNameIsNotUnique(String newValue) {
-        return Controller.get().getAssetsList().stream()
+        return ObservableAssets.get().merge().stream()
                 .anyMatch(p -> p.getName().equals(newValue));
     }
 

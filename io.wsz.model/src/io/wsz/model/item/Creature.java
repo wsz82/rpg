@@ -8,15 +8,16 @@ import io.wsz.model.stage.Coords;
 
 import java.util.List;
 
+import static io.wsz.model.Constants.METER;
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.CreatureSize.M;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> {
-    private volatile Coords dest;
-    private volatile CreatureSize size;
-    private volatile CreatureControl control;
-    private volatile Integer speed;
+    private Coords dest;
+    private CreatureSize size;
+    private CreatureControl control;
+    private Double speed;
 
     public Creature(Creature prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,
@@ -29,7 +30,7 @@ public class Creature extends PosItem<Creature> {
     public Creature(Creature prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                    Coords dest, CreatureSize size, CreatureControl control, Integer speed) {
+                    Coords dest, CreatureSize size, CreatureControl control, Double speed) {
         super(prototype, name, type, path,
                 visible, pos, level,
                 coverLine, collisionPolygons);
@@ -43,10 +44,10 @@ public class Creature extends PosItem<Creature> {
         if (dest == null) {
             return;
         }
-        int x1 = pos.x;
-        int x2 = dest.x;
-        int y1 = pos.y;
-        int y2 = dest.y;
+        double x1 = pos.x;
+        double x2 = dest.x;
+        double y1 = pos.y;
+        double y2 = dest.y;
         if (x1 == x2 && y1 == y2) {
             dest = null;
             return;
@@ -56,8 +57,8 @@ public class Creature extends PosItem<Creature> {
         if (dist < getSpeed()) {
             moveDist = dist;
         }
-        int x3 = x1 + (int) (moveDist/dist * (x2 - x1));
-        int y3 = y1 + (int) (moveDist/dist * (y2 - y1));
+        double x3 = x1 + (moveDist/dist * (x2 - x1));
+        double y3 = y1 + (moveDist/dist * (y2 - y1));
         Coords nextPos = new Coords(x3, y3);
         PosItem pi = getCollision(nextPos);
         if (pi != null) {
@@ -81,7 +82,7 @@ public class Creature extends PosItem<Creature> {
                 case TELEPORT -> ((Teleport) pi).enter(this);
             }
         }
-        Creature cr = getCornersCreature(this);
+        Creature cr = getCornersCreature();
         if (cr != null) {
             escapeCreature(cr);
         }
@@ -92,8 +93,8 @@ public class Creature extends PosItem<Creature> {
         setDest(centerToPos(free));
     }
 
-    private Creature getCornersCreature(Creature cr) {
-        return Controller.get().getBoard().getCornersCreature(getCorners(), cr);
+    private Creature getCornersCreature() {
+        return Controller.get().getBoard().getCornersCreature(getCorners(), this);
     }
 
     private PosItem getCornersContent(ItemType[] types) {
@@ -106,10 +107,10 @@ public class Creature extends PosItem<Creature> {
     }
 
     public Coords posToCenter(Coords pos) {
-        double width = getImage().getWidth();
-        double height = getImage().getHeight();
-        int x = pos.x + (int) (width/2);
-        int y = pos.y + (int) height;
+        double width = getImage().getWidth() / METER;
+        double height = getImage().getHeight() / METER;
+        double x = pos.x + width/2;
+        double y = pos.y + height;
         return new Coords(x, y);
     }
 
@@ -117,10 +118,10 @@ public class Creature extends PosItem<Creature> {
         if (difPos == null) {
             return null;
         }
-        double width = getImage().getWidth();
-        double height = getImage().getHeight();
-        int x = difPos.x - (int) (width/2);
-        int y = difPos.y - (int) height;
+        double width = getImage().getWidth() / METER;
+        double height = getImage().getHeight() / METER;
+        double x = difPos.x - width/2;
+        double y = difPos.y - height;
         return new Coords(x, y);
     }
 
@@ -130,19 +131,19 @@ public class Creature extends PosItem<Creature> {
     }
 
     public Coords[] getCorners(Coords pos) {
-        int halfWidth = getSize().getWidth()/2;
-        int halfHeight = getSize().getHeight()/2;
-        int centerX = pos.x;
-        int centerY = pos.y;
+        double halfWidth = getSize().getWidth()/2;
+        double halfHeight = getSize().getHeight()/2;
+        double centerX = pos.x;
+        double centerY = pos.y;
 
         Coords N = new Coords(centerX, centerY - halfHeight);
         Coords W = new Coords(centerX - halfWidth, centerY);
         Coords S = new Coords(centerX, centerY + halfHeight);
         Coords E = new Coords(centerX + halfWidth, centerY);
-        Coords NE = new Coords(centerX + (int) (3/5.0*halfWidth), centerY - (int) (2/3.0*halfHeight));
-        Coords NW = new Coords(centerX - (int) (3/5.0*halfWidth), centerY - (int) (2/3.0*halfHeight));
-        Coords SE = new Coords(centerX + (int) (3/5.0*halfWidth), centerY + (int) (2/3.0*halfHeight));
-        Coords SW = new Coords(centerX - (int) (3/5.0*halfWidth), centerY + (int) (2/3.0*halfHeight));
+        Coords NE = new Coords(centerX + 3/5.0*halfWidth, centerY - 2/3.0*halfHeight);
+        Coords NW = new Coords(centerX - 3/5.0*halfWidth, centerY - 2/3.0*halfHeight);
+        Coords SE = new Coords(centerX + 3/5.0*halfWidth, centerY + 2/3.0*halfHeight);
+        Coords SW = new Coords(centerX - 3/5.0*halfWidth, centerY + 2/3.0*halfHeight);
         return new Coords[] {N, NW, W, SW, S, SE, E, NE};
     }
 
@@ -193,10 +194,10 @@ public class Creature extends PosItem<Creature> {
         this.dest = pos;
     }
 
-    public Integer getSpeed() {
+    public Double getSpeed() {
         if (speed == null) {
             if (prototype == null) {
-                return 0;
+                return 0.0;
             }
             return prototype.speed;
         } else {
@@ -204,7 +205,7 @@ public class Creature extends PosItem<Creature> {
         }
     }
 
-    public void setSpeed(Integer speed) {
+    public void setSpeed(Double speed) {
         this.speed = speed;
     }
 
@@ -239,7 +240,7 @@ public class Creature extends PosItem<Creature> {
     }
 
     @Override
-    public void changeLocation(Location from, Location target, Layer targetLayer, int targetX, int targetY) {
+    public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         pos = centerToPos(new Coords(targetX, targetY));
     }

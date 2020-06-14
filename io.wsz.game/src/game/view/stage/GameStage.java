@@ -56,7 +56,7 @@ public class GameStage extends Stage {
 
     public GameStage() {
         super(StageStyle.DECORATED);
-        this.gameCanvas = new GameCanvas(this);
+        this.gameCanvas = new GameCanvas();
         GameController.get().setGameCanvas(gameCanvas);
     }
 

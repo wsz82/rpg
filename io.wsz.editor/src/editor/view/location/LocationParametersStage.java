@@ -1,6 +1,6 @@
 package editor.view.location;
 
-import editor.view.IntegerField;
+import editor.view.DoubleField;
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
 import io.wsz.model.location.CurrentLocation;
@@ -14,8 +14,8 @@ import javafx.stage.Stage;
 
 public class LocationParametersStage extends ChildStage {
     private final AnchorPane root = new AnchorPane();
-    private final IntegerField inputWidth = new IntegerField(1);
-    private final IntegerField inputHeight = new IntegerField(1);
+    private final DoubleField inputWidth = new DoubleField(0.0);
+    private final DoubleField inputHeight = new DoubleField(0.0);
     private final Button accept = new Button("Ok");
     private final Button cancel = new Button("Cancel");
 

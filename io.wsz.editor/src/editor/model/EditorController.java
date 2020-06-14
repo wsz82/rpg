@@ -43,9 +43,10 @@ public class EditorController {
 
     public void initNewPlugin() {
         Controller.get().getAssetsList().clear();
+        ObservableAssets.get().clearLists();
         Controller.get().getLocationsList().clear();
 
-        Location location = new Location("new", 800, 600);
+        Location location = new Location("new", 8, 6);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);
         Controller.get().getLocationsList().add(location);

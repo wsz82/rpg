@@ -1,6 +1,6 @@
 package editor.view.asset;
 
-import editor.view.IntegerField;
+import editor.view.DoubleField;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;
@@ -18,7 +18,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
-    private final IntegerField speedInput = new IntegerField(0);
+    private final DoubleField speedInput = new DoubleField(0.0);
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
@@ -69,7 +69,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         sizeCB.setValue(size);
         CreatureControl control = asset.getControl();
         controlCB.setValue(control);
-        Integer speed = asset.getSpeed();
+        Double speed = asset.getSpeed();
         speedInput.setText(String.valueOf(speed));
     }
 
@@ -77,7 +77,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected void defineAsset() {
         asset.setSize(sizeCB.getValue());
         asset.setControl(controlCB.getValue());
-        asset.setSpeed(Integer.parseInt(speedInput.getText()));
+        asset.setSpeed(Double.parseDouble(speedInput.getText()));
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.Constants.METER;
 import static io.wsz.model.stage.Comparator.Comparison;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 import static io.wsz.model.stage.Comparator.compare;
@@ -107,10 +108,10 @@ public class Board {
         final List<Coords> i1_cl = i1.getCoverLine();
         final Coords i1_pos = i1.getPos();
         final Image i1_img = i1.getImage();
-        final int i1_posX = i1_pos.x;
-        final int i1_posY = i1_pos.y;
-        final int i1_imgWidth = (int) i1_img.getWidth();
-        final int i1_imgHeight = (int) i1_img.getHeight();
+        final double i1_posX = i1_pos.x;
+        final double i1_posY = i1_pos.y;
+        final double i1_imgWidth = i1_img.getWidth() / METER;
+        final double i1_imgHeight = i1_img.getHeight() / METER;
         final LinkedList<Coords> i1_list = new LinkedList<>();
         if (!i1_cl.isEmpty()) {
             looseCoordsReference(i1_cl, i1_list);
@@ -125,10 +126,10 @@ public class Board {
         final List<Coords> i2_cl = i2.getCoverLine();
         final Coords i2_pos = i2.getPos();
         final Image i2_img = i2.getImage();
-        final int i2_posX = i2_pos.x;
-        final int i2_posY = i2_pos.y;
-        final int i2_imgWidth = (int) i2_img.getWidth();
-        final int i2_imgHeight = (int) i2_img.getHeight();
+        final double i2_posX = i2_pos.x;
+        final double i2_posY = i2_pos.y;
+        final double i2_imgWidth = i2_img.getWidth() / METER;
+        final double i2_imgHeight = i2_img.getHeight() / METER;
         final LinkedList<Coords> i2_list = new LinkedList<>();
         if (!i2_cl.isEmpty()) {
             looseCoordsReference(i2_cl, i2_list);
@@ -147,18 +148,18 @@ public class Board {
     private Comparison isCoverLineAbove(LinkedList<Coords> i1_list, LinkedList<Coords> i2_list) {
         for (int i = 0; i < i2_list.size() - 1; i++) {
             Coords first = i2_list.get(i);
-            int x1 = first.x;
-            int y1 = first.y;
+            double x1 = first.x;
+            double y1 = first.y;
             Coords second = i2_list.get(i+1);
-            int x2 = second.x;
-            int y2 = second.y;
+            double x2 = second.x;
+            double y2 = second.y;
 
             if (x1 == x2) {
                 continue;
             }
 
             for (Coords compared : i1_list) {
-                int x = compared.x;
+                double x = compared.x;
                 if (x == x1) {
                     continue;
                 }
@@ -166,8 +167,8 @@ public class Board {
                 if (!xIsBetweenLine) {
                     continue;
                 }
-                int y = compared.y;
-                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (double) (x1 - x2);
+                double y = compared.y;
+                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
                 if (y > func) {
                     return GREAT;
                 } else {
@@ -203,17 +204,17 @@ public class Board {
 
         for (PosItem pi : items) {
             for (Coords pos : poss) {
-                int x = pos.x;
-                int y = pos.y;
+                int x = (int) (pos.x * METER);
+                int y = (int) (pos.y * METER);
 
-                int cX = pi.getPos().x;
+                int cX = (int) (pi.getPos().x * METER);
                 int cWidth = (int) pi.getImage().getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = pi.getPos().y;
+                int cY = (int) (pi.getPos().y * METER);
                 int cHeight = (int) pi.getImage().getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
@@ -241,12 +242,12 @@ public class Board {
 
     private void looseCoordsReference(List<Coords> from, List<Coords> to) {
         for (Coords pos : from) {
-            Coords newPos = new Coords(pos.x, pos.y);
+            Coords newPos = pos.clone();
             to.add(newPos);
         }
     }
 
-    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, int i2_posX, int i2_imgWidth) {
+    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
         Coords first = linkedCoords.getFirst();
         if (first.x != i2_posX) {
             Coords left = new Coords(i2_posX, first.y);
@@ -254,58 +255,18 @@ public class Board {
         }
 
         Coords last = linkedCoords.getLast();
-        int rightX = i2_posX + i2_imgWidth;
+        double rightX = i2_posX + i2_imgWidth;
         if (last.x != rightX) {
             Coords right = new Coords(rightX, last.y);
             linkedCoords.addLast(right);
         }
     }
 
-    private void translateCoords(List<Coords> list, int i2_posX, int i2_posY) {
+    private void translateCoords(List<Coords> list, double i2_posX, double i2_posY) {
         list.forEach(c -> {
                     c.x = i2_posX + c.x;
                     c.y = i2_posY + c.y;
                 });
-    }
-
-    public Coords getFreePos(Coords[] corners, PosItem pi) {
-        List<Coords> coordsList = new ArrayList<>();
-        Collections.addAll(coordsList, corners);
-        Collections.shuffle(coordsList);
-        for (Coords pos : coordsList) {
-            int x = pos.x;
-            int y = pos.y;
-            Coords oPos = pi.getPos();
-            Image img = pi.getImage();
-
-            int cX = oPos.x;
-            int cWidth = (int) img.getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
-                return pos;
-            }
-
-            int cY = oPos.y;
-            int cHeight = (int) img.getHeight();
-            boolean fitY = y >= cY && y <= cY + cHeight;
-            if (!fitY) {
-                return pos;
-            }
-
-            int imgX = x - cX;
-            int imgY = y - cY;
-            Color color;
-            try {
-                color = img.getPixelReader().getColor(imgX, imgY);
-            } catch (IndexOutOfBoundsException e) {
-                return pos;
-            }
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                return pos;
-            }
-        }
-        return null;
     }
 
     public Coords getFreePosCreature(Coords[] corners, Creature cr) {
@@ -313,21 +274,21 @@ public class Board {
         Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
-            int x = pos.x;
-            int y = pos.y;
+            int x = (int) (pos.x * METER);
+            int y = (int) (pos.y * METER);
             Coords cPos = cr.getPos();
             Image img = cr.getImage();
 
-            int cX = cPos.x;
+            int cX = (int) (cPos.x * METER);
             int cWidth = (int) img.getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            int cY = cPos.y;
+            int cY = (int) (cPos.y * METER);
             int cYbottom = cY + (int) img.getHeight();
-            int cSizeHeight = cr.getSize().getHeight()/2;
+            int cSizeHeight = (int) (cr.getSize().getHeight()/2 * METER);
             boolean fitY = y <= cYbottom && y >= cYbottom + cSizeHeight;
             if (!fitY) {
                 return pos;
@@ -379,14 +340,14 @@ public class Board {
                 continue;
             }
             for (Coords pos : corners) {
-                int x = pos.x;
-                int y = pos.y;
+                double x = pos.x;
+                double y = pos.y;
 
                 Coords cPos = c.posToCenter();
-                int h = cPos.x;
-                int k = cPos.y;
-                int rx = c.getSize().getWidth()/2;
-                int ry = c.getSize().getHeight()/2;
+                double h = cPos.x;
+                double k = cPos.y;
+                double rx = c.getSize().getWidth()/2;
+                double ry = c.getSize().getHeight()/2;
 
                 double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
                 if (eq <= 1) {
@@ -410,20 +371,20 @@ public class Board {
 
         for (PosItem pi : items) {
             for (Coords pos : poss) {
-                int x = pos.x;
-                int y = pos.y;
+                double x = pos.x;
+                double y = pos.y;
 
                 final Image img = pi.getImage();
                 final Coords cPos = pi.getPos();
-                int cX = cPos.x;
-                int cWidth = (int) img.getWidth();
+                double cX = cPos.x;
+                double cWidth = img.getWidth() / METER;
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = cPos.y;
-                int cHeight = (int) img.getHeight();
+                double cY = cPos.y;
+                double cHeight = img.getHeight() / METER;
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
                     continue;
@@ -436,27 +397,27 @@ public class Board {
                     translateCoords(tc, cX, cY);
 
 
-                    int maxObstacleX = tc.stream()
-                            .mapToInt(p -> p.x)
+                    double maxObstacleX = tc.stream()
+                            .mapToDouble(p -> p.x)
                             .max()
-                            .getAsInt();
-                    int minObstacleX = tc.stream()
-                            .mapToInt(p -> p.x)
+                            .getAsDouble();
+                    double minObstacleX = tc.stream()
+                            .mapToDouble(p -> p.x)
                             .min()
-                            .getAsInt();
+                            .getAsDouble();
                     boolean fitObstacleX = x >= minObstacleX && x <= maxObstacleX;
                     if (!fitObstacleX) {
                         continue;
                     }
 
-                    int maxObstacleY = tc.stream()
-                            .mapToInt(p -> p.y)
+                    double maxObstacleY = tc.stream()
+                            .mapToDouble(p -> p.y)
                             .max()
-                            .getAsInt();
-                    int minObstacleY = tc.stream()
-                            .mapToInt(p -> p.y)
+                            .getAsDouble();
+                    double minObstacleY = tc.stream()
+                            .mapToDouble(p -> p.y)
                             .min()
-                            .getAsInt();
+                            .getAsDouble();
                     boolean fitObstacleY = y >= minObstacleY && y <= maxObstacleY;
                     if (!fitObstacleY) {
                         continue;

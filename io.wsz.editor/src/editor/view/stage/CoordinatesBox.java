@@ -9,17 +9,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
+import static io.wsz.model.Constants.METER;
+
 class CoordinatesBox extends HBox {
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                Coords mousePos = new Coords((int) event.getX(), (int) event.getY());
+                Coords mousePos = new Coords(event.getX() / METER, event.getY() / METER);
                 Controller.get();
                 Coords boardPos = Controller.get().getBoardPos();
                 Coords translated = mousePos.add(boardPos);
-                mouseX.setText("X: " + translated.x);
-                mouseY.setText("Y: " + translated.y);
+                mouseX.setText("X: " + String.format("%.2f", translated.x));
+                mouseY.setText("Y: " + String.format("%.2f", translated.y));
             }
         }
     };

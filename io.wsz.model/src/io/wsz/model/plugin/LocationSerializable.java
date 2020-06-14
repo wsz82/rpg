@@ -5,12 +5,12 @@ import java.util.List;
 
 public class LocationSerializable implements Serializable {
     private String name;
-    private int width;
-    private int height;
+    private double width;
+    private double height;
     private List<LayerSerializable> layers;
     private List<PosItemSerializable> contents;
 
-    public LocationSerializable(String name, int width, int height,
+    public LocationSerializable(String name, double width, double height,
                                 List<LayerSerializable> layers, List<PosItemSerializable> contents) {
         this.name = name;
         this.width = width;
@@ -27,19 +27,19 @@ public class LocationSerializable implements Serializable {
         this.name = name;
     }
 
-    int getWidth() {
+    double getWidth() {
         return width;
     }
 
-    void setWidth(int width) {
+    void setWidth(double width) {
         this.width = width;
     }
 
-    int getHeight() {
+    double getHeight() {
         return height;
     }
 
-    void setHeight(int height) {
+    void setHeight(double height) {
         this.height = height;
     }
 
