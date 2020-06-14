@@ -52,6 +52,7 @@ public class EditorCanvas extends Canvas {
 
         List<PosItem> items = Controller.get().getCurrentLocation().getItems();
         items = items.stream()
+                .filter(PosItem::getVisible)
                 .filter(pi -> {
                     Coords pos = pi.getPos();
                     Image img = pi.getImage();
@@ -60,10 +61,9 @@ public class EditorCanvas extends Canvas {
                     int piTopY = pos.y;
                     int piBottomY = piTopY + (int) img.getHeight();
                     return Comparator.doOverlap(
-                            leftX, topY, rightX, bottomY,
-                            piLeftX, piTopY, piRightX, piBottomY);
+                    leftX, topY, rightX, bottomY,
+                    piLeftX, piTopY, piRightX, piBottomY);
                 })
-                .filter(PosItem::getVisible)
                 .collect(Collectors.toList());
         Board.get().sortItems(items);
 
@@ -75,7 +75,32 @@ public class EditorCanvas extends Canvas {
             final int y = translated.y;
 
             if (pi.getVisible()) {
-                gc.drawImage(pi.getImage(), x, y);
+
+                Image img = pi.getImage();
+                double width = img.getWidth();
+                double height = img.getHeight();
+
+                int startX = 0;
+                if (x < 0) {
+                    startX = -x;
+                    width = x + width;
+                }
+                int startY = 0;
+                if (y < 0) {
+                    startY = -y;
+                    height = y + height;
+                }
+
+                int destX = 0;
+                if (x > 0) {
+                    destX = x;
+                }
+                int destY = 0;
+                if (y > 0) {
+                    destY = y;
+                }
+                gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
+
                 if (!activeContentMarked
                         && pi.equals(EditorController.get().getActiveContent().getItems())) {
                     activeContentMarked = true;
@@ -166,6 +191,7 @@ public class EditorCanvas extends Canvas {
                 List<PosItem> addedContent = (List<PosItem>) c.getAddedSubList();
                 hookupItemsEvents(addedContent);
             }
+            refresh();
         };
         Controller.get().getCurrentLocation().getItems().addListener(locationListener);
         Controller.get().getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
@@ -268,7 +294,6 @@ public class EditorCanvas extends Canvas {
                 refresh();
             });
         }
-        refresh();
     }
 
     private void openContextMenu(PosItem pi, MouseEvent e) {

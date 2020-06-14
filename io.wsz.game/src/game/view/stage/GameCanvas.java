@@ -76,7 +76,30 @@ public class GameCanvas extends Canvas {
                         drawCreatureSize((Creature) pi, gc);
                     }
                 }
-                gc.drawImage(pi.getImage(), x, y);
+                Image img = pi.getImage();
+                double width = img.getWidth();
+                double height = img.getHeight();
+
+                int startX = 0;
+                if (x < 0) {
+                    startX = -x;
+                    width = x + width;
+                }
+                int startY = 0;
+                if (y < 0) {
+                    startY = -y;
+                    height = y + height;
+                }
+
+                int destX = 0;
+                if (x > 0) {
+                    destX = x;
+                }
+                int destY = 0;
+                if (y > 0) {
+                    destY = y;
+                }
+                gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
             }
         }
     }
