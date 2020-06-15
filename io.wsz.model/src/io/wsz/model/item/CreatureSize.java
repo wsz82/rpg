@@ -15,6 +15,10 @@ public enum CreatureSize {
         this.height = height;
     }
 
+    public static CreatureSize getDefault() {
+        return M;
+    }
+
     public double getWidth() {
         return width;
     }

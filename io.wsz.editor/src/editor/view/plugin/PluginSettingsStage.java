@@ -26,8 +26,8 @@ public class PluginSettingsStage extends ChildStage {
     private final String TITLE = "Plugin settings";
     private final BooleanProperty startingLocation = new SimpleBooleanProperty();
     private final ObjectProperty<String> startLocationName = new SimpleObjectProperty<>();
-    private final IntegerProperty startX = new SimpleIntegerProperty();
-    private final IntegerProperty startY = new SimpleIntegerProperty();
+    private final DoubleProperty startX = new SimpleDoubleProperty();
+    private final DoubleProperty startY = new SimpleDoubleProperty();
     private final IntegerProperty startLayer = new SimpleIntegerProperty();
     private final StackPane root = new StackPane();
 
@@ -59,11 +59,11 @@ public class PluginSettingsStage extends ChildStage {
         final Label xLabel = new Label("X:");
         final Label yLabel = new Label("Y:");
         final Label layerLabel = new Label("Layer:");
-        final DoubleField inputX = new DoubleField(0.0);
+        final DoubleField inputX = new DoubleField(0.0, false);
         inputX.setPrefWidth(50);
-        final DoubleField inputY = new DoubleField(0.0);
+        final DoubleField inputY = new DoubleField(0.0, false);
         inputY.setPrefWidth(50);
-        final IntegerField inputLayer = new IntegerField();
+        final IntegerField inputLayer = new IntegerField(false);
         inputLayer.setText("0");
         inputLayer.setPrefWidth(50);
         pos.getChildren().addAll(xLabel, inputX, yLabel, inputY, layerLabel, inputLayer);
@@ -118,7 +118,7 @@ public class PluginSettingsStage extends ChildStage {
                 return singleLocation.get(0);
             }
         };
-        StringConverter<Number> stringConverter = new StringConverter<>() {
+        StringConverter<Number> stringDoubleConverter = new StringConverter<>() {
             @Override
             public String toString(Number n) {
                 return n.toString();
@@ -126,14 +126,30 @@ public class PluginSettingsStage extends ChildStage {
 
             @Override
             public Number fromString(String s) {
-                return Integer.parseInt(s);
+                return Double.parseDouble(s);
             }
         };
         startingLocation.bindBidirectional(ifStartingLocation.selectedProperty());
         Bindings.bindBidirectional(startLocationName, locationChoice.valueProperty(), locationConverter);
-        Bindings.bindBidirectional(inputX.textProperty(), startX, stringConverter);
-        Bindings.bindBidirectional(inputY.textProperty(), startY, stringConverter);
-        Bindings.bindBidirectional(inputLayer.textProperty(), startLayer, stringConverter);
+        Bindings.bindBidirectional(inputX.textProperty(), startX, stringDoubleConverter);
+        Bindings.bindBidirectional(inputY.textProperty(), startY, stringDoubleConverter);
+        StringConverter<Number> stringIntegerConverter = new StringConverter<>() {
+            @Override
+            public String toString(Number n) {
+                return n.toString();
+            }
+
+            @Override
+            public Number fromString(String s) {
+                try {
+                    Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+                return Integer.parseInt(s);
+            }
+        };
+        Bindings.bindBidirectional(inputLayer.textProperty(), startLayer, stringIntegerConverter);
     }
 
     public void open(){
@@ -156,19 +172,19 @@ public class PluginSettingsStage extends ChildStage {
         this.startLocationName.set(startLocationName);
     }
 
-    public int getStartX() {
+    public double getStartX() {
         return startX.get();
     }
 
-    public void setStartX(int startX) {
+    public void setStartX(double startX) {
         this.startX.set(startX);
     }
 
-    public int getStartY() {
+    public double getStartY() {
         return startY.get();
     }
 
-    public void setStartY(int startY) {
+    public void setStartY(double startY) {
         this.startY.set(startY);
     }
 

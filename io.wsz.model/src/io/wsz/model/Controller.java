@@ -10,8 +10,6 @@ import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.*;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 
 import java.io.File;
@@ -20,8 +18,8 @@ import java.util.List;
 public class Controller {
     private static Controller singleton;
     private static File programDir;
-    private volatile Location locationToUpdate;
-    private final ObjectProperty<Coords> centerPos = new SimpleObjectProperty<>();
+    private Location locationToUpdate;
+    private Coords posToCenter;
 
     public static Controller get() {
         if (singleton == null) {
@@ -91,16 +89,12 @@ public class Controller {
         return Board.get();
     }
 
-    public Coords getCenterPos() {
-        return centerPos.get();
+    public Coords getPosToCenter() {
+        return posToCenter;
     }
 
-    public ObjectProperty<Coords> centerPosProperty() {
-        return centerPos;
-    }
-
-    public void setCenterPos(Coords centerPos) {
-        this.centerPos.set(centerPos);
+    public void setPosToCenter(Coords posToCenter) {
+        this.posToCenter = posToCenter;
     }
 
     public Plugin loadPluginMetadata(String name) {
@@ -109,11 +103,11 @@ public class Controller {
     }
 
 
-    public Location getUpdatedLocation() {
+    public Location getLocationToUpdate() {
         return locationToUpdate;
     }
 
-    public void setUpdatedLocation(Location locationToUpdate) {
+    public void setLocationToUpdate(Location locationToUpdate) {
         this.locationToUpdate = locationToUpdate;
     }
 

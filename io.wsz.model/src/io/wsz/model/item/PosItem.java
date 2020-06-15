@@ -32,7 +32,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public void centerScreenOn(Coords targetPos) {
-        Controller.get().setCenterPos(targetPos);
+        Controller.get().setPosToCenter(targetPos);
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {

@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 public class SerializableConverter {
 
-    public static PluginSerializable toPluginSerializable(Plugin plugin) {
-        List<LocationSerializable> locations = toSerializableLocations(plugin.getLocations());
-        List<AssetSerializable> assets = toSerializableAssets(plugin.getAssets());
-        return new PluginSerializable(plugin.getName(), locations, assets, plugin.isActive(),
-                plugin.isStartingLocation(), plugin.getStartLocation(),
-                plugin.getStartX(), plugin.getStartY(), plugin.getStartLayer());
+    public static PluginSerializable toPluginSerializable(Plugin p) {
+        List<LocationSerializable> locations = toSerializableLocations(p.getLocations());
+        List<AssetSerializable> assets = toSerializableAssets(p.getAssets());
+        return new PluginSerializable(p.getName(), locations, assets, p.isActive(),
+                p.isStartingLocation(), p.getStartLocation(),
+                p.getStartPos(), p.getStartLayer());
     }
 
     public static Plugin toPlugin(PluginSerializable ps) {
@@ -28,7 +28,7 @@ public class SerializableConverter {
         List<Location> locations = toLocation(ps.getLocations(), assets);
         return new Plugin(ps.getName(), locations, assets, ps.isActive(),
                 ps.isStartingLocation(), ps.getStartLocation(),
-                ps.getStartX(), ps.getStartY(), ps.getStartLayer());
+                ps.getStartPos(), ps.getStartLayer());
     }
 
     public static List<LocationSerializable> toSerializableLocations(List<Location> input) {
@@ -131,7 +131,7 @@ public class SerializableConverter {
                 prototype, name, type, path,
                 visible, pos, level,
                 cr.getCoverLine(), cr.getCollisionPolygons(),
-                dest, cr.getSize(), cr.getControl(), cr.getSpeed());
+                dest, cr.getIndividualSize(), cr.getIndividualControl(), cr.getIndividualSpeed());
     }
 
     public static List<Location> toLocation(List<LocationSerializable> input, List<Asset> assets) {

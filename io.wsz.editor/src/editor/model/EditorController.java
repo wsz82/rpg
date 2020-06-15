@@ -13,6 +13,7 @@ import io.wsz.model.location.LocationsList;
 import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
+import io.wsz.model.stage.Coords;
 
 import java.io.File;
 import java.util.List;
@@ -84,10 +85,9 @@ public class EditorController {
         p.setStartingLocation(isStartingLocation);
         String startLocation = pss.getStartLocationName();
         p.setStartLocation(startLocation);
-        int startX = pss.getStartX();
-        p.setStartX(startX);
-        int startY = pss.getStartY();
-        p.setStartY(startY);
+        double startX = pss.getStartX();
+        double startY = pss.getStartY();
+        p.setStartPos(new Coords(startX, startY));
         int startLayer = pss.getStartLayer();
         p.setStartLayer(startLayer);
     }
@@ -99,8 +99,8 @@ public class EditorController {
         loadEditorActivePluginToLists();
         pss.setStartingLocation(p.isStartingLocation());
         pss.setStartLocationName(p.getStartLocation());
-        pss.setStartX(p.getStartX());
-        pss.setStartY(p.getStartY());
+        pss.setStartX(p.getStartPos().x);
+        pss.setStartY(p.getStartPos().y);
         pss.setStartLayer(p.getStartLayer());
     }
 

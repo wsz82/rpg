@@ -4,5 +4,9 @@ public enum CreatureControl {
     NEUTRAL,
     CONTROLLABLE,
     CONTROL,
-    ENEMY
+    ENEMY;
+
+    public static CreatureControl getDefault() {
+        return NEUTRAL;
+    }
 }

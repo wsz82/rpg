@@ -20,6 +20,7 @@ import java.util.List;
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final VBox container = new VBox(5);
     protected A item;
+    protected boolean isContent;
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -28,7 +29,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
-    private boolean isContent;
     private String path;
 
     public AssetStage(Stage parent, A item, boolean isContent) {

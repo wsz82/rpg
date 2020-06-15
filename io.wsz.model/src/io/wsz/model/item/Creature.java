@@ -10,8 +10,8 @@ import java.util.List;
 
 import static io.wsz.model.Constants.METER;
 import static io.wsz.model.Constants.SECOND;
-import static io.wsz.model.item.CreatureControl.*;
-import static io.wsz.model.item.CreatureSize.M;
+import static io.wsz.model.item.CreatureControl.CONTROL;
+import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> {
@@ -195,6 +195,10 @@ public class Creature extends PosItem<Creature> {
         this.dest = pos;
     }
 
+    public Double getIndividualSpeed() {
+        return speed;
+    }
+
     public Double getSpeed() {
         if (speed == null) {
             if (prototype == null) {
@@ -210,10 +214,14 @@ public class Creature extends PosItem<Creature> {
         this.speed = speed;
     }
 
+    public CreatureSize getIndividualSize() {
+        return size;
+    }
+
     public CreatureSize getSize() {
         if (size == null) {
             if (prototype == null) {
-                return M;
+                return CreatureSize.getDefault();
             }
             return prototype.size;
         } else {
@@ -225,10 +233,14 @@ public class Creature extends PosItem<Creature> {
         this.size = size;
     }
 
+    public CreatureControl getIndividualControl() {
+        return control;
+    }
+
     public CreatureControl getControl() {
         if (control == null) {
             if (prototype == null) {
-                return NEUTRAL;
+                return CreatureControl.getDefault();
             }
             return prototype.getControl();
         } else {

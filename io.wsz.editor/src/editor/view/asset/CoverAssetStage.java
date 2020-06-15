@@ -4,6 +4,8 @@ import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class CoverAssetStage extends AssetStage<Cover> {
 
     public CoverAssetStage(Stage parent, Cover asset, boolean isContent) {
@@ -39,7 +41,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
     @Override
     protected Cover createNewAsset(String name, String relativePath) {
         return new Cover(null, name, getType(), relativePath,
-                true, null, null, null, null);
+                true, null, null, new ArrayList<>(0), new ArrayList<>(0));
     }
 
     @Override

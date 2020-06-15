@@ -60,7 +60,7 @@ public class Teleport extends PosItem<Teleport> {
             Location from = Controller.get().getCurrentLocation().getLocation();
             cr.changeLocation(from, target, targetLayer, targetX, targetY);
             if (cr.getControl().equals(CONTROL)) {
-                Controller.get().setUpdatedLocation(target);
+                Controller.get().setLocationToUpdate(target);
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
                 cr.centerScreenOn(targetPos);
             }
@@ -68,8 +68,15 @@ public class Teleport extends PosItem<Teleport> {
         }
     }
 
+    public String getIndividualLocationName() {
+        return locationName;
+    }
+
     public String getLocationName() {
         if (locationName == null) {
+            if (prototype == null) {
+                return "";
+            }
             return prototype.locationName;
         } else {
             return locationName;
@@ -80,8 +87,15 @@ public class Teleport extends PosItem<Teleport> {
         this.locationName = locationName;
     }
 
+    public Coords getIndividualExit() {
+        return exit;
+    }
+
     public Coords getExit() {
         if (exit == null) {
+            if (prototype == null) {
+                return new Coords(0, 0);
+            }
             return prototype.exit;
         } else {
             return exit;
@@ -92,8 +106,15 @@ public class Teleport extends PosItem<Teleport> {
         this.exit = exit;
     }
 
+    public Integer getIndividualExitLevel() {
+        return exitLevel;
+    }
+
     public Integer getExitLevel() {
         if (exitLevel == null) {
+            if (prototype == null) {
+                return 0;
+            }
             return prototype.exitLevel;
         } else {
             return exitLevel;

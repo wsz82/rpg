@@ -201,8 +201,8 @@ public class GameController {
 
     public void initNewGameSettings() {
         Plugin p = Controller.get().getActivePlugin();
-        int startX = p.getStartX();
-        int startY = p.getStartY();
+        double startX = p.getStartPos().x;
+        double startY = p.getStartPos().y;
         Coords currentPos = gameCanvas.getCurrentPos();
         currentPos.x = startX;
         currentPos.y = startY;

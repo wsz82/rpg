@@ -40,14 +40,14 @@ public class GameRunner {
         Thread gameThread = new Thread(() -> {
             while (GameController.get().isGame()) {
                 synchronized (this) {
-                    List<PosItem> contents = Controller.get().getCurrentLocation().getItems();
+                    List<PosItem> items = Controller.get().getCurrentLocation().getItems();
 
-                    for (PosItem pi : contents) {
+                    for (PosItem pi : items) {
                         pi.update();
                     }
                     for (Location l : Controller.get().getLocationsList()) {
-                        addContent(l);
-                        removeContent(l);
+                        addItems(l);
+                        removeItems(l);
                     }
                     updateLocation();
                 }
@@ -69,7 +69,7 @@ public class GameRunner {
         gameThread.start();
     }
 
-    private void addContent(Location l) {
+    private void addItems(Location l) {
         List<PosItem> p = l.getItemsToAdd();
         if (p.isEmpty()) {
             return;
@@ -78,7 +78,7 @@ public class GameRunner {
         p.clear();
     }
 
-    private void removeContent(Location l) {
+    private void removeItems(Location l) {
         List<PosItem> p = l.getItemsToRemove();
         if (p.isEmpty()) {
             return;
@@ -88,7 +88,7 @@ public class GameRunner {
     }
 
     private void updateLocation() {
-        Location locationToUpdate = Controller.get().getUpdatedLocation();
+        Location locationToUpdate = Controller.get().getLocationToUpdate();
         if (locationToUpdate != null) {
             CurrentLocation cl = Controller.get().getCurrentLocation();
             Location l = cl.getLocation();

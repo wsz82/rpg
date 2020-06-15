@@ -2,6 +2,7 @@ package io.wsz.model.plugin;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
+import io.wsz.model.stage.Coords;
 
 import java.util.List;
 
@@ -12,8 +13,7 @@ public class Plugin {
     private boolean active;
     private boolean isStartingLocation;
     private String startLocation;
-    private int startX;
-    private int startY;
+    private Coords startPos;
     private int startLayer;
 
     public Plugin(){}
@@ -25,15 +25,14 @@ public class Plugin {
     }
 
     public Plugin(String name, List<Location> locations, List<Asset> assets, boolean active,
-                  boolean isStartingLocation, String startLocation, int startX, int startY, int startLayer) {
+                  boolean isStartingLocation, String startLocation, Coords startPos, int startLayer) {
         this.name = name;
         this.locations = locations;
         this.assets = assets;
         this.active = active;
         this.isStartingLocation = isStartingLocation;
         this.startLocation = startLocation;
-        this.startX = startX;
-        this.startY = startY;
+        this.startPos = startPos;
         this.startLayer = startLayer;
     }
 
@@ -85,20 +84,12 @@ public class Plugin {
         this.startLocation = startLocation;
     }
 
-    public int getStartX() {
-        return startX;
+    public Coords getStartPos() {
+        return startPos;
     }
 
-    public void setStartX(int startX) {
-        this.startX = startX;
-    }
-
-    public int getStartY() {
-        return startY;
-    }
-
-    public void setStartY(int startY) {
-        this.startY = startY;
+    public void setStartPos(Coords startPos) {
+        this.startPos = startPos;
     }
 
     public int getStartLayer() {

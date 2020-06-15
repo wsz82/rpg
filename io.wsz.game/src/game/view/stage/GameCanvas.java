@@ -105,6 +105,13 @@ public class GameCanvas extends Canvas {
     }
 
     private void updatePos() {
+
+        Coords posToCenter = Controller.get().getPosToCenter();
+        if (posToCenter != null) {
+            centerScreenOn(posToCenter);
+            Controller.get().setPosToCenter(null);
+        }
+
         Bounds b = localToScreen(getBoundsInLocal());
         if (b == null) {
             return;
@@ -223,23 +230,6 @@ public class GameCanvas extends Canvas {
 
         });
 
-        Controller.get().centerPosProperty().addListener((observable, oldValue, newValue) -> {
-            double x = newValue.x - (getWidth() / 2)/METER;
-            double y = newValue.y - (getHeight() / 2)/METER;
-            double locWidth = Controller.get().getCurrentLocation().getWidth();
-            double locHeight = Controller.get().getCurrentLocation().getHeight();
-            if (x > locWidth - getWidth()) {
-                currentPos.x = locWidth - getWidth()/METER;
-            } else {
-                currentPos.x = Math.max(x, 0);
-            }
-            if (y > locHeight - getHeight()) {
-                currentPos.y = locHeight - getHeight()/METER;
-            } else {
-                currentPos.y = Math.max(y, 0);
-            }
-        });
-
         CurrentLocation.get().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
         });
@@ -273,6 +263,26 @@ public class GameCanvas extends Canvas {
                 }
             }
         });
+    }
+
+    private void centerScreenOn(Coords posToCenter) {
+        double canvasWidth = getWidth()/METER;
+        double canvasHeight = getHeight()/METER;
+        double x = posToCenter.x - canvasWidth/2;
+        double y = posToCenter.y - canvasHeight/2;
+        double locWidth = Controller.get().getCurrentLocation().getWidth();
+        double locHeight = Controller.get().getCurrentLocation().getHeight();
+        if (x > locWidth - canvasWidth) {
+            currentPos.x = locWidth - canvasWidth;
+        } else {
+            currentPos.x = Math.max(x, 0);
+        }
+        if (y > locHeight - canvasHeight) {
+            currentPos.y = locHeight - canvasHeight;
+        } else {
+            currentPos.y = Math.max(y, 0);
+        }
+        Controller.get().setPosToCenter(null);
     }
 
     private void commandControllable(Coords pos) {

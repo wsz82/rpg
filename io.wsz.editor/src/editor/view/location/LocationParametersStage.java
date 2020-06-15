@@ -14,8 +14,8 @@ import javafx.stage.Stage;
 
 public class LocationParametersStage extends ChildStage {
     private final AnchorPane root = new AnchorPane();
-    private final DoubleField inputWidth = new DoubleField(0.0);
-    private final DoubleField inputHeight = new DoubleField(0.0);
+    private final DoubleField inputWidth = new DoubleField(0.01, false);
+    private final DoubleField inputHeight = new DoubleField(0.01, false);
     private final Button accept = new Button("Ok");
     private final Button cancel = new Button("Cancel");
 

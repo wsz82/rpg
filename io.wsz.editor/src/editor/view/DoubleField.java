@@ -2,44 +2,42 @@ package editor.view;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
-import javafx.util.converter.DoubleStringConverter;
-
-import java.util.function.UnaryOperator;
 
 public class DoubleField extends TextField {
 
-    public DoubleField() {
-        filterTextFieldForDouble(null);
+    public DoubleField(boolean canBeEmpty) {
+        filterTextFieldForDouble(null, canBeEmpty);
     }
 
-    public DoubleField(Double min) {
-        filterTextFieldForDouble(min);
+    public DoubleField(Double min, boolean canBeEmpty) {
+        filterTextFieldForDouble(min, canBeEmpty);
     }
 
-    private void filterTextFieldForDouble(Double min) {
-        UnaryOperator<TextFormatter.Change> doubleFilter = change -> {
-            String input = change.getControlNewText();
+    private void filterTextFieldForDouble(Double min, boolean canBeEmpty) {
+        ChangeListener<String> positiveNumberListener = (observable, oldValue, newValue) -> {
+            double newNumber = 0.0;
+
             try {
-                Double.parseDouble(input);
+                newNumber = Double.parseDouble(newValue);
             } catch (NumberFormatException e) {
-                return null;
-            }
-            return change;
-        };
-        if (min != null) {
-            setTextFormatter(new TextFormatter<>(new DoubleStringConverter(), min, doubleFilter));
-            ChangeListener<String> positiveNumberListener = (observable, oldValue, newValue) -> {
-                double newNumber = min;
-
-                try {
-                    newNumber = Double.parseDouble(newValue);
-                } catch (NumberFormatException e) {
-                    setText("" + oldValue);
+                if (canBeEmpty && newValue.isEmpty()) {
+                    setText("");
+                    return;
                 }
-                if (newNumber < min) setText("" + oldValue);
-            };
-            textProperty().addListener(positiveNumberListener);
+                if (oldValue.isEmpty()) {
+                    oldValue = "0.0";
+                }
+                setText("" + oldValue);
+            }
+            resetIfBelowMin(min, oldValue, newNumber);
+        };
+        textProperty().addListener(positiveNumberListener);
+    }
+
+    private void resetIfBelowMin(Double min, String oldValue, double newNumber) {
+        if (min == null) {
+            return;
         }
+        if (newNumber < min) setText("" + oldValue);
     }
 }

@@ -12,13 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
-    private final DoubleField speedInput = new DoubleField(0.0);
+    private final DoubleField speedInput = new DoubleField(true);
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
@@ -56,6 +57,11 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         controls.addAll(Arrays.asList(CreatureControl.values()));
         controlCB.setItems(controls);
 
+        if (isContent) {
+            sizes.add(null);
+            controls.add(null);
+        }
+
         fillInputs();
     }
 
@@ -65,19 +71,44 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         if (item == null) {
             return;
         }
-        CreatureSize size = item.getSize();
+        CreatureSize size = item.getIndividualSize();
         sizeCB.setValue(size);
-        CreatureControl control = item.getControl();
+        CreatureControl control = item.getIndividualControl();
         controlCB.setValue(control);
-        Double speed = item.getSpeed();
-        speedInput.setText(String.valueOf(speed));
+        Double speed = item.getIndividualSpeed();
+        if (speed == null) {
+            speedInput.setText("");
+        } else {
+            speedInput.setText(String.valueOf(speed));
+        }
     }
 
     @Override
     protected void defineAsset() {
-        item.setSize(sizeCB.getValue());
-        item.setControl(controlCB.getValue());
-        item.setSpeed(Double.parseDouble(speedInput.getText()));
+        CreatureSize size = sizeCB.getValue();
+        if (!isContent && size == null) {
+            item.setSize(CreatureSize.getDefault());
+        } else {
+            item.setSize(size);
+        }
+
+        CreatureControl control = controlCB.getValue();
+        if (!isContent && control == null) {
+            item.setControl(CreatureControl.getDefault());
+        } else {
+            item.setControl(control);
+        }
+
+        String speed = speedInput.getText();
+        if (speed.isEmpty()) {
+            if (isContent) {
+                item.setSpeed(null);
+            } else {
+                item.setSpeed(0.0);
+            }
+        } else {
+            item.setSpeed(Double.parseDouble(speed));
+        }
     }
 
     @Override
@@ -89,7 +120,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected Creature createNewAsset(String name, String relativePath) {
         return new Creature(
                 null, name, getType(), relativePath,
-                true, null, null, null, null);
+                true, null, null, new ArrayList<>(0), new ArrayList<>(0));
     }
 
     @Override
