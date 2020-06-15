@@ -35,9 +35,10 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
     }
 
     @Override
-    protected void addToStage(Coords pos) {
+    protected List<Landscape> createItems(Coords pos) {
         List<Landscape> selectedAssets = getSelectionModel().getSelectedItems();
         int level = Controller.get().getCurrentLayer().getLevel();
+        List<Landscape> output = new ArrayList<>(1);
         for (Landscape p
                 : selectedAssets) {
             if (!pos.is0()) {
@@ -63,8 +64,9 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
                     p, name, type, path,
                     true, clonePos, level,
                     coverLine, collisionPolygons);
-            Controller.get().getCurrentLocation().getItems().add(l);
+            output.add(l);
         }
+        return output;
     }
 
     @Override

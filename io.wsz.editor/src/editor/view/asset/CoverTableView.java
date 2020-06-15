@@ -35,9 +35,10 @@ public class CoverTableView extends AssetsTableView<Cover> {
     }
 
     @Override
-    protected void addToStage(Coords pos) {
+    protected List<Cover> createItems(Coords pos) {
         List<Cover> selectedAssets = getSelectionModel().getSelectedItems();
         int level = Controller.get().getCurrentLayer().getLevel();
+        List<Cover> output = new ArrayList<>(1);
         for (Cover c
                 : selectedAssets) {
             if (!pos.is0()) {
@@ -63,8 +64,9 @@ public class CoverTableView extends AssetsTableView<Cover> {
                     c, name, type, path,
                     true, clonePos, level,
                     coverLine, collisionPolygons);
-            Controller.get().getCurrentLocation().getItems().add(cover);
+            output.add(cover);
         }
+        return output;
     }
 
     @Override

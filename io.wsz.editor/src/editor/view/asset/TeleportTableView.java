@@ -74,9 +74,10 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
     }
 
     @Override
-    protected void addToStage(Coords pos) {
+    protected List<Teleport> createItems(Coords pos) {
         List<Teleport> selectedAssets = getSelectionModel().getSelectedItems();
         int level = Controller.get().getCurrentLayer().getLevel();
+        List<Teleport> output = new ArrayList<>(1);
         for (Teleport p
                 : selectedAssets) {
             if (!pos.is0()) {
@@ -102,8 +103,9 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
                     p, name, type, path,
                     true, clonePos, level,
                     coverLine, collisionPolygons);
-            Controller.get().getCurrentLocation().getItems().add(t);
+            output.add(t);
         }
+        return output;
     }
 
     @Override

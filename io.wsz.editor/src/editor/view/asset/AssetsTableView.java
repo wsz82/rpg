@@ -10,12 +10,15 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
+    private static final double MAX_HEIGHT = 8000;
+    private static final double MAX_WIDTH = 8000;
     protected final Stage parent;
     protected final ObservableList<A> assets;
     private static Pointer pointer;
@@ -75,9 +78,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         editAsset.setOnAction(event -> editAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
-            Coords mark = pointer.getMark();
-            Coords clone = mark.clone();
-            addToStage(clone);
+            addItemsToStage();
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {
@@ -85,7 +86,35 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         });
     }
 
-    protected abstract void addToStage(Coords pos);
+    private void addItemsToStage() {
+        Coords mark = pointer.getMark();
+        Coords clone = mark.clone();
+        List<A> createdItems = createItems(clone);
+        for (A item : createdItems) {
+            Image img = item.getImage();
+            double width = img.getWidth();
+            double height = img.getHeight();
+            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                alertTooBigImage(width, height, item.getName());
+                continue;
+            }
+            Controller.get().getCurrentLocation().getItems().add(item);
+        }
+    }
+
+    private void alertTooBigImage(double width, double height, String itemName) {
+        String message = "Image of asset \"" + itemName + "\" is too big: " + "\n"
+                + "Width: " + width + "\n"
+                + "Height: " + height + "\n"
+                + "when maximum is: " + MAX_WIDTH;
+        final Alert alert = new Alert(
+                Alert.AlertType.ERROR, message, ButtonType.CLOSE);
+        alert.showAndWait()
+                .filter(r -> r == ButtonType.CLOSE)
+                .ifPresent(r -> alert.close());
+    }
+
+    protected abstract List<A> createItems(Coords pos);
 
     private void removeAssets() {
         List<A> assetsToRemove = getSelectionModel().getSelectedItems();

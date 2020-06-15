@@ -63,9 +63,10 @@ class CreatureTableView extends AssetsTableView<Creature> {
     }
 
     @Override
-    protected void addToStage(Coords pos) {
+    protected List<Creature> createItems(Coords pos) {
         List<Creature> selectedAssets = getSelectionModel().getSelectedItems();
         int level = Controller.get().getCurrentLayer().getLevel();
+        List<Creature> output = new ArrayList<>(1);
         for (Creature p
                 : selectedAssets) {
             if (!pos.is0()) {
@@ -91,8 +92,9 @@ class CreatureTableView extends AssetsTableView<Creature> {
                     p, name, type, path,
                     true, clone, level,
                     coverLine, collisionPolygons);
-            Controller.get().getCurrentLocation().getItems().add(cr);
+            output.add(cr);
         }
+        return output;
     }
 
     @Override
