@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import static io.wsz.model.item.CreatureControl.CONTROL;
 
 public class Teleport extends PosItem<Teleport> {
-    private volatile String locationName;
-    private volatile Coords exit;
-    private volatile Integer exitLevel;
+    private String locationName;
+    private Coords exit;
+    private Integer exitLevel;
 
     public Teleport(Teleport prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,

@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
-    protected volatile A prototype;
+    protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
-    protected volatile Coords pos;
-    protected volatile Integer level;
-    protected volatile List<Coords> coverLine;
-    protected volatile List<List<Coords>> collisionPolygons;
+    protected Coords pos;
+    protected Integer level;
+    protected List<Coords> coverLine;
+    protected List<List<Coords>> collisionPolygons;
 
     public PosItem(A prototype, String name, ItemType type, String path,
                    Boolean visible, Coords pos, Integer level,
