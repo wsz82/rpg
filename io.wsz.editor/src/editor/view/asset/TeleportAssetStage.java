@@ -95,15 +95,15 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     @Override
     protected void fillInputs() {
         super.fillInputs();
-        if (asset == null) {
+        if (item == null) {
             return;
         }
-        String locationName = asset.getLocationName();
+        String locationName = item.getLocationName();
         if (locationName != null) {
             locationChoice.setValue(getLocation(locationName));
         }
-        inputLayer.setText(""+asset.getExitLevel());
-        Coords exitPos = asset.getExit();
+        inputLayer.setText(""+ item.getExitLevel());
+        Coords exitPos = item.getExit();
         if (exitPos != null) {
             double x = exitPos.x;
             double y = exitPos.y;
@@ -116,14 +116,14 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     protected void defineAsset() {
         if (locationChoice.getValue() != null) {
             String locationName = locationChoice.getValue().getName();
-            asset.setLocationName(locationName);
+            item.setLocationName(locationName);
         }
         int layer = Integer.parseInt(inputLayer.getText());
-        asset.setExitLevel(layer);
+        item.setExitLevel(layer);
         int x = Integer.parseInt(inputX.getText());
         int y = Integer.parseInt(inputY.getText());
         Coords exitPos = new Coords(x, y);
-        asset.setExit(exitPos);
+        item.setExit(exitPos);
     }
 
     @Override

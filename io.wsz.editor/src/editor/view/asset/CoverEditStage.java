@@ -33,21 +33,21 @@ public class CoverEditStage extends ChildStage {
     private final ImageView iv = new ImageView();
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
-    private final Asset asset;
+    private final Asset item;
 
-    public CoverEditStage(Stage parent, Asset asset) {
+    public CoverEditStage(Stage parent, Asset item, boolean isContent) {
         super(parent);
-        this.asset = asset;
+        this.item = item;
         initOwner(parent);
-        initWindow();
+        initWindow(isContent);
     }
 
-    private void initWindow() {
+    private void initWindow(boolean isContent) {
         setTitle("Cover edit");
         final StackPane r = new StackPane();
 
         final VBox c = new VBox(5);
-        final Image img = asset.getImage();
+        final Image img = item.getImage();
         iv.setImage(img);
         pane.getChildren().add(iv);
         final ScrollPane sc = new ScrollPane();
@@ -66,10 +66,15 @@ public class CoverEditStage extends ChildStage {
         setScene(scene);
         hookupEvents();
         restoreLine();
+
+        if (isContent) {
+            pane.setDisable(true);
+            save.setDisable(true);
+        }
     }
 
     private void restoreLine() {
-        PosItem item = (PosItem) asset;
+        PosItem item = (PosItem) this.item;
         List<Coords> coverLine = item.getCoverLine();
         if (coverLine == null) {
             return;
@@ -146,6 +151,9 @@ public class CoverEditStage extends ChildStage {
     }
 
     private List<Coords> pointsToCoords(List<Double> points) {
+        if (points.isEmpty()) {
+            return new ArrayList<>(0);
+        }
         int size = points.size();
         List<Coords> coordsList = new ArrayList<>(size / 2);
         for (int i = 0; i < size - 1; i = i + 2) {
@@ -171,11 +179,9 @@ public class CoverEditStage extends ChildStage {
 
     private void saveLine() {
         List<Double> points = polyline.getPoints();
-        if (!points.isEmpty()) {
-            List<Coords> coverLine = pointsToCoords(points);
-            PosItem i = (PosItem) asset;
-            i.setCoverLine(coverLine);
-        }
+        List<Coords> coverLine = pointsToCoords(points);
+        PosItem i = (PosItem) item;
+        i.setCoverLine(coverLine);
         close();
     }
 }

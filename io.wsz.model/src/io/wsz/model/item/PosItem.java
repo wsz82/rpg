@@ -75,7 +75,11 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public List<Coords> getCoverLine() {
-        return coverLine;
+        if (prototype != null) {
+            return prototype.coverLine;
+        } else {
+            return coverLine;
+        }
     }
 
     public void setCoverLine(List<Coords> coverLine) {
@@ -83,7 +87,11 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public List<List<Coords>> getCollisionPolygons() {
-        return collisionPolygons;
+        if (prototype != null) {
+            return prototype.collisionPolygons;
+        } else {
+            return collisionPolygons;
+        }
     }
 
     public void setCollisionPolygons(List<List<Coords>> collisionPolygons) {

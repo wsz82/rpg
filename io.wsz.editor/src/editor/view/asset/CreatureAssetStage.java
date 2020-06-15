@@ -62,22 +62,22 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     @Override
     protected void fillInputs() {
         super.fillInputs();
-        if (asset == null) {
+        if (item == null) {
             return;
         }
-        CreatureSize size = asset.getSize();
+        CreatureSize size = item.getSize();
         sizeCB.setValue(size);
-        CreatureControl control = asset.getControl();
+        CreatureControl control = item.getControl();
         controlCB.setValue(control);
-        Double speed = asset.getSpeed();
+        Double speed = item.getSpeed();
         speedInput.setText(String.valueOf(speed));
     }
 
     @Override
     protected void defineAsset() {
-        asset.setSize(sizeCB.getValue());
-        asset.setControl(controlCB.getValue());
-        asset.setSpeed(Double.parseDouble(speedInput.getText()));
+        item.setSize(sizeCB.getValue());
+        item.setControl(controlCB.getValue());
+        item.setSpeed(Double.parseDouble(speedInput.getText()));
     }
 
     @Override

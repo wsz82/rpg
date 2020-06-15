@@ -19,7 +19,7 @@ import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final VBox container = new VBox(5);
-    protected A asset;
+    protected A item;
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -31,9 +31,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private boolean isContent;
     private String path;
 
-    public AssetStage(Stage parent, A asset, boolean isContent) {
+    public AssetStage(Stage parent, A item, boolean isContent) {
         super(parent);
-        this.asset = asset;
+        this.item = item;
         this.isContent = isContent;
     }
 
@@ -51,7 +51,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         final HBox buttons = new HBox(10);
         buttons.getChildren().add(cancel);
-        if (asset == null) {
+        if (item == null) {
             coverButton.setDisable(true);
             collisionButton.setDisable(true);
             buttons.getChildren().add(create);
@@ -84,12 +84,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     protected void fillInputs() {
-        if (asset == null) {
+        if (item == null) {
             return;
         }
-        nameInput.setText(asset.getName());
-        path = asset.getRelativePath();
-        imageLabel.setText(asset.getRelativePath());
+        nameInput.setText(item.getName());
+        path = item.getRelativePath();
+        imageLabel.setText(item.getRelativePath());
     }
 
     protected abstract void defineAsset();
@@ -146,23 +146,23 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void openCollisionEdit() {
-        if (asset.getImage() == null) {
+        if (item.getImage() == null) {
             return;
         }
-        Stage coverEdit = new CollisionEditStage(this, asset);
+        Stage coverEdit = new CollisionEditStage(this, item, isContent);
         coverEdit.show();
     }
 
     private void openCoverEdit() {
-        if (asset.getImage() == null) {
+        if (item.getImage() == null) {
             return;
         }
-        Stage coverEdit = new CoverEditStage(this, asset);
+        Stage coverEdit = new CoverEditStage(this, item, isContent);
         coverEdit.show();
     }
 
     private void editAsset() {
-        asset.setRelativePath(path);
+        item.setRelativePath(path);
         close();
     }
 
@@ -192,8 +192,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private void addNewAsset() {
         String name = nameInput.getText();
         String relativePath = Asset.convertToRelativeFilePath(path, getType());
-        asset = createNewAsset(name, relativePath);
-        addAssetToList(asset);
+        item = createNewAsset(name, relativePath);
+        addAssetToList(item);
     }
 
     protected abstract void addAssetToList(A asset);

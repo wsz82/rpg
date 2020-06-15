@@ -36,14 +36,14 @@ public class CollisionEditStage extends ChildStage {
     private final Button cancel = new Button("Cancel");
     private final Asset asset;
 
-    public CollisionEditStage(Stage parent, Asset asset) {
+    public CollisionEditStage(Stage parent, Asset asset, boolean isContent) {
         super(parent);
         this.asset = asset;
         initOwner(parent);
-        initWindow();
+        initWindow(isContent);
     }
 
-    private void initWindow() {
+    private void initWindow(boolean isContent) {
         setTitle("Collision edit");
         final StackPane r = new StackPane();
 
@@ -66,6 +66,12 @@ public class CollisionEditStage extends ChildStage {
         setUpChoiceBox();
         hookupEvents();
         restorePolygons();
+
+        if (isContent) {
+            ivPane.setDisable(true);
+            polygonsCB.setDisable(true);
+            save.setDisable(true);
+        }
     }
 
     private void setUpChoiceBox() {
@@ -203,15 +209,16 @@ public class CollisionEditStage extends ChildStage {
     }
 
     private void savePolygons() {
-        if (!polygons.isEmpty()) {
-            List<List<Coords>> cp = polygonsToCoords(polygons);
-            PosItem i = (PosItem) asset;
-            i.setCollisionPolygons(cp);
-        }
+        List<List<Coords>> cp = polygonsToCoords(polygons);
+        PosItem i = (PosItem) asset;
+        i.setCollisionPolygons(cp);
         close();
     }
 
     private List<List<Coords>> polygonsToCoords(List<Polygon> ps) {
+        if (ps.isEmpty()) {
+            return new ArrayList<>(0);
+        }
         List<List<Coords>> cp = new ArrayList<>(ps.size()/2);
         for (Polygon p : ps) {
             List<Double> doubles = p.getPoints();
