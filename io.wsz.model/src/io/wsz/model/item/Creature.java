@@ -9,6 +9,7 @@ import io.wsz.model.stage.Coords;
 import java.util.List;
 
 import static io.wsz.model.Constants.METER;
+import static io.wsz.model.Constants.SECOND;
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.CreatureSize.M;
 import static io.wsz.model.item.ItemType.TELEPORT;
@@ -57,8 +58,8 @@ public class Creature extends PosItem<Creature> {
         if (dist < getSpeed()) {
             moveDist = dist;
         }
-        double x3 = x1 + (moveDist/dist * (x2 - x1));
-        double y3 = y1 + (moveDist/dist * (y2 - y1));
+        double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
+        double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
         Coords nextPos = new Coords(x3, y3);
         PosItem pi = getCollision(nextPos);
         if (pi != null) {

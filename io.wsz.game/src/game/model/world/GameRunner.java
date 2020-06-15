@@ -10,8 +10,9 @@ import javafx.application.Platform;
 
 import java.util.List;
 
+import static io.wsz.model.Constants.TURN_DURATION_MILLIS;
+
 public class GameRunner {
-    private final long turnDurationMillis = 16;
 
     public GameRunner() {
     }
@@ -52,7 +53,7 @@ public class GameRunner {
                 }
 
                 try {
-                    Thread.sleep(turnDurationMillis);
+                    Thread.sleep(TURN_DURATION_MILLIS);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
