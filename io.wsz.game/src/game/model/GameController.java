@@ -14,9 +14,7 @@ import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
-import io.wsz.model.plugin.LocationSerializable;
 import io.wsz.model.plugin.Plugin;
-import io.wsz.model.plugin.SerializableConverter;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
@@ -134,8 +132,8 @@ public class GameController {
 
         Controller.get().getLocationsList().clear();
 
-        List<LocationSerializable> lsList = m.getLocations();
-        List<Location> locations = SerializableConverter.toLocation(lsList, Controller.get().getAssetsList());
+        List<Location> locations = m.getLocations();
+//        List<Location> locations = SerializableConverter.toLocation(lsList, Controller.get().getAssetsList());
         Controller.get().getLocationsList().setAll(locations);
 
         List<Location> singleLocation = locations.stream()

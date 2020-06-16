@@ -6,6 +6,11 @@ import io.wsz.model.location.Location;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.List;
 
 import static io.wsz.model.Constants.METER;
@@ -15,10 +20,14 @@ import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> {
-    private Coords dest;
+    private ArrayDeque<Task> tasks;
+    private Inventory inventory;
     private CreatureSize size;
     private CreatureControl control;
     private Double speed;
+    private Double range;
+
+    public Creature() {}
 
     public Creature(Creature prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,
@@ -31,43 +40,21 @@ public class Creature extends PosItem<Creature> {
     public Creature(Creature prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                    Coords dest, CreatureSize size, CreatureControl control, Double speed) {
+                    ArrayDeque<Task> tasks, Inventory inventory,
+                    CreatureSize size, CreatureControl control,
+                    Double speed, Double range) {
         super(prototype, name, type, path,
                 visible, pos, level,
                 coverLine, collisionPolygons);
-        this.dest = dest;
+        this.tasks = tasks;
+        this.inventory = inventory;
         this.size = size;
         this.control = control;
         this.speed = speed;
+        this.range = range;
     }
 
-    public void move() {
-        if (dest == null) {
-            return;
-        }
-        double x1 = pos.x;
-        double x2 = dest.x;
-        double y1 = pos.y;
-        double y2 = dest.y;
-        if (x1 == x2 && y1 == y2) {
-            dest = null;
-            return;
-        }
-        double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        double moveDist = getSpeed();
-        if (dist < getSpeed()) {
-            moveDist = dist;
-        }
-        double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
-        double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
-        Coords nextPos = new Coords(x3, y3);
-        PosItem pi = getCollision(nextPos);
-        if (pi != null) {
-            dest = null;
-            return;
-        }
-        pos = nextPos;
-    }
+
 
     private PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(posToCenter(nextPos));
@@ -91,7 +78,7 @@ public class Creature extends PosItem<Creature> {
 
     private void escapeCreature(Creature cr) {
         Coords free = Controller.get().getBoard().getFreePosCreature(getCorners(), cr);
-        setDest(centerToPos(free));
+        goTo(free);
     }
 
     private Creature getCornersCreature() {
@@ -176,8 +163,34 @@ public class Creature extends PosItem<Creature> {
         ItemType type = pi.getType();
         switch (type) {
             case CREATURE -> interactWithCreature((Creature) pi);
-            default -> setDest(centerToPos(pos));
+            case WEAPON -> takeItem((Equipment) pi);
+            default -> {
+                tasks.clear();
+                goTo(pos);
+            }
         }
+    }
+
+    private void goTo(Coords pos) {
+        Task goTo = new Task(centerToPos(pos));
+        tasks.push(goTo);
+    }
+
+    private void takeItem(Equipment e) {
+        Task takeItem = new Task(e);
+        tasks.push(takeItem);
+    }
+
+    private boolean withinRange(Equipment e) {
+        Coords ePos = e.getCenter();
+        Coords[] poss = getCorners();
+        for (Coords corner : poss) {
+            double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
+            if (dist <= getRange()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void interactWithCreature(Creature cr) {
@@ -187,12 +200,57 @@ public class Creature extends PosItem<Creature> {
         }
     }
 
-    public Coords getDest() {
-        return dest;
+    private double getDistance(double x1, double x2, double y1, double y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
-    public void setDest(Coords pos) {
-        this.dest = pos;
+    private void checkTasks() {
+        if (tasks.isEmpty()) {
+            return;
+        }
+        Task priorTask = tasks.getFirst();
+        priorTask.doTask();
+        if (priorTask.finished) {
+            tasks.remove(priorTask);
+        }
+    }
+
+    public ArrayDeque<Task> getIndividualTasks() {
+        return tasks;
+    }
+
+    public ArrayDeque<Task> getTasks() {
+        if (tasks == null) {
+            if (prototype == null) {
+                return new ArrayDeque<>(0);
+            }
+            return prototype.tasks;
+        } else {
+            return tasks;
+        }
+    }
+
+    public void setTasks(ArrayDeque<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    public Inventory getIndividualInventory() {
+        return inventory;
+    }
+
+    public Inventory getInventory() {
+        if (inventory == null) {
+            if (prototype == null) {
+                return new Inventory(1, 1);
+            }
+            return prototype.inventory;
+        } else {
+            return inventory;
+        }
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     public Double getIndividualSpeed() {
@@ -212,6 +270,25 @@ public class Creature extends PosItem<Creature> {
 
     public void setSpeed(Double speed) {
         this.speed = speed;
+    }
+
+    public Double getIndividualRange() {
+        return range;
+    }
+
+    public Double getRange() {
+        if (range == null) {
+            if (prototype == null) {
+                return 0.0;
+            }
+            return prototype.range;
+        } else {
+            return range;
+        }
+    }
+
+    public void setRange(Double range) {
+        this.range = range;
     }
 
     public CreatureSize getIndividualSize() {
@@ -256,11 +333,111 @@ public class Creature extends PosItem<Creature> {
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         pos = centerToPos(new Coords(targetX, targetY));
+        tasks.clear();
     }
 
     @Override
     public void update() {
         checkSurrounding();
-        move();
+        checkTasks();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+
+        out.writeObject(tasks);
+
+        out.writeObject(inventory);
+
+        out.writeObject(size);
+
+        out.writeObject(control);
+
+        out.writeObject(speed);
+
+        out.writeObject(range);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+
+        tasks = (ArrayDeque<Task>) in.readObject();
+
+        inventory = (Inventory) in.readObject();
+
+        size = (CreatureSize) in.readObject();
+
+        control = (CreatureControl) in.readObject();
+
+        speed = (Double) in.readObject();
+
+        range = (Double) in.readObject();
+    }
+
+    private class Task implements Serializable {
+        private Equipment equipment;
+        private Coords dest;
+
+        private boolean finished;
+
+        public Task() {}
+
+        Task(Coords dest) {
+            this.dest = dest;
+        }
+
+        Task(Equipment equipment) {
+            this.equipment = equipment;
+            this.dest = centerToPos(equipment.getPos());
+        }
+
+        void doTask() {
+            if (dest != null) {
+                move();
+                return;
+            }
+            if (equipment != null) {
+                tryToTakeItem();
+                return;
+            }
+            finished = true;
+        }
+
+        private void tryToTakeItem() {
+            if (withinRange(equipment)) {
+                boolean taken = inventory.add(equipment);
+                if (taken) {
+                    equipment.onTake(Creature.this);
+                }
+            }
+        }
+
+        public void move() {
+            double x1 = pos.x;
+            double x2 = dest.x;
+            double y1 = pos.y;
+            double y2 = dest.y;
+            if (x1 <= x2 + 10.0/METER && x1 >= x2 - 10.0/METER
+                    && y1 <= y2 + 10.0/METER && y1 >= y2 - 10.0/METER) {
+                dest = null;
+                return;
+            }
+            double dist = getDistance(x1, x2, y1, y2);
+            double moveDist = getSpeed();
+            if (dist < getSpeed()) {
+                moveDist = dist;
+            }
+            double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
+            double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
+            Coords nextPos = new Coords(x3, y3);
+            PosItem pi = getCollision(nextPos);
+            if (pi != null) {
+                dest = null;
+                return;
+            }
+            pos = nextPos;
+        }
     }
 }

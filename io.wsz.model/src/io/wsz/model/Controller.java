@@ -7,7 +7,9 @@ import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
-import io.wsz.model.plugin.*;
+import io.wsz.model.plugin.ActivePlugin;
+import io.wsz.model.plugin.Plugin;
+import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
@@ -67,10 +69,6 @@ public class Controller {
 
     public CurrentLayer getCurrentLayer() {
         return CurrentLayer.get();
-    }
-
-    public List<LocationSerializable> getLocationsSerializable() {
-        return SerializableConverter.toSerializableLocations(LocationsList.get());
     }
 
     public CurrentLocation getCurrentLocation() {

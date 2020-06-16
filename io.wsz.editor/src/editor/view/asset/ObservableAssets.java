@@ -1,10 +1,7 @@
 package editor.view.asset;
 
 import io.wsz.model.asset.Asset;
-import io.wsz.model.item.Cover;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.Landscape;
-import io.wsz.model.item.Teleport;
+import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -20,6 +17,7 @@ public class ObservableAssets {
     private final ObservableList<Landscape> landscapes = FXCollections.observableArrayList();
     private final ObservableList<Cover> covers = FXCollections.observableArrayList();
     private final ObservableList<Teleport> teleports = FXCollections.observableArrayList();
+    private final ObservableList<Weapon> weapons = FXCollections.observableArrayList();
 
     public static ObservableAssets get() {
         if (singleton == null) {
@@ -37,6 +35,7 @@ public class ObservableAssets {
         assets.addAll(landscapes);
         assets.addAll(covers);
         assets.addAll(teleports);
+        assets.addAll(weapons);
         return assets;
     }
 
@@ -45,6 +44,7 @@ public class ObservableAssets {
         landscapes.clear();
         covers.clear();
         teleports.clear();
+        weapons.clear();
     }
 
     public void fillLists(List<Asset> assets) {
@@ -68,6 +68,11 @@ public class ObservableAssets {
                 .map(a -> (Teleport) a)
                 .collect(Collectors.toList());
         teleports.addAll(tempT);
+        List<Weapon> tempW = assets.stream()
+                .filter(a -> a.getType().equals(WEAPON))
+                .map(a -> (Weapon) a)
+                .collect(Collectors.toList());
+        weapons.addAll(tempW);
     }
 
     public ObservableList<Creature> getCreatures() {
@@ -84,5 +89,9 @@ public class ObservableAssets {
 
     public ObservableList<Teleport> getTeleports() {
         return teleports;
+    }
+
+    public ObservableList<Weapon> getWeapons() {
+        return weapons;
     }
 }

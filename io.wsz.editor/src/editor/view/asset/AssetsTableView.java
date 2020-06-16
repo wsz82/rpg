@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.content.ContentTableView;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
@@ -21,7 +22,8 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private static final double MAX_WIDTH = 8000;
     protected final Stage parent;
     protected final ObservableList<A> assets;
-    private static Pointer pointer;
+    private Pointer pointer;
+    private ContentTableView contentTableView;
 
     AssetsTableView(Stage parent, ObservableList<A> assets) {
         super();
@@ -50,6 +52,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                 asset.setName(t.getOldValue());
             } else {
                 asset.setName(newValue);
+                contentTableView.refresh();
             }
             refresh();
         });
@@ -141,7 +144,11 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     protected abstract ItemType getType();
 
-    public static void setPointer(Pointer p) {
+    public void setPointer(Pointer p) {
         pointer = p;
+    }
+
+    public void setContentTableView(ContentTableView contentTableView) {
+        this.contentTableView = contentTableView;
     }
 }

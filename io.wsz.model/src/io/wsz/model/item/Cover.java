@@ -2,9 +2,15 @@ package io.wsz.model.item;
 
 import io.wsz.model.stage.Coords;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 
-public class Cover extends PosItem<Cover> {
+public class Cover extends PosItem<Cover> implements Externalizable {
+
+    public Cover() {}
 
     public Cover(Cover prototype, String name, ItemType type, String path,
                  Boolean visible, Coords pos, Integer level,
@@ -17,5 +23,15 @@ public class Cover extends PosItem<Cover> {
     @Override
     public void update() {
 
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
     }
 }

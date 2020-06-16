@@ -8,16 +8,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.util.NoSuchElementException;
 
-public abstract class Asset {
+public abstract class Asset implements Externalizable {
     private static final String ASSETS_DIR = File.separator + "assets";
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
     protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
+
+    public Asset() {}
 
     public Asset(String name, ItemType type, String relativePath) {
         this.name.set(name);
@@ -97,5 +99,23 @@ public abstract class Asset {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(name.get());
+
+        out.writeObject(type.get());
+
+        out.writeObject(relativePath.get());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        name.set(in.readUTF());
+
+        type.set((ItemType) in.readObject());
+
+        relativePath.set((String) in.readObject());
     }
 }

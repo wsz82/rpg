@@ -3,7 +3,6 @@ package editor.view.stage;
 import editor.model.EditorController;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.AssetsStage;
-import editor.view.asset.AssetsTableView;
 import editor.view.content.ContentStage;
 import editor.view.content.ContentTableView;
 import editor.view.layer.LayersStage;
@@ -46,7 +45,7 @@ class MainView {
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(stage, ctv, editorCanvas);
-        assetsWindow = new AssetsStage(stage);
+        assetsWindow = new AssetsStage(stage, pointer, ctv);
         locationsWindow = new LocationsStage(stage);
         pss = new PluginSettingsStage(stage);
     }
@@ -143,7 +142,6 @@ class MainView {
     private ToolBar getToolBar() {
         pointer.setEditorCanvas(editorCanvas);
         contentsWindow.setPointer(pointer);
-        AssetsTableView.setPointer(pointer);
         return new EditorToolBar(pointer);
     }
 

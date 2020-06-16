@@ -49,7 +49,7 @@ public class LocationsStage extends ChildStage {
     }
 
     private void addLocation() {
-        Location location = new Location("new", 800, 600);
+        Location location = new Location("new", 20, 20);
         Location uniqueLocation = getUniqueLocation(location);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);

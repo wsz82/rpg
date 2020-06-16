@@ -2,9 +2,13 @@ package io.wsz.model.layer;
 
 import javafx.beans.property.*;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Objects;
 
-public class Layer {
+public class Layer implements Externalizable {
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final StringProperty name = new SimpleStringProperty(this, "name");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
@@ -66,5 +70,23 @@ public class Layer {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(level.get());
+
+        out.writeUTF(name.get());
+
+        out.writeBoolean(visible.get());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        level.set(in.readInt());
+
+        name.set(in.readUTF());
+
+        visible.set(in.readBoolean());
     }
 }

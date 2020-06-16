@@ -8,8 +8,13 @@ import io.wsz.model.stage.Coords;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
+
+import static io.wsz.model.Constants.METER;
 
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
     protected A prototype;
@@ -18,6 +23,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     protected Integer level;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
+
+    public PosItem() {}
 
     public PosItem(A prototype, String name, ItemType type, String path,
                    Boolean visible, Coords pos, Integer level,
@@ -29,6 +36,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.level = level;
         this.coverLine = coverLine;
         this.collisionPolygons = collisionPolygons;
+    }
+
+    public Coords getCenter() {
+        double centerX = pos.x + getImage().getWidth()/METER;
+        double centerY = pos.y + getImage().getHeight()/METER;
+        return new Coords(centerX, centerY);
     }
 
     public void centerScreenOn(Coords targetPos) {
@@ -107,6 +120,14 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     @Override
+    public String getName() {
+        if (prototype != null) {
+            return prototype.getName();
+        }
+        return super.getName();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -127,5 +148,39 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+
+        out.writeObject(prototype);
+
+        out.writeBoolean(visible.get());
+
+        out.writeObject(pos);
+
+        out.writeObject(level);
+
+        out.writeObject(coverLine);
+
+        out.writeObject(collisionPolygons);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+
+        prototype = (A) in.readObject();
+
+        visible.set(in.readBoolean());
+
+        pos = (Coords) in.readObject();
+
+        level = (Integer) in.readObject();
+
+        coverLine = (List<Coords>) in.readObject();
+
+        collisionPolygons = (List<List<Coords>>) in.readObject();
     }
 }

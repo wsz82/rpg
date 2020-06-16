@@ -36,7 +36,7 @@ public class CurrentLocation {
         return getLocation().getItems().get();
     }
 
-    public ItemList getContentList() {
+    public ItemList getItemsList() {
         return getLocation().getItems();
     }
 

@@ -21,11 +21,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final VBox container = new VBox(5);
     protected A item;
     protected boolean isContent;
+    protected final Button coverButton = new Button("Cover");
+    protected final Button collisionButton = new Button("Collision");
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
-    private final Button coverButton = new Button("Cover");
-    private final Button collisionButton = new Button("Collision");
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");

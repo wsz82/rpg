@@ -184,6 +184,8 @@ public class ContentTableView extends TableView<PosItem> {
                     parent, (Landscape) pi, true);
             case COVER -> new CoverAssetStage(
                     parent, (Cover) pi, true);
+            case WEAPON -> new WeaponAssetStage(
+                    parent, (Weapon) pi, true);
         };
         itemStage.show();
     }

@@ -1,10 +1,7 @@
 package editor.view.asset;
 
 import editor.view.DoubleField;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -12,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,7 +17,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
-    private final DoubleField speedInput = new DoubleField(true);
+    private final DoubleField speedInput = new DoubleField(isContent);
+    private final DoubleField rangeInput = new DoubleField(isContent);
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
@@ -48,7 +47,11 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label speedLabel = new Label("Speed");
         speedBox.getChildren().addAll(speedLabel, speedInput);
 
-        container.getChildren().addAll(sizeBox, controlBox, speedBox);
+        final HBox rangeBox = new HBox(10);
+        final Label rangeLabel = new Label("Range");
+        rangeBox.getChildren().addAll(rangeLabel, rangeInput);
+
+        container.getChildren().addAll(sizeBox, controlBox, speedBox, rangeBox);
 
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
@@ -73,13 +76,22 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         }
         CreatureSize size = item.getIndividualSize();
         sizeCB.setValue(size);
+
         CreatureControl control = item.getIndividualControl();
         controlCB.setValue(control);
+
         Double speed = item.getIndividualSpeed();
         if (speed == null) {
             speedInput.setText("");
         } else {
             speedInput.setText(String.valueOf(speed));
+        }
+
+        Double range = item.getIndividualRange();
+        if (range == null) {
+            rangeInput.setText("");
+        } else {
+            rangeInput.setText(String.valueOf(range));
         }
     }
 
@@ -109,6 +121,17 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         } else {
             item.setSpeed(Double.parseDouble(speed));
         }
+
+        String range = rangeInput.getText();
+        if (range.isEmpty()) {
+            if (isContent) {
+                item.setRange(null);
+            } else {
+                item.setRange(0.0);
+            }
+        } else {
+            item.setRange(Double.parseDouble(range));
+        }
     }
 
     @Override
@@ -118,9 +141,12 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected Creature createNewAsset(String name, String relativePath) {
-        return new Creature(
+        Creature cr = new Creature(
                 null, name, getType(), relativePath,
                 true, null, null, new ArrayList<>(0), new ArrayList<>(0));
+        cr.setTasks(new ArrayDeque<>(0));
+        cr.setInventory(new Inventory(20, 40));
+        return cr;
     }
 
     @Override

@@ -4,9 +4,13 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 
-public class Plugin {
+public class Plugin implements Externalizable {
     private String name;
     private List<Location> locations;
     private List<Asset> assets;
@@ -16,7 +20,7 @@ public class Plugin {
     private Coords startPos;
     private int startLayer;
 
-    public Plugin(){}
+    public Plugin() {}
 
     public Plugin(String name, List<Location> locations, List<Asset> assets) {
         this.name = name;
@@ -98,5 +102,43 @@ public class Plugin {
 
     public void setStartLayer(int startLayer) {
         this.startLayer = startLayer;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(name);
+
+        out.writeObject(locations);
+
+        out.writeObject(assets);
+
+        out.writeBoolean(active);
+
+        out.writeBoolean(isStartingLocation);
+
+        out.writeObject(startLocation);
+
+        out.writeObject(startPos);
+
+        out.writeInt(startLayer);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        name = in.readUTF();
+
+        locations = (List<Location>) in.readObject();
+
+        assets = (List<Asset>) in.readObject();
+
+        active = in.readBoolean();
+
+        isStartingLocation = in.readBoolean();
+
+        startLocation = (String) in.readObject();
+
+        startPos = (Coords) in.readObject();
+
+        startLayer = in.readInt();
     }
 }

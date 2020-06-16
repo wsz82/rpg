@@ -16,6 +16,7 @@ import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Coords;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EditorController {
@@ -47,7 +48,7 @@ public class EditorController {
         ObservableAssets.get().clearLists();
         Controller.get().getLocationsList().clear();
 
-        Location location = new Location("new", 8, 6);
+        Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);
         Controller.get().getLocationsList().add(location);
@@ -80,7 +81,7 @@ public class EditorController {
 
     private void setPluginsParams(Plugin p, PluginSettingsStage pss) {
         p.setAssets(AssetsList.get());
-        p.setLocations(LocationsList.get());
+        p.setLocations(new ArrayList<>(LocationsList.get()));
         boolean isStartingLocation = pss.isStartingLocation();
         p.setStartingLocation(isStartingLocation);
         String startLocation = pss.getStartLocationName();

@@ -5,6 +5,9 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +17,8 @@ public class Teleport extends PosItem<Teleport> {
     private String locationName;
     private Coords exit;
     private Integer exitLevel;
+
+    public Teleport() {}
 
     public Teleport(Teleport prototype, String name, ItemType type, String path,
                     Boolean visible, Coords pos, Integer level,
@@ -64,7 +69,6 @@ public class Teleport extends PosItem<Teleport> {
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
                 cr.centerScreenOn(targetPos);
             }
-            cr.setDest(null);
         }
     }
 
@@ -128,5 +132,27 @@ public class Teleport extends PosItem<Teleport> {
     @Override
     public void update() {
 
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+
+        out.writeObject(locationName);
+
+        out.writeObject(exit);
+
+        out.writeObject(exitLevel);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+
+        locationName = (String) in.readObject();
+
+        exit = (Coords) in.readObject();
+
+        exitLevel = (Integer) in.readObject();
     }
 }

@@ -95,8 +95,8 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
         columns.add(1, nameCol);
         columns.add(2, visibleCol);
 
-        attachLevelValueListener(CurrentLocation.get().getContentList());
-        attachVisibleValueListener(CurrentLocation.get().getContentList());
+        attachLevelValueListener(CurrentLocation.get().getItemsList());
+        attachVisibleValueListener(CurrentLocation.get().getItemsList());
         getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
                 Controller.get().getCurrentLayer().setLayer(newSel);

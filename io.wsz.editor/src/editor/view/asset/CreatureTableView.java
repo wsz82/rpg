@@ -92,6 +92,8 @@ class CreatureTableView extends AssetsTableView<Creature> {
                     p, name, type, path,
                     true, clone, level,
                     coverLine, collisionPolygons);
+            cr.setTasks(p.getTasks());
+            cr.setInventory(p.getInventory());
             output.add(cr);
         }
         return output;

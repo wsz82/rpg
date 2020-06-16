@@ -20,10 +20,6 @@ public class ContentStage extends ChildStage {
         initWindow();
     }
 
-    public ContentTableView getTable() {
-        return table;
-    }
-
     private void initWindow() {
         Scene scene = new Scene(root);
         setTitle(TITLE);
@@ -68,5 +64,9 @@ public class ContentStage extends ChildStage {
 
     public void setPointer(Pointer pointer) {
         table.setPointer(pointer);
+    }
+
+    public ContentTableView getTable() {
+        return table;
     }
 }

@@ -16,7 +16,8 @@ public class SaveCaretaker {
     }
 
     public void createSave(SaveMemento memento) {
-        memento.setLocations(Controller.get().getLocationsSerializable());
+//        memento.setLocations(Controller.get().getLocationsSerializable());
+        memento.setLocations(Controller.get().getLocationsList());
         String path = programDir + File.separator + FILE_NAME
                 + File.separator + memento.getName();
         new File(programDir + File.separator + FILE_NAME).mkdir();

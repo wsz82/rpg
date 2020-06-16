@@ -1,6 +1,6 @@
 package game.model.save;
 
-import io.wsz.model.plugin.LocationSerializable;
+import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
 import java.io.Serializable;
@@ -9,7 +9,7 @@ import java.util.List;
 public class SaveMemento implements Serializable {
     private String name;
     private Coords lastPos;
-    private List<LocationSerializable> locations;
+    private List<Location> locations;
     private String currentLocationName;
     private int currentLayer;
 
@@ -38,11 +38,11 @@ public class SaveMemento implements Serializable {
         this.lastPos = lastPos;
     }
 
-    public List<LocationSerializable> getLocations() {
+    public List<Location> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<LocationSerializable> locations) {
+    public void setLocations(List<Location> locations) {
         this.locations = locations;
     }
 
