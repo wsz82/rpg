@@ -396,10 +396,9 @@ public class Creature extends PosItem<Creature> {
         void doTask() {
             if (dest != null) {
                 move();
-                return;
-            }
-            if (equipment != null) {
-                tryToTakeItem();
+                if (equipment != null) {
+                    tryToTakeItem();
+                }
                 return;
             }
             finished = true;
@@ -411,6 +410,7 @@ public class Creature extends PosItem<Creature> {
                 if (taken) {
                     equipment.onTake(Creature.this);
                 }
+                equipment = null;
             }
         }
 
