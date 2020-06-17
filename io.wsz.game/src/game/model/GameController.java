@@ -8,8 +8,10 @@ import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
 import game.model.world.GameRunner;
 import game.view.launcher.Main;
-import game.view.stage.GameCanvas;
+import game.view.stage.GameStage;
+import game.view.stage.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.item.Creature;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -20,12 +22,14 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class GameController {
     private static GameController singleton;
-    private volatile boolean isGame; //TODO make atomic?
-    private GameCanvas gameCanvas;
+    private final AtomicBoolean isGame = new AtomicBoolean(false);
+    private GameView gameView;
+    private GameStage gameStage;
 
     public static GameController get() {
         if (singleton == null) {
@@ -46,8 +50,14 @@ public class GameController {
     }
 
     public void resumeGame() {
+        gameStage.setGameForRoot();
         GameRunner gameRunner = new GameRunner();
         gameRunner.resumeGame();
+    }
+
+    public void openInventory(Creature active) {
+        isGame.set(false);
+        gameStage.setInventoryForRoot(active);
     }
 
     public void restoreLastPlugin() {
@@ -133,7 +143,6 @@ public class GameController {
         Controller.get().getLocationsList().clear();
 
         List<Location> locations = m.getLocations();
-//        List<Location> locations = SerializableConverter.toLocation(lsList, Controller.get().getAssetsList());
         Controller.get().getLocationsList().setAll(locations);
 
         List<Location> singleLocation = locations.stream()
@@ -174,24 +183,8 @@ public class GameController {
         Controller.get().getLocationsList().setAll(p.getLocations());
     }
 
-    public void setGameCanvas(GameCanvas gameCanvas) {
-        this.gameCanvas = gameCanvas;
-    }
-
-    public GameCanvas getGameCanvas() {
-        return gameCanvas;
-    }
-
-    public boolean isGame() {
-        return isGame;
-    }
-
-    public void setGame(boolean game) {
-        isGame = game;
-    }
-
     public void initLoadedGameSettings(SaveMemento memento) {
-        Coords currentPos = gameCanvas.getCurrentPos();
+        Coords currentPos = gameView.getCurrentPos();
         Coords loadedPos = memento.getLastPos();
         currentPos.x = loadedPos.x;
         currentPos.y = loadedPos.y;
@@ -201,12 +194,32 @@ public class GameController {
         Plugin p = Controller.get().getActivePlugin();
         double startX = p.getStartPos().x;
         double startY = p.getStartPos().y;
-        Coords currentPos = gameCanvas.getCurrentPos();
+        Coords currentPos = gameView.getCurrentPos();
         currentPos.x = startX;
         currentPos.y = startY;
     }
 
-    public void showGame() {
-        getGameCanvas().refresh();
+    public void refreshGame() {
+        gameView.refresh();
+    }
+
+    public void setGameView(GameView gameView) {
+        this.gameView = gameView;
+    }
+
+    public boolean isGame() {
+        return isGame.get();
+    }
+
+    public void setGame(boolean game) {
+        isGame.set(game);
+    }
+
+    public GameStage getGameStage() {
+        return gameStage;
+    }
+
+    public void setGameStage(GameStage gameStage) {
+        this.gameStage = gameStage;
     }
 }

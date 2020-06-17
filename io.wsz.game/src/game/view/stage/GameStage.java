@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
+import io.wsz.model.item.Creature;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -41,10 +42,10 @@ public class GameStage extends Stage {
     private final EventHandler<KeyEvent> gameReturn = event -> {
         event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
-            resumeGame();
+            GameController.get().resumeGame();
         }
     };
-    private final GameCanvas gameCanvas;
+    private final GameView gameView;
     private final Button cancel = new Button("Cancel");
     private StackPane mainMenuRoot;
     private StackPane gameMenuRoot;
@@ -56,8 +57,9 @@ public class GameStage extends Stage {
 
     public GameStage() {
         super(StageStyle.DECORATED);
-        this.gameCanvas = new GameCanvas();
-        GameController.get().setGameCanvas(gameCanvas);
+        this.gameView = new GameView();
+        GameController.get().setGameView(gameView);
+        GameController.get().setGameStage(this);
     }
 
     private void showMainMenu() {
@@ -95,6 +97,11 @@ public class GameStage extends Stage {
         settingsMenu.open(getScene(), returnEvent);
     }
 
+    public void setInventoryForRoot(Creature active) {
+        EquipmentView ev = new EquipmentView(active, this);
+        getScene().setRoot(ev);
+    }
+
     private void startNewGame() {
         GameController.get().restoreLastPlugin();
         startGame(null);
@@ -102,7 +109,7 @@ public class GameStage extends Stage {
 
     private void initGameRoot() {
         gameRoot = new Group();
-        gameRoot.getChildren().addAll(gameCanvas);
+        gameRoot.getChildren().addAll(gameView);
     }
 
     private void showGameMenu() {
@@ -120,7 +127,7 @@ public class GameStage extends Stage {
         menu.setAlignment(Pos.CENTER);
         Button resume = new Button("Resume");
         resume.setOnAction(event -> {
-            resumeGame();
+            GameController.get().resumeGame();
         });
         Button saveMenu = new Button("Save game");
         saveMenu.setOnAction(event -> {
@@ -227,13 +234,6 @@ public class GameStage extends Stage {
         saveGame(true, name);
     }
 
-    private void resumeGame() {
-        if (gameRoot == null) {
-            initGameRoot();
-        }
-        setRootToGame();
-        GameController.get().resumeGame();
-    }
 
     private void startGame(SaveMemento memento) {
         if (gameRoot == null) {
@@ -244,7 +244,7 @@ public class GameStage extends Stage {
             alertNoGame();
             return;
         }
-        setRootToGame();
+        setGameForRoot();
     }
 
     private void alertNoGame() {
@@ -312,12 +312,12 @@ public class GameStage extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        Coords currentPos = gameCanvas.getCurrentPos();
+        Coords currentPos = gameView.getCurrentPos();
         GameController.get().saveGame(overwrite, name, currentPos, Main.getDir());
-        resumeGame();
+        GameController.get().resumeGame();
     }
 
-    private void setRootToGame() {
+    public void setGameForRoot() {
         removeEventHandler(KeyEvent.KEY_RELEASED, gameReturn);
         addEventHandler(KeyEvent.KEY_RELEASED, gameMenuReturn);
         getScene().setRoot(gameRoot);

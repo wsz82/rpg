@@ -13,12 +13,14 @@ import java.util.List;
 import static io.wsz.model.Constants.TURN_DURATION_MILLIS;
 
 public class GameRunner {
+    private final GameController gameController = GameController.get();
+    private final Controller controller = Controller.get();
 
     public GameRunner() {
     }
 
     public void startGame(SaveMemento memento) {
-        GameController.get().setGame(true);
+        gameController.setGame(true);
 
         if (memento == null) {
             loadNewGame();
@@ -30,7 +32,7 @@ public class GameRunner {
     }
 
     public void resumeGame() {
-        GameController.get().setGame(true);
+        gameController.setGame(true);
         runGameThread();
     }
 
@@ -38,14 +40,14 @@ public class GameRunner {
         showGame();
 
         Thread gameThread = new Thread(() -> {
-            while (GameController.get().isGame()) {
+            while (gameController.isGame()) {
                 synchronized (this) {
-                    List<PosItem> items = Controller.get().getCurrentLocation().getItems();
+                    List<PosItem> items = controller.getCurrentLocation().getItems();
 
                     for (PosItem pi : items) {
                         pi.update();
                     }
-                    for (Location l : Controller.get().getLocationsList()) {
+                    for (Location l : controller.getLocationsList()) {
                         addItems(l);
                         removeItems(l);
                     }
@@ -88,9 +90,9 @@ public class GameRunner {
     }
 
     private void updateLocation() {
-        Location locationToUpdate = Controller.get().getLocationToUpdate();
+        Location locationToUpdate = controller.getLocationToUpdate();
         if (locationToUpdate != null) {
-            CurrentLocation cl = Controller.get().getCurrentLocation();
+            CurrentLocation cl = controller.getCurrentLocation();
             Location l = cl.getLocation();
             if (!l.getName().equals(locationToUpdate.getName())) {
                 cl.setLocation(locationToUpdate);
@@ -99,16 +101,16 @@ public class GameRunner {
     }
 
     private void showGame() {
-        GameController.get().showGame();
+        gameController.refreshGame();
     }
 
     private void loadSave(SaveMemento memento) {
-        GameController.get().loadSaveToLists(memento);
-        GameController.get().initLoadedGameSettings(memento);
+        gameController.loadSaveToLists(memento);
+        gameController.initLoadedGameSettings(memento);
     }
 
     private void loadNewGame() {
-        GameController.get().loadGameActivePluginToLists();
-        GameController.get().initNewGameSettings();
+        gameController.loadGameActivePluginToLists();
+        gameController.initNewGameSettings();
     }
 }

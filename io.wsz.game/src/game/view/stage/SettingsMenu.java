@@ -1,6 +1,6 @@
 package game.view.stage;
 
-import game.model.GameController;
+import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -73,7 +73,7 @@ class SettingsMenu extends StackPane {
 
     private void changeFullScreenSetting(boolean isSelected) {
         gameStage.setFullScreen(isSelected);
-        Coords current = GameController.get().getGameCanvas().getCurrentPos();
+        Coords current = Controller.get().getBoardPos();
         current.x = 0;
         current.y = 0;
     }

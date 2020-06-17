@@ -1,11 +1,13 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -24,14 +26,20 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.Constants.METER;
 
-public class GameCanvas extends Canvas {
+public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * METER;
     private static final double SCROLL = 0.2;
     private final Board board = Controller.get().getBoard();
     private final Coords currentPos = Controller.get().getBoardPos();
+    private final EventHandler<KeyEvent> inventoryEvent = e -> {
+        if (e.getCode().equals(KeyCode.I)) {
+            e.consume();
+            openInventory();
+        }
+    };
     private List<Layer> layers;
 
-    public GameCanvas() {
+    public GameView() {
         hookupEvents();
     }
 
@@ -227,14 +235,15 @@ public class GameCanvas extends Canvas {
                 board.getControlledCreatures()
                         .forEach(Creature::loseControl);
             }
-
         });
 
         CurrentLocation.get().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
         });
 
-        addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+        addEventHandler(KeyEvent.KEY_RELEASED, inventoryEvent);
+
+        addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             KeyCode key = e.getCode();
             switch (key) {
                 case PAGE_UP -> {
@@ -263,6 +272,15 @@ public class GameCanvas extends Canvas {
                 }
             }
         });
+    }
+
+    private void openInventory() {
+        List<Creature> controlled = Board.get().getControlledCreatures();
+        if (controlled.isEmpty()) {
+            return;
+        }
+        Creature active = controlled.get(0);
+        GameController.get().openInventory(active);
     }
 
     private void centerScreenOn(Coords posToCenter) {
