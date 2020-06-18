@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,13 +95,23 @@ class CreatureTableView extends AssetsTableView<Creature> {
                     true, clone, level,
                     coverLine, collisionPolygons);
 
-            cr.setTasks(p.getTasks()); //TODO clone
+            cloneTasks(p, cr);
+
             cr.setInventory(new Inventory(cr));
             cr.getInventory().getItems().addAll(p.getInventory().getItems());
 
             output.add(cr);
         }
         return output;
+    }
+
+    private void cloneTasks(Creature p, Creature cr) {
+        ArrayDeque<Creature.Task> pTasks = p.getTasks();
+        ArrayDeque<Creature.Task> tasks = new ArrayDeque<>(pTasks.size());
+        for (Creature.Task task : pTasks) {
+            tasks.add(task.clone());
+        }
+        cr.setTasks(tasks);
     }
 
     @Override

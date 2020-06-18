@@ -387,24 +387,30 @@ public class Creature extends PosItem<Creature> {
         strength = (Integer) in.readObject();
     }
 
-    private class Task implements Serializable {
+    public class Task implements Serializable {
         private Equipment equipment;
         private Coords dest;
-
         private boolean finished;
 
         public Task() {}
 
-        Task(Coords dest) {
+        public Task(Coords dest) {
             this.dest = dest;
         }
 
-        Task(Equipment equipment) {
+        public Task(Equipment equipment) {
             this.equipment = equipment;
             this.dest = centerToPos(equipment.getPos());
         }
 
-        void doTask() {
+        public Task clone() {
+            Task task = new Task();
+            task.equipment = this.equipment;
+            task.dest = this.dest;
+            return task;
+        }
+
+        private void doTask() {
             if (dest != null) {
                 move();
                 if (equipment != null) {
@@ -426,7 +432,7 @@ public class Creature extends PosItem<Creature> {
             }
         }
 
-        public void move() {
+        private void move() {
             double x1 = pos.x;
             double x2 = dest.x;
             double y1 = pos.y;
