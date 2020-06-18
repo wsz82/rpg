@@ -58,8 +58,29 @@ public class EquipmentView extends AnchorPane {
 
         initItemsScrollPane();
         initWeightBox();
+        initSizeBox();
         initDropScrollPane();
         initCreatureView();
+    }
+
+    private void initSizeBox() {
+        final VBox sizeBox = new VBox(10);
+        Inventory inventory = cr.getIndividualInventory();
+        int maxSize = inventory.getMaxSize();
+        Label maxSizeLabel = new Label(String.valueOf(maxSize));
+        int sumSize = inventoryEquipment.stream()
+                .mapToInt(Equipment::getSize)
+                .reduce(0, Integer::sum);
+        Label sumSizeLabel = new Label(String.valueOf(sumSize));
+
+        sizeBox.getChildren().addAll(sumSizeLabel, maxSizeLabel);
+
+        sizeBox.setPrefSize(unit, 2*unit);
+
+        setLeftAnchor(sizeBox, 0.1 * getWidth());
+        setTopAnchor(sizeBox, 0.7 * getHeight());
+
+        getChildren().add(sizeBox);
     }
 
     private void initWeightBox() {
