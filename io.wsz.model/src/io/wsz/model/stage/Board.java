@@ -1,10 +1,7 @@
 package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.ItemType;
-import io.wsz.model.item.PosItem;
+import io.wsz.model.item.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -184,8 +181,8 @@ public class Board {
         Collections.addAll(typesList, types);
         List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
         items = items.stream()
+                .filter(PosItem::getVisible)
                 .filter(pi -> typesList.contains(pi.getType()))
-                .filter(pi -> pi.getVisible())
                 .filter(pi -> {
                     int level = pi.getLevel();
                     int actualLevel = Controller.get().getCurrentLayer().getLevel();
@@ -361,8 +358,8 @@ public class Board {
     public PosItem lookForObstacle(Coords[] poss) {
         List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
         items = items.stream()
-                .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(PosItem::getVisible)
+                .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(pi -> pi.getLevel() == Controller.get().getCurrentLayer().getLevel())
                 .collect(Collectors.toList());
         if (items.isEmpty()) {
@@ -431,5 +428,43 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public List<Equipment> getEquipmentWithinRange(Coords[] poss, Creature cr) {
+        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
+        List<Equipment> equipment = items.stream()
+                .filter(PosItem::getVisible)
+                .filter(pi -> pi.getLevel() == cr.getLevel())
+                .filter(pi -> pi instanceof Equipment)
+                .map(pi -> (Equipment) pi)
+                .collect(Collectors.toList());
+        if (items.isEmpty()) {
+            return null;
+        }
+        sortItems(items);
+        Collections.reverse(items);
+
+        List<Equipment> output = new ArrayList<>(0);
+        Double range = cr.getRange();
+        for (Equipment e : equipment) {
+            Coords eCenter = e.getCenter();
+            for (Coords pos : poss) {
+                if (pointWithinRange(pos, range, eCenter)) {
+                    if (!output.contains(e)) {
+                        output.add(e);
+                    }
+                }
+            }
+        }
+        return output;
+    }
+
+    private boolean pointWithinRange(Coords pos, Double range, Coords eCenter) {
+        double eX = eCenter.x;
+        double eY = eCenter.y;
+        double x = pos.x;
+        double y = pos.y;
+
+        return pow(eX - x, 2) + pow(eY - y, 2) < pow(range, 2);
     }
 }

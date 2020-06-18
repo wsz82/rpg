@@ -178,6 +178,7 @@ public class Creature extends PosItem<Creature> {
 
     private void takeItem(Equipment e) {
         Task takeItem = new Task(e);
+        tasks.clear();
         tasks.push(takeItem);
     }
 
@@ -191,6 +192,11 @@ public class Creature extends PosItem<Creature> {
             }
         }
         return false;
+    }
+
+    public List<Equipment> getEquipmentWithinRange() {
+        Coords[] poss = getCorners();
+        return Controller.get().getBoard().getEquipmentWithinRange(poss, this);
     }
 
     private void interactWithCreature(Creature cr) {
@@ -208,10 +214,10 @@ public class Creature extends PosItem<Creature> {
         if (tasks.isEmpty()) {
             return;
         }
-        Task priorTask = tasks.getFirst();
-        priorTask.doTask();
-        if (priorTask.finished) {
-            tasks.remove(priorTask);
+        Task priority = tasks.getFirst();
+        priority.doTask();
+        if (priority.finished) {
+            tasks.remove(priority);
         }
     }
 
@@ -411,6 +417,7 @@ public class Creature extends PosItem<Creature> {
                     equipment.onTake(Creature.this);
                 }
                 equipment = null;
+                dest = null;
             }
         }
 

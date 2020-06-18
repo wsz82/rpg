@@ -15,6 +15,7 @@ import static io.wsz.model.Constants.TURN_DURATION_MILLIS;
 public class GameRunner {
     private final GameController gameController = GameController.get();
     private final Controller controller = Controller.get();
+    private Thread gameThread;
 
     public GameRunner() {
     }
@@ -28,19 +29,24 @@ public class GameRunner {
             loadSave(memento);
         }
 
-        runGameThread();
+        if (gameThread == null) {
+            runGameThread();
+        }
     }
 
     public void resumeGame() {
+        showGame();
         gameController.setGame(true);
-        runGameThread();
     }
 
     private void runGameThread() {
         showGame();
 
-        Thread gameThread = new Thread(() -> {
-            while (gameController.isGame()) {
+        gameThread = new Thread(() -> {
+            while (true) {
+                if (!gameController.isGame()) {
+                    continue;
+                }
                 synchronized (this) {
                     List<PosItem> items = controller.getCurrentLocation().getItems();
 
@@ -73,6 +79,7 @@ public class GameRunner {
 
     private void addItems(Location l) {
         List<PosItem> p = l.getItemsToAdd();
+
         if (p.isEmpty()) {
             return;
         }

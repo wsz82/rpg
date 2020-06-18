@@ -30,6 +30,7 @@ public class GameController {
     private final AtomicBoolean isGame = new AtomicBoolean(false);
     private GameView gameView;
     private GameStage gameStage;
+    private GameRunner gameRunner;
 
     public static GameController get() {
         if (singleton == null) {
@@ -38,20 +39,21 @@ public class GameController {
         return singleton;
     }
 
-    private GameController(){}
+    private GameController() {}
 
     public boolean startGame(SaveMemento memento) {
         if (ActivePlugin.get().getPlugin() == null) {
             return false;
         }
-        GameRunner gameRunner = new GameRunner();
+        if (gameRunner == null) {
+            gameRunner = new GameRunner();
+        }
         gameRunner.startGame(memento);
         return true;
     }
 
     public void resumeGame() {
         gameStage.setGameForRoot();
-        GameRunner gameRunner = new GameRunner();
         gameRunner.resumeGame();
     }
 

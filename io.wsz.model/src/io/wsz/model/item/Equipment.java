@@ -55,10 +55,10 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     }
 
     @Override
-    public void onDrop(Coords pos, Integer level) {
+    public void onDrop(Creature cr) {
         visible.set(true);
-        this.pos = pos;
-        this.level = level;
+        this.pos = cr.posToCenter();
+        this.level = cr.getLevel();
         Controller.get().getCurrentLocation().getLocation().getItemsToAdd().add(this);
     }
 

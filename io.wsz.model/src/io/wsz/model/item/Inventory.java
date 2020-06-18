@@ -60,4 +60,8 @@ public class Inventory implements Serializable {
     public void setMaxWeight(double maxWeight) {
         this.maxWeight = maxWeight;
     }
+
+    public List<Equipment> getItems() {
+        return items;
+    }
 }

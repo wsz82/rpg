@@ -27,21 +27,21 @@ import java.io.File;
 public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
     private final EventHandler<KeyEvent> gameMenuReturn = event -> {
-        event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
+            event.consume();
             showGameMenu();
             GameController.get().setGame(false);
         }
     };
     private final EventHandler<KeyEvent> mainMenuReturn = event -> {
-        event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
+            event.consume();
             showMainMenu();
         }
     };
     private final EventHandler<KeyEvent> gameReturn = event -> {
-        event.consume();
         if (event.getCode() == KeyCode.ESCAPE) {
+            event.consume();
             GameController.get().resumeGame();
         }
     };
@@ -58,8 +58,8 @@ public class GameStage extends Stage {
     public GameStage() {
         super(StageStyle.DECORATED);
         this.gameView = new GameView();
-        GameController.get().setGameView(gameView);
         GameController.get().setGameStage(this);
+        GameController.get().setGameView(gameView);
     }
 
     private void showMainMenu() {
@@ -100,6 +100,7 @@ public class GameStage extends Stage {
     public void setInventoryForRoot(Creature active) {
         EquipmentView ev = new EquipmentView(active, this);
         getScene().setRoot(ev);
+        ev.initWindow();
     }
 
     private void startNewGame() {
@@ -341,6 +342,8 @@ public class GameStage extends Stage {
         setFullScreenExitKeyCombination(CLOSE_GAME);
         setWidth(800);
         setHeight(600);
+        setMinWidth(300);
+        setMinHeight(300);
         setFullScreen(true);
 
         createMainMenu();
