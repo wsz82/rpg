@@ -5,11 +5,13 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.Inventory;
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -55,8 +57,29 @@ public class EquipmentView extends AnchorPane {
         unit = getWidth() / MAX_WIDTH;
 
         initItemsScrollPane();
+        initWeightBox();
         initDropScrollPane();
         initCreatureView();
+    }
+
+    private void initWeightBox() {
+        final VBox weightBox = new VBox(10);
+        Inventory inventory = cr.getIndividualInventory();
+        double maxWeight = inventory.getMaxWeight();
+        Label maxWeightLabel = new Label(String.format("%.1f", maxWeight));
+        double sumWeight = inventoryEquipment.stream()
+                .mapToDouble(Equipment::getWeight)
+                .reduce(0.0, Double::sum);
+        Label sumWeightLabel = new Label(String.format("%.1f", sumWeight));
+
+        weightBox.getChildren().addAll(sumWeightLabel, maxWeightLabel);
+
+        weightBox.setPrefSize(unit, 2*unit);
+
+        setLeftAnchor(weightBox, 0.2 * getWidth());
+        setTopAnchor(weightBox, 0.7 * getHeight());
+
+        getChildren().add(weightBox);
     }
 
     private void resolveInventory() {
