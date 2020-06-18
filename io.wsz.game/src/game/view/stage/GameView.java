@@ -246,6 +246,7 @@ public class GameView extends Canvas {
         addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             KeyCode key = e.getCode();
             switch (key) {
+                case SPACE -> handlePause();
                 case PAGE_UP -> {
                     e.consume();
                     Layer layer = Controller.get().getCurrentLayer().getLayer();
@@ -272,6 +273,11 @@ public class GameView extends Canvas {
                 }
             }
         });
+    }
+
+    private void handlePause() {
+        boolean isGame = GameController.get().isGame();
+        GameController.get().setGame(!isGame);
     }
 
     private void openInventory() {
