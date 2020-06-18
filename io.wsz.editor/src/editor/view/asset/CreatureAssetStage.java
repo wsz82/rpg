@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.view.DoubleField;
+import editor.view.IntegerField;
 import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +20,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final DoubleField speedInput = new DoubleField(isContent);
     private final DoubleField rangeInput = new DoubleField(isContent);
+    private final IntegerField strengthInput = new IntegerField(isContent);
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
@@ -51,7 +53,11 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label rangeLabel = new Label("Range");
         rangeBox.getChildren().addAll(rangeLabel, rangeInput);
 
-        container.getChildren().addAll(sizeBox, controlBox, speedBox, rangeBox);
+        final HBox strengthBox = new HBox(10);
+        final Label strengthLabel = new Label("Strength");
+        strengthBox.getChildren().addAll(strengthLabel, strengthInput);
+
+        container.getChildren().addAll(sizeBox, controlBox, speedBox, rangeBox, strengthBox);
 
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
@@ -93,6 +99,13 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         } else {
             rangeInput.setText(String.valueOf(range));
         }
+
+        Integer strength = item.getIndividualStrength();
+        if (strength == null) {
+            strengthInput.setText("");
+        } else {
+            strengthInput.setText(String.valueOf(strength));
+        }
     }
 
     @Override
@@ -132,6 +145,17 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         } else {
             item.setRange(Double.parseDouble(range));
         }
+
+        String strength = strengthInput.getText();
+        if (strength.isEmpty()) {
+            if (isContent) {
+                item.setStrength(null);
+            } else {
+                item.setStrength(0);
+            }
+        } else {
+            item.setStrength(Integer.parseInt(strength));
+        }
     }
 
     @Override
@@ -145,7 +169,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 null, name, getType(), relativePath,
                 true, null, null, new ArrayList<>(0), new ArrayList<>(0));
         cr.setTasks(new ArrayDeque<>(0));
-        cr.setInventory(new Inventory(20, 40));
+        cr.setInventory(new Inventory(cr));
         return cr;
     }
 

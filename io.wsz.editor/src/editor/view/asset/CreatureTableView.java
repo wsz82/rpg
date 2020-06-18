@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -92,8 +93,11 @@ class CreatureTableView extends AssetsTableView<Creature> {
                     p, name, type, path,
                     true, clone, level,
                     coverLine, collisionPolygons);
-            cr.setTasks(p.getTasks());
-            cr.setInventory(p.getInventory());
+
+            cr.setTasks(p.getTasks()); //TODO clone
+            cr.setInventory(new Inventory(cr));
+            cr.getInventory().getItems().addAll(p.getInventory().getItems());
+
             output.add(cr);
         }
         return output;

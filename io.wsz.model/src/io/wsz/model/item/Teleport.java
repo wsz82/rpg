@@ -28,18 +28,6 @@ public class Teleport extends PosItem<Teleport> {
                 coverLine, collisionPolygons);
     }
 
-    public Teleport(Teleport prototype, String name, ItemType type, String path,
-                    Boolean visible, Coords pos, Integer level,
-                    List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                    String locationName, Coords exitPos, Integer exitLevel) {
-        super(prototype, name, type, path,
-                visible, pos, level,
-                coverLine, collisionPolygons);
-        this.locationName = locationName;
-        this.exit = exitPos;
-        this.exitLevel = exitLevel;
-    }
-
     public void enter(Creature cr) {
         List<Location> singleLocation = Controller.get().getLocationsList().stream()
                 .filter(l -> l.getName().equals(getLocationName()))

@@ -6,26 +6,24 @@ import java.util.List;
 
 public class Inventory implements Serializable {
     private List<Equipment> items;
-    private int maxSize;
+    private Creature owner;
     private int actualSize;
-    private double maxWeight;
     private double actualWeight;
 
     public Inventory() {}
 
-    public Inventory(int maxSize, double maxWeight) {
-        this.items = new ArrayList<>(maxSize);
-        this.maxSize = maxSize;
+    public Inventory(Creature owner) {
+        this.items = new ArrayList<>(1);
+        this.owner = owner;
         this.actualSize = 0;
-        this.maxWeight = maxWeight;
         this.actualWeight = 0;
     }
 
     public boolean add(Equipment e) {
         double weight = e.getWeight();
         double size = e.getSize();
-        if (actualWeight + weight > maxWeight
-                || actualSize + size > maxSize) {
+        if (actualWeight + weight > getMaxWeight()
+                || actualSize + size > getMaxSize()) {
             return false;
         }
         actualWeight += weight;
@@ -46,19 +44,11 @@ public class Inventory implements Serializable {
     }
 
     public int getMaxSize() {
-        return maxSize;
-    }
-
-    public void setMaxSize(int maxSize) {
-        this.maxSize = maxSize;
+        return (owner.getSize().ordinal() + 1) * 5;
     }
 
     public double getMaxWeight() {
-        return maxWeight;
-    }
-
-    public void setMaxWeight(double maxWeight) {
-        this.maxWeight = maxWeight;
+        return owner.getStrength() * 3;
     }
 
     public List<Equipment> getItems() {

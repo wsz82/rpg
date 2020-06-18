@@ -26,6 +26,7 @@ public class Creature extends PosItem<Creature> {
     private CreatureControl control;
     private Double speed;
     private Double range;
+    private Integer strength;
 
     public Creature() {}
 
@@ -36,25 +37,6 @@ public class Creature extends PosItem<Creature> {
                 visible, pos, level,
                 coverLine, collisionPolygons);
     }
-
-    public Creature(Creature prototype, String name, ItemType type, String path,
-                    Boolean visible, Coords pos, Integer level,
-                    List<Coords> coverLine, List<List<Coords>> collisionPolygons,
-                    ArrayDeque<Task> tasks, Inventory inventory,
-                    CreatureSize size, CreatureControl control,
-                    Double speed, Double range) {
-        super(prototype, name, type, path,
-                visible, pos, level,
-                coverLine, collisionPolygons);
-        this.tasks = tasks;
-        this.inventory = inventory;
-        this.size = size;
-        this.control = control;
-        this.speed = speed;
-        this.range = range;
-    }
-
-
 
     private PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(posToCenter(nextPos));
@@ -247,7 +229,7 @@ public class Creature extends PosItem<Creature> {
     public Inventory getInventory() {
         if (inventory == null) {
             if (prototype == null) {
-                return new Inventory(1, 1);
+                return new Inventory(this);
             }
             return prototype.inventory;
         } else {
@@ -335,6 +317,25 @@ public class Creature extends PosItem<Creature> {
         this.control = control;
     }
 
+    public Integer getIndividualStrength() {
+        return strength;
+    }
+
+    public Integer getStrength() {
+        if (strength == null) {
+            if (prototype == null) {
+                return 0;
+            }
+            return prototype.strength;
+        } else {
+            return strength;
+        }
+    }
+
+    public void setStrength(Integer strength) {
+        this.strength = strength;
+    }
+
     @Override
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
@@ -363,6 +364,8 @@ public class Creature extends PosItem<Creature> {
         out.writeObject(speed);
 
         out.writeObject(range);
+
+        out.writeObject(strength);
     }
 
     @Override
@@ -380,6 +383,8 @@ public class Creature extends PosItem<Creature> {
         speed = (Double) in.readObject();
 
         range = (Double) in.readObject();
+
+        strength = (Integer) in.readObject();
     }
 
     private class Task implements Serializable {
