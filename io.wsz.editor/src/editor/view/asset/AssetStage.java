@@ -101,7 +101,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (inputNameIsEmpty || inputFileIsEmpty) {
             return;
         }
-        List<Asset> assets = Controller.get().getAssetsList();
+        List<Asset> assets = ObservableAssets.get().merge();
         boolean assetNameAlreadyExists = assets.stream()
                 .anyMatch(a -> a.getName().equals(name));
         if (assetNameAlreadyExists) {
