@@ -167,7 +167,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected Creature createNewAsset(String name, String relativePath) {
         Creature cr = new Creature(
                 null, name, getType(), relativePath,
-                true, null, null, new ArrayList<>(0), new ArrayList<>(0));
+                true, null, null,
+                new ArrayList<>(0), new ArrayList<>(0));
         cr.setTasks(new ArrayDeque<>(0));
         cr.setInventory(new Inventory(cr));
         return cr;

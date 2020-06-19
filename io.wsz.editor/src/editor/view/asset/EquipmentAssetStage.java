@@ -41,14 +41,14 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
             return;
         }
 
-        Double weight = item.getWeight();
+        Double weight = item.getIndividualWeight();
         if (weight == null) {
             inputWeight.setText(null);
         } else {
             inputWeight.setText(String.valueOf(weight));
         }
 
-        Integer size = item.getSize();
+        Integer size = item.getIndividualSize();
         if (size == null) {
             inputSize.setText(null);
         } else {

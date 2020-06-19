@@ -286,7 +286,7 @@ public class GameView extends Canvas {
             return;
         }
         Creature active = controlled.get(0);
-        GameController.get().openInventory(active);
+        GameController.get().openInventory(active, null);
     }
 
     private void centerScreenOn(Coords posToCenter) {

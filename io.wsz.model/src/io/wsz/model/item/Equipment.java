@@ -6,6 +6,7 @@ import io.wsz.model.stage.Coords;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 
 public abstract class Equipment<E extends Equipment> extends PosItem<E> implements Equippable {
     protected Double weight;
@@ -14,8 +15,12 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public Equipment() {}
 
     public Equipment(E prototype, String name, ItemType type, String path,
-                     Boolean visible, Coords pos, Integer level) {
-        super(prototype, name, type, path, visible, pos, level, null, null);
+                     Boolean visible, Coords pos, Integer level,
+                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
+        super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
+    }
+    public Double getIndividualWeight() {
+        return weight;
     }
 
     public Double getWeight() {
@@ -30,6 +35,10 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
 
     public void setWeight(Double weight) {
         this.weight = weight;
+    }
+
+    public Integer getIndividualSize() {
+        return size;
     }
 
     public Integer getSize() {
@@ -60,6 +69,11 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         this.pos = cr.posToCenter();
         this.level = cr.getLevel();
         Controller.get().getCurrentLocation().getLocation().getItemsToAdd().add(this);
+    }
+
+    @Override
+    public void onEquip() {
+
     }
 
     @Override

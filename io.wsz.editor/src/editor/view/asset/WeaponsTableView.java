@@ -102,7 +102,8 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
 
             Weapon w = new Weapon(
                     p, name, type, path,
-                    true, clonePos, level);
+                    true, clonePos, level,
+                    coverLine, collisionPolygons);
             output.add(w);
         }
         return output;

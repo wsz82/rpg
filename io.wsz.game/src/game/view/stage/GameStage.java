@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
+import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
@@ -97,8 +98,8 @@ public class GameStage extends Stage {
         settingsMenu.open(getScene(), returnEvent);
     }
 
-    public void setInventoryForRoot(Creature active) {
-        EquipmentView ev = new EquipmentView(active, this);
+    public void setInventoryForRoot(Creature active, Container container) {
+        EquipmentView ev = new EquipmentView(active, container, this);
         getScene().setRoot(ev);
         ev.initWindow();
     }

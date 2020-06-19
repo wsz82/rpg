@@ -146,6 +146,9 @@ public class Creature extends PosItem<Creature> {
         switch (type) {
             case CREATURE -> interactWithCreature((Creature) pi);
             case WEAPON -> takeItem((Equipment) pi);
+            case CONTAINER -> {
+                tryToOpenContainer((Container) pi);
+            }
             default -> {
                 tasks.clear();
                 goTo(pos);
@@ -162,6 +165,12 @@ public class Creature extends PosItem<Creature> {
         Task takeItem = new Task(e);
         tasks.clear();
         tasks.push(takeItem);
+    }
+
+    private void tryToOpenContainer(Container c) {
+        Task task = new Task(c);
+        tasks.clear();
+        tasks.push(task);
     }
 
     private boolean withinRange(Equipment e) {
@@ -414,18 +423,22 @@ public class Creature extends PosItem<Creature> {
             if (dest != null) {
                 move();
                 if (equipment != null) {
-                    tryToTakeItem();
+                    interactWithItem();
                 }
                 return;
             }
             finished = true;
         }
 
-        private void tryToTakeItem() {
+        private void interactWithItem() {
             if (withinRange(equipment)) {
-                boolean taken = inventory.add(equipment);
-                if (taken) {
-                    equipment.onTake(Creature.this);
+                if (equipment instanceof Container) {
+                    ((Container) equipment).open(Creature.this);
+                } else {
+                    boolean taken = inventory.add(equipment);
+                    if (taken) {
+                        equipment.onTake(Creature.this);
+                    }
                 }
                 equipment = null;
                 dest = null;

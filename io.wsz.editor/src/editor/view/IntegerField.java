@@ -19,8 +19,8 @@ public class IntegerField extends TextField {
 
             try {
                 newNumber = Integer.parseInt(newValue);
-            } catch (NumberFormatException e) {
-                if (canBeEmpty && newValue.isEmpty()) {
+            } catch (NumberFormatException|NullPointerException e) {
+                if (canBeEmpty && (newValue == null || newValue.isEmpty())) {
                     setText("");
                     return;
                 }

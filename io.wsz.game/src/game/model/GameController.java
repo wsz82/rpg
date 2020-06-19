@@ -11,6 +11,7 @@ import game.view.launcher.Main;
 import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
@@ -57,9 +58,9 @@ public class GameController {
         gameRunner.resumeGame();
     }
 
-    public void openInventory(Creature active) {
+    public void openInventory(Creature active, Container container) {
         isGame.set(false);
-        gameStage.setInventoryForRoot(active);
+        gameStage.setInventoryForRoot(active, container);
     }
 
     public void restoreLastPlugin() {

@@ -61,6 +61,10 @@ public class AssetsStage extends ChildStage {
                     ObservableList<Weapon> weapons = ObservableAssets.get().getWeapons();
                     table = new WeaponsTableView(this, weapons);
                 }
+                case CONTAINER -> {
+                    ObservableList<Container> containers = ObservableAssets.get().getContainers();
+                    table = new ContainerTableView(this, containers);
+                }
             }
             table.setPointer(pointer);
             table.setContentTableView(contentTableView);

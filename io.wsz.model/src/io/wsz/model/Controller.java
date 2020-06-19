@@ -2,6 +2,8 @@ package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
+import io.wsz.model.item.Container;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
@@ -22,6 +24,8 @@ public class Controller {
     private static File programDir;
     private Location locationToUpdate;
     private Coords posToCenter;
+    private Creature creatureToOpenContainer;
+    private Container containerToOpen;
 
     public static Controller get() {
         if (singleton == null) {
@@ -111,5 +115,21 @@ public class Controller {
 
     public Coords getBoardPos() {
         return Board.get().getBoardPos();
+    }
+
+    public Creature getCreatureToOpenContainer() {
+        return creatureToOpenContainer;
+    }
+
+    public void setCreatureToOpenContainer(Creature creatureToOpenContainer) {
+        this.creatureToOpenContainer = creatureToOpenContainer;
+    }
+
+    public void setContainerToOpen(Container container) {
+        this.containerToOpen = container;
+    }
+
+    public Container getContainerToOpen() {
+        return containerToOpen;
     }
 }

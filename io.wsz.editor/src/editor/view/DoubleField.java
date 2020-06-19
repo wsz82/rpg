@@ -19,8 +19,8 @@ public class DoubleField extends TextField {
 
             try {
                 newNumber = Double.parseDouble(newValue);
-            } catch (NumberFormatException e) {
-                if (canBeEmpty && newValue.isEmpty()) {
+            } catch (NumberFormatException|NullPointerException e ) {
+                if (canBeEmpty && (newValue == null || newValue.isEmpty())) {
                     setText("");
                     return;
                 }

@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private static final String TITLE = "Weapon asset";
     private final DoubleField inputDamage = new DoubleField(0.0, isContent);
@@ -28,9 +30,6 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     protected void initWindow() {
         super.initWindow();
         setTitle(TITLE);
-
-        coverButton.setVisible(false);
-        collisionButton.setVisible(false);
 
         final HBox damage = new HBox(10);
         damage.setAlignment(Pos.CENTER_LEFT);
@@ -129,7 +128,8 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     protected Weapon createNewAsset(String name, String relativePath) {
         return new Weapon(
                 null, name, getType(), relativePath,
-                true, null, null);
+                true, null, null,
+                new ArrayList<>(0), new ArrayList<>(0));
     }
 
     @Override

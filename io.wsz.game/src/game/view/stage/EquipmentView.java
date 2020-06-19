@@ -1,10 +1,7 @@
 package game.view.stage;
 
 import game.model.GameController;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.Equipment;
-import io.wsz.model.item.Inventory;
-import io.wsz.model.item.Weapon;
+import io.wsz.model.item.*;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -38,17 +35,23 @@ public class EquipmentView extends AnchorPane {
     };
     private final List<Weapon> weaponToEquip = new ArrayList<>(1);
     private final List<Equipment> draggedEquipment = new ArrayList<>(1);
+    private final Container container;
     private final Stage parent;
     private double unit;
     private GridPane holdGP;
     private GridPane dropGP;
     private Pane equippedWeaponPane;
 
-    public EquipmentView(Creature cr, Stage parent) {
+    public EquipmentView(Creature cr, Container container, Stage parent) {
         this.cr = cr;
+        this.container = container;
         this.parent = parent;
         this.equipmentToHold.addAll(cr.getIndividualInventory().getItems());
-        this.equipmentToDrop.addAll(cr.getEquipmentWithinRange());
+        if (container == null) {
+            this.equipmentToDrop.addAll(cr.getEquipmentWithinRange());
+        } else {
+            this.equipmentToDrop.addAll(container.getItems());
+        }
         Weapon weapon = cr.getIndividualInventory().getEquippedWeapon();
         this.weaponToEquip.add(null);
         this.weaponToEquip.set(0, weapon);
@@ -63,22 +66,37 @@ public class EquipmentView extends AnchorPane {
     private void resolveInventory() {
         Inventory actualHold = cr.getIndividualInventory();
         for (Equipment e : equipmentToHold) {
-            boolean notContainsThis = actualHold.getItems().stream()
+            boolean notContainThis = actualHold.getItems().stream()
                     .noneMatch(eq -> eq == e);
-            if (notContainsThis) {
+            if (notContainThis) {
                 if (actualHold.add(e)) {
-                    e.onTake(cr);
+                    if (container == null) {
+                        e.onTake(cr);
+                    } else {
+                        container.remove(e);
+                    }
                 }
             }
         }
 
-        List<Equipment> actualDrop = cr.getEquipmentWithinRange();
+        List<Equipment> actualDrop;
+        if (container == null) {
+            actualDrop = cr.getEquipmentWithinRange();
+        } else {
+            actualDrop = container.getItems();
+        }
         for (Equipment e : equipmentToDrop) {
-            boolean notContainsThis = actualDrop.stream()
+            boolean notContainThis = actualDrop.stream()
                     .noneMatch(eq -> eq == e);
-            if (notContainsThis) {
+            if (notContainThis) {
                 actualHold.remove(e);
-                e.onDrop(cr);
+                if (container == null) {
+                    e.onDrop(cr);
+                } else {
+                    if (!container.add(e)) {
+                        e.onDrop(cr);
+                    }
+                }
             }
         }
 
@@ -88,7 +106,11 @@ public class EquipmentView extends AnchorPane {
             actualHold.remove(w);
         }
         if (actualDrop.stream().anyMatch(e -> e == w)) {
-            w.onTake(cr);
+            if (container == null) {
+                w.onTake(cr);
+            } else {
+                container.remove(w);
+            }
         }
     }
 

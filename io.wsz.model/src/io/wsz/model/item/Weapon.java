@@ -5,6 +5,7 @@ import io.wsz.model.stage.Coords;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 
 public class Weapon extends Equipment<Weapon> {
     protected Double damage;
@@ -14,8 +15,9 @@ public class Weapon extends Equipment<Weapon> {
     public Weapon() {}
 
     public Weapon(Weapon prototype, String name, ItemType type, String path,
-                  Boolean visible, Coords pos, Integer level) {
-        super(prototype, name, type, path, visible, pos, level);
+                  Boolean visible, Coords pos, Integer level,
+                  List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
+        super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
     }
 
     public Double getIndividualDamage() {

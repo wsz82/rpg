@@ -3,6 +3,8 @@ package game.model.world;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import io.wsz.model.Controller;
+import io.wsz.model.item.Container;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -68,6 +70,7 @@ public class GameRunner {
                 Platform.runLater(() -> {
                     synchronized (this) {
                         showGame();
+                        tryToOpenInventory();
                     }
                 });
 
@@ -75,6 +78,16 @@ public class GameRunner {
         });
         gameThread.setDaemon(true);
         gameThread.start();
+    }
+
+    private void tryToOpenInventory() {
+        Creature creatureToOpenContainer = controller.getCreatureToOpenContainer();
+        Container containerToOpen = controller.getContainerToOpen();
+        if (creatureToOpenContainer != null && containerToOpen != null) {
+            gameController.openInventory(creatureToOpenContainer, containerToOpen);
+            controller.setCreatureToOpenContainer(null);
+            controller.setContainerToOpen(null);
+        }
     }
 
     private void addItems(Location l) {
