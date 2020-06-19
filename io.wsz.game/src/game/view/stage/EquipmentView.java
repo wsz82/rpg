@@ -4,14 +4,16 @@ import game.model.GameController;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.Inventory;
+import io.wsz.model.item.Weapon;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ import java.util.List;
 
 public class EquipmentView extends AnchorPane {
     private static final double MAX_WIDTH = 40;
-    private final List<Equipment> inventoryEquipment = new ArrayList<>(0);
-    private final List<Equipment> groundEquipment = new ArrayList<>(0);
+    private final List<Equipment> equipmentToHold = new ArrayList<>(0);
+    private final List<Equipment> equipmentToDrop = new ArrayList<>(0);
     private final Creature cr;
     private final EventHandler<KeyEvent> inventoryClose = e -> {
         if (e.getCode().equals(KeyCode.I)
@@ -34,22 +36,60 @@ public class EquipmentView extends AnchorPane {
             removeInventoryCloseEvent();
         }
     };
-
+    private final List<Weapon> weaponToEquip = new ArrayList<>(1);
+    private final List<Equipment> draggedEquipment = new ArrayList<>(1);
     private final Stage parent;
-
     private double unit;
-    private GridPane inventoryGP;
+    private GridPane holdGP;
     private GridPane dropGP;
+    private Pane equippedWeaponPane;
+
     public EquipmentView(Creature cr, Stage parent) {
         this.cr = cr;
         this.parent = parent;
-        this.inventoryEquipment.addAll(cr.getIndividualInventory().getItems());
-        this.groundEquipment.addAll(cr.getEquipmentWithinRange());
+        this.equipmentToHold.addAll(cr.getIndividualInventory().getItems());
+        this.equipmentToDrop.addAll(cr.getEquipmentWithinRange());
+        Weapon weapon = cr.getIndividualInventory().getEquippedWeapon();
+        this.weaponToEquip.add(null);
+        this.weaponToEquip.set(0, weapon);
+        this.draggedEquipment.add(null);
     }
 
     public void initWindow() {
         refresh();
         hookupEvents();
+    }
+
+    private void resolveInventory() {
+        Inventory actualHold = cr.getIndividualInventory();
+        for (Equipment e : equipmentToHold) {
+            boolean notContainsThis = actualHold.getItems().stream()
+                    .noneMatch(eq -> eq == e);
+            if (notContainsThis) {
+                if (actualHold.add(e)) {
+                    e.onTake(cr);
+                }
+            }
+        }
+
+        List<Equipment> actualDrop = cr.getEquipmentWithinRange();
+        for (Equipment e : equipmentToDrop) {
+            boolean notContainsThis = actualDrop.stream()
+                    .noneMatch(eq -> eq == e);
+            if (notContainsThis) {
+                actualHold.remove(e);
+                e.onDrop(cr);
+            }
+        }
+
+        Weapon w = weaponToEquip.get(0);
+        cr.getInventory().setEquippedWeapon(w);
+        if (actualHold.getItems().stream().anyMatch(e -> e == w)) {
+            actualHold.remove(w);
+        }
+        if (actualDrop.stream().anyMatch(e -> e == w)) {
+            w.onTake(cr);
+        }
     }
 
     private void refresh() {
@@ -61,6 +101,58 @@ public class EquipmentView extends AnchorPane {
         initSizeBox();
         initDropScrollPane();
         initCreatureView();
+        initEquippedWeaponView();
+    }
+
+    private void initEquippedWeaponView() {
+        final ImageView iv = new ImageView();
+        equippedWeaponPane = new Pane(iv);
+        iv.setFitWidth(unit);
+        iv.setFitHeight(unit);
+        equippedWeaponPane.setBackground(new Background(new BackgroundFill(Color.BROWN, null, null)));
+
+        setLeftAnchor(equippedWeaponPane, 0.4 * getWidth());
+        setTopAnchor(equippedWeaponPane, 0.4 * getHeight());
+
+        getChildren().add(equippedWeaponPane);
+
+        Weapon w = weaponToEquip.get(0);
+        if (w != null) {
+            Image img = w.getImage();
+            iv.setImage(img);
+
+            addDragAndDropEventsForEquipment(iv, w);
+        }
+
+        addDragAndDropEventsForEquippedWeapon(equippedWeaponPane);
+    }
+
+    private void addDragAndDropEventsForEquippedWeapon(Node node) {
+        node.setOnDragOver(e -> {
+            if (e.getGestureSource() != node
+                    && e.getDragboard().hasImage()
+                    && draggedEquipment.get(0) != null
+                    && draggedEquipment.get(0) instanceof Weapon) {
+                e.acceptTransferModes(TransferMode.MOVE);
+            }
+
+            e.consume();
+        });
+
+        node.setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            boolean success = false;
+            if (db.hasImage()
+                    && draggedEquipment.get(0) != null
+                    && draggedEquipment.get(0) instanceof Weapon) {
+                Weapon weapon = (Weapon) draggedEquipment.get(0);
+                weaponToEquip.set(0, weapon);
+                success = true;
+            }
+            e.setDropCompleted(success);
+
+            e.consume();
+        });
     }
 
     private void initSizeBox() {
@@ -68,7 +160,7 @@ public class EquipmentView extends AnchorPane {
         Inventory inventory = cr.getIndividualInventory();
         int maxSize = inventory.getMaxSize();
         Label maxSizeLabel = new Label(String.valueOf(maxSize));
-        int sumSize = inventoryEquipment.stream()
+        int sumSize = equipmentToHold.stream()
                 .mapToInt(Equipment::getSize)
                 .reduce(0, Integer::sum);
         Label sumSizeLabel = new Label(String.valueOf(sumSize));
@@ -88,7 +180,7 @@ public class EquipmentView extends AnchorPane {
         Inventory inventory = cr.getIndividualInventory();
         double maxWeight = inventory.getMaxWeight();
         Label maxWeightLabel = new Label(String.format("%.1f", maxWeight));
-        double sumWeight = inventoryEquipment.stream()
+        double sumWeight = equipmentToHold.stream()
                 .mapToDouble(Equipment::getWeight)
                 .reduce(0.0, Double::sum);
         Label sumWeightLabel = new Label(String.format("%.1f", sumWeight));
@@ -103,62 +195,43 @@ public class EquipmentView extends AnchorPane {
         getChildren().add(weightBox);
     }
 
-    private void resolveInventory() {
-        Inventory actualInventory = cr.getIndividualInventory();
-        for (Equipment e : inventoryEquipment) {
-            boolean notContainsThis = actualInventory.getItems().stream()
-                    .noneMatch(eq -> eq == e);
-            if (notContainsThis) {
-                if (actualInventory.add(e)) {
-                    e.onTake(cr);
-                }
-            }
-        }
-        for (Equipment e : groundEquipment) {
-            List<Equipment> actual = cr.getEquipmentWithinRange();
-            boolean notContainsThis = actual.stream()
-                    .noneMatch(eq -> eq == e);
-            if (notContainsThis) {
-                actualInventory.remove(e);
-                e.onDrop(cr);
-            }
-        }
-    }
-
     private void initItemsScrollPane() {
-        final ScrollPane inventorySP = new ScrollPane();
-        inventorySP.setPrefSize(21 * unit, 2.5 * unit);
-        inventoryGP = new GridPane();
-        inventoryGP.setHgap(unit/10);
-        inventoryGP.setVgap(unit/10);
+        final ScrollPane holdSP = new ScrollPane();
+        holdSP.setPrefSize(21 * unit, 2.5 * unit);
+        holdGP = new GridPane();
+        holdGP.setHgap(unit/10);
+        holdGP.setVgap(unit/10);
 
         int maxColumnNumber = 10;
-        fillGridPane(inventoryGP, maxColumnNumber, inventoryEquipment);
+        fillGridPane(holdGP, maxColumnNumber, equipmentToHold);
 
-        inventorySP.setContent(inventoryGP);
+        holdSP.setContent(holdGP);
 
-        setLeftAnchor(inventorySP, 0.3 * getWidth());
-        setTopAnchor(inventorySP, 0.7 * getHeight());
+        setLeftAnchor(holdSP, 0.3 * getWidth());
+        setTopAnchor(holdSP, 0.7 * getHeight());
 
-        getChildren().add(inventorySP);
+        getChildren().add(holdSP);
 
-        addDragAndDropEventsForInventory(inventorySP);
+        addDragAndDropEventsForHold(holdSP);
     }
 
-    private void addDragAndDropEventsForInventory(ScrollPane inventorySP) {
-        inventorySP.setOnDragOver(e -> {
-            if (e.getGestureSource() != inventorySP &&
-                    e.getDragboard().hasImage()) {
+    private void addDragAndDropEventsForHold(ScrollPane holdSP) {
+        holdSP.setOnDragOver(e -> {
+            if (e.getGestureSource() != holdSP
+                    && e.getDragboard().hasImage()
+                    && draggedEquipment.get(0) != null) {
                 e.acceptTransferModes(TransferMode.MOVE);
             }
 
             e.consume();
         });
 
-        inventorySP.setOnDragDropped(e -> {
+        holdSP.setOnDragDropped(e -> {
             Dragboard db = e.getDragboard();
             boolean success = false;
-            if (db.hasImage()) {
+            if (db.hasImage()
+                    && draggedEquipment.get(0) != null) {
+                equipmentToHold.add(draggedEquipment.get(0));
                 success = true;
             }
             e.setDropCompleted(success);
@@ -175,7 +248,7 @@ public class EquipmentView extends AnchorPane {
         dropGP.setVgap(unit/10);
 
         int maxColumnNumber = 2;
-        fillGridPane(dropGP, maxColumnNumber, groundEquipment);
+        fillGridPane(dropGP, maxColumnNumber, equipmentToDrop);
 
         dropSP.setContent(dropGP);
 
@@ -189,8 +262,9 @@ public class EquipmentView extends AnchorPane {
 
     private void addDragAndDropEventsForGround(ScrollPane dropSP) {
         dropSP.setOnDragOver(e -> {
-            if (e.getGestureSource() != dropSP &&
-                    e.getDragboard().hasImage()) {
+            if (e.getGestureSource() != dropSP
+                    && e.getDragboard().hasImage()
+                    && draggedEquipment.get(0) != null) {
                 e.acceptTransferModes(TransferMode.MOVE);
             }
 
@@ -200,7 +274,9 @@ public class EquipmentView extends AnchorPane {
         dropSP.setOnDragDropped(e -> {
             Dragboard db = e.getDragboard();
             boolean success = false;
-            if (db.hasImage()) {
+            if (db.hasImage()
+                    && draggedEquipment.get(0) != null) {
+                equipmentToDrop.add(draggedEquipment.get(0));
                 success = true;
             }
             e.setDropCompleted(success);
@@ -237,21 +313,22 @@ public class EquipmentView extends AnchorPane {
             content.putImage(iv.getImage());
             db.setContent(content);
 
+            draggedEquipment.set(0, equipment);
+
             e.consume();
         });
 
         iv.setOnDragDone(e -> {
             if (e.getTransferMode() == TransferMode.MOVE) {
-                GridPane target = (GridPane) iv.getParent();
-                if (target.equals(inventoryGP)) {
-                    dropGP.getChildren().remove(iv);
-                    inventoryEquipment.remove(equipment);
-                    groundEquipment.add(equipment);
-                } else if (target.equals(dropGP)) {
-                    inventoryGP.getChildren().remove(iv);
-                    groundEquipment.remove(equipment);
-                    inventoryEquipment.add(equipment);
+                Node parent = iv.getParent();
+                if (parent == holdGP) {
+                    equipmentToHold.remove(equipment);
+                } else if (parent == dropGP) {
+                    equipmentToDrop.remove(equipment);
+                } else if (parent == equippedWeaponPane) {
+                    weaponToEquip.set(0, null);
                 }
+                draggedEquipment.set(0, null);
                 refresh();
             }
             e.consume();

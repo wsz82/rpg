@@ -9,6 +9,7 @@ public class Inventory implements Serializable {
     private Creature owner;
     private int actualSize;
     private double actualWeight;
+    private Weapon equippedWeapon;
 
     public Inventory() {}
 
@@ -53,5 +54,13 @@ public class Inventory implements Serializable {
 
     public List<Equipment> getItems() {
         return items;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    public void setEquippedWeapon(Weapon equippedWeapon) {
+        this.equippedWeapon = equippedWeapon;
     }
 }
