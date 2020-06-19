@@ -124,6 +124,23 @@ public class EquipmentView extends AnchorPane {
         initDropScrollPane();
         initCreatureView();
         initEquippedWeaponView();
+        initDropImage();
+    }
+
+    private void initDropImage() {
+        if (container != null) {
+            final ImageView iv = new ImageView(container.getImage());
+            iv.setPreserveRatio(true);
+            iv.setFitWidth(2*unit);
+            iv.setFitHeight(2*unit);
+
+            setLeftAnchor(iv, 0.8 * getWidth());
+            setTopAnchor(iv, 0.1 * getHeight());
+            setRightAnchor(iv, 0.1 * getWidth());
+            setBottomAnchor(iv, 0.7 * getHeight());
+
+            getChildren().add(iv);
+        }
     }
 
     private void initEquippedWeaponView() {
