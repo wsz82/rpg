@@ -113,6 +113,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(equippedWeaponPane, 0.4 * getWidth());
         setTopAnchor(equippedWeaponPane, 0.4 * getHeight());
+        setRightAnchor(equippedWeaponPane, 0.5 * getWidth());
+        setBottomAnchor(equippedWeaponPane, 0.5 * getHeight());
 
         getChildren().add(equippedWeaponPane);
 
@@ -171,6 +173,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(sizeBox, 0.1 * getWidth());
         setTopAnchor(sizeBox, 0.7 * getHeight());
+        setRightAnchor(sizeBox, 0.8 * getWidth());
+        setBottomAnchor(sizeBox, 0.1 * getHeight());
 
         getChildren().add(sizeBox);
     }
@@ -191,6 +195,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(weightBox, 0.2 * getWidth());
         setTopAnchor(weightBox, 0.7 * getHeight());
+        setRightAnchor(weightBox, 0.7 * getWidth());
+        setBottomAnchor(weightBox, 0.1 * getHeight());
 
         getChildren().add(weightBox);
     }
@@ -209,6 +215,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(holdSP, 0.3 * getWidth());
         setTopAnchor(holdSP, 0.7 * getHeight());
+        setRightAnchor(holdSP, 0.3 * getWidth());
+        setBottomAnchor(holdSP, 0.1 * getHeight());
 
         getChildren().add(holdSP);
 
@@ -254,6 +262,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(dropSP, 0.8 * getWidth());
         setTopAnchor(dropSP, 0.3 * getHeight());
+        setRightAnchor(dropSP, 0.1 * getWidth());
+        setBottomAnchor(dropSP, 0.4 * getHeight());
 
         getChildren().add(dropSP);
 
@@ -342,6 +352,8 @@ public class EquipmentView extends AnchorPane {
 
         setLeftAnchor(iv, 0.1 * getWidth());
         setTopAnchor(iv, 0.2 * getHeight());
+        setRightAnchor(iv, 0.7 * getWidth());
+        setBottomAnchor(iv, 0.7 * getHeight());
 
         getChildren().add(iv);
     }
