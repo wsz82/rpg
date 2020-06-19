@@ -147,9 +147,17 @@ public class EquipmentView extends AnchorPane {
             if (db.hasImage()
                     && draggedEquipment.get(0) != null
                     && draggedEquipment.get(0) instanceof Weapon) {
-                Weapon weapon = (Weapon) draggedEquipment.get(0);
-                weaponToEquip.set(0, weapon);
-                success = true;
+                Weapon dragged = (Weapon) draggedEquipment.get(0);
+                Weapon actual = weaponToEquip.get(0);
+                if (dragged == actual) {
+                    success = false;
+                } else {
+                    if (actual != null) {
+                        equipmentToHold.add(actual);
+                    }
+                    weaponToEquip.set(0, dragged);
+                    success = true;
+                }
             }
             e.setDropCompleted(success);
 
