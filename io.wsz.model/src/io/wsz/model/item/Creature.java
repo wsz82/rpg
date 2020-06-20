@@ -451,6 +451,9 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
 
         private void move() {
+            if (inventory.getActualWeight() > inventory.getMaxWeight()) {
+                return;
+            }
             double x1 = pos.x;
             double x2 = dest.x;
             double y1 = pos.y;

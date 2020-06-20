@@ -64,4 +64,12 @@ public class Inventory implements Serializable {
     public List<Equipment> getItems() {
         return items;
     }
+
+    public int getFilledSpace() {
+        return filledSpace;
+    }
+
+    public double getActualWeight() {
+        return actualWeight;
+    }
 }
