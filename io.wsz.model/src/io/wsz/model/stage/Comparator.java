@@ -1,5 +1,6 @@
 package io.wsz.model.stage;
 
+import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 
@@ -69,13 +70,29 @@ public class Comparator {
 
             }
 
-            else if ((t1.equals(CREATURE) && t2.equals(COVER))) {
+            else if ((t1.equals(CREATURE)) && !t2.equals(LANDSCAPE)) {
+
+                if (i2 instanceof Equipment) {
+
+                    if (i2.getCoverLine().isEmpty()) {
+                        return GREAT;
+                    }
+
+                }
 
                 return Board.get().isCovered(i1, i2);
 
             }
 
-            else if ((t1.equals(COVER) && t2.equals(CREATURE))) {
+            else if ((!t1.equals(LANDSCAPE) && t2.equals(CREATURE))) {
+
+                if (i1 instanceof Equipment) {
+
+                    if (i1.getCoverLine().isEmpty()) {
+                        return LESS;
+                    }
+
+                }
 
                 Comparison isCovered = Board.get().isCovered(i2, i1);
 
