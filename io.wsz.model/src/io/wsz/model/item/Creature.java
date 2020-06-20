@@ -19,7 +19,7 @@ import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
-public class Creature extends PosItem<Creature> {
+public class Creature extends PosItem<Creature> implements Containable {
     private ArrayDeque<Task> tasks;
     private Inventory inventory;
     private CreatureSize size;
@@ -356,6 +356,11 @@ public class Creature extends PosItem<Creature> {
     public void update() {
         checkSurrounding();
         checkTasks();
+    }
+
+    @Override
+    public List<Equipment> getItems() {
+        return inventory.getItems();
     }
 
     @Override

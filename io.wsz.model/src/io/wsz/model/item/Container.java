@@ -9,7 +9,7 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container extends Equipment<Container> {
+public class Container extends Equipment<Container> implements Containable {
     private final List<Equipment> items = new ArrayList<>(0);
     private int filledSpace;
 
@@ -23,7 +23,7 @@ public class Container extends Equipment<Container> {
 
     public boolean add(Equipment e) {
         double size = e.getSize();
-        if (filledSpace + size > getMaxSize()) {
+        if (filledSpace + size > getSize()) {
             return false;
         }
         setWeight(getWeight() + e.getWeight());
@@ -49,10 +49,7 @@ public class Container extends Equipment<Container> {
         Controller.get().setContainerToOpen(this);
     }
 
-    public int getMaxSize() {
-        return getSize();
-    }
-
+    @Override
     public List<Equipment> getItems() {
         return items;
     }

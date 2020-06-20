@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
@@ -65,12 +64,12 @@ class CreatureTableView extends AssetsTableView<Creature> {
     }
 
     @Override
-    protected List<Creature> createItems(Coords pos) {
+    protected List<Creature> createItems(Coords rawPos, int level) {
         List<Creature> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Creature> output = new ArrayList<>(1);
         for (Creature p
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / METER;
                 pos.y = pos.y - height;

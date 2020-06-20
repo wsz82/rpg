@@ -21,6 +21,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
     @Override
     protected void initWindow() {
         super.initWindow();
+
         fillInputs();
     }
 

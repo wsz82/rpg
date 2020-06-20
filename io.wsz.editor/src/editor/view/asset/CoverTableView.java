@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
@@ -35,12 +34,12 @@ public class CoverTableView extends AssetsTableView<Cover> {
     }
 
     @Override
-    protected List<Cover> createItems(Coords pos) {
+    protected List<Cover> createItems(Coords rawPos, int level) {
         List<Cover> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Cover> output = new ArrayList<>(1);
         for (Cover c
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = c.getImage().getHeight() / METER;
                 pos.y = pos.y - height;

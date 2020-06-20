@@ -52,8 +52,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         final HBox buttons = new HBox(10);
         buttons.getChildren().add(cancel);
         if (item == null) {
-            coverButton.setDisable(true);
-            collisionButton.setDisable(true);
             buttons.getChildren().add(create);
             create.setDefaultButton(true);
             create.setOnAction(event -> {
@@ -72,7 +70,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
 
-        container.getChildren().addAll(nameInput, imageBox, coverButton, collisionButton);
+        container.getChildren().addAll(nameInput, imageBox);
+
+        if (item != null) {
+            container.getChildren().addAll(coverButton, collisionButton);
+        }
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);

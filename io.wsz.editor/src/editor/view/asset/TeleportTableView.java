@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.stage.Coords;
@@ -74,12 +73,12 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
     }
 
     @Override
-    protected List<Teleport> createItems(Coords pos) {
+    protected List<Teleport> createItems(Coords rawPos, int level) {
         List<Teleport> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Teleport> output = new ArrayList<>(1);
         for (Teleport p
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / METER;
                 pos.y = pos.y - height;

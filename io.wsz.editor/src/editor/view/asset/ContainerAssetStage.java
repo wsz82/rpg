@@ -2,12 +2,14 @@ package editor.view.asset;
 
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
 public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     private static final String TITLE = "Container asset";
+    private final Button itemsButton = new Button("Items");
 
     public ContainerAssetStage(Stage parent, Container item, boolean isContent) {
         super(parent, item, isContent);
@@ -24,7 +26,19 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
         super.initWindow();
         setTitle(TITLE);
 
+        if (item != null) {
+            container.getChildren().add(itemsButton);
+            hookupContainerEvents();
+        }
+
         fillInputs();
+    }
+
+    private void hookupContainerEvents() {
+        itemsButton.setOnAction(e -> {
+            ItemsStage<Container> itemsStage = new ItemsStage<>(parent, item);
+            itemsStage.show();
+        });
     }
 
     @Override

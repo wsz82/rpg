@@ -5,6 +5,7 @@ import editor.view.IntegerField;
 import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -21,6 +22,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final DoubleField speedInput = new DoubleField(isContent);
     private final DoubleField rangeInput = new DoubleField(isContent);
     private final IntegerField strengthInput = new IntegerField(isContent);
+    private final Button itemsButton = new Button("Items");
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
         super(parent, asset, isContent);
@@ -36,6 +38,9 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected void initWindow() {
         super.initWindow();
         setTitle(TITLE);
+
+        container.getChildren().remove(coverButton);
+        container.getChildren().remove(collisionButton);
 
         final HBox sizeBox = new HBox(10);
         final Label sizeLabel = new Label("Size");
@@ -71,7 +76,19 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             controls.add(null);
         }
 
+        if (item != null) {
+            container.getChildren().add(itemsButton);
+            hookupCreatureEvents();
+        }
+
         fillInputs();
+    }
+
+    private void hookupCreatureEvents() {
+        itemsButton.setOnAction(e -> {
+            ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item);
+            itemsStage.show();
+        });
     }
 
     @Override

@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
 import io.wsz.model.stage.Coords;
@@ -75,12 +74,12 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
     }
 
     @Override
-    protected List<Weapon> createItems(Coords pos) {
+    protected List<Weapon> createItems(Coords rawPos, int level) {
         List<Weapon> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Weapon> output = new ArrayList<>(1);
         for (Weapon p
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / METER;
                 pos.y = pos.y - height;

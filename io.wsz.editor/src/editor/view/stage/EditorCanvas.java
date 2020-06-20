@@ -241,6 +241,28 @@ public class EditorCanvas extends Canvas {
                 refresh();
             }
         });
+
+        setOnDragOver(e -> {
+            if (e.getGestureSource() != this
+                    && e.getDragboard().hasImage()) {
+                e.acceptTransferModes(TransferMode.COPY);
+            }
+
+            e.consume();
+        });
+
+        setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            boolean success = false;
+            if (db.hasImage()) {
+                Coords dragPos = new Coords(e.getX() / METER, e.getY() / METER);
+                EditorController.get().setDragPos(dragPos);
+                success = true;
+            }
+            e.setDropCompleted(success);
+
+            e.consume();
+        });
     }
 
     private void attachArrowsEventToPointer() {
@@ -347,7 +369,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void updatePos(KeyCode keyCode, Coords pos) {
-        double dif = METER/100.0;
+        double dif = 1.0/METER;
         switch (keyCode) {
             case UP -> pos.y = pos.y - dif;
             case LEFT -> pos.x = pos.x - dif;

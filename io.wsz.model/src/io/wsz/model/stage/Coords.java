@@ -2,6 +2,7 @@ package io.wsz.model.stage;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Coords implements Serializable {
     public double x;
@@ -109,5 +110,19 @@ public class Coords implements Serializable {
     @Override
     public String toString() {
         return "X: " + x + ", Y: " + y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Coords coords = (Coords) o;
+        return Double.compare(coords.x, x) == 0 &&
+                Double.compare(coords.y, y) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

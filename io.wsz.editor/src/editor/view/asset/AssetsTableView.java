@@ -1,9 +1,11 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -12,6 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -34,6 +39,41 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         setItems(assets);
         setUpContextMenu();
         setEditable(true);
+        hookupEvents();
+    }
+
+    private void hookupEvents() {
+        setOnDragDetected(e -> {
+            List<A> selectedAssets = getSelectionModel().getSelectedItems();
+            if (selectedAssets == null || selectedAssets.isEmpty()) {
+                return;
+            }
+            A firstAsset = selectedAssets.get(0);
+
+            Dragboard db = startDragAndDrop(TransferMode.COPY);
+
+            ClipboardContent content = new ClipboardContent();
+            content.putImage(firstAsset.getImage());
+            db.setContent(content);
+
+            e.consume();
+        });
+
+        setOnDragDone(e -> {
+            if (e.getTransferMode() == TransferMode.COPY) {
+                EditorController editorController = EditorController.get();
+                Coords dragPos = editorController.getDragPos();
+                ItemsStage itemsStage;
+                if (dragPos != null) {
+                    addItemsToStage(dragPos);
+                    editorController.setDragPos(null);
+                } else if ((itemsStage = editorController.getItemsStageToAddItems()) != null) {
+                    addItemsToContainable(itemsStage);
+                    editorController.setItemsStageToAddItems(null);
+                }
+            }
+            e.consume();
+        });
     }
 
     protected abstract void editAsset();
@@ -81,7 +121,8 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         editAsset.setOnAction(event -> editAsset());
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
-            addItemsToStage();
+            Coords mark = pointer.getMark();
+            addItemsToStage(mark);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
         setOnContextMenuRequested(event -> {
@@ -89,10 +130,9 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         });
     }
 
-    private void addItemsToStage() {
-        Coords mark = pointer.getMark();
-        Coords clone = mark.clone();
-        List<A> createdItems = createItems(clone);
+    private void addItemsToStage(Coords pos) {
+        int level = Controller.get().getCurrentLayer().getLevel();
+        List<A> createdItems = createItems(pos, level);
         for (A item : createdItems) {
             Image img = item.getImage();
             double width = img.getWidth();
@@ -105,8 +145,27 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         }
     }
 
+    private void addItemsToContainable(ItemsStage itemsStage) {
+        Coords pos = new Coords(0, 0);
+        List<A> createdItems = createItems(pos, 0);
+        for (A item : createdItems) {
+            if (item instanceof Equipment) {
+                Image img = item.getImage();
+                double width = img.getWidth();
+                double height = img.getHeight();
+                if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                    alertTooBigImage(width, height, item.getName());
+                    continue;
+                }
+                Equipment e = (Equipment) item;
+                itemsStage.addEquipment(e);
+            }
+        }
+    }
+
     private void alertTooBigImage(double width, double height, String itemName) {
-        String message = "Image of asset \"" + itemName + "\" is too big: " + "\n"
+        String message =
+                "Image of asset \"" + itemName + "\" is too big: " + "\n"
                 + "Width: " + width + "\n"
                 + "Height: " + height + "\n"
                 + "when maximum is: " + MAX_WIDTH;
@@ -117,7 +176,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                 .ifPresent(r -> alert.close());
     }
 
-    protected abstract List<A> createItems(Coords pos);
+    protected abstract List<A> createItems(Coords pos, int level);
 
     private void removeAssets() {
         List<A> assetsToRemove = getSelectionModel().getSelectedItems();

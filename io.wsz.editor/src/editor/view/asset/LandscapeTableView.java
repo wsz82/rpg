@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
 import io.wsz.model.stage.Coords;
@@ -35,12 +34,12 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
     }
 
     @Override
-    protected List<Landscape> createItems(Coords pos) {
+    protected List<Landscape> createItems(Coords rawPos, int level) {
         List<Landscape> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Landscape> output = new ArrayList<>(1);
         for (Landscape p
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / METER;
                 pos.y = pos.y - height;

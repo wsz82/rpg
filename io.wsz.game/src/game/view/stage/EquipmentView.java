@@ -46,7 +46,7 @@ public class EquipmentView extends AnchorPane {
         this.cr = cr;
         this.container = container;
         this.parent = parent;
-        this.equipmentToHold.addAll(cr.getIndividualInventory().getItems());
+        this.equipmentToHold.addAll(cr.getItems());
         if (container == null) {
             this.equipmentToDrop.addAll(cr.getEquipmentWithinRange());
         } else {

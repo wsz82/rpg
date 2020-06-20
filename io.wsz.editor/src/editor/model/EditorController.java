@@ -2,6 +2,7 @@ package editor.model;
 
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
+import editor.view.asset.ItemsStage;
 import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
@@ -21,6 +22,8 @@ import java.util.List;
 
 public class EditorController {
     private static EditorController singleton;
+    private Coords dragPos;
+    private ItemsStage itemsStage;
 
     public static EditorController get() {
         if (singleton == null) {
@@ -129,5 +132,21 @@ public class EditorController {
         ObservableAssets.get().fillLists(assets);
         Controller.get().getLocationsList().setAll(p.getLocations());
         return true;
+    }
+
+    public void setDragPos(Coords pos) {
+        this.dragPos = pos;
+    }
+
+    public Coords getDragPos() {
+        return dragPos;
+    }
+
+    public ItemsStage getItemsStageToAddItems() {
+        return itemsStage;
+    }
+
+    public void setItemsStageToAddItems(ItemsStage itemsStage) {
+        this.itemsStage = itemsStage;
     }
 }

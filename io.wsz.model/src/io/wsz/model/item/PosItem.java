@@ -133,7 +133,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         if (o == null || getClass() != o.getClass()) return false;
         PosItem<?> item = (PosItem<?>) o;
         return Objects.equals(prototype, item.prototype) &&
-                Objects.equals(visible, item.visible) &&
+                Objects.equals(visible.get(), item.visible.get()) &&
                 Objects.equals(pos, item.pos) &&
                 Objects.equals(level, item.level) &&
                 Objects.equals(coverLine, item.coverLine) &&

@@ -1,6 +1,5 @@
 package editor.view.asset;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
@@ -53,12 +52,12 @@ public class ContainerTableView extends AssetsTableView<Container> {
     }
 
     @Override
-    protected List<Container> createItems(Coords pos) {
+    protected List<Container> createItems(Coords rawPos, int level) {
         List<Container> selectedAssets = getSelectionModel().getSelectedItems();
-        int level = Controller.get().getCurrentLayer().getLevel();
         List<Container> output = new ArrayList<>(1);
         for (Container p
                 : selectedAssets) {
+            Coords pos = rawPos.clone();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / METER;
                 pos.y = pos.y - height;
@@ -83,6 +82,9 @@ public class ContainerTableView extends AssetsTableView<Container> {
                     true, clonePos, level,
                     coverLine, collisionPolygons);
             output.add(c);
+
+            c.getItems().addAll(p.getItems());
+
         }
         return output;
     }
