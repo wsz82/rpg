@@ -146,20 +146,20 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
         ItemType type = pi.getType();
         switch (type) {
-            case CREATURE -> interactWithCreature((Creature) pi);
-            case WEAPON -> takeItem((Equipment) pi);
-            case CONTAINER -> {
-                tryToOpenContainer((Container) pi);
-            }
-            default -> {
-                tasks.clear();
-                goTo(pos);
-            }
+            case CREATURE ->
+                    interactWithCreature((Creature) pi);
+            case WEAPON ->
+                    takeItem((Equipment) pi);
+            case CONTAINER ->
+                    tryToOpenContainer((Container) pi);
+            default ->
+                    goTo(pos);
         }
     }
 
     private void goTo(Coords pos) {
         Task goTo = new Task(centerToPos(pos));
+        tasks.clear();
         tasks.push(goTo);
     }
 
