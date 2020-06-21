@@ -8,6 +8,7 @@ import java.io.ObjectOutput;
 import java.util.List;
 
 public class Landscape extends PosItem<Landscape> {
+    private static final long serialVersionUID = 1L;
 
     public Landscape() {}
 

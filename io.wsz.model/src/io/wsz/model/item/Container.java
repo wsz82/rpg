@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Container extends Equipment<Container> implements Containable {
+    private static final long serialVersionUID = 1L;
+
     private final List<Equipment> items = new ArrayList<>(0);
-    private int filledSpace;
+    private Double nettoWeight;
+    private Integer nettoSize;
 
     public Container() {}
 
@@ -23,11 +26,9 @@ public class Container extends Equipment<Container> implements Containable {
 
     public boolean add(Equipment e) {
         double size = e.getSize();
-        if (filledSpace + size > getSize()) {
+        if (getFilledSpace() + size > getSize() - getNettoSize()) {
             return false;
         }
-        setWeight(getWeight() + e.getWeight());
-        filledSpace += size;
         items.add(e);
         return true;
     }
@@ -35,18 +36,62 @@ public class Container extends Equipment<Container> implements Containable {
     public void remove(Equipment e) {
         items.remove(e);
         setWeight(getWeight() - e.getWeight());
-        filledSpace -= e.getSize();
-    }
-
-    public void moveItem(Equipment e, Container i) {
-        if (i.add(e)) {
-            this.remove(e);
-        }
     }
 
     public void open(Creature cr) {
         Controller.get().setCreatureToOpenContainer(cr);
         Controller.get().setContainerToOpen(this);
+    }
+
+    public int getFilledSpace() {
+        return getItems().stream()
+                .mapToInt(Equipment::getSize)
+                .sum();
+    }
+
+    public Double getIndividualNettoWeight() {
+        return nettoWeight;
+    }
+
+    public Double getNettoWeight() {
+        if (nettoWeight == null) {
+            if (prototype == null) {
+                return 0.0;
+            }
+            return prototype.nettoWeight;
+        } else {
+            return nettoWeight;
+        }
+    }
+
+    public void setNettoWeight(Double nettoWeight) {
+        this.nettoWeight = nettoWeight;
+    }
+
+    public Integer getIndividualNettoSize() {
+        return nettoSize;
+    }
+
+    public Integer getNettoSize() {
+        if (nettoSize == null) {
+            if (prototype == null) {
+                return 0;
+            }
+            return prototype.nettoSize;
+        } else {
+            return nettoSize;
+        }
+    }
+
+    public void setNettoSize(Integer nettoSize) {
+        this.nettoSize = nettoSize;
+    }
+
+    @Override
+    public Double getWeight() {
+        return getNettoWeight() + getItems().stream()
+                .mapToDouble(Equipment::getWeight)
+                .sum();
     }
 
     @Override
@@ -60,7 +105,9 @@ public class Container extends Equipment<Container> implements Containable {
 
         out.writeObject(items);
 
-        out.writeInt(filledSpace);
+        out.writeObject(nettoWeight);
+
+        out.writeObject(nettoSize);
     }
 
     @Override
@@ -69,6 +116,8 @@ public class Container extends Equipment<Container> implements Containable {
 
         items.addAll((List<Equipment>) in.readObject());
 
-        filledSpace = in.readInt();
+        nettoWeight = (Double) in.readObject();
+
+        nettoSize = (Integer) in.readObject();
     }
 }

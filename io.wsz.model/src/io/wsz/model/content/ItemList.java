@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemList implements LevelValueListener, VisibleValueListener, Externalizable {
+    private static final long serialVersionUID = 1L;
+
     private final ObservableList<PosItem> contents;
 
     public ItemList() {

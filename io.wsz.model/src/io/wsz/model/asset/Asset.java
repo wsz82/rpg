@@ -13,6 +13,8 @@ import java.net.MalformedURLException;
 import java.util.NoSuchElementException;
 
 public abstract class Asset implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
     private static final String ASSETS_DIR = File.separator + "assets";
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");

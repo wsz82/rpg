@@ -9,6 +9,8 @@ import java.io.ObjectOutput;
 import java.util.Objects;
 
 public class Layer implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
     private final IntegerProperty level = new SimpleIntegerProperty(this, "level");
     private final StringProperty name = new SimpleStringProperty(this, "name");
     private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");

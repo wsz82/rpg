@@ -9,6 +9,7 @@ import java.io.ObjectOutput;
 import java.util.List;
 
 public class Cover extends PosItem<Cover> implements Externalizable {
+    private static final long serialVersionUID = 1L;
 
     public Cover() {}
 

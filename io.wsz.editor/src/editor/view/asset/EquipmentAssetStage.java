@@ -8,8 +8,9 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStage<A> {
-    private final DoubleField inputWeight = new DoubleField(0.0, isContent);
-    private final IntegerField inputSize = new IntegerField(0, isContent);
+    protected final DoubleField inputWeight = new DoubleField(0.0, isContent);
+    protected final IntegerField inputSize = new IntegerField(0, isContent);
+    protected HBox weightBox;
 
     public EquipmentAssetStage(Stage parent, A item, boolean isContent) {
         super(parent, item, isContent);
@@ -23,9 +24,9 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
     protected void initWindow() {
         super.initWindow();
 
-        final HBox weightBox = new HBox(10);
-        final Label weigthLabel = new Label("Weight");
-        weightBox.getChildren().addAll(weigthLabel, inputWeight);
+        weightBox = new HBox(10);
+        final Label weightLabel = new Label("Weight");
+        weightBox.getChildren().addAll(weightLabel, inputWeight);
 
         final HBox sizeBox = new HBox(10);
         final Label sizeLabel = new Label("Size");

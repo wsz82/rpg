@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LayersList implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
     private final ObservableList<Layer> layers;
 
     public LayersList() {

@@ -9,6 +9,8 @@ import java.io.ObjectOutput;
 import java.util.List;
 
 public abstract class Equipment<E extends Equipment> extends PosItem<E> implements Equippable {
+    private static final long serialVersionUID = 1L;
+
     protected Double weight;
     protected Integer size;
 

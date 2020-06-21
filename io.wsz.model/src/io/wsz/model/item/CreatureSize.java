@@ -7,6 +7,8 @@ public enum CreatureSize {
     L (0.3*4, 0.2*4),
     XL (0.3*5, 0.2*5);
 
+    private static final long serialVersionUID = 1L;
+
     private final double width;
     private final double height;
 

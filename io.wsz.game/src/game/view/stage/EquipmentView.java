@@ -211,7 +211,7 @@ public class EquipmentView extends AnchorPane {
         Label maxSizeLabel = new Label(String.valueOf(maxSize));
         int sumSize = equipmentToHold.stream()
                 .mapToInt(Equipment::getSize)
-                .reduce(0, Integer::sum);
+                .sum();
         Label sumSizeLabel = new Label(String.valueOf(sumSize));
 
         sizeBox.getChildren().addAll(sumSizeLabel, maxSizeLabel);
@@ -233,7 +233,7 @@ public class EquipmentView extends AnchorPane {
         Label maxWeightLabel = new Label(String.format("%.1f", maxWeight));
         double sumWeight = equipmentToHold.stream()
                 .mapToDouble(Equipment::getWeight)
-                .reduce(0.0, Double::sum);
+                .sum();
         Label sumWeightLabel = new Label(String.format("%.1f", sumWeight));
 
         weightBox.getChildren().addAll(sumWeightLabel, maxWeightLabel);

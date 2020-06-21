@@ -141,6 +141,11 @@ public class ItemsStage<A extends Containable> extends ChildStage {
         });
         countCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         countCol.setEditable(true);
+        countCol.setOnEditCommit(t -> {
+            TableItem ti = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            ti.count = t.getNewValue();
+            table.refresh();
+        });
         table.getColumns().add(countCol);
         return table;
     }

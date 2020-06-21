@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import static io.wsz.model.item.CreatureControl.CONTROL;
 
 public class Teleport extends PosItem<Teleport> {
+    private static final long serialVersionUID = 1L;
+
     private String locationName;
     private Coords exit;
     private Integer exitLevel;

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Location implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
     private final StringProperty name = new SimpleStringProperty(this, "name");
     private final DoubleProperty width = new SimpleDoubleProperty(this, "width");
     private final DoubleProperty height = new SimpleDoubleProperty(this, "height");

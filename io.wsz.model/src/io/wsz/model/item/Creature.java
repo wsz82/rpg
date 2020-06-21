@@ -20,6 +20,8 @@ import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> implements Containable {
+    private static final long serialVersionUID = 1L;
+
     private ArrayDeque<Task> tasks;
     private Inventory inventory;
     private CreatureSize size;

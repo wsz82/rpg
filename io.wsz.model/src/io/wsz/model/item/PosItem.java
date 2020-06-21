@@ -17,6 +17,8 @@ import java.util.Objects;
 import static io.wsz.model.Constants.METER;
 
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
+    private static final long serialVersionUID = 1L;
+
     protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
     protected Coords pos;

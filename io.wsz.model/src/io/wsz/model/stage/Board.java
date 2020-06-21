@@ -28,7 +28,7 @@ public class Board {
         return singleton;
     }
 
-    private Board(){}
+    private Board() {}
 
     public Coords getBoardPos() {
         return boardPos;
@@ -309,7 +309,10 @@ public class Board {
 
     public List<Creature> getCreatures() {
         return Controller.get().getCurrentLocation().getItems().stream()
-                .filter(pi -> pi.getLevel() == Controller.get().getCurrentLayer().getLevel())
+                .filter(pi -> {
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    return pi.getLevel().equals(level);
+                })
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .map(pi -> (Creature) pi)
                 .collect(Collectors.toList());
@@ -360,7 +363,10 @@ public class Board {
         items = items.stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getCollisionPolygons() != null)
-                .filter(pi -> pi.getLevel() == Controller.get().getCurrentLayer().getLevel())
+                .filter(pi -> {
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    return pi.getLevel().equals(level);
+                })
                 .collect(Collectors.toList());
         if (items.isEmpty()) {
             return null;
@@ -434,7 +440,7 @@ public class Board {
         List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
         List<Equipment> equipment = items.stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> pi.getLevel() == cr.getLevel())
+                .filter(pi -> pi.getLevel().equals(cr.getLevel()))
                 .filter(pi -> pi instanceof Equipment)
                 .map(pi -> (Equipment) pi)
                 .collect(Collectors.toList());

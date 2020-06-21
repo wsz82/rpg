@@ -8,6 +8,8 @@ import java.io.ObjectOutput;
 import java.util.List;
 
 public class Weapon extends Equipment<Weapon> {
+    private static final long serialVersionUID = 1L;
+
     protected Double damage;
     protected Double range;
     protected Double speed;

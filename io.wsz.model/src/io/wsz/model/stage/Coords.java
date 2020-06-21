@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Coords implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public double x;
     public double y;
 

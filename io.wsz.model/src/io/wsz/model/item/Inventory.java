@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Inventory implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private List<Equipment> items = new ArrayList<>(1);
     private Creature owner;
-    private int filledSpace;
-    private double actualWeight;
     private Weapon equippedWeapon;
 
     public Inventory() {}
@@ -16,33 +16,19 @@ public class Inventory implements Serializable {
     public Inventory(Creature owner) {
         this.items = new ArrayList<>(1);
         this.owner = owner;
-        this.filledSpace = 0;
-        this.actualWeight = 0;
     }
 
-    public boolean add(Equipment e) {
-        double weight = e.getWeight();
-        double size = e.getSize();
-        if (actualWeight + weight > getMaxWeight()
-                || filledSpace + size > getMaxSize()) {
+    public boolean add(Equipment equipment) {
+        double size = equipment.getSize();
+        if (getFilledSpace() + size > getMaxSize()) {
             return false;
         }
-        actualWeight += weight;
-        filledSpace += size;
-        items.add(e);
+        items.add(equipment);
         return true;
     }
 
     public void remove(Equipment e) {
         items.remove(e);
-        actualWeight -= e.getWeight();
-        filledSpace -= e.getSize();
-    }
-
-    public void moveItem(Equipment e, Inventory i) {
-        if (i.add(e)) {
-            this.remove(e);
-        }
     }
 
     public int getMaxSize() {
@@ -66,10 +52,14 @@ public class Inventory implements Serializable {
     }
 
     public int getFilledSpace() {
-        return filledSpace;
+        return getItems().stream()
+                .mapToInt(Equipment::getSize)
+                .sum();
     }
 
     public double getActualWeight() {
-        return actualWeight;
+        return getItems().stream()
+                .mapToDouble(Equipment::getWeight)
+                .sum();
     }
 }
