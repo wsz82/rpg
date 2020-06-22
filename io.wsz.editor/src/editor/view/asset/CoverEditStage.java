@@ -38,7 +38,6 @@ public class CoverEditStage extends ChildStage {
     public CoverEditStage(Stage parent, Asset item, boolean isContent) {
         super(parent);
         this.item = item;
-        initOwner(parent);
         initWindow(isContent);
     }
 

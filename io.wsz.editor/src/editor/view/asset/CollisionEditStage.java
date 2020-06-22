@@ -39,7 +39,6 @@ public class CollisionEditStage extends ChildStage {
     public CollisionEditStage(Stage parent, Asset asset, boolean isContent) {
         super(parent);
         this.asset = asset;
-        initOwner(parent);
         initWindow(isContent);
     }
 

@@ -2,6 +2,7 @@ package io.wsz.model.item;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
@@ -25,6 +26,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     protected Integer level;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
+    protected Dialog dialog;
 
     public PosItem() {}
 
@@ -113,6 +115,25 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.collisionPolygons = collisionPolygons;
     }
 
+    public Dialog getIndividualDialog() {
+        return dialog;
+    }
+
+    public Dialog getDialog() {
+        if (dialog == null) {
+            if (prototype == null) {
+                return null;
+            }
+            return prototype.dialog;
+        } else {
+            return dialog;
+        }
+    }
+
+    public void setDialog(Dialog dialog) {
+        this.dialog = dialog;
+    }
+
     public A getPrototype() {
         return prototype;
     }
@@ -167,6 +188,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         out.writeObject(coverLine);
 
         out.writeObject(collisionPolygons);
+
+        out.writeObject(dialog);
     }
 
     @Override
@@ -184,5 +207,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         coverLine = (List<Coords>) in.readObject();
 
         collisionPolygons = (List<List<Coords>>) in.readObject();
+
+        dialog = (Dialog) in.readObject();
     }
 }

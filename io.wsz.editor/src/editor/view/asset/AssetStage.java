@@ -3,6 +3,7 @@ package editor.view.asset;
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import javafx.geometry.Insets;
@@ -23,6 +24,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected boolean isContent;
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
+    protected final Button dialogButton = new Button("Dialog");
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -74,6 +76,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         if (item != null) {
             container.getChildren().addAll(coverButton, collisionButton);
+            if (!isContent) {
+                container.getChildren().add(dialogButton);
+            }
         }
 
         containerWithButtons.getChildren().addAll(container, buttons);
@@ -143,8 +148,14 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         });
         coverButton.setOnAction(e -> openCoverEdit());
         collisionButton.setOnAction(e -> openCollisionEdit());
+        dialogButton.setOnAction(e -> openDialogEdit());
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
+    }
+
+    private void openDialogEdit() {
+        Stage dialogEditStage = new DialogEditStage(this, item.getDialog());
+        dialogEditStage.show();
     }
 
     private void openCollisionEdit() {
@@ -195,6 +206,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         String name = nameInput.getText();
         String relativePath = Asset.convertToRelativeFilePath(path, getType());
         item = createNewAsset(name, relativePath);
+        item.setDialog(new Dialog());
         addAssetToList(item);
     }
 
