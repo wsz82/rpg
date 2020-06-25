@@ -138,6 +138,7 @@ public class GameController {
         Sizes.setFontSize(memento.getFontSize());
         Settings.setGameScrollSpeed(memento.getGameScrollSpeed());
         Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
+        Settings.setCenterOnPC(memento.isCenterOnPc());
         return memento;
     }
 
@@ -146,6 +147,7 @@ public class GameController {
         memento.setFontSize(Sizes.getFontSize());
         memento.setGameScrollSpeed(Settings.getGameScrollSpeed());
         memento.setDialogScrollSpeed(Settings.getDialogScrollSpeed());
+        memento.setCenterOnPc(Settings.isCenterOnPC());
         sc.saveMemento(memento);
     }
 

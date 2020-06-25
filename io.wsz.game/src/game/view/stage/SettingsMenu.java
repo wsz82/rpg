@@ -67,11 +67,26 @@ class SettingsMenu extends StackPane {
         dialogScrollSpeed.setMaxWidth(getWidth()/10);
         hookUpDialogScrollSpeedEvents(dialogScrollSpeed);
 
+        final HBox centerOnPcBox = new HBox(5);
+        centerOnPcBox.setAlignment(Pos.CENTER);
+        final Label centerOnPcLabel = new Label("Center on PC");
+        final CheckBox centerOnPcCB = new CheckBox();
+        centerOnPcBox.getChildren().addAll(centerOnPcLabel, centerOnPcCB);
+        centerOnPcCB.setMaxWidth(getWidth()/10);
+        hookUpCenterOnPCEvents(centerOnPcCB);
+
         final Button back = new Button("Back");
         back.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, back);
+        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, back);
         game.getChildren().addAll(settings);
+    }
+
+    private void hookUpCenterOnPCEvents(CheckBox cb) {
+        cb.setSelected(Settings.isCenterOnPC());
+        cb.setOnAction(e -> {
+            Settings.setCenterOnPC(cb.isSelected());
+        });
     }
 
     private void hookUpDialogScrollSpeedEvents(Slider s) {

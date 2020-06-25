@@ -143,6 +143,17 @@ public class GameView extends Canvas {
             controller.setPosToCenter(null);
         }
 
+        if (Settings.isCenterOnPC()) {
+            List<Creature> controlledCreatures = board.getControlledCreatures();
+            if (!controlledCreatures.isEmpty()) {
+                Creature cr = controlledCreatures.get(0);
+                if (cr != null) {
+                    centerScreenOn(cr.posToCenter());
+                    return;
+                }
+            }
+        }
+
         Bounds b = localToScreen(getBoundsInLocal());
         if (b == null) {
             return;
