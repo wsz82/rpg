@@ -15,7 +15,7 @@ import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
     private static final long serialVersionUID = 1L;

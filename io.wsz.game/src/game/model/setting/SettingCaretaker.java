@@ -1,5 +1,7 @@
 package game.model.setting;
 
+import io.wsz.model.sizes.Sizes;
+
 import java.io.*;
 
 public class SettingCaretaker {
@@ -25,7 +27,7 @@ public class SettingCaretaker {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {
-            return new SettingMemento(true);
+            return new SettingMemento(true, Sizes.getFontSize());
         }
         SettingMemento memento = new SettingMemento();
         try (

@@ -4,8 +4,8 @@ import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 
-import static io.wsz.model.Constants.METER;
 import static io.wsz.model.item.ItemType.*;
+import static io.wsz.model.sizes.Sizes.METER;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 
 public class Comparator {

@@ -10,7 +10,7 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class Pointer {
     private final EventHandler<MouseEvent> clickEvent = new EventHandler<>() {

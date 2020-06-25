@@ -5,6 +5,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.dialog.Answer;
 import io.wsz.model.dialog.Question;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -25,11 +26,12 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class DialogView {
     private static final double MAX_HEIGHT = 0.5;
     private static final double TEXT_FIELD_WIDTH = 0.6;
+
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final double offset;
@@ -37,17 +39,19 @@ public class DialogView {
     private final List<DialogItem> dialogs = new ArrayList<>(0);
     private final Controller controller = Controller.get();
     private final Map<Question, VerticalPos> questionsPos = new HashMap<>(0);
+
     private Answer lastAnswer;
     private Question activeQuestion;
     private double fontSize;
-    private double caretPos = 0;
-    private double topY;
+    private double dialogRectangleTop;
     private double textWidth;
-    private double leftX;
-    private double scrollPos = 0;
-    private double dialogHeight = 0;
+    private double dialogTextLeft;
+    private double caretPos;
+    private double scrollPos;
+    private double dialogHeight;
+    private boolean finished;
     private boolean isToRefresh = true;
-    private boolean finished = false;
+
     private final EventHandler<MouseEvent> clickEvent = e -> {
         MouseButton button = e.getButton();
         if (button.equals(MouseButton.PRIMARY)) {
@@ -102,10 +106,10 @@ public class DialogView {
     public void refresh() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
-        fontSize = width/50;
-        topY = height - height * MAX_HEIGHT;
+        fontSize = width / Sizes.getFontSize().getSize();
+        dialogRectangleTop = height - height * MAX_HEIGHT;
         textWidth = TEXT_FIELD_WIDTH * width;
-        leftX = (width - textWidth) / 2;
+        dialogTextLeft = (width - textWidth) / 2;
         caretPos = 0;
 
         updatePos();
@@ -186,7 +190,7 @@ public class DialogView {
                 imgStartY = scrollPos - lastPos;
                 imgCutHeight = height - imgStartY;
             }
-            gc.drawImage(img, 0, imgStartY, width, imgCutHeight, leftX, caretPos + topY, width, imgCutHeight);
+            gc.drawImage(img, 0, imgStartY, width, imgCutHeight, dialogTextLeft, caretPos + dialogRectangleTop, width, imgCutHeight);
             caretPos += imgCutHeight;
         }
 
@@ -234,9 +238,9 @@ public class DialogView {
         if (b == null) {
             return;
         }
-        int left = (int) b.getMinX() + (int) leftX;
-        int top = (int) b.getMinY() + (int) topY;
-        int right = (int) b.getMaxX() - (int) leftX;
+        int left = (int) b.getMinX() + (int) dialogTextLeft;
+        int top = (int) b.getMinY() + (int) dialogRectangleTop;
+        int right = (int) b.getMaxX() - (int) dialogTextLeft;
         int bottom = (int) b.getMaxY();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
@@ -332,7 +336,7 @@ public class DialogView {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
 
-        gc.fillRect(0, topY, width, height*MAX_HEIGHT);
+        gc.fillRect(0, dialogRectangleTop, width, height*MAX_HEIGHT);
     }
 
     private double getScroll() {

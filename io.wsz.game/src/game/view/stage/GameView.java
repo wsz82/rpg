@@ -26,9 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.Constants.METER;
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * METER;
@@ -157,6 +157,11 @@ public class GameView extends Canvas {
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
         int y = p.y;
+
+        if (x >= leftX+OFFSET && x <= rightX-OFFSET
+                && y >= topY+OFFSET && y <= bottomY-OFFSET) {
+            return;
+        }
 
         if (x < leftX+OFFSET && x >= leftX
                 && y > topY + OFFSET && y < bottomY - OFFSET) {

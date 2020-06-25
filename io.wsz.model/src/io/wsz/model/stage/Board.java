@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 import static io.wsz.model.stage.Comparator.Comparison;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 import static io.wsz.model.stage.Comparator.compare;

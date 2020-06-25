@@ -12,7 +12,7 @@ import javafx.application.Platform;
 
 import java.util.List;
 
-import static io.wsz.model.Constants.TURN_DURATION_MILLIS;
+import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
     private final GameController gameController = GameController.get();

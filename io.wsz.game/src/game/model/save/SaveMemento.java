@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class SaveMemento implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private Coords lastPos;
     private List<Location> locations;

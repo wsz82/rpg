@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 class CoordinatesBox extends HBox {
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {

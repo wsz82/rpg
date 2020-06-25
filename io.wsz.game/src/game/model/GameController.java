@@ -18,6 +18,7 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
@@ -132,11 +133,14 @@ public class GameController {
 
     public SettingMemento loadSettings(File programDir) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
-        return sc.loadMemento();
+        SettingMemento memento = sc.loadMemento();
+        Sizes.setFontSize(memento.getFontSize());
+        return memento;
     }
 
     public void saveSettings(File programDir, SettingMemento memento) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
+        memento.setFontSize(Sizes.getFontSize());
         sc.saveMemento(memento);
     }
 

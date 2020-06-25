@@ -24,7 +24,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class EditorCanvas extends Canvas {
     private final Stage stage;

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class CollisionEditStage extends ChildStage {
     private final ObservableList<Polygon> polygons = FXCollections.observableArrayList();

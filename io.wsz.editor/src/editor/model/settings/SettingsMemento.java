@@ -3,6 +3,8 @@ package editor.model.settings;
 import java.io.Serializable;
 
 public class SettingsMemento implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private double stageX;
     private double stageY;
     private double stageWidth;

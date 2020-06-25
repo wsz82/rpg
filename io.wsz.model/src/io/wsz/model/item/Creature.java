@@ -13,10 +13,10 @@ import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.List;
 
-import static io.wsz.model.Constants.METER;
-import static io.wsz.model.Constants.SECOND;
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
+import static io.wsz.model.sizes.Sizes.METER;
+import static io.wsz.model.sizes.Sizes.SECOND;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;

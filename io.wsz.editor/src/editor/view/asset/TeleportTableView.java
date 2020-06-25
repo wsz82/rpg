@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class TeleportTableView extends AssetsTableView<Teleport> {
 

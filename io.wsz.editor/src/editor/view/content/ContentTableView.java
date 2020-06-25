@@ -20,7 +20,7 @@ import javafx.util.converter.DoubleStringConverter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class ContentTableView extends TableView<PosItem> {
     private final EditorCanvas editorCanvas;

@@ -13,7 +13,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.wsz.model.Constants.METER;
+import static io.wsz.model.sizes.Sizes.METER;
 
 public class ContainerTableView extends AssetsTableView<Container> {
 

@@ -1,11 +1,16 @@
 package game.view.stage;
 
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.FontSize;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -44,20 +49,38 @@ class SettingsMenu extends StackPane {
     private void initGraphicsSettings() {
         graphics = new StackPane();
 
-        VBox settings = new VBox(10);
+        final VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
-        CheckBox fullScreen = new CheckBox("Full screen");
+
+        final CheckBox fullScreen = new CheckBox("Full screen");
+        hookUpFullScreenEvents(fullScreen);
+
+        final ChoiceBox<FontSize> fontSizeCB = new ChoiceBox<>();
+        hookUpFontSizeEvents(fontSizeCB);
+
+        Button back = new Button("Back");
+        back.setOnAction(event -> goBackToSettings());
+
+        settings.getChildren().addAll(fullScreen, fontSizeCB, back);
+        graphics.getChildren().addAll(settings);
+    }
+
+    private void hookUpFontSizeEvents(ChoiceBox<FontSize> fontSizeCB) {
+        ObservableList<FontSize> fontSizes = FXCollections.observableArrayList(FontSize.values());
+        fontSizeCB.setItems(fontSizes);
+        fontSizeCB.setValue(Sizes.getFontSize());
+        fontSizeCB.setOnAction(e -> {
+            FontSize value = fontSizeCB.getValue();
+            Sizes.setFontSize(value);
+        });
+    }
+
+    private void hookUpFullScreenEvents(CheckBox fullScreen) {
         fullScreen.setSelected(gameStage.isFullScreen());
         fullScreen.setOnAction(event -> {
             changeFullScreenSetting(fullScreen.isSelected()
             );
         });
-
-        Button back = new Button("Back");
-        back.setOnAction(event -> goBackToSettings());
-
-        settings.getChildren().addAll(fullScreen, back);
-        graphics.getChildren().addAll(settings);
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
