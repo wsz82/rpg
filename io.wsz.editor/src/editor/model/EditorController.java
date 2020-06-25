@@ -22,6 +22,7 @@ import java.util.List;
 
 public class EditorController {
     private static EditorController singleton;
+    private final Controller controller = Controller.get();
     private Coords dragPos;
     private ItemsStage itemsStage;
 
@@ -47,16 +48,17 @@ public class EditorController {
     }
 
     public void initNewPlugin() {
-        Controller.get().getAssetsList().clear();
+        controller.getAssetsList().clear();
         ObservableAssets.get().clearLists();
-        Controller.get().getLocationsList().clear();
+        controller.getLocationsList().clear();
 
         Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
         location.getLayers().get().add(layer);
-        Controller.get().getLocationsList().add(location);
-        Controller.get().getCurrentLocation().setLocation(location);
-        Controller.get().getCurrentLayer().setLayer(layer);
+        controller.getLocationsList().add(location);
+        controller.getCurrentLocation().setLocation(location);
+        controller.getCurrentLayer().setLayer(layer);
+        controller.setActivePlugin(null);
     }
 
     public void saveActivePlugin(PluginSettingsStage pss) {
@@ -68,8 +70,8 @@ public class EditorController {
     }
 
     private void mergeAssetsLists() {
-        Controller.get().getAssetsList().clear();
-        Controller.get().getAssetsList().addAll(ObservableAssets.get().merge());
+        controller.getAssetsList().clear();
+        controller.getAssetsList().addAll(ObservableAssets.get().merge());
     }
 
     public void savePluginAs(String pluginName, PluginSettingsStage pss) {
@@ -99,7 +101,7 @@ public class EditorController {
     public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = pc.load(pluginName);
-        Controller.get().setActivePlugin(p);
+        controller.setActivePlugin(p);
         loadEditorActivePluginToLists();
         pss.setStartingLocation(p.isStartingLocation());
         pss.setStartLocationName(p.getStartLocation());
@@ -112,25 +114,25 @@ public class EditorController {
         if (ActivePlugin.get().getPlugin() == null) {
             return;
         }
-        Controller.get().getAssetsList().clear();
+        controller.getAssetsList().clear();
         ObservableAssets.get().clearLists();
-        Controller.get().getLocationsList().clear();
+        controller.getLocationsList().clear();
 
         Plugin p = ActivePlugin.get().getPlugin();
 
         boolean listAreLoaded = loadLists(p);
         if (listAreLoaded) {
             Location first = p.getLocations().get(0);
-            Controller.get().getCurrentLocation().setLocation(first);
-            Controller.get().getCurrentLayer().setLayer(first.getLayers().get().get(0));
+            controller.getCurrentLocation().setLocation(first);
+            controller.getCurrentLayer().setLayer(first.getLayers().get().get(0));
         }
     }
 
     private boolean loadLists(Plugin p) {
-        List<Asset> assets = Controller.get().getAssetsList();
+        List<Asset> assets = controller.getAssetsList();
         assets.addAll(p.getAssets());
         ObservableAssets.get().fillLists(assets);
-        Controller.get().getLocationsList().setAll(p.getLocations());
+        controller.getLocationsList().setAll(p.getLocations());
         return true;
     }
 
