@@ -26,6 +26,8 @@ public class Controller {
     private Coords posToCenter;
     private Creature creatureToOpenContainer;
     private Container containerToOpen;
+    private PosItem asking;
+    private PosItem answering;
 
     public static Controller get() {
         if (singleton == null) {
@@ -131,5 +133,21 @@ public class Controller {
 
     public Container getContainerToOpen() {
         return containerToOpen;
+    }
+
+    public PosItem getAsking() {
+        return asking;
+    }
+
+    public void setAsking(PosItem asking) {
+        this.asking = asking;
+    }
+
+    public PosItem getAnswering() {
+        return answering;
+    }
+
+    public void setAnswering(PosItem answering) {
+        this.answering = answering;
     }
 }

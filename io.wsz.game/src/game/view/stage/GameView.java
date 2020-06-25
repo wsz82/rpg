@@ -16,7 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,27 +27,49 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.wsz.model.Constants.METER;
+import static io.wsz.model.item.CreatureControl.CONTROL;
+import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 
 public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * METER;
     private static final double SCROLL = 0.2;
-    private final Board board = Controller.get().getBoard();
-    private final Coords currentPos = Controller.get().getBoardPos();
-    private final EventHandler<KeyEvent> inventoryEvent = e -> {
-        if (e.getCode().equals(KeyCode.I)) {
-            e.consume();
-            openInventory();
-        }
-    };
+    private final Stage parent;
+    private final Controller controller = Controller.get();
+    private final Board board = controller.getBoard();
+    private final Coords currentPos = controller.getBoardPos();
+    private final GameController gameController = GameController.get();
     private List<Layer> layers;
+    private EventHandler<MouseEvent> clickEvent;
+    private EventHandler<KeyEvent> keyboardEvent;
+    private DialogView dialogView;
+    private boolean dialogStarted = true;
 
-    public GameView() {
-        hookupEvents();
+    public GameView(Stage parent) {
+        this.parent = parent;
+        defineEvents();
+        hookUpRemovableEvents();
     }
 
     public void refresh() {
+        if (parent.isIconified()) {
+            return;
+        }
+        if (gameController.isDialog()) {
+            if (dialogStarted) {
+                dialogStarted = false;
+                removeEvents();
+                dialogView = new DialogView(this, OFFSET, SCROLL);
+            }
+            dialogView.refresh();
+            return;
+        }
+        if (!dialogStarted) {
+            dialogStarted = true;
+            hookUpRemovableEvents();
+        }
         setSize();
         updatePos();
+
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
@@ -54,7 +78,7 @@ public class GameView extends Canvas {
         double topY = currentPos.y;
         double bottomY = topY + getHeight()/METER;
 
-        List<PosItem> items = Controller.get().getCurrentLocation().getItems();
+        List<PosItem> items = controller.getCurrentLocation().getItems();
         Board.get().sortItems(items);
         items = items.stream()
                 .filter(PosItem::getVisible)
@@ -69,7 +93,7 @@ public class GameView extends Canvas {
                             leftX, topY, rightX, bottomY,
                             piLeftX, piTopY, piRightX, piBottomY);
                 })
-                .filter(pi -> pi.getLevel() <= Controller.get().getCurrentLayer().getLevel())    //TODO
+                .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toList());
         for (PosItem pi : items) {
             final ItemType type = pi.getType();
@@ -113,11 +137,10 @@ public class GameView extends Canvas {
     }
 
     private void updatePos() {
-
-        Coords posToCenter = Controller.get().getPosToCenter();
+        Coords posToCenter = controller.getPosToCenter();
         if (posToCenter != null) {
             centerScreenOn(posToCenter);
-            Controller.get().setPosToCenter(null);
+            controller.setPosToCenter(null);
         }
 
         Bounds b = localToScreen(getBoundsInLocal());
@@ -128,8 +151,8 @@ public class GameView extends Canvas {
         int topY = (int) b.getMinY();
         int rightX = (int) b.getMaxX();
         int bottomY = (int) b.getMaxY();
-        double locWidth = Controller.get().getCurrentLocation().getWidth();
-        double locHeight = Controller.get().getCurrentLocation().getHeight();
+        double locWidth = controller.getCurrentLocation().getWidth();
+        double locHeight = controller.getCurrentLocation().getHeight();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
@@ -174,12 +197,12 @@ public class GameView extends Canvas {
     }
 
     private void scrollDown(double locHeight) {
-        double newY = currentPos.y = currentPos.y + SCROLL;
+        double newY = currentPos.y + SCROLL;
         currentPos.y = Math.min(newY, locHeight - getHeight()/METER);
     }
 
     private void scrollUp() {
-        double newY = currentPos.y = currentPos.y - SCROLL;
+        double newY = currentPos.y - SCROLL;
         currentPos.y = Math.max(newY, 0);
     }
 
@@ -213,43 +236,48 @@ public class GameView extends Canvas {
                 size.getWidth() * METER, size.getHeight() * METER);
     }
 
-    private void hookupEvents() {
+    private void defineEvents() {
         setFocusTraversable(true);
-        setOnMouseClicked(e -> {
-            if (e.getButton().equals(MouseButton.PRIMARY)) {
+        clickEvent = e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
                 Coords pos = new Coords(e.getX() / METER, e.getY() / METER);
                 Coords translated = pos.add(currentPos);
-                Coords[] poss = new Coords[] {translated};
-                ItemType[] types = new ItemType[] {ItemType.CREATURE};
-                PosItem pi = Controller.get().getBoard().lookForContent(poss, types, true);
+                Coords[] poss = new Coords[]{translated};
+                ItemType[] types = new ItemType[]{ItemType.CREATURE};
+                PosItem pi = controller.getBoard().lookForContent(poss, types, true);
                 if (pi != null) {
                     ItemType type = pi.getType();
-                    switch (type) {
-                        case CREATURE -> ((Creature) pi).interact();
+                    boolean success = switch (type) {
+                        case CREATURE -> interact((Creature) pi);
+                        default -> false;
+                    };
+                    if (!success) {
+                        commandControllable(translated);
                     }
                 } else {
                     commandControllable(translated);
                 }
-            } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                board.getControlledCreatures()
-                        .forEach(Creature::loseControl);
+            } else if (button.equals(MouseButton.SECONDARY)) {
+                e.consume();
+                looseAllControl();
             }
-        });
-
-        CurrentLocation.get().locationProperty().addListener(observable -> {
-            layers = getSortedLayers();
-        });
-
-        addEventHandler(KeyEvent.KEY_RELEASED, inventoryEvent);
-
-        addEventHandler(KeyEvent.KEY_RELEASED, e -> {
+        };
+        keyboardEvent = e -> {
             KeyCode key = e.getCode();
             switch (key) {
-                case SPACE -> handlePause();
+                case I -> {
+                    e.consume();
+                    openInventory();
+                }
+                case SPACE -> {
+                    e.consume();
+                    handlePause();
+                }
                 case PAGE_UP -> {
                     e.consume();
-                    Layer layer = Controller.get().getCurrentLayer().getLayer();
+                    Layer layer = controller.getCurrentLayer().getLayer();
                     Layer next = layer;
                     for (int i = 0; i < layers.size() - 1; i++) {
                         Layer current = layers.get(i);
@@ -257,11 +285,11 @@ public class GameView extends Canvas {
                             next = layers.get(i + 1);
                         }
                     }
-                    Controller.get().getCurrentLayer().setLayer(next);
+                    controller.getCurrentLayer().setLayer(next);
                 }
                 case PAGE_DOWN -> {
                     e.consume();
-                    Layer layer = Controller.get().getCurrentLayer().getLayer();
+                    Layer layer = controller.getCurrentLayer().getLayer();
                     Layer prev = layer;
                     for (int i = 1; i < layers.size(); i++) {
                         Layer current = layers.get(i);
@@ -269,15 +297,47 @@ public class GameView extends Canvas {
                             prev = layers.get(i - 1);
                         }
                     }
-                    Controller.get().getCurrentLayer().setLayer(prev);
+                    controller.getCurrentLayer().setLayer(prev);
                 }
             }
+        };
+
+        CurrentLocation.get().locationProperty().addListener(observable -> {
+            layers = getSortedLayers();
         });
     }
 
+    private void hookUpRemovableEvents() {
+        addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
+    }
+
+    private void removeEvents() {
+        removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
+    }
+
+    private boolean interact(Creature cr) {
+        CreatureControl control = cr.getControl();
+        if (control == CONTROL) {
+            cr.setControl(CONTROLLABLE);
+            return true;
+        } else if (control == CONTROLLABLE) {
+            looseAllControl();
+            cr.setControl(CONTROL);
+            return true;
+        }
+        return false;
+    }
+
+    private void looseAllControl() {
+        board.getControlledCreatures()
+                .forEach(Creature::loseControl);
+    }
+
     private void handlePause() {
-        boolean isGame = GameController.get().isGame();
-        GameController.get().setGame(!isGame);
+        boolean isGame = gameController.isGame();
+        gameController.setGame(!isGame);
     }
 
     private void openInventory() {
@@ -286,7 +346,7 @@ public class GameView extends Canvas {
             return;
         }
         Creature active = controlled.get(0);
-        GameController.get().openInventory(active, null);
+        gameController.openInventory(active, null);
     }
 
     private void centerScreenOn(Coords posToCenter) {
@@ -294,8 +354,8 @@ public class GameView extends Canvas {
         double canvasHeight = getHeight()/METER;
         double x = posToCenter.x - canvasWidth/2;
         double y = posToCenter.y - canvasHeight/2;
-        double locWidth = Controller.get().getCurrentLocation().getWidth();
-        double locHeight = Controller.get().getCurrentLocation().getHeight();
+        double locWidth = controller.getCurrentLocation().getWidth();
+        double locHeight = controller.getCurrentLocation().getHeight();
         if (x > locWidth - canvasWidth) {
             currentPos.x = locWidth - canvasWidth;
         } else {
@@ -306,7 +366,7 @@ public class GameView extends Canvas {
         } else {
             currentPos.y = Math.max(y, 0);
         }
-        Controller.get().setPosToCenter(null);
+        controller.setPosToCenter(null);
     }
 
     private void commandControllable(Coords pos) {
@@ -319,8 +379,8 @@ public class GameView extends Canvas {
         if (scene == null) {
             return;
         }
-        double locWidth = Controller.get().getCurrentLocation().getWidth() * METER;
-        double locHeight = Controller.get().getCurrentLocation().getHeight() * METER;
+        double locWidth = controller.getCurrentLocation().getWidth() * METER;
+        double locHeight = controller.getCurrentLocation().getHeight() * METER;
         double maxWidth = getScene().getWidth();
         double maxHeight = getScene().getHeight();
         if (locWidth >= maxWidth) {
@@ -339,11 +399,11 @@ public class GameView extends Canvas {
 
     private void clear(GraphicsContext gc) {
         gc.setFill(Color.LIGHTGREY);
-        gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        gc.fillRect(0, 0, getWidth(), getHeight());
     }
 
     private List<Layer> getSortedLayers() {
-        List<Layer> layers = new ArrayList<>(Controller.get().getCurrentLocation().getLayers());
+        List<Layer> layers = new ArrayList<>(controller.getCurrentLocation().getLayers());
         return layers.stream()
                 .distinct()
                 .sorted(Comparator.comparingInt(Layer::getLevel))

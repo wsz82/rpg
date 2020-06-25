@@ -60,6 +60,7 @@ public class GameRunner {
                         removeItems(l);
                     }
                     updateLocation();
+                    tryToStartDialog();
                 }
 
                 try {
@@ -78,6 +79,18 @@ public class GameRunner {
         });
         gameThread.setDaemon(true);
         gameThread.start();
+    }
+
+    private void tryToStartDialog() {
+        PosItem asking = controller.getAsking();
+        if (asking == null) {
+            return;
+        }
+        PosItem answering = controller.getAnswering();
+        if (answering == null) {
+            return;
+        }
+        gameController.setDialog(true);
     }
 
     private void tryToOpenInventory() {

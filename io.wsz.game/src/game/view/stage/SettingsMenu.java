@@ -2,27 +2,19 @@ package game.view.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 class SettingsMenu extends StackPane {
-    private final EventHandler<KeyEvent> settingsReturn = event -> {
-        event.consume();
-        if (event.getCode() == KeyCode.ESCAPE) {
-            goBackToSettings();
-        }
-    };
+    private StackPane graphics;
+    private Node parentToReturn;
+    private BorderPane root;
     private final GameStage gameStage;
-    private Scene scene;
-    private EventHandler<KeyEvent> menuReturn;
-    private StackPane graphicsRoot;
 
     public SettingsMenu(GameStage gameStage){
         this.gameStage = gameStage;
@@ -39,21 +31,18 @@ class SettingsMenu extends StackPane {
     }
 
     private void goBackToMenu() {
-        menuReturn.handle(new KeyEvent(this, null, KeyEvent.KEY_RELEASED, "", "", KeyCode.ESCAPE,
-                false, false, false, false));
+        root.setCenter(parentToReturn);
     }
 
     private void openGraphicsSettings() {
-        gameStage.removeEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
-        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
-        if (graphicsRoot == null) {
+        if (graphics == null) {
             initGraphicsSettings();
         }
-        scene.setRoot(graphicsRoot);
+        root.setCenter(graphics);
     }
 
     private void initGraphicsSettings() {
-        graphicsRoot = new StackPane();
+        graphics = new StackPane();
 
         VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
@@ -68,7 +57,7 @@ class SettingsMenu extends StackPane {
         back.setOnAction(event -> goBackToSettings());
 
         settings.getChildren().addAll(fullScreen, back);
-        graphicsRoot.getChildren().addAll(settings);
+        graphics.getChildren().addAll(settings);
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
@@ -78,16 +67,12 @@ class SettingsMenu extends StackPane {
         current.y = 0;
     }
 
-    void goBackToSettings(){
-        gameStage.removeEventHandler(KeyEvent.KEY_RELEASED, settingsReturn);
-        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
-        scene.setRoot(this);
+    private void goBackToSettings(){
+        root.setCenter(this);
     }
 
-    void open(Scene scene, EventHandler<KeyEvent> menuReturn){
-        gameStage.addEventHandler(KeyEvent.KEY_RELEASED, menuReturn);
-        this.scene = scene;
-        this.menuReturn = menuReturn;
-        scene.setRoot(this);
+    void open(BorderPane root, Node parentToReturn){
+        this.root = root;
+        this.parentToReturn = parentToReturn;
     }
 }

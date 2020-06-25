@@ -40,27 +40,25 @@ public class DialogEditStage extends ChildStage {
     private HBox answerBox;
     private HBox startAnswerBox;
     private TextArea questionText;
-    private final ChangeListener<Number> questionTableIndexListener = (observable, oldValue, newValue) -> {
+    private final ChangeListener<QuestionItem> questionTableItemListener = (observable, oldValue, newValue) -> {
         if (questionsTableView.getItems().size() < 1) {
             disableQuestionDetails();
             return;
         }
-        int oldInt = oldValue.intValue();
-        if (oldInt != -1) {
-            QuestionItem qi = questionsTableView.getItems().get(oldInt);
-            saveQuestionItem(qi);
+        if (oldValue != null) {
+            saveQuestionItem(oldValue);
         }
-        int newInt = newValue.intValue();
-        if (newInt != -1) {
-            QuestionItem newQuestion = questionsTableView.getItems().get(newInt);
-            questionDetails.setDisable(false);
-            questionText.setText(newQuestion.question.getText());
-            answerCB.setValue(newQuestion.question.getAnswer());
-            finishCB.setSelected(newQuestion.question.isFinish());
+        if (newValue != null) {
+            questionDetails.setVisible(true);
+            Question q = newValue.question;
+            questionText.setText(q.getText());
+            answerCB.setValue(q.getAnswer());
+            finishCB.setSelected(q.isFinish());
         } else {
             disableQuestionDetails();
         }
     };
+    private VBox center;
 
     public DialogEditStage(Stage parent, Dialog dialog) {
         super(parent);
@@ -82,22 +80,24 @@ public class DialogEditStage extends ChildStage {
         final Label startAnswerLabel = new Label("Start answer");
         startAnswerBox.setAlignment(Pos.CENTER);
         startAnswerCB = new ChoiceBox<>(answersList);
+        startAnswerCB.setMaxWidth(100);
         startAnswerCB.setValue(dialog.getStartAnswer());
         startAnswerBox.getChildren().addAll(startAnswerLabel, startAnswerCB);
 
         left.getChildren().addAll(answersListView, startAnswerBox);
         root.setLeft(left);
 
-        final VBox center = new VBox(10);
+        center = new VBox(10);
         center.setPrefWidth(800);
         root.setCenter(center);
         answerText = new TextArea();
         questionsTableView = new TableView<>();
 
         questionDetails = new VBox(5);
-        questionDetails.setDisable(true);
+        questionDetails.setVisible(false);
         questionText = new TextArea();
         answerCB = new ChoiceBox<>(answersList);
+        answerCB.setMaxWidth(100);
         answerBox = new HBox(5);
         final Label answerLabel = new Label("Answer");
         answerBox.getChildren().addAll(answerLabel, answerCB);
@@ -119,6 +119,7 @@ public class DialogEditStage extends ChildStage {
     }
 
     private void initAnswerListView() {
+        answersListView.setMaxWidth(200);
         setUpAnswersListContextMenu();
         hookUpAnswersListEvents();
     }
@@ -135,7 +136,7 @@ public class DialogEditStage extends ChildStage {
 
     private void hookUpQuestionDetailsEvents() {
         answerCB.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (questionDetails.isDisabled()) {
+            if (!questionDetails.isVisible()) {
                 return;
             }
             QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
@@ -146,7 +147,7 @@ public class DialogEditStage extends ChildStage {
             questionsTableView.refresh();
         });
         finishCB.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (questionDetails.isDisabled()) {
+            if (!questionDetails.isVisible()) {
                 return;
             }
             QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
@@ -227,16 +228,16 @@ public class DialogEditStage extends ChildStage {
         addQuestionTableIndexListener();
     }
 
-    private void removeQuestionTableIndexListener() {
-        questionsTableView.getSelectionModel().selectedIndexProperty().removeListener(questionTableIndexListener);
+    private void addQuestionTableIndexListener() {
+        questionsTableView.getSelectionModel().selectedItemProperty().addListener(questionTableItemListener);
     }
 
-    private void addQuestionTableIndexListener() {
-        questionsTableView.getSelectionModel().selectedIndexProperty().addListener(questionTableIndexListener);
+    private void removeQuestionTableIndexListener() {
+        questionsTableView.getSelectionModel().selectedItemProperty().removeListener(questionTableItemListener);
     }
 
     private void disableQuestionDetails() {
-        questionDetails.setDisable(true);
+        questionDetails.setVisible(false);
         questionText.setText(null);
         answerCB.setValue(null);
         finishCB.setSelected(false);
@@ -250,25 +251,25 @@ public class DialogEditStage extends ChildStage {
     }
 
     private void hookUpAnswersListEvents() {
-        answersListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+        answersListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             removeQuestionTableIndexListener();
 
-            int oldIndex = oldValue.intValue();
-            if (oldIndex != -1) {
+            if (oldValue != null) {
                 QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
                 if (qi != null) {
                     saveQuestionItem(qi);
                 }
 
-                Answer oldAnswer = answersList.get(oldIndex);
-                saveAnswer(oldAnswer);
+                saveAnswer(oldValue);
                 refreshAnswerChoiceBox();
                 refreshStartAnswerChoiceBox();
             }
-            int newIndex = newValue.intValue();
-            if (newIndex != -1) {
-                Answer newAnswer = answersList.get(newIndex);
-                refreshCenter(newAnswer);
+
+            if (newValue != null) {
+                refreshCenter(newValue);
+                center.setVisible(true);
+            } else {
+                center.setVisible(false);
             }
 
             addQuestionTableIndexListener();
@@ -278,6 +279,7 @@ public class DialogEditStage extends ChildStage {
     private void refreshAnswerChoiceBox() {
         answerBox.getChildren().remove(answerCB);
         answerCB = new ChoiceBox<>(answersList);
+        answerCB.setMaxWidth(100);
         answerBox.getChildren().add(answerCB);
         hookUpQuestionDetailsEvents();
     }
@@ -286,6 +288,7 @@ public class DialogEditStage extends ChildStage {
         Answer temp = startAnswerCB.getValue();
         startAnswerBox.getChildren().remove(startAnswerCB);
         startAnswerCB = new ChoiceBox<>(answersList);
+        startAnswerCB.setMaxWidth(100);
         startAnswerBox.getChildren().add(startAnswerCB);
         startAnswerCB.setValue(temp);
     }

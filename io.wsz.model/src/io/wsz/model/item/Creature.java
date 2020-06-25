@@ -15,8 +15,7 @@ import java.util.List;
 
 import static io.wsz.model.Constants.METER;
 import static io.wsz.model.Constants.SECOND;
-import static io.wsz.model.item.CreatureControl.CONTROL;
-import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
 
 public class Creature extends PosItem<Creature> implements Containable {
@@ -119,20 +118,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         return new Coords[] {N, NW, W, SW, S, SE, E, NE};
     }
 
-    public void interact() {
-        if (getControl() == CONTROL) {
-            setControl(CONTROLLABLE);
-        } else if (getControl() == CONTROLLABLE) {
-            looseAllControl();
-            setControl(CONTROL);
-        }
-    }
-
-    private void looseAllControl() {
-        Controller.get().getBoard().getControlledCreatures()
-                .forEach(Creature::loseControl);
-    }
-
     public void loseControl() {
         setControl(CONTROLLABLE);
     }
@@ -145,37 +130,66 @@ public class Creature extends PosItem<Creature> implements Containable {
             return;
         }
         ItemType type = pi.getType();
+
         switch (type) {
             case CREATURE ->
-                    interactWithCreature((Creature) pi);
+                    resolveInteractionWithCreature((Creature) pi);
             case WEAPON ->
                     takeItem((Equipment) pi);
             case CONTAINER ->
-                    tryToOpenContainer((Container) pi);
+                    openContainer((Container) pi);
             default ->
                     goTo(pos);
         }
     }
 
+    private void resolveInteractionWithCreature(Creature cr) {
+        CreatureControl control = cr.getControl();
+        if (control.equals(CONTROLLABLE)) {
+            cr.setControl(CONTROL);
+            this.setControl(CONTROLLABLE);
+        } else if (control.equals(NEUTRAL)) {
+            startConversation(cr);
+        }
+    }
+
     private void goTo(Coords pos) {
-        Task goTo = new Task(centerToPos(pos));
+        Task task = new Task(centerToPos(pos));
         tasks.clear();
-        tasks.push(goTo);
+        tasks.push(task);
     }
 
     private void takeItem(Equipment e) {
-        Task takeItem = new Task(e);
+        Task task = new Task(e);
         tasks.clear();
-        tasks.push(takeItem);
+        tasks.push(task);
     }
 
-    private void tryToOpenContainer(Container c) {
+    private void openContainer(Container c) {
         Task task = new Task(c);
         tasks.clear();
         tasks.push(task);
     }
 
-    private boolean withinRange(Equipment e) {
+    private void startConversation(Creature cr) {
+        Task task = new Task(cr);
+        tasks.clear();
+        tasks.push(task);
+    }
+
+    private boolean creatureWithinRange(Creature cr) {
+        Coords ePos = cr.posToCenter();
+        Coords[] poss = getCorners();
+        for (Coords corner : poss) {
+            double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
+            if (dist <= getRange()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean withinRange(PosItem e) {
         Coords ePos = e.getCenter();
         Coords[] poss = getCorners();
         for (Coords corner : poss) {
@@ -190,13 +204,6 @@ public class Creature extends PosItem<Creature> implements Containable {
     public List<Equipment> getEquipmentWithinRange() {
         Coords[] poss = getCorners();
         return Controller.get().getBoard().getEquipmentWithinRange(poss, this);
-    }
-
-    private void interactWithCreature(Creature cr) {
-        if (cr.getControl().equals(CONTROLLABLE)) {
-            cr.setControl(CONTROL);
-            this.setControl(CONTROLLABLE);
-        }
     }
 
     private double getDistance(double x1, double x2, double y1, double y2) {
@@ -404,7 +411,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public class Task implements Serializable {
-        private Equipment equipment;
+        private PosItem item;
         private Coords dest;
         private boolean finished;
 
@@ -414,14 +421,18 @@ public class Creature extends PosItem<Creature> implements Containable {
             this.dest = dest;
         }
 
-        public Task(Equipment equipment) {
-            this.equipment = equipment;
-            this.dest = centerToPos(equipment.getPos());
+        public Task(PosItem item) {
+            this.item = item;
+            if (item instanceof Creature) {
+                this.dest = centerToPos(((Creature) item).posToCenter());
+            } else {
+                this.dest = centerToPos(item.getPos());
+            }
         }
 
         public Task clone() {
             Task task = new Task();
-            task.equipment = this.equipment;
+            task.item = this.item;
             task.dest = this.dest;
             return task;
         }
@@ -429,15 +440,29 @@ public class Creature extends PosItem<Creature> implements Containable {
         private void doTask() {
             if (dest != null) {
                 move();
-                if (equipment != null) {
-                    interactWithItem();
+                if (item != null) {
+                    if (item instanceof Equipment) {
+                        interactWithEquipment((Equipment) item);
+                    } else
+                    if (item instanceof Creature) {
+                        interactWithCreature((Creature) item);
+                    }
                 }
                 return;
             }
             finished = true;
         }
 
-        private void interactWithItem() {
+        private void interactWithCreature(Creature cr) {
+            if (creatureWithinRange(cr)) {
+                Controller.get().setAsking(Creature.this);
+                Controller.get().setAnswering(cr);
+                item = null;
+                dest = null;
+            }
+        }
+
+        private void interactWithEquipment(Equipment equipment) {
             if (withinRange(equipment)) {
                 if (equipment instanceof Container) {
                     ((Container) equipment).open(Creature.this);
@@ -447,7 +472,7 @@ public class Creature extends PosItem<Creature> implements Containable {
                         equipment.onTake(Creature.this);
                     }
                 }
-                equipment = null;
+                item = null;
                 dest = null;
             }
         }

@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EquipmentView extends AnchorPane {
+public class EquipmentView extends Pane {
     private static final double MAX_WIDTH = 40;
     private final List<Equipment> equipmentToHold = new ArrayList<>(0);
     private final List<Equipment> equipmentToDrop = new ArrayList<>(0);
@@ -131,13 +131,11 @@ public class EquipmentView extends AnchorPane {
         if (container != null) {
             final ImageView iv = new ImageView(container.getImage());
             iv.setPreserveRatio(true);
-            iv.setFitWidth(2*unit);
-            iv.setFitHeight(2*unit);
+            iv.setFitWidth(unit);
+            iv.setFitHeight(unit);
 
-            setLeftAnchor(iv, 0.8 * getWidth());
-            setTopAnchor(iv, 0.1 * getHeight());
-            setRightAnchor(iv, 0.1 * getWidth());
-            setBottomAnchor(iv, 0.7 * getHeight());
+            iv.setX(0.8 * getWidth());
+            iv.setY(0.1 * getHeight());
 
             getChildren().add(iv);
         }
@@ -150,10 +148,8 @@ public class EquipmentView extends AnchorPane {
         iv.setFitHeight(unit);
         equippedWeaponPane.setBackground(new Background(new BackgroundFill(Color.BROWN, null, null)));
 
-        setLeftAnchor(equippedWeaponPane, 0.4 * getWidth());
-        setTopAnchor(equippedWeaponPane, 0.4 * getHeight());
-        setRightAnchor(equippedWeaponPane, 0.5 * getWidth());
-        setBottomAnchor(equippedWeaponPane, 0.5 * getHeight());
+        equippedWeaponPane.setLayoutX(0.4 * getWidth());
+        equippedWeaponPane.setLayoutY(0.4 * getHeight());
 
         getChildren().add(equippedWeaponPane);
 
@@ -218,10 +214,8 @@ public class EquipmentView extends AnchorPane {
 
         sizeBox.setPrefSize(unit, 2*unit);
 
-        setLeftAnchor(sizeBox, 0.1 * getWidth());
-        setTopAnchor(sizeBox, 0.7 * getHeight());
-        setRightAnchor(sizeBox, 0.8 * getWidth());
-        setBottomAnchor(sizeBox, 0.1 * getHeight());
+        sizeBox.setLayoutX(0.1 * getWidth());
+        sizeBox.setLayoutY(0.7 * getHeight());
 
         getChildren().add(sizeBox);
     }
@@ -240,10 +234,8 @@ public class EquipmentView extends AnchorPane {
 
         weightBox.setPrefSize(unit, 2*unit);
 
-        setLeftAnchor(weightBox, 0.2 * getWidth());
-        setTopAnchor(weightBox, 0.7 * getHeight());
-        setRightAnchor(weightBox, 0.7 * getWidth());
-        setBottomAnchor(weightBox, 0.1 * getHeight());
+        weightBox.setLayoutX(0.2 * getWidth());
+        weightBox.setLayoutY(0.7 * getHeight());
 
         getChildren().add(weightBox);
     }
@@ -260,10 +252,8 @@ public class EquipmentView extends AnchorPane {
 
         holdSP.setContent(holdGP);
 
-        setLeftAnchor(holdSP, 0.3 * getWidth());
-        setTopAnchor(holdSP, 0.7 * getHeight());
-        setRightAnchor(holdSP, 0.3 * getWidth());
-        setBottomAnchor(holdSP, 0.1 * getHeight());
+        holdSP.setLayoutX(0.3 * getWidth());
+        holdSP.setLayoutY(0.7 * getHeight());
 
         getChildren().add(holdSP);
 
@@ -307,10 +297,8 @@ public class EquipmentView extends AnchorPane {
 
         dropSP.setContent(dropGP);
 
-        setLeftAnchor(dropSP, 0.8 * getWidth());
-        setTopAnchor(dropSP, 0.3 * getHeight());
-        setRightAnchor(dropSP, 0.1 * getWidth());
-        setBottomAnchor(dropSP, 0.4 * getHeight());
+        dropSP.setLayoutX(0.8 * getWidth());
+        dropSP.setLayoutY(0.3 * getHeight());
 
         getChildren().add(dropSP);
 
@@ -397,10 +385,8 @@ public class EquipmentView extends AnchorPane {
         iv.setPreserveRatio(true);
         iv.setFitWidth(1.5 * unit);
 
-        setLeftAnchor(iv, 0.1 * getWidth());
-        setTopAnchor(iv, 0.2 * getHeight());
-        setRightAnchor(iv, 0.7 * getWidth());
-        setBottomAnchor(iv, 0.7 * getHeight());
+        iv.setX(0.1 * getWidth());
+        iv.setY(0.2 * getHeight());
 
         getChildren().add(iv);
     }
