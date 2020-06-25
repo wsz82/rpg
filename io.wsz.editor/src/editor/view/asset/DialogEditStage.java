@@ -126,6 +126,7 @@ public class DialogEditStage extends ChildStage {
 
     private void initCenter() {
         answerText.setPrefSize(300, 200);
+        answerText.setWrapText(true);
         initQuestionsTable();
         initQuestionDetails();
     }
