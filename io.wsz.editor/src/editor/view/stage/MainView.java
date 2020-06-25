@@ -34,6 +34,7 @@ class MainView {
     private final LocationsStage locationsWindow;
     private final PluginSettingsStage pss;
     private final Pointer pointer;
+    private final EditorController editorController = EditorController.get();
 
     MainView(Stage stage) {
         this.stage = stage;
@@ -106,11 +107,11 @@ class MainView {
                 contentsWindow.getX(), contentsWindow.getY(), contentsWindow.getWidth(), contentsWindow.getHeight(),
                 locationsWindow.getX(), locationsWindow.getY(), locationsWindow.getWidth(), locationsWindow.getHeight()
         );
-        EditorController.get().storeSettings(programDir, memento);
+        editorController.storeSettings(programDir, memento);
     }
 
     private void restoreSettings(File programDir) {
-        SettingsMemento memento = EditorController.get().restoreSettings(programDir);
+        SettingsMemento memento = editorController.restoreSettings(programDir);
         stage.setX(memento.getStageX());
         stage.setY(memento.getStageY());
         stage.setWidth(memento.getStageWidth());
@@ -203,7 +204,8 @@ class MainView {
     }
 
     private void createNewPlugin() {
-        EditorController.get().initNewPlugin();
+        onCloseRequest();
+        editorController.initNewPlugin();
     }
 
     private void openPluginsTable() {
@@ -223,12 +225,12 @@ class MainView {
         if (saveFile == null) {
             return;
         }
-        EditorController.get().savePluginAs(saveFile.getName(), pss);    //TODO fill only name
+        editorController.savePluginAs(saveFile.getName(), pss);    //TODO fill only name
     }
 
     private void saveFile() {
         if (ActivePlugin.get().getPlugin() != null) {
-            EditorController.get().saveActivePlugin(pss);
+            editorController.saveActivePlugin(pss);
         } else {
             saveAsFile();
         }

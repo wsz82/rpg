@@ -7,7 +7,6 @@ import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.asset.AssetsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
@@ -85,7 +84,7 @@ public class EditorController {
     }
 
     private void setPluginsParams(Plugin p, PluginSettingsStage pss) {
-        p.setAssets(AssetsList.get());
+        p.setAssets(controller.getAssetsList());
         p.setLocations(new ArrayList<>(LocationsList.get()));
         boolean isStartingLocation = pss.isStartingLocation();
         p.setStartingLocation(isStartingLocation);
