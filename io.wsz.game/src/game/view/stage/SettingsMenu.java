@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.sizes.FontSize;
 import io.wsz.model.sizes.Sizes;
@@ -8,31 +9,89 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 class SettingsMenu extends StackPane {
     private StackPane graphics;
+    private StackPane game;
     private Node parentToReturn;
     private BorderPane root;
     private final GameStage gameStage;
 
-    public SettingsMenu(GameStage gameStage){
+    public SettingsMenu(GameStage gameStage) {
         this.gameStage = gameStage;
-        VBox buttons = new VBox(10);
+        final VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
-        Button graphics = new Button("Graphics");
+        final Button graphics = new Button("Graphics");
         graphics.setOnAction(event -> openGraphicsSettings());
-        Button back = new Button("Back");
+        final Button game = new Button("Game");
+        game.setOnAction(event -> openGameSettings());
+        final Button back = new Button("Back");
         back.setOnAction(event -> goBackToMenu());
 
-        buttons.getChildren().addAll(graphics, back);
+        buttons.getChildren().addAll(graphics, game, back);
         getChildren().addAll(buttons);
+    }
+
+    private void openGameSettings() {
+        if (game == null) {
+            initGameSettings();
+        }
+        root.setCenter(game);
+    }
+
+    private void initGameSettings() {
+        game = new StackPane();
+
+        final VBox settings = new VBox(10);
+        settings.setAlignment(Pos.CENTER);
+
+        final HBox gameScrollBox = new HBox(5);
+        gameScrollBox.setAlignment(Pos.CENTER);
+        final Label gameScrollLabel = new Label("Game scroll speed");
+        final Slider gameScrollSpeed = new Slider();
+        gameScrollBox.getChildren().addAll(gameScrollLabel, gameScrollSpeed);
+        gameScrollSpeed.setMaxWidth(getWidth()/10);
+        hookUpGameScrollSpeedEvents(gameScrollSpeed);
+
+        final HBox dialogScrollBox = new HBox(5);
+        dialogScrollBox.setAlignment(Pos.CENTER);
+        final Label dialogScrollLabel = new Label("Dialog scroll speed");
+        final Slider dialogScrollSpeed = new Slider();
+        dialogScrollBox.getChildren().addAll(dialogScrollLabel, dialogScrollSpeed);
+        dialogScrollSpeed.setMaxWidth(getWidth()/10);
+        hookUpDialogScrollSpeedEvents(dialogScrollSpeed);
+
+        final Button back = new Button("Back");
+        back.setOnAction(event -> goBackToSettings());
+
+        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, back);
+        game.getChildren().addAll(settings);
+    }
+
+    private void hookUpDialogScrollSpeedEvents(Slider s) {
+        s.setMin(0.01);
+        s.setMax(1);
+        s.setBlockIncrement(0.01);
+        s.setValue(Settings.getDialogScrollSpeed());
+        s.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Settings.setDialogScrollSpeed(s.getValue());
+        });
+    }
+
+    private void hookUpGameScrollSpeedEvents(Slider s) {
+        s.setMin(0.01);
+        s.setMax(1);
+        s.setBlockIncrement(0.01);
+        s.setValue(Settings.getGameScrollSpeed());
+        s.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Settings.setGameScrollSpeed(s.getValue());
+        });
     }
 
     private void goBackToMenu() {
@@ -55,13 +114,17 @@ class SettingsMenu extends StackPane {
         final CheckBox fullScreen = new CheckBox("Full screen");
         hookUpFullScreenEvents(fullScreen);
 
+        final HBox fontBox = new HBox(5);
+        fontBox.setAlignment(Pos.CENTER);
+        final Label fontLabel = new Label("Font size");
         final ChoiceBox<FontSize> fontSizeCB = new ChoiceBox<>();
+        fontBox.getChildren().addAll(fontLabel, fontSizeCB);
         hookUpFontSizeEvents(fontSizeCB);
 
-        Button back = new Button("Back");
+        final Button back = new Button("Back");
         back.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(fullScreen, fontSizeCB, back);
+        settings.getChildren().addAll(fullScreen, fontBox, back);
         graphics.getChildren().addAll(settings);
     }
 

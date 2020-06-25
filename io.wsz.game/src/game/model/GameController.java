@@ -6,6 +6,7 @@ import game.model.save.SaveMemento;
 import game.model.save.SavesList;
 import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
+import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import game.view.launcher.Main;
 import game.view.stage.GameStage;
@@ -135,12 +136,16 @@ public class GameController {
         SettingCaretaker sc = new SettingCaretaker(programDir);
         SettingMemento memento = sc.loadMemento();
         Sizes.setFontSize(memento.getFontSize());
+        Settings.setGameScrollSpeed(memento.getGameScrollSpeed());
+        Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
         return memento;
     }
 
     public void saveSettings(File programDir, SettingMemento memento) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
         memento.setFontSize(Sizes.getFontSize());
+        memento.setGameScrollSpeed(Settings.getGameScrollSpeed());
+        memento.setDialogScrollSpeed(Settings.getDialogScrollSpeed());
         sc.saveMemento(memento);
     }
 

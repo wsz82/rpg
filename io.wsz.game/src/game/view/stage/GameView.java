@@ -1,6 +1,7 @@
 package game.view.stage;
 
 import game.model.GameController;
+import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
@@ -32,7 +33,6 @@ import static io.wsz.model.sizes.Sizes.METER;
 
 public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * METER;
-    private static final double SCROLL = 0.2;
     private final Stage parent;
     private final Controller controller = Controller.get();
     private final Board board = controller.getBoard();
@@ -58,7 +58,7 @@ public class GameView extends Canvas {
             if (dialogStarted) {
                 dialogStarted = false;
                 removeEvents();
-                dialogView = new DialogView(this, OFFSET, SCROLL);
+                dialogView = new DialogView(this, OFFSET);
             }
             dialogView.refresh();
             return;
@@ -202,22 +202,22 @@ public class GameView extends Canvas {
     }
 
     private void scrollDown(double locHeight) {
-        double newY = currentPos.y + SCROLL;
+        double newY = currentPos.y + Settings.getGameScrollSpeed();
         currentPos.y = Math.min(newY, locHeight - getHeight()/METER);
     }
 
     private void scrollUp() {
-        double newY = currentPos.y - SCROLL;
+        double newY = currentPos.y - Settings.getGameScrollSpeed();
         currentPos.y = Math.max(newY, 0);
     }
 
     private void scrollRight(double locWidth) {
-        double newX = currentPos.x + SCROLL;
+        double newX = currentPos.x + Settings.getGameScrollSpeed();
         currentPos.x = Math.min(newX, locWidth - getWidth()/METER);
     }
 
     private void scrollLeft() {
-        double newX = currentPos.x - SCROLL;
+        double newX = currentPos.x - Settings.getGameScrollSpeed();
         currentPos.x = Math.max(newX, 0);
     }
 

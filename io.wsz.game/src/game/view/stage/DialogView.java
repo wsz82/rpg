@@ -1,6 +1,7 @@
 package game.view.stage;
 
 import game.model.GameController;
+import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Answer;
 import io.wsz.model.dialog.Question;
@@ -35,7 +36,6 @@ public class DialogView {
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final double offset;
-    private final double scroll;
     private final List<DialogItem> dialogs = new ArrayList<>(0);
     private final Controller controller = Controller.get();
     private final Map<Question, VerticalPos> questionsPos = new HashMap<>(0);
@@ -67,11 +67,10 @@ public class DialogView {
         }
     };
 
-    public DialogView(Canvas canvas, double offset, double scroll) {
+    public DialogView(Canvas canvas, double offset) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         this.offset = offset;
-        this.scroll = scroll;
         hookupEvents();
     }
 
@@ -340,7 +339,7 @@ public class DialogView {
     }
 
     private double getScroll() {
-        return scroll*canvas.getWidth()/METER*3;
+        return Settings.getDialogScrollSpeed() * canvas.getWidth() / METER * 3;
     }
 
     private class DialogItem {
