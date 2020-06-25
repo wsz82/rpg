@@ -12,16 +12,18 @@ public class SettingMemento implements Serializable {
     private double gameScrollSpeed;
     private double dialogScrollSpeed;
     private boolean centerOnPc;
+    private boolean pauseOnInventory;
 
     public SettingMemento() {}
 
     public SettingMemento(boolean isFullScreen, FontSize fontSize, double gameScrollSpeed, double dialogScrollSpeed,
-                          boolean centerOnPc) {
+                          boolean centerOnPc, boolean pauseOnInventory) {
         this.isFullScreen = isFullScreen;
         this.fontSize = fontSize;
         this.gameScrollSpeed = gameScrollSpeed;
         this.dialogScrollSpeed = dialogScrollSpeed;
         this.centerOnPc = centerOnPc;
+        this.pauseOnInventory = pauseOnInventory;
     }
 
     public boolean isFullScreen() {
@@ -62,5 +64,13 @@ public class SettingMemento implements Serializable {
 
     public void setCenterOnPc(boolean centerOnPc) {
         this.centerOnPc = centerOnPc;
+    }
+
+    public boolean isPauseOnInventory() {
+        return pauseOnInventory;
+    }
+
+    public void setPauseOnInventory(boolean pauseOnInventory) {
+        this.pauseOnInventory = pauseOnInventory;
     }
 }

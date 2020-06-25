@@ -75,11 +75,26 @@ class SettingsMenu extends StackPane {
         centerOnPcCB.setMaxWidth(getWidth()/10);
         hookUpCenterOnPCEvents(centerOnPcCB);
 
+        final HBox stopOnInventoryBox = new HBox(5);
+        stopOnInventoryBox.setAlignment(Pos.CENTER);
+        final Label stopOnInventoryLabel = new Label("Pause on inventory");
+        final CheckBox stopOnInventoryCB = new CheckBox();
+        stopOnInventoryBox.getChildren().addAll(stopOnInventoryLabel, stopOnInventoryCB);
+        stopOnInventoryCB.setMaxWidth(getWidth()/10);
+        hookUpStopOnInventoryEvents(stopOnInventoryCB);
+
         final Button back = new Button("Back");
         back.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, back);
+        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, stopOnInventoryBox, back);
         game.getChildren().addAll(settings);
+    }
+
+    private void hookUpStopOnInventoryEvents(CheckBox cb) {
+        cb.setSelected(Settings.isPauseOnInventory());
+        cb.setOnAction(e -> {
+            Settings.setPauseOnInventory(cb.isSelected());
+        });
     }
 
     private void hookUpCenterOnPCEvents(CheckBox cb) {

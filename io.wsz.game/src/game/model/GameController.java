@@ -63,7 +63,9 @@ public class GameController {
     }
 
     public void openInventory(Creature active, Container container) {
-        isGame.set(false);
+        if (Settings.isPauseOnInventory()) {
+            isGame.set(false);
+        }
         gameStage.setInventoryForCenter(active, container);
     }
 
@@ -139,6 +141,7 @@ public class GameController {
         Settings.setGameScrollSpeed(memento.getGameScrollSpeed());
         Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
         Settings.setCenterOnPC(memento.isCenterOnPc());
+        Settings.setPauseOnInventory(memento.isPauseOnInventory());
         return memento;
     }
 
@@ -148,6 +151,7 @@ public class GameController {
         memento.setGameScrollSpeed(Settings.getGameScrollSpeed());
         memento.setDialogScrollSpeed(Settings.getDialogScrollSpeed());
         memento.setCenterOnPc(Settings.isCenterOnPC());
+        memento.setPauseOnInventory(Settings.isPauseOnInventory());
         sc.saveMemento(memento);
     }
 
