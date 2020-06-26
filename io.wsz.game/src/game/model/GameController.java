@@ -22,6 +22,7 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 
 import java.io.File;
 import java.util.List;
@@ -30,9 +31,9 @@ import java.util.stream.Collectors;
 
 public class GameController {
     private static GameController singleton;
+    private final Controller controller = Controller.get();
     private final AtomicBoolean isGame = new AtomicBoolean(false);
     private final AtomicBoolean isDialog = new AtomicBoolean(false);
-    private final Controller controller = Controller.get();
     private GameView gameView;
     private GameStage gameStage;
     private GameRunner gameRunner;
@@ -218,6 +219,11 @@ public class GameController {
         currentPos.x = startX;
         currentPos.y = startY;
     }
+
+    public void showLoaderView(Task<String> loader) {
+        gameStage.setLoaderViewToCenter(loader);
+    }
+
 
     public void refreshGame() {
         gameView.refresh();

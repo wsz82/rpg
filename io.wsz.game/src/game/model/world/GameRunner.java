@@ -9,6 +9,7 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 
 import java.util.List;
 
@@ -31,19 +32,25 @@ public class GameRunner {
             loadSave(memento);
         }
 
-        if (gameThread == null) {
-            runGameThread();
-        }
+        loadImages();
     }
 
     public void resumeGame() {
-        showGame();
         gameController.setGame(true);
     }
 
-    private void runGameThread() {
-        showGame();
+    private void loadImages() {
+        Task<String> loader = new Loader();
+        gameController.showLoaderView(loader);
+        new Thread(loader).start();
+        loader.setOnSucceeded(e -> {
+            if (gameThread == null) {
+                runGameThread();
+            }
+        });
+    }
 
+    private void runGameThread() {
         gameThread = new Thread(() -> {
             while (true) {
                 if (!gameController.isGame()) {
@@ -129,6 +136,7 @@ public class GameRunner {
             Location l = cl.getLocation();
             if (!l.getName().equals(locationToUpdate.getName())) {
                 cl.setLocation(locationToUpdate);
+                Platform.runLater(this::loadImages);
             }
         }
     }
@@ -145,5 +153,22 @@ public class GameRunner {
     private void loadNewGame() {
         gameController.loadGameActivePluginToLists();
         gameController.initNewGameSettings();
+    }
+
+    private class Loader extends Task<String> {
+
+        @Override
+        protected String call() throws Exception {
+            List<PosItem> items = controller.getCurrentLocation().getItems();
+            int total = items.size() - 1;
+            updateProgress(0, total);
+
+            for (int i = 0; i <= total; i++) {
+                PosItem item = items.get(i);
+                item.getImage();
+                updateProgress(i, total);
+            }
+            return "Completed";
+        }
     }
 }

@@ -7,6 +7,7 @@ import game.view.launcher.Main;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.stage.Coords;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -251,7 +252,7 @@ public class GameStage extends Stage {
             alertNoGame();
             return;
         }
-        setGameViewForCenter();
+//        setGameViewForCenter();
     }
 
     private void alertNoGame() {
@@ -330,20 +331,34 @@ public class GameStage extends Stage {
             createGameMenu();
         }
         parentToReturn = gameMenu;
-        root.setCenter(gameView);
+        if (root.getCenter() != gameView) {
+            root.setCenter(gameView);
+        }
     }
 
     private void restoreSettings(File programDir) {
         SettingMemento memento = gameController.loadSettings(programDir);
-
         setFullScreen(memento.isFullScreen());
     }
 
     private void storeSettings() {
         SettingMemento memento = new SettingMemento();
         memento.setFullScreen(isFullScreen());
-
         gameController.saveSettings(Main.getDir(), memento);
+    }
+
+    public void setLoaderViewToCenter(Task<String> loader) {
+        final StackPane sp = new StackPane();
+        final ProgressBar pb = new ProgressBar();
+        sp.getChildren().addAll(pb);
+        root.setCenter(sp);
+
+        pb.progressProperty().bind(loader.progressProperty());
+        pb.progressProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() >= 1) {
+                setGameViewForCenter();
+            }
+        });
     }
 
     public void open() {
