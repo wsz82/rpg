@@ -132,6 +132,7 @@ public class GameRunner {
     private void updateLocation() {
         Location locationToUpdate = controller.getLocationToUpdate();
         if (locationToUpdate != null) {
+            controller.setLocationToUpdate(null);
             CurrentLocation cl = controller.getCurrentLocation();
             Location l = cl.getLocation();
             if (!l.getName().equals(locationToUpdate.getName())) {
