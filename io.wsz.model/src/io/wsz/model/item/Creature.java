@@ -41,7 +41,12 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(posToCenter(nextPos));
-        return Board.get().lookForObstacle(poss);
+        PosItem collidedObstacle = Board.get().lookForObstacle(poss);
+        if (collidedObstacle == null) {
+            Creature collidedCreature = Board.get().getCornersCreature(poss, this);
+            return collidedCreature;
+        }
+        return collidedObstacle;
     }
 
     private void checkSurrounding() {
@@ -53,19 +58,6 @@ public class Creature extends PosItem<Creature> implements Containable {
                 case TELEPORT -> ((Teleport) pi).enter(this);
             }
         }
-        Creature cr = getCornersCreature();
-        if (cr != null) {
-            escapeCreature(cr);
-        }
-    }
-
-    private void escapeCreature(Creature cr) {
-        Coords free = Controller.get().getBoard().getFreePosCreature(getCorners(), cr);
-        goTo(free);
-    }
-
-    private Creature getCornersCreature() {
-        return Controller.get().getBoard().getCornersCreature(getCorners(), this);
     }
 
     private PosItem getCornersContent(ItemType[] types) {
