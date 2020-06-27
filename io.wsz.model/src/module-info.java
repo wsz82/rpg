@@ -2,6 +2,8 @@ module io.wsz.model {
     requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
+    requires javafx.swing;
+    requires java.desktop;
 
     exports io.wsz.model;
     exports io.wsz.model.content;

@@ -2,6 +2,7 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
+import io.wsz.model.sizes.Sizes;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -11,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.wsz.model.sizes.Sizes.METER;
 import static io.wsz.model.stage.Comparator.Comparison;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 import static io.wsz.model.stage.Comparator.compare;
@@ -107,8 +107,8 @@ public class Board {
         final Image i1_img = i1.getImage();
         final double i1_posX = i1_pos.x;
         final double i1_posY = i1_pos.y;
-        final double i1_imgWidth = i1_img.getWidth() / METER;
-        final double i1_imgHeight = i1_img.getHeight() / METER;
+        final double i1_imgWidth = i1_img.getWidth() / Sizes.getMeter();
+        final double i1_imgHeight = i1_img.getHeight() / Sizes.getMeter();
         final LinkedList<Coords> i1_list = new LinkedList<>();
         if (!i1_cl.isEmpty()) {
             looseCoordsReference(i1_cl, i1_list);
@@ -125,8 +125,8 @@ public class Board {
         final Image i2_img = i2.getImage();
         final double i2_posX = i2_pos.x;
         final double i2_posY = i2_pos.y;
-        final double i2_imgWidth = i2_img.getWidth() / METER;
-        final double i2_imgHeight = i2_img.getHeight() / METER;
+        final double i2_imgWidth = i2_img.getWidth() / Sizes.getMeter();
+        final double i2_imgHeight = i2_img.getHeight() / Sizes.getMeter();
         final LinkedList<Coords> i2_list = new LinkedList<>();
         if (!i2_cl.isEmpty()) {
             looseCoordsReference(i2_cl, i2_list);
@@ -201,17 +201,17 @@ public class Board {
 
         for (PosItem pi : items) {
             for (Coords pos : poss) {
-                int x = (int) (pos.x * METER);
-                int y = (int) (pos.y * METER);
+                int x = (int) (pos.x * Sizes.getMeter());
+                int y = (int) (pos.y * Sizes.getMeter());
 
-                int cX = (int) (pi.getPos().x * METER);
+                int cX = (int) (pi.getPos().x * Sizes.getMeter());
                 int cWidth = (int) pi.getImage().getWidth();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
-                int cY = (int) (pi.getPos().y * METER);
+                int cY = (int) (pi.getPos().y * Sizes.getMeter());
                 int cHeight = (int) pi.getImage().getHeight();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
@@ -271,21 +271,21 @@ public class Board {
         Collections.addAll(coordsList, corners);
         Collections.shuffle(coordsList);
         for (Coords pos : coordsList) {
-            int x = (int) (pos.x * METER);
-            int y = (int) (pos.y * METER);
+            int x = (int) (pos.x * Sizes.getMeter());
+            int y = (int) (pos.y * Sizes.getMeter());
             Coords cPos = cr.getPos();
             Image img = cr.getImage();
 
-            int cX = (int) (cPos.x * METER);
+            int cX = (int) (cPos.x * Sizes.getMeter());
             int cWidth = (int) img.getWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
             if (!fitX) {
                 return pos;
             }
 
-            int cY = (int) (cPos.y * METER);
+            int cY = (int) (cPos.y * Sizes.getMeter());
             int cYbottom = cY + (int) img.getHeight();
-            int cSizeHeight = (int) (cr.getSize().getHeight()/2 * METER);
+            int cSizeHeight = (int) (cr.getSize().getHeight()/2 * Sizes.getMeter());
             boolean fitY = y <= cYbottom && y >= cYbottom + cSizeHeight;
             if (!fitY) {
                 return pos;
@@ -380,14 +380,14 @@ public class Board {
                 final Image img = pi.getImage();
                 final Coords cPos = pi.getPos();
                 double cX = cPos.x;
-                double cWidth = img.getWidth() / METER;
+                double cWidth = img.getWidth() / Sizes.getMeter();
                 boolean fitX = x >= cX && x <= cX + cWidth;
                 if (!fitX) {
                     continue;
                 }
 
                 double cY = cPos.y;
-                double cHeight = img.getHeight() / METER;
+                double cHeight = img.getHeight() / Sizes.getMeter();
                 boolean fitY = y >= cY && y <= cY + cHeight;
                 if (!fitY) {
                     continue;

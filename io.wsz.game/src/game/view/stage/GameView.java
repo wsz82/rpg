@@ -6,6 +6,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
@@ -29,10 +30,9 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class GameView extends Canvas {
-    private static final double OFFSET = 0.3 * METER;
+    private static final double OFFSET = 0.3 * Sizes.getMeter();
     private final Stage parent;
     private final Controller controller = Controller.get();
     private final Board board = controller.getBoard();
@@ -74,9 +74,9 @@ public class GameView extends Canvas {
         clear(gc);
 
         double leftX = currentPos.x;
-        double rightX = leftX + getWidth()/METER;
+        double rightX = leftX + getWidth()/Sizes.getMeter();
         double topY = currentPos.y;
-        double bottomY = topY + getHeight()/METER;
+        double bottomY = topY + getHeight()/Sizes.getMeter();
 
         List<PosItem> items = controller.getCurrentLocation().getItems();
         Board.get().sortItems(items);
@@ -86,9 +86,9 @@ public class GameView extends Canvas {
                     Coords pos = pi.getPos();
                     Image img = pi.getImage();
                     double piLeftX = pos.x;
-                    double piRightX = piLeftX + img.getWidth();
+                    double piRightX = piLeftX + img.getWidth()/Sizes.getMeter();
                     double piTopY = pos.y;
-                    double piBottomY = piTopY + img.getHeight();
+                    double piBottomY = piTopY + img.getHeight()/Sizes.getMeter();
                     return io.wsz.model.stage.Comparator.doOverlap(
                             leftX, topY, rightX, bottomY,
                             piLeftX, piTopY, piRightX, piBottomY);
@@ -99,8 +99,8 @@ public class GameView extends Canvas {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
             Coords translated = pos.subtract(currentPos);
-            final int x = (int) (translated.x * METER);
-            final int y = (int) (translated.y * METER);
+            final int x = (int) (translated.x * Sizes.getMeter());
+            final int y = (int) (translated.y * Sizes.getMeter());
 
             if (pi.getVisible()) {
                 switch (type) {
@@ -169,25 +169,29 @@ public class GameView extends Canvas {
         int x = p.x;
         int y = p.y;
 
+        if (x < leftX || x > rightX || y < topY || y > bottomY) {
+            return;
+        }
+
         if (x >= leftX+OFFSET && x <= rightX-OFFSET
                 && y >= topY+OFFSET && y <= bottomY-OFFSET) {
             return;
         }
 
         if (x < leftX+OFFSET && x >= leftX
-                && y > topY + OFFSET && y < bottomY - OFFSET) {
+                && y > topY+OFFSET && y < bottomY-OFFSET) {
             scrollLeft();
         } else
         if (x > rightX-OFFSET && x <= rightX
-                && y > topY + OFFSET && y < bottomY - OFFSET) {
+                && y > topY+OFFSET && y < bottomY-OFFSET) {
             scrollRight(locWidth);
         } else
         if (y < topY+OFFSET && y >= topY
-                && x > leftX + OFFSET && x < rightX - OFFSET) {
+                && x > leftX+OFFSET && x < rightX-OFFSET) {
             scrollUp();
         } else
         if (y > bottomY-OFFSET && y <= bottomY
-                && x > leftX + OFFSET && x < rightX - OFFSET) {
+                && x > leftX+OFFSET && x < rightX-OFFSET) {
             scrollDown(locHeight);
         } else
         if (x < leftX+OFFSET && x >= leftX
@@ -201,12 +205,12 @@ public class GameView extends Canvas {
             scrollUp();
         } else
         if (x < leftX+OFFSET && x >= leftX
-                && y >= bottomY - OFFSET && y < bottomY) {
+                && y >= bottomY-OFFSET && y < bottomY) {
             scrollLeft();
             scrollDown(locHeight);
         } else
         if (x > rightX-OFFSET && x <= rightX
-                && y >= bottomY - OFFSET && y < bottomY) {
+                && y >= bottomY-OFFSET && y < bottomY) {
             scrollRight(locWidth);
             scrollDown(locHeight);
         }
@@ -214,7 +218,7 @@ public class GameView extends Canvas {
 
     private void scrollDown(double locHeight) {
         double newY = currentPos.y + Settings.getGameScrollSpeed();
-        currentPos.y = Math.min(newY, locHeight - getHeight()/METER);
+        currentPos.y = Math.min(newY, locHeight - getHeight()/Sizes.getMeter());
     }
 
     private void scrollUp() {
@@ -224,7 +228,7 @@ public class GameView extends Canvas {
 
     private void scrollRight(double locWidth) {
         double newX = currentPos.x + Settings.getGameScrollSpeed();
-        currentPos.x = Math.min(newX, locWidth - getWidth()/METER);
+        currentPos.x = Math.min(newX, locWidth - getWidth()/Sizes.getMeter());
     }
 
     private void scrollLeft() {
@@ -241,15 +245,15 @@ public class GameView extends Canvas {
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.posToCenter();
         Coords translated = centerBottomPos.subtract(currentPos);
-        double x = translated.x * METER;
-        double y = translated.y * METER;
+        double x = translated.x * Sizes.getMeter();
+        double y = translated.y * Sizes.getMeter();
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
         }
         gc.setLineWidth(1.5);
-        gc.strokeOval(x - size.getWidth()/2.0 * METER, y - size.getHeight()/2.0 * METER,
-                size.getWidth() * METER, size.getHeight() * METER);
+        gc.strokeOval(x - size.getWidth()/2.0 * Sizes.getMeter(), y - size.getHeight()/2.0 * Sizes.getMeter(),
+                size.getWidth() * Sizes.getMeter(), size.getHeight() * Sizes.getMeter());
     }
 
     private void defineEvents() {
@@ -258,7 +262,7 @@ public class GameView extends Canvas {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
-                Coords pos = new Coords(e.getX() / METER, e.getY() / METER);
+                Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
                 Coords translated = pos.add(currentPos);
                 Coords[] poss = new Coords[]{translated};
                 ItemType[] types = new ItemType[]{ItemType.CREATURE};
@@ -366,8 +370,8 @@ public class GameView extends Canvas {
     }
 
     private void centerScreenOn(Coords posToCenter) {
-        double canvasWidth = getWidth()/METER;
-        double canvasHeight = getHeight()/METER;
+        double canvasWidth = getWidth()/ Sizes.getMeter();
+        double canvasHeight = getHeight()/ Sizes.getMeter();
         double x = posToCenter.x - canvasWidth/2;
         double y = posToCenter.y - canvasHeight/2;
         double locWidth = controller.getCurrentLocation().getWidth();
@@ -395,21 +399,37 @@ public class GameView extends Canvas {
         if (scene == null) {
             return;
         }
-        double locWidth = controller.getCurrentLocation().getWidth() * METER;
-        double locHeight = controller.getCurrentLocation().getHeight() * METER;
-        double maxWidth = getScene().getWidth();
-        double maxHeight = getScene().getHeight();
+        int locWidth = (int) (controller.getCurrentLocation().getWidth() * Sizes.getMeter());
+        int locHeight = (int) (controller.getCurrentLocation().getHeight() * Sizes.getMeter());
+        int resWidth = Settings.getResolutionWidth();
+        int resHeight = Settings.getResolutionHeight();
+        int sceneWidth = (int) getScene().getWidth();
+        int sceneHeight = (int) getScene().getHeight();
+        double maxWidth = sceneWidth;
+        double maxHeight = sceneHeight;
+
+        if (resWidth != sceneWidth || resHeight != sceneHeight) {
+            double rW = (double) sceneWidth/resWidth;
+            double rH = (double) sceneHeight/resHeight;
+            if (rW > rH) {
+                maxHeight = sceneHeight;
+                maxWidth = resWidth * rH;
+            } else {
+                maxWidth = sceneWidth;
+                maxHeight = resHeight * rW;
+            }
+        }
+
         if (locWidth >= maxWidth) {
             setWidth(maxWidth);
         } else {
             setWidth(locWidth);
-            setTranslateX((maxWidth - locWidth)/2);
         }
+
         if (locHeight >= maxHeight) {
             setHeight(maxHeight);
         } else {
             setHeight(locHeight);
-            setTranslateY((maxHeight - locHeight)/2);
         }
     }
 

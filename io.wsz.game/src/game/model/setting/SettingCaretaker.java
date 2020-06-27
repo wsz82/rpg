@@ -29,7 +29,8 @@ public class SettingCaretaker {
         if (!mementoExists) {
             return new SettingMemento(true, Sizes.getFontSize(),
                     Settings.getGameScrollSpeed(), Settings.getDialogScrollSpeed(), Settings.isCenterOnPC(),
-                    Settings.isPauseOnInventory());
+                    Settings.isPauseOnInventory(), Settings.getResolutionWidth(), Settings.getResolutionHeight(),
+                    Sizes.isResizeWithResolution());
         }
         SettingMemento memento = new SettingMemento();
         try (

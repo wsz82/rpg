@@ -3,9 +3,9 @@ package io.wsz.model.stage;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Sizes;
 
 import static io.wsz.model.item.ItemType.*;
-import static io.wsz.model.sizes.Sizes.METER;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 
 public class Comparator {
@@ -22,10 +22,10 @@ public class Comparator {
         double o2y_top = pos2.y;
         double o1x_left = pos1.x;
         double o2x_left = pos2.x;
-        double o1y_bottom = o1y_top + i1.getImage().getHeight() / METER;
-        double o2y_bottom = o2y_top + i2.getImage().getHeight() / METER;
-        double o1x_right = o1x_left + i1.getImage().getWidth() / METER;
-        double o2x_right = o2x_left + i2.getImage().getWidth() / METER;
+        double o1y_bottom = o1y_top + i1.getImage().getHeight() / Sizes.getMeter();
+        double o2y_bottom = o2y_top + i2.getImage().getHeight() / Sizes.getMeter();
+        double o1x_right = o1x_left + i1.getImage().getWidth() / Sizes.getMeter();
+        double o2x_right = o2x_left + i2.getImage().getWidth() / Sizes.getMeter();
 
         boolean doOverlap = doOverlap(o1x_left, o1y_top, o1x_right, o1y_bottom,
                 o2x_left, o2y_top, o2x_right, o2y_bottom);

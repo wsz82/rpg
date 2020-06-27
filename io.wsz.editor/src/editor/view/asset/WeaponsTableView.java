@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -12,8 +13,6 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class WeaponsTableView extends AssetsTableView<Weapon> {
 
@@ -81,7 +80,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
                 : selectedAssets) {
             Coords pos = rawPos.clone();
             if (!pos.is0()) {
-                double height = p.getImage().getHeight() / METER;
+                double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
             }
 

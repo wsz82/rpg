@@ -13,17 +13,24 @@ public class SettingMemento implements Serializable {
     private double dialogScrollSpeed;
     private boolean centerOnPc;
     private boolean pauseOnInventory;
+    private int resolutionWidth;
+    private int resolutionHeight;
+    private boolean resizeWithResolution;
 
     public SettingMemento() {}
 
     public SettingMemento(boolean isFullScreen, FontSize fontSize, double gameScrollSpeed, double dialogScrollSpeed,
-                          boolean centerOnPc, boolean pauseOnInventory) {
+                          boolean centerOnPc, boolean pauseOnInventory, int resolutionWidth, int resolutionHeight,
+                          boolean resizeWithResolution) {
         this.isFullScreen = isFullScreen;
         this.fontSize = fontSize;
         this.gameScrollSpeed = gameScrollSpeed;
         this.dialogScrollSpeed = dialogScrollSpeed;
         this.centerOnPc = centerOnPc;
         this.pauseOnInventory = pauseOnInventory;
+        this.resolutionWidth = resolutionWidth;
+        this.resolutionHeight = resolutionHeight;
+        this.resizeWithResolution = resizeWithResolution;
     }
 
     public boolean isFullScreen() {
@@ -72,5 +79,29 @@ public class SettingMemento implements Serializable {
 
     public void setPauseOnInventory(boolean pauseOnInventory) {
         this.pauseOnInventory = pauseOnInventory;
+    }
+
+    public int getResolutionWidth() {
+        return resolutionWidth;
+    }
+
+    public void setResolutionWidth(int resolutionWidth) {
+        this.resolutionWidth = resolutionWidth;
+    }
+
+    public int getResolutionHeight() {
+        return resolutionHeight;
+    }
+
+    public void setResolutionHeight(int resolutionHeight) {
+        this.resolutionHeight = resolutionHeight;
+    }
+
+    public boolean isResizeWithResolution() {
+        return resizeWithResolution;
+    }
+
+    public void setResizeWithResolution(boolean resizeWithResolution) {
+        this.resizeWithResolution = resizeWithResolution;
     }
 }

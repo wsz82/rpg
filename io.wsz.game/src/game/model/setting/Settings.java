@@ -1,10 +1,14 @@
 package game.model.setting;
 
+import io.wsz.model.sizes.Sizes;
+
 public class Settings {
     private static double gameScrollSpeed = 0.2;
     private static double dialogScrollSpeed = 0.2;
     private static boolean centerOnPC = false;
     private static boolean pauseOnInventory = true;
+    private static int resolutionWidth = 800;
+    private static int resolutionHeight = 600;
 
     public static double getGameScrollSpeed() {
         return gameScrollSpeed;
@@ -36,5 +40,23 @@ public class Settings {
 
     public static void setPauseOnInventory(boolean pauseOnInventory) {
         Settings.pauseOnInventory = pauseOnInventory;
+    }
+
+    public static int getResolutionWidth() {
+        return resolutionWidth;
+    }
+
+    public static void setResolutionWidth(int resolutionWidth) {
+        Sizes.setReloadImages(true);
+        Sizes.setMeter(resolutionWidth);
+        Settings.resolutionWidth = resolutionWidth;
+    }
+
+    public static int getResolutionHeight() {
+        return resolutionHeight;
+    }
+
+    public static void setResolutionHeight(int resolutionHeight) {
+        Settings.resolutionHeight = resolutionHeight;
     }
 }

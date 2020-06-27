@@ -1,6 +1,7 @@
 package editor.view.stage;
 
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -9,14 +10,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
-import static io.wsz.model.sizes.Sizes.METER;
-
 class CoordinatesBox extends HBox {
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                Coords mousePos = new Coords(event.getX() / METER, event.getY() / METER);
+                Coords mousePos = new Coords(event.getX() / Sizes.getMeter(), event.getY() / Sizes.getMeter());
                 Controller.get();
                 Coords boardPos = Controller.get().getBoardPos();
                 Coords translated = mousePos.add(boardPos);

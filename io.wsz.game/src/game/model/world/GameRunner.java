@@ -8,6 +8,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
@@ -20,8 +21,7 @@ public class GameRunner {
     private final Controller controller = Controller.get();
     private Thread gameThread;
 
-    public GameRunner() {
-    }
+    public GameRunner() {}
 
     public void startGame(SaveMemento memento) {
         gameController.setGame(true);
@@ -40,10 +40,12 @@ public class GameRunner {
     }
 
     private void loadImages() {
+        gameController.setGame(false);
         Task<String> loader = new Loader();
         gameController.showLoaderView(loader);
         new Thread(loader).start();
         loader.setOnSucceeded(e -> {
+            gameController.setGame(true);
             if (gameThread == null) {
                 runGameThread();
             }
@@ -77,6 +79,10 @@ public class GameRunner {
                 }
                 Platform.runLater(() -> {
                     synchronized (this) {
+                        if (Sizes.isReloadImages()) {
+                            clearImagesAndReload();
+                            Sizes.setReloadImages(false);
+                        }
                         showGame();
                         tryToOpenInventory();
                     }
@@ -86,6 +92,17 @@ public class GameRunner {
         });
         gameThread.setDaemon(true);
         gameThread.start();
+    }
+
+    private void clearImagesAndReload() {
+        List<Location> locations = Controller.get().getLocationsList();
+        for (Location l : locations) {
+            List<PosItem> items = l.getItems().get();
+            for (PosItem pi : items) {
+                pi.setImage(null);
+            }
+        }
+        loadImages();
     }
 
     private void tryToStartDialog() {

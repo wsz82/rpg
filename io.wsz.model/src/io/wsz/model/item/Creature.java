@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
@@ -15,7 +16,6 @@ import java.util.List;
 
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
-import static io.wsz.model.sizes.Sizes.METER;
 import static io.wsz.model.sizes.Sizes.SECOND;
 
 public class Creature extends PosItem<Creature> implements Containable {
@@ -70,8 +70,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public Coords posToCenter(Coords pos) {
-        double width = getImage().getWidth() / METER;
-        double height = getImage().getHeight() / METER;
+        double width = getImage().getWidth() / Sizes.getMeter();
+        double height = getImage().getHeight() / Sizes.getMeter();
         double x = pos.x + width/2;
         double y = pos.y + height;
         return new Coords(x, y);
@@ -81,8 +81,8 @@ public class Creature extends PosItem<Creature> implements Containable {
         if (difPos == null) {
             return null;
         }
-        double width = getImage().getWidth() / METER;
-        double height = getImage().getHeight() / METER;
+        double width = getImage().getWidth() / Sizes.getMeter();
+        double height = getImage().getHeight() / Sizes.getMeter();
         double x = difPos.x - width/2;
         double y = difPos.y - height;
         return new Coords(x, y);
@@ -477,8 +477,8 @@ public class Creature extends PosItem<Creature> implements Containable {
             double x2 = dest.x;
             double y1 = pos.y;
             double y2 = dest.y;
-            if (x1 <= x2 + 10.0/METER && x1 >= x2 - 10.0/METER
-                    && y1 <= y2 + 10.0/METER && y1 >= y2 - 10.0/METER) {
+            if (x1 <= x2 + 10.0/ Sizes.getMeter() && x1 >= x2 - 10.0/ Sizes.getMeter()
+                    && y1 <= y2 + 10.0/ Sizes.getMeter() && y1 >= y2 - 10.0/ Sizes.getMeter()) {
                 dest = null;
                 return;
             }

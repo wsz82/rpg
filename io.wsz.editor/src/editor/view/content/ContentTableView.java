@@ -7,6 +7,7 @@ import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -19,8 +20,6 @@ import javafx.util.converter.DoubleStringConverter;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class ContentTableView extends TableView<PosItem> {
     private final EditorCanvas editorCanvas;
@@ -157,7 +156,7 @@ public class ContentTableView extends TableView<PosItem> {
             pi.getPos().x = newPos.x;
             double y = 0;
             if (newPos.y != 0) {
-                y = newPos.y - pi.getImage().getHeight() / METER;
+                y = newPos.y - pi.getImage().getHeight() / Sizes.getMeter();
             }
             pi.getPos().y = y;
         }

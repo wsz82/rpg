@@ -2,14 +2,13 @@ package editor.view.asset;
 
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 class LandscapeTableView extends AssetsTableView<Landscape> {
 
@@ -41,7 +40,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
                 : selectedAssets) {
             Coords pos = rawPos.clone();
             if (!pos.is0()) {
-                double height = p.getImage().getHeight() / METER;
+                double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
             }
 

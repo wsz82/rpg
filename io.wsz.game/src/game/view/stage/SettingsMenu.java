@@ -8,12 +8,15 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
+import javafx.util.StringConverter;
 
 class SettingsMenu extends StackPane {
     private StackPane graphics;
@@ -21,6 +24,7 @@ class SettingsMenu extends StackPane {
     private Node parentToReturn;
     private BorderPane root;
     private final GameStage gameStage;
+    private StringConverter<Number> stringConverter;
 
     public SettingsMenu(GameStage gameStage) {
         this.gameStage = gameStage;
@@ -138,11 +142,52 @@ class SettingsMenu extends StackPane {
     private void initGraphicsSettings() {
         graphics = new StackPane();
 
+        stringConverter = new StringConverter<>() {
+            @Override
+            public String toString(Number n) {
+                return String.valueOf(n.intValue());
+            }
+
+            @Override
+            public Number fromString(String s) {
+                return Integer.parseInt(s);
+            }
+        };
+
         final VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
 
-        final CheckBox fullScreen = new CheckBox("Full screen");
-        hookUpFullScreenEvents(fullScreen);
+        final HBox fullScreenBox = new HBox(5);
+        fullScreenBox.setAlignment(Pos.CENTER);
+        final Label fullScreenLabel = new Label("Full screen");
+        final CheckBox fullScreenCB = new CheckBox();
+        fullScreenBox.getChildren().addAll(fullScreenLabel, fullScreenCB);
+        hookUpFullScreenEvents(fullScreenCB);
+
+        final HBox resizeWithResolutionBox = new HBox(5);
+        resizeWithResolutionBox.setAlignment(Pos.CENTER);
+        final Label resizeWithResolutionLabel = new Label("Resize with resolution");
+        final CheckBox resizeWithResolutionCB = new CheckBox();
+        resizeWithResolutionBox.getChildren().addAll(resizeWithResolutionLabel, resizeWithResolutionCB);
+        hookUpResizeWithResolutionEvents(resizeWithResolutionCB);
+
+        final HBox resWidthBox = new HBox(5);
+        resWidthBox.setAlignment(Pos.CENTER);
+        final Label resWidthLabel = new Label("Resolution width");
+        final Label resWidthActual = new Label();
+        resWidthActual.setMinWidth(getWidth()/20);
+        final Slider resWidthInput = new Slider();
+        resWidthBox.getChildren().addAll(resWidthLabel, resWidthActual, resWidthInput);
+        hookUpResWidthEvents(resWidthInput, resWidthActual);
+
+        final HBox resHeightBox = new HBox(5);
+        resHeightBox.setAlignment(Pos.CENTER);
+        final Label resHeightLabel = new Label("Resolution height");
+        final Label resHeightActual = new Label();
+        resHeightActual.setMinWidth(getWidth()/20);
+        final Slider resHeightInput = new Slider();
+        resHeightBox.getChildren().addAll(resHeightLabel, resHeightActual, resHeightInput);
+        hookUpResHeightEvents(resHeightInput, resHeightActual);
 
         final HBox fontBox = new HBox(5);
         fontBox.setAlignment(Pos.CENTER);
@@ -154,8 +199,43 @@ class SettingsMenu extends StackPane {
         final Button back = new Button("Back");
         back.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(fullScreen, fontBox, back);
+        settings.getChildren().addAll(fullScreenBox, resizeWithResolutionBox, resWidthBox, resHeightBox, fontBox, back);
         graphics.getChildren().addAll(settings);
+    }
+
+    private void hookUpResHeightEvents(Slider s, Label l) {
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        int maxHeight = (int) bounds.getHeight();
+        s.setMin(300);
+        s.setMax(maxHeight);
+        s.setBlockIncrement(1);
+        s.setValue(Settings.getResolutionHeight());
+        s.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Settings.setResolutionHeight((int) s.getValue());
+        });
+        l.setText(String.valueOf(s.getValue()));
+        l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);
+    }
+
+    private void hookUpResWidthEvents(Slider s, Label l) {
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        int maxWidth = (int) bounds.getWidth();
+        s.setMin(300);
+        s.setMax(maxWidth);
+        s.setBlockIncrement(1);
+        s.setValue(Settings.getResolutionWidth());
+        s.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Settings.setResolutionWidth((int) s.getValue());
+        });
+        l.setText(String.valueOf(s.getValue()));
+        l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);
+    }
+
+    private void hookUpResizeWithResolutionEvents(CheckBox cb) {
+        cb.setSelected(Sizes.isResizeWithResolution());
+        cb.setOnAction(event -> {
+            Sizes.setResizeWithResolution(cb.isSelected());
+        });
     }
 
     private void hookUpFontSizeEvents(ChoiceBox<FontSize> fontSizeCB) {
@@ -168,11 +248,10 @@ class SettingsMenu extends StackPane {
         });
     }
 
-    private void hookUpFullScreenEvents(CheckBox fullScreen) {
-        fullScreen.setSelected(gameStage.isFullScreen());
-        fullScreen.setOnAction(event -> {
-            changeFullScreenSetting(fullScreen.isSelected()
-            );
+    private void hookUpFullScreenEvents(CheckBox cb) {
+        cb.setSelected(gameStage.isFullScreen());
+        cb.setOnAction(event -> {
+            changeFullScreenSetting(cb.isSelected());
         });
     }
 

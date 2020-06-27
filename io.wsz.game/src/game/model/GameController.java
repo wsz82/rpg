@@ -143,6 +143,9 @@ public class GameController {
         Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
         Settings.setCenterOnPC(memento.isCenterOnPc());
         Settings.setPauseOnInventory(memento.isPauseOnInventory());
+        Settings.setResolutionWidth(memento.getResolutionWidth());
+        Settings.setResolutionHeight(memento.getResolutionHeight());
+        Sizes.setResizeWithResolution(memento.isResizeWithResolution());
         return memento;
     }
 
@@ -153,6 +156,9 @@ public class GameController {
         memento.setDialogScrollSpeed(Settings.getDialogScrollSpeed());
         memento.setCenterOnPc(Settings.isCenterOnPC());
         memento.setPauseOnInventory(Settings.isPauseOnInventory());
+        memento.setResolutionWidth(Settings.getResolutionWidth());
+        memento.setResolutionHeight(Settings.getResolutionHeight());
+        memento.setResizeWithResolution(Sizes.isResizeWithResolution());
         sc.saveMemento(memento);
     }
 

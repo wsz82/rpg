@@ -27,8 +27,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
-import static io.wsz.model.sizes.Sizes.METER;
-
 public class DialogView {
     private static final double MAX_HEIGHT = 0.5;
     private static final double TEXT_FIELD_WIDTH = 0.6;
@@ -339,7 +337,7 @@ public class DialogView {
     }
 
     private double getScroll() {
-        return Settings.getDialogScrollSpeed() * canvas.getWidth() / METER * 3;
+        return Settings.getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3;
     }
 
     private class DialogItem {

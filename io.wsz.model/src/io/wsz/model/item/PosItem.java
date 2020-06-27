@@ -5,6 +5,7 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -14,8 +15,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
     private static final long serialVersionUID = 1L;
@@ -43,8 +42,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Coords getCenter() {
-        double centerX = pos.x + getImage().getWidth()/METER;
-        double centerY = pos.y + getImage().getHeight()/METER;
+        double centerX = pos.x + getImage().getWidth()/ Sizes.getMeter();
+        double centerY = pos.y + getImage().getHeight()/ Sizes.getMeter();
         return new Coords(centerX, centerY);
     }
 

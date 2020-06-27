@@ -3,6 +3,7 @@ package editor.view.asset;
 import editor.view.stage.ChildStage;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,8 +25,6 @@ import javafx.util.StringConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class CollisionEditStage extends ChildStage {
     private final ObservableList<Polygon> polygons = FXCollections.observableArrayList();
@@ -109,8 +108,8 @@ public class CollisionEditStage extends ChildStage {
             double firstX = first.x;
             double firstY = first.y;
             for (Coords pos : poss) {
-                double x = pos.x * METER;
-                double y = pos.y * METER;
+                double x = pos.x * Sizes.getMeter();
+                double y = pos.y * Sizes.getMeter();
                 p.getPoints().add(x);
                 p.getPoints().add(y);
             }
@@ -192,15 +191,15 @@ public class CollisionEditStage extends ChildStage {
         p.setStroke(Color.RED);
         p.setStrokeWidth(1);
         p.setOpacity(0.5);
-        p.setId(String.format("%.2f", x/METER) + "; " + String.format("%.2f", y/METER));
+        p.setId(String.format("%.2f", x / Sizes.getMeter()) + "; " + String.format("%.2f", y / Sizes.getMeter()));
     }
 
     private List<Coords> pointsToCoords(List<Double> points) {
         int size = points.size();
         List<Coords> coordsList = new ArrayList<>(size / 2);
         for (int i = 0; i < size - 1; i = i + 2) {
-            double px = points.get(i) / METER;
-            double py = points.get(i + 1) / METER;
+            double px = points.get(i) / Sizes.getMeter();
+            double py = points.get(i + 1) / Sizes.getMeter();
             Coords point = new Coords(px, py);
             coordsList.add(point);
         }

@@ -3,6 +3,7 @@ package editor.view.asset;
 import editor.view.stage.ChildStage;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,8 +25,6 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class CoverEditStage extends ChildStage {
     private final Polyline polyline = new Polyline();
@@ -144,8 +143,8 @@ public class CoverEditStage extends ChildStage {
         List<Coords> coords = pointsToCoords(doubles);
         return coords.stream()
                 .anyMatch(c ->
-                        x/METER > c.x - 1.0/METER
-                        && x/METER < c.x + 1.0/METER
+                        x/Sizes.getMeter() > c.x - 1.0/Sizes.getMeter()
+                        && x/Sizes.getMeter() < c.x + 1.0/Sizes.getMeter()
                 );
     }
 
@@ -156,8 +155,8 @@ public class CoverEditStage extends ChildStage {
         int size = points.size();
         List<Coords> coordsList = new ArrayList<>(size / 2);
         for (int i = 0; i < size - 1; i = i + 2) {
-            double px = points.get(i) / METER;
-            double py = points.get(i + 1) / METER;
+            double px = points.get(i) / Sizes.getMeter();
+            double py = points.get(i + 1) / Sizes.getMeter();
             Coords point = new Coords(px, py);
             coordsList.add(point);
         }
@@ -168,8 +167,8 @@ public class CoverEditStage extends ChildStage {
         int size = coordsList.size() * 2;
         List<Double> doubles = new ArrayList<>(size);
         for (Coords pos : coordsList) {
-            double px = pos.x * METER;
-            double py = pos.y * METER;
+            double px = pos.x * Sizes.getMeter();
+            double py = pos.y * Sizes.getMeter();
             doubles.add(px);
             doubles.add(py);
         }

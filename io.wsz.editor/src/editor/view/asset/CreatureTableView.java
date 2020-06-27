@@ -3,6 +3,7 @@ package editor.view.asset;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -13,8 +14,6 @@ import javafx.stage.Stage;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 class CreatureTableView extends AssetsTableView<Creature> {
 
@@ -71,7 +70,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
                 : selectedAssets) {
             Coords pos = rawPos.clone();
             if (!pos.is0()) {
-                double height = p.getImage().getHeight() / METER;
+                double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
             }
 

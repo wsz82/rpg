@@ -2,14 +2,13 @@ package editor.view.asset;
 
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.wsz.model.sizes.Sizes.METER;
 
 public class CoverTableView extends AssetsTableView<Cover> {
 
@@ -41,7 +40,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
                 : selectedAssets) {
             Coords pos = rawPos.clone();
             if (!pos.is0()) {
-                double height = c.getImage().getHeight() / METER;
+                double height = c.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
             }
 
