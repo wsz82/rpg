@@ -206,7 +206,7 @@ class SettingsMenu extends StackPane {
     private void hookUpResHeightEvents(Slider s, Label l) {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
         int maxHeight = (int) bounds.getHeight();
-        s.setMin(300);
+        s.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
         s.setMax(maxHeight);
         s.setBlockIncrement(1);
         s.setValue(Settings.getResolutionHeight());
@@ -220,7 +220,7 @@ class SettingsMenu extends StackPane {
     private void hookUpResWidthEvents(Slider s, Label l) {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
         int maxWidth = (int) bounds.getWidth();
-        s.setMin(300);
+        s.setMin(Sizes.MIN_RESOLUTION_WIDTH);
         s.setMax(maxWidth);
         s.setBlockIncrement(1);
         s.setValue(Settings.getResolutionWidth());

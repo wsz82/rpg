@@ -4,6 +4,8 @@ import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 public class Sizes {
+    public static final int MIN_RESOLUTION_WIDTH = 100;
+    public static final int MIN_RESOLUTION_HEIGHT = 100;
     public static final int ORIGIN_RESOLUTION_WIDTH = 1600;
     public static final int CONSTANT_METER = 100;
     public static final int TURN_DURATION_MILLIS = 16;

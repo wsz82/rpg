@@ -7,8 +7,8 @@ public class Settings {
     private static double dialogScrollSpeed = 0.2;
     private static boolean centerOnPC = false;
     private static boolean pauseOnInventory = true;
-    private static int resolutionWidth = 800;
-    private static int resolutionHeight = 600;
+    private static int resolutionWidth = 1600;
+    private static int resolutionHeight = 900;
 
     public static double getGameScrollSpeed() {
         return gameScrollSpeed;
