@@ -39,8 +39,8 @@ public class Creature extends PosItem<Creature> implements Containable {
                 coverLine, collisionPolygons);
     }
 
-    private PosItem getCollision(Coords nextPos) {
-        Coords[] poss = getCorners(posToCenter(nextPos));
+    public PosItem getCollision(Coords nextPos) {
+        Coords[] poss = getCorners(nextPos);
         PosItem collidedObstacle = Board.get().lookForObstacle(poss);
         if (collidedObstacle == null) {
             Creature collidedCreature = Board.get().getCornersCreature(poss, this);
@@ -58,6 +58,12 @@ public class Creature extends PosItem<Creature> implements Containable {
                 case TELEPORT -> ((Teleport) pi).enter(this);
             }
         }
+
+        PosItem collided = getCollision(getCenterBottomPos());
+        if (collided != null) {
+            Coords freePos = Board.get().getFreePosAround(this);
+            pos = reverseCenterBottomPos(freePos);
+        }
     }
 
     private PosItem getCornersContent(ItemType[] types) {
@@ -65,11 +71,11 @@ public class Creature extends PosItem<Creature> implements Containable {
         return Controller.get().getBoard().lookForContent(poss, types, false);
     }
 
-    public Coords posToCenter() {
-        return posToCenter(pos);
+    public Coords getCenterBottomPos() {
+        return getCenterBottomPos(pos);
     }
 
-    public Coords posToCenter(Coords pos) {
+    public Coords getCenterBottomPos(Coords pos) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
         double x = pos.x + width/2;
@@ -77,7 +83,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         return new Coords(x, y);
     }
 
-    public Coords centerToPos(Coords difPos) {
+    public Coords reverseCenterBottomPos(Coords difPos) {
         if (difPos == null) {
             return null;
         }
@@ -89,7 +95,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public Coords[] getCorners() {
-        Coords centerBottomPos = posToCenter();
+        Coords centerBottomPos = getCenterBottomPos();
         return getCorners(centerBottomPos);
     }
 
@@ -146,7 +152,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private void goTo(Coords pos) {
-        Task task = new Task(centerToPos(pos));
+        Task task = new Task(reverseCenterBottomPos(pos));
         tasks.clear();
         tasks.push(task);
     }
@@ -170,7 +176,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private boolean creatureWithinRange(Creature cr) {
-        Coords ePos = cr.posToCenter();
+        Coords ePos = cr.getCenterBottomPos();
         Coords[] poss = getCorners();
         for (Coords corner : poss) {
             double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
@@ -349,7 +355,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
-        pos = centerToPos(new Coords(targetX, targetY));
+        Coords rawPos = new Coords(targetX, targetY);
+        pos = reverseCenterBottomPos(rawPos);
         tasks.clear();
     }
 
@@ -416,9 +423,9 @@ public class Creature extends PosItem<Creature> implements Containable {
         public Task(PosItem item) {
             this.item = item;
             if (item instanceof Creature) {
-                this.dest = centerToPos(((Creature) item).posToCenter());
+                this.dest = reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
             } else {
-                this.dest = centerToPos(item.getPos());
+                this.dest = reverseCenterBottomPos(item.getPos());
             }
         }
 
@@ -490,7 +497,7 @@ public class Creature extends PosItem<Creature> implements Containable {
             double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
             double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
             Coords nextPos = new Coords(x3, y3);
-            PosItem pi = getCollision(nextPos);
+            PosItem pi = getCollision(getCenterBottomPos(nextPos));
             if (pi != null) {
                 dest = null;
                 return;

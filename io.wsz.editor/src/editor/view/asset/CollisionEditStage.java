@@ -7,6 +7,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -50,6 +52,9 @@ public class CollisionEditStage extends ChildStage {
         iv.setImage(img);
         ivPane.getChildren().add(iv);
         final ScrollPane sc = new ScrollPane();
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        sc.setMaxSize(bounds.getWidth() - bounds.getWidth()/10,
+                bounds.getHeight() - bounds.getHeight()/5);
         sc.setContent(ivPane);
 
         final HBox btns = new HBox(5);

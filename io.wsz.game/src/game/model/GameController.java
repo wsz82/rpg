@@ -230,7 +230,6 @@ public class GameController {
         gameStage.setLoaderViewToCenter(loader);
     }
 
-
     public void refreshGame() {
         gameView.refresh();
     }

@@ -2,6 +2,7 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.sizes.Sizes;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 import static io.wsz.model.stage.Comparator.Comparison;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 import static io.wsz.model.stage.Comparator.compare;
-import static java.lang.Math.pow;
+import static java.lang.Math.*;
 
 public class Board {
     private static Board singleton;
@@ -336,14 +337,14 @@ public class Board {
         }
 
         for (Creature c : creatures) {
-            if (cr.equals(c)) {
+            if (cr == c) {
                 continue;
             }
             for (Coords pos : corners) {
                 double x = pos.x;
                 double y = pos.y;
 
-                Coords cPos = c.posToCenter();
+                Coords cPos = c.getCenterBottomPos();
                 double h = cPos.x;
                 double k = cPos.y;
                 double rx = c.getSize().getWidth()/2;
@@ -373,12 +374,13 @@ public class Board {
         }
 
         for (PosItem pi : items) {
+            final Image img = pi.getImage();
+            final Coords cPos = pi.getPos();
+
             for (Coords pos : poss) {
                 double x = pos.x;
                 double y = pos.y;
 
-                final Image img = pi.getImage();
-                final Coords cPos = pi.getPos();
                 double cX = cPos.x;
                 double cWidth = img.getWidth() / Sizes.getMeter();
                 boolean fitX = x >= cX && x <= cX + cWidth;
@@ -472,5 +474,71 @@ public class Board {
         double y = pos.y;
 
         return pow(eX - x, 2) + pow(eY - y, 2) < pow(range, 2);
+    }
+
+    public Coords getFreePosAround(Creature cr) {
+        Coords pos = cr.getCenterBottomPos();
+
+        CreatureSize size = cr.getSize();
+        double height = size.getHeight();
+        double width = size.getWidth();
+        double offset = 0.1;
+
+        for (int i = 1; i < 10; i++) {
+            double angleScope = 45.0 / i;
+            int iterations = i * 8;
+            int angle = 0;
+            for (int j = 1; j < iterations; j++) {
+                double dx = i*width + offset;
+                double dyAngle = dx * tan(toRadians(angle));
+                double dyStraight = i*height + offset;
+                double x = 0;
+                double y = 0;
+                if (angle >= 360) {
+                    break;
+                } else if (angle == 0) {
+                    x = pos.x + dx;
+                    y = pos.y;
+                } else if (angle == 90) {
+                    x = pos.x;
+                    y = pos.y - dyStraight;
+                } else if (angle == 180) {
+                    x = pos.x - dx;
+                    y = pos.y;
+                } else if (angle == 270) {
+                    x = pos.x;
+                    y = pos.y + dyStraight;
+                } else if (angle > 270) {
+                    x = pos.x + dx;
+                    y = pos.y + dyAngle;
+                } else if (angle > 180) {
+                    x = pos.x - dx;
+                    y = pos.y + dyAngle;
+                } else if (angle > 90) {
+                    x = pos.x - dx;
+                    y = pos.y - dyAngle;
+                } else if (angle > 0) {
+                    x = pos.x + dx;
+                    y = pos.y - dyAngle;
+                }
+
+                CurrentLocation cl = Controller.get().getCurrentLocation();
+                if (x < 0 || x > cl.getWidth()) {
+                    continue;
+                }
+                if (y < 0 || y > cl.getHeight()) {
+                    continue;
+                }
+
+                Coords nextPos = new Coords(x, y);
+                PosItem pi = cr.getCollision(nextPos);
+
+                if (pi == null) {
+                    return nextPos;
+                }
+                angle = (int) (angleScope * j);
+            }
+        }
+        return pos;
     }
 }

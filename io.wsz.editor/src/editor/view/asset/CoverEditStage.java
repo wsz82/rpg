@@ -5,6 +5,7 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -20,6 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -49,6 +51,9 @@ public class CoverEditStage extends ChildStage {
         iv.setImage(img);
         pane.getChildren().add(iv);
         final ScrollPane sc = new ScrollPane();
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        sc.setMaxSize(bounds.getWidth() - bounds.getWidth()/10,
+                bounds.getHeight() - bounds.getHeight()/5);
         sc.setContent(pane);
         polyline.setStroke(Color.RED);
         polyline.setStrokeWidth(1);

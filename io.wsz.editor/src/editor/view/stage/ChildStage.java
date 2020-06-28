@@ -7,7 +7,7 @@ public class ChildStage extends Stage {
     protected final Stage parent;
 
     public ChildStage(Stage parent) {
-        super(StageStyle.UTILITY);
+        super(StageStyle.DECORATED);
         this.parent = parent;
         initOwner(parent);
     }

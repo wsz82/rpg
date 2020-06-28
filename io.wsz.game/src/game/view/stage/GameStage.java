@@ -364,8 +364,8 @@ public class GameStage extends Stage {
     public void open() {
         setFullScreenExitHint("");
         setFullScreenExitKeyCombination(CLOSE_GAME);
-        setWidth(800);
-        setHeight(600);
+        setWidth(1280);
+        setHeight(720);
         setMinWidth(300);
         setMinHeight(300);
 
