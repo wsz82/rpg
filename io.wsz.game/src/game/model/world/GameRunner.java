@@ -3,9 +3,7 @@ package game.model.world;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Container;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.PosItem;
+import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -185,6 +183,21 @@ public class GameRunner {
             for (int i = 0; i <= total; i++) {
                 PosItem item = items.get(i);
                 item.getImage();
+                if (item instanceof Containable) {
+                    Containable c = (Containable) item;
+                    List<Equipment> equipment = c.getItems();
+                    if (!equipment.isEmpty()) {
+                        for (Equipment e : equipment) {
+                            e.setImage(null);
+                            e.getImage();
+                        }
+                    }
+                }
+                if (item instanceof Creature) {
+                    Creature c = (Creature) item;
+                    c.setPortrait(null);
+                    c.getPortrait();
+                }
                 updateProgress(i, total);
             }
             return "Completed";

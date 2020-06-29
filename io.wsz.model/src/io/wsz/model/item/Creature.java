@@ -363,7 +363,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         return portrait;
     }
 
-    private void setPortrait(Image portrait) {
+    public void setPortrait(Image portrait) {
         this.portrait = portrait;
     }
 
