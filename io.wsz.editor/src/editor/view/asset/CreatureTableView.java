@@ -3,6 +3,7 @@ package editor.view.asset;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.Task;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -11,8 +12,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 class CreatureTableView extends AssetsTableView<Creature> {
@@ -104,10 +105,10 @@ class CreatureTableView extends AssetsTableView<Creature> {
     }
 
     private void cloneTasks(Creature p, Creature cr) {
-        ArrayDeque<Creature.Task> pTasks = p.getTasks();
-        ArrayDeque<Creature.Task> tasks = new ArrayDeque<>(pTasks.size());
-        for (Creature.Task task : pTasks) {
-            tasks.add(task.clone());
+        LinkedList<Task> pTasks = p.getTasks();
+        LinkedList<Task> tasks = new LinkedList<>();
+        for (Task task : pTasks) {
+            tasks.add(task.clone(cr));
         }
         cr.setTasks(tasks);
     }

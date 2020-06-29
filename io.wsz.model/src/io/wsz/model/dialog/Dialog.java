@@ -40,12 +40,16 @@ public class Dialog implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Dialog dialog = (Dialog) o;
-        return Objects.equals(answers, dialog.answers) &&
-                Objects.equals(startAnswer, dialog.startAnswer);
+        if (startAnswer == null && dialog.startAnswer == null) {
+            return true;
+        } else if (startAnswer == null || dialog.startAnswer == null) {
+            return false;
+        }
+        return startAnswer.getText().equals(dialog.startAnswer.getText()); //TODO equals method when dialog edit stage requires identity equals
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(answers, startAnswer);
+        return Objects.hash(startAnswer.getText());
     }
 }

@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
@@ -50,10 +51,10 @@ public abstract class Asset implements Externalizable {
         return ASSETS_DIR + File.separator + type.toString().toLowerCase();
     }
 
-    public static String convertToRelativeFilePath(String path, ItemType type) {
+    public static String convertToRelativePath(String path) {
         File file = new File(path);
         String fileName = file.getName();
-        return ASSETS_DIR + File.separator + type.toString().toLowerCase() + File.separator + fileName;
+        return File.separator + fileName;
     }
 
     public String getName() {
@@ -82,16 +83,17 @@ public abstract class Asset implements Externalizable {
 
     public Image getImage() {
         if (this.image.get() == null) {
-            setImage(loadImageFromPath());
+            setImage(loadImageFromPath(getRelativePath()));
         }
         return image.get();
     }
 
-    public Image loadImageFromPath() {
-        if (getRelativePath() == null || getRelativePath().isEmpty()) {
+    protected Image loadImageFromPath(String fileName) {
+        String path = getRelativeTypePath(getType()) + File.separator + fileName;
+        if (path.isEmpty()) {
             throw new NoSuchElementException();
         }
-        File fixedFile = new File(Controller.getProgramDir() + getRelativePath());
+        File fixedFile = new File(Controller.getProgramDir() + path);
         String url = null;
         try {
             url = fixedFile.toURI().toURL().toString();
@@ -120,7 +122,7 @@ public abstract class Asset implements Externalizable {
         }
     }
 
-    public Image getChangedImage(String url, Dimension d, Dimension rd) {
+    private Image getChangedImage(String url, Dimension d, Dimension rd) {
         Image img = new Image(url, rd.width, rd.height, false, false);
         BufferedImage bInput = SwingFXUtils.fromFXImage(img, null);
         java.awt.Image imgInput = bInput.getScaledInstance(d.width, d.height, java.awt.Image.SCALE_DEFAULT);
@@ -170,6 +172,21 @@ public abstract class Asset implements Externalizable {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Asset)) return false;
+        Asset asset = (Asset) o;
+        return Objects.equals(getName(), asset.getName()) &&
+                Objects.equals(getType(), asset.getType()) &&
+                Objects.equals(getRelativePath(), asset.getRelativePath());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getType(), getRelativePath());
     }
 
     @Override

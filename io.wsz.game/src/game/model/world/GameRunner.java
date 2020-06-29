@@ -171,6 +171,7 @@ public class GameRunner {
     private void loadNewGame() {
         gameController.loadGameActivePluginToLists();
         gameController.initNewGameSettings();
+        controller.initNewGameHeroes();
     }
 
     private class Loader extends Task<String> {

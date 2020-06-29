@@ -38,6 +38,7 @@ public class GameView extends Canvas {
     private final Board board = controller.getBoard();
     private final Coords currentPos = controller.getBoardPos();
     private final GameController gameController = GameController.get();
+    private final BarView barView = new BarView(this);
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
@@ -133,6 +134,10 @@ public class GameView extends Canvas {
                 }
                 gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
             }
+        }
+
+        if (Settings.isShowBar()) {
+            barView.refresh();
         }
     }
 

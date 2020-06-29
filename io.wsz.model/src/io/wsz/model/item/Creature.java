@@ -6,23 +6,27 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
-import java.util.ArrayDeque;
+import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
-import static io.wsz.model.sizes.Sizes.SECOND;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
-    private ArrayDeque<Task> tasks;
+    private Image portrait;
+    private String portraitPath;
+    private LinkedList<Task> tasks;
     private Inventory inventory;
+
     private CreatureSize size;
     private CreatureControl control;
     private Double speed;
@@ -152,30 +156,30 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private void goTo(Coords pos) {
-        Task task = new Task(reverseCenterBottomPos(pos));
+        Task task = new Task(this, reverseCenterBottomPos(pos));
         tasks.clear();
         tasks.push(task);
     }
 
     private void takeItem(Equipment e) {
-        Task task = new Task(e);
+        Task task = new Task(this, e);
         tasks.clear();
         tasks.push(task);
     }
 
     private void openContainer(Container c) {
-        Task task = new Task(c);
+        Task task = new Task(this, c);
         tasks.clear();
         tasks.push(task);
     }
 
     private void startConversation(Creature cr) {
-        Task task = new Task(cr);
+        Task task = new Task(this, cr);
         tasks.clear();
         tasks.push(task);
     }
 
-    private boolean creatureWithinRange(Creature cr) {
+    public boolean creatureWithinRange(Creature cr) {
         Coords ePos = cr.getCenterBottomPos();
         Coords[] poss = getCorners();
         for (Coords corner : poss) {
@@ -187,7 +191,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         return false;
     }
 
-    private boolean withinRange(PosItem e) {
+    public boolean withinRange(PosItem e) {
         Coords ePos = e.getCenter();
         Coords[] poss = getCorners();
         for (Coords corner : poss) {
@@ -204,7 +208,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         return Controller.get().getBoard().getEquipmentWithinRange(poss, this);
     }
 
-    private double getDistance(double x1, double x2, double y1, double y2) {
+    public double getDistance(double x1, double x2, double y1, double y2) {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
@@ -214,19 +218,19 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
         Task priority = tasks.getFirst();
         priority.doTask();
-        if (priority.finished) {
+        if (priority.isFinished()) {
             tasks.remove(priority);
         }
     }
 
-    public ArrayDeque<Task> getIndividualTasks() {
+    public LinkedList<Task> getIndividualTasks() {
         return tasks;
     }
 
-    public ArrayDeque<Task> getTasks() {
+    public LinkedList<Task> getTasks() {
         if (tasks == null) {
             if (prototype == null) {
-                return new ArrayDeque<>(0);
+                return new LinkedList<>();
             }
             return prototype.tasks;
         } else {
@@ -234,7 +238,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
     }
 
-    public void setTasks(ArrayDeque<Task> tasks) {
+    public void setTasks(LinkedList<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -352,12 +356,47 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.strength = strength;
     }
 
+    public Image getPortrait() {
+        if (this.portrait == null) {
+            setPortrait(loadImageFromPath(getPortraitPath()));
+        }
+        return portrait;
+    }
+
+    private void setPortrait(Image portrait) {
+        this.portrait = portrait;
+    }
+
+    public String getIndividualPortraitPath() {
+        return portraitPath;
+    }
+
+    public String getPortraitPath() {
+        if (portraitPath == null || portraitPath.isEmpty()) {
+            if (prototype == null) {
+                return "";
+            }
+            return prototype.portraitPath;
+        } else {
+            return portraitPath;
+        }
+    }
+
+    public void setPortraitPath(String portraitPath) {
+        this.portraitPath = portraitPath;
+    }
+
     @Override
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         Coords rawPos = new Coords(targetX, targetY);
         pos = reverseCenterBottomPos(rawPos);
         tasks.clear();
+
+        IdentityHashMap<Creature, Location> heroes = Controller.get().getHeroes();
+        if (heroes.containsKey(this)) {
+            heroes.put(this, target);
+        }
     }
 
     @Override
@@ -369,6 +408,26 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public List<Equipment> getItems() {
         return inventory.getItems();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Creature creature = (Creature) o;
+        return Objects.equals(getTasks(), creature.getTasks()) &&
+                Objects.equals(getInventory(), creature.getInventory()) &&
+                getSize() == creature.getSize() &&
+                getControl() == creature.getControl() &&
+                Objects.equals(getSpeed(), creature.getSpeed()) &&
+                Objects.equals(getRange(), creature.getRange()) &&
+                Objects.equals(getStrength(), creature.getStrength());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getTasks(), getInventory(), getSize(), getControl(), getSpeed(), getRange(), getStrength());
     }
 
     @Override
@@ -388,13 +447,15 @@ public class Creature extends PosItem<Creature> implements Containable {
         out.writeObject(range);
 
         out.writeObject(strength);
+
+        out.writeObject(portraitPath);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
 
-        tasks = (ArrayDeque<Task>) in.readObject();
+        tasks = (LinkedList<Task>) in.readObject();
 
         inventory = (Inventory) in.readObject();
 
@@ -407,102 +468,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         range = (Double) in.readObject();
 
         strength = (Integer) in.readObject();
-    }
 
-    public class Task implements Serializable {
-        private PosItem item;
-        private Coords dest;
-        private boolean finished;
-
-        public Task() {}
-
-        public Task(Coords dest) {
-            this.dest = dest;
-        }
-
-        public Task(PosItem item) {
-            this.item = item;
-            if (item instanceof Creature) {
-                this.dest = reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
-            } else {
-                this.dest = reverseCenterBottomPos(item.getPos());
-            }
-        }
-
-        public Task clone() {
-            Task task = new Task();
-            task.item = this.item;
-            task.dest = this.dest;
-            return task;
-        }
-
-        private void doTask() {
-            if (dest != null) {
-                move();
-                if (item != null) {
-                    if (item instanceof Equipment) {
-                        interactWithEquipment((Equipment) item);
-                    } else
-                    if (item instanceof Creature) {
-                        interactWithCreature((Creature) item);
-                    }
-                }
-                return;
-            }
-            finished = true;
-        }
-
-        private void interactWithCreature(Creature cr) {
-            if (creatureWithinRange(cr)) {
-                Controller.get().setAsking(Creature.this);
-                Controller.get().setAnswering(cr);
-                item = null;
-                dest = null;
-            }
-        }
-
-        private void interactWithEquipment(Equipment equipment) {
-            if (withinRange(equipment)) {
-                if (equipment instanceof Container) {
-                    ((Container) equipment).open(Creature.this);
-                } else {
-                    boolean taken = inventory.add(equipment);
-                    if (taken) {
-                        equipment.onTake(Creature.this);
-                    }
-                }
-                item = null;
-                dest = null;
-            }
-        }
-
-        private void move() {
-            if (inventory.getActualWeight() > inventory.getMaxWeight()) {
-                return;
-            }
-            double x1 = pos.x;
-            double x2 = dest.x;
-            double y1 = pos.y;
-            double y2 = dest.y;
-            if (x1 <= x2 + 10.0/ Sizes.getMeter() && x1 >= x2 - 10.0/ Sizes.getMeter()
-                    && y1 <= y2 + 10.0/ Sizes.getMeter() && y1 >= y2 - 10.0/ Sizes.getMeter()) {
-                dest = null;
-                return;
-            }
-            double dist = getDistance(x1, x2, y1, y2);
-            double moveDist = getSpeed();
-            if (dist < getSpeed()) {
-                moveDist = dist;
-            }
-            double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
-            double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
-            Coords nextPos = new Coords(x3, y3);
-            PosItem pi = getCollision(getCenterBottomPos(nextPos));
-            if (pi != null) {
-                dest = null;
-                return;
-            }
-            pos = nextPos;
-        }
+        portraitPath = (String) in.readObject();
     }
 }

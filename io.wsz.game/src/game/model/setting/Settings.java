@@ -9,6 +9,7 @@ public class Settings {
     private static boolean pauseOnInventory = true;
     private static int resolutionWidth = 1600;
     private static int resolutionHeight = 900;
+    private static boolean showBar = true;
 
     public static double getGameScrollSpeed() {
         return gameScrollSpeed;
@@ -58,5 +59,13 @@ public class Settings {
 
     public static void setResolutionHeight(int resolutionHeight) {
         Settings.resolutionHeight = resolutionHeight;
+    }
+
+    public static boolean isShowBar() {
+        return showBar;
+    }
+
+    public static void setShowBar(boolean showBar) {
+        Settings.showBar = showBar;
     }
 }

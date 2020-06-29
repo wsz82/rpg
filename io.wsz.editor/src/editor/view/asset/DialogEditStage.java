@@ -40,6 +40,7 @@ public class DialogEditStage extends ChildStage {
     private HBox answerBox;
     private HBox startAnswerBox;
     private TextArea questionText;
+    private VBox center;
     private final ChangeListener<QuestionItem> questionTableItemListener = (observable, oldValue, newValue) -> {
         if (questionsTableView.getItems().size() < 1) {
             disableQuestionDetails();
@@ -58,7 +59,6 @@ public class DialogEditStage extends ChildStage {
             disableQuestionDetails();
         }
     };
-    private VBox center;
 
     public DialogEditStage(Stage parent, Dialog dialog) {
         super(parent);

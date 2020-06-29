@@ -541,4 +541,15 @@ public class Board {
         }
         return pos;
     }
+
+    public List<Creature> getControllableCreatures() {
+        return Controller.get().getCurrentLocation().getItems().stream()
+                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .filter(pi -> {
+                    Creature cr = (Creature) pi;
+                    return cr.getControl().equals(CreatureControl.CONTROLLABLE);
+                })
+                .map(pi -> (Creature) pi)
+                .collect(Collectors.toList());
+    }
 }

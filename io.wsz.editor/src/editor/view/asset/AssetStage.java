@@ -31,7 +31,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
-    private String path;
 
     public AssetStage(Stage parent, A item, boolean isContent) {
         super(parent);
@@ -95,7 +94,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         nameInput.setText(item.getName());
-        path = item.getRelativePath();
         imageLabel.setText(item.getRelativePath());
     }
 
@@ -103,6 +101,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void onCreate() {
         String name = nameInput.getText();
+        String path = imageLabel.getText();
         boolean inputNameIsEmpty = name.equals("");
         boolean inputFileIsEmpty = path == null || path.isEmpty();
         if (inputNameIsEmpty || inputFileIsEmpty) {
@@ -121,6 +120,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void onEdit() {
+        String path = imageLabel.getText();
         boolean inputFileIsEmpty = path == null || path.isEmpty();
         if (inputFileIsEmpty) {
             return;
@@ -131,26 +131,31 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void hookupEvents() {
         imageButton.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose image for asset");
-            fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
-            );
-            File selectedFile = fileChooser.showOpenDialog(this);
-            if (selectedFile == null || !selectedFile.isFile()) {
-                return;
-            }
-            String selectedFilePath = selectedFile.getAbsolutePath();
-            if (pathIsIncorrect(selectedFilePath)) return;
-            path = Asset.convertToRelativeFilePath(selectedFilePath, getType());
-            imageLabel.setText(path);
+            String title = "Choose image for asset";
+            setUpImageChooser(title, imageLabel);
         });
         coverButton.setOnAction(e -> openCoverEdit());
         collisionButton.setOnAction(e -> openCollisionEdit());
         dialogButton.setOnAction(e -> openDialogEdit());
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
+    }
+
+    protected void setUpImageChooser(String title, Label label) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(title);
+        fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
+        );
+        File selectedFile = fileChooser.showOpenDialog(this);
+        if (selectedFile == null || !selectedFile.isFile()) {
+            return;
+        }
+        String selectedFilePath = selectedFile.getAbsolutePath();
+        if (pathIsIncorrect(selectedFilePath)) return;
+        String path = Asset.convertToRelativePath(selectedFilePath);
+        label.setText(path);
     }
 
     private void openDialogEdit() {
@@ -175,11 +180,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void editAsset() {
+        String path = imageLabel.getText();
         item.setRelativePath(path);
         close();
     }
 
-    private boolean pathIsIncorrect(String path) {
+    protected boolean pathIsIncorrect(String path) {
         File selectedFile = new File(path);
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
@@ -204,7 +210,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void addNewAsset() {
         String name = nameInput.getText();
-        String relativePath = Asset.convertToRelativeFilePath(path, getType());
+        String path = imageLabel.getText();
+        String relativePath = Asset.convertToRelativePath(path);
         item = createNewAsset(name, relativePath);
         item.setDialog(new Dialog());
         addAssetToList(item);

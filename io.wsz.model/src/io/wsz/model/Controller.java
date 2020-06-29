@@ -17,11 +17,13 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 public class Controller {
     private static Controller singleton;
     private static File programDir;
+    private final IdentityHashMap<Creature, Location> heroes = new IdentityHashMap<>(6);
     private Location locationToUpdate;
     private Coords posToCenter;
     private Creature creatureToOpenContainer;
@@ -149,5 +151,19 @@ public class Controller {
 
     public void setAnswering(PosItem answering) {
         this.answering = answering;
+    }
+
+
+    public IdentityHashMap<Creature, Location> getHeroes() {
+        return heroes;
+    }
+
+    public void initNewGameHeroes() {
+        heroes.clear();
+        List<Creature> controllables = Controller.get().getBoard().getControllableCreatures();
+        Location current = Controller.get().getCurrentLocation().getLocation();
+        for (Creature cr : controllables) {
+            heroes.put(cr, current);
+        }
     }
 }

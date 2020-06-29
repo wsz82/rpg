@@ -90,7 +90,9 @@ public class GameController {
 
     public SaveMemento loadSaveMemento(String name, File programDir) {
         SaveCaretaker sc = new SaveCaretaker(programDir);
-        return sc.loadMemento(name);
+        SaveMemento memento = sc.loadMemento(name);
+        controller.getHeroes().putAll(memento.getHeroes());
+        return memento;
     }
 
     public void deleteGameSave(String name, File programDir) {
@@ -112,7 +114,7 @@ public class GameController {
         }
         String currentLocationName = controller.getCurrentLocation().getName();
         int currentLayer = controller.getCurrentLayer().getLevel();
-        SaveMemento memento = new SaveMemento(name, savedPos, currentLocationName, currentLayer);
+        SaveMemento memento = new SaveMemento(name, savedPos, currentLocationName, currentLayer, controller.getHeroes());
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.createSave(memento);
     }

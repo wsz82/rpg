@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Inventory implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -61,5 +62,28 @@ public class Inventory implements Serializable {
         return getItems().stream()
                 .mapToDouble(Equipment::getWeight)
                 .sum();
+    }
+
+    @Override
+    public String toString() {
+        return "Inventory{" +
+                "items=" + items +
+                ", owner=" + owner +
+                ", equippedWeapon=" + equippedWeapon +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Inventory)) return false;
+        Inventory inventory = (Inventory) o;
+        return Objects.equals(getItems(), inventory.getItems()) &&
+                Objects.equals(getEquippedWeapon(), inventory.getEquippedWeapon());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getItems(), getEquippedWeapon());
     }
 }

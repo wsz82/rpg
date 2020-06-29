@@ -11,12 +11,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
+    private final Button portraitButton = new Button("Portrait");
+    private final Label portraitLabel = new Label();
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final DoubleField speedInput = new DoubleField(isContent);
@@ -42,6 +44,9 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         container.getChildren().remove(coverButton);
         container.getChildren().remove(collisionButton);
 
+        final HBox portraitBox = new HBox(10);
+        portraitBox.getChildren().addAll(portraitButton, portraitLabel);
+
         final HBox sizeBox = new HBox(10);
         final Label sizeLabel = new Label("Size");
         sizeBox.getChildren().addAll(sizeLabel, sizeCB);
@@ -62,7 +67,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label strengthLabel = new Label("Strength");
         strengthBox.getChildren().addAll(strengthLabel, strengthInput);
 
-        container.getChildren().addAll(sizeBox, controlBox, speedBox, rangeBox, strengthBox);
+        container.getChildren().addAll(portraitBox, sizeBox, controlBox, speedBox, rangeBox, strengthBox);
 
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
@@ -78,13 +83,21 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
         if (item != null) {
             container.getChildren().add(itemsButton);
-            hookupCreatureEvents();
+            hookUpEditEvents();
         }
 
         fillInputs();
+        hookUpEvents();
     }
 
-    private void hookupCreatureEvents() {
+    private void hookUpEvents() {
+        portraitButton.setOnAction(e -> {
+            String title = "Choose image for creature portrait";
+            setUpImageChooser(title, portraitLabel);
+        });
+    }
+
+    private void hookUpEditEvents() {
         itemsButton.setOnAction(e -> {
             ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item);
             itemsStage.show();
@@ -97,6 +110,14 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         if (item == null) {
             return;
         }
+
+        String portraitPath = item.getIndividualPortraitPath();
+        if (portraitPath == null) {
+            portraitLabel.setText("");
+        } else {
+            portraitLabel.setText(portraitPath);
+        }
+
         CreatureSize size = item.getIndividualSize();
         sizeCB.setValue(size);
 
@@ -127,6 +148,13 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void defineAsset() {
+        String portraitPath = portraitLabel.getText();
+        if (!isContent && portraitPath == null) {
+            item.setPortraitPath("");
+        } else {
+            item.setPortraitPath(portraitPath);
+        }
+
         CreatureSize size = sizeCB.getValue();
         if (!isContent && size == null) {
             item.setSize(CreatureSize.getDefault());
@@ -186,7 +214,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 null, name, getType(), relativePath,
                 true, null, null,
                 new ArrayList<>(0), new ArrayList<>(0));
-        cr.setTasks(new ArrayDeque<>(0));
+        cr.setTasks(new LinkedList<>());
         cr.setInventory(new Inventory(cr));
         return cr;
     }

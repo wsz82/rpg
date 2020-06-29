@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Equipment<E extends Equipment> extends PosItem<E> implements Equippable {
     private static final long serialVersionUID = 1L;
@@ -81,6 +82,21 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void update() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Equipment)) return false;
+        if (!super.equals(o)) return false;
+        Equipment<?> equipment = (Equipment<?>) o;
+        return Objects.equals(getWeight(), equipment.getWeight()) &&
+                Objects.equals(getSize(), equipment.getSize());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getWeight(), getSize());
     }
 
     @Override

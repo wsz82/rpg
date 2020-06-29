@@ -1,10 +1,12 @@
 package game.model.save;
 
+import io.wsz.model.item.Creature;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public class SaveMemento implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,14 +16,18 @@ public class SaveMemento implements Serializable {
     private List<Location> locations;
     private String currentLocationName;
     private int currentLayer;
+    private Map<Creature, Location> heroes;
 
     public SaveMemento() {}
 
-    public SaveMemento(String name, Coords lastPos, String currentLocationName, int currentLayer) {
+    public SaveMemento(String name, Coords lastPos, String currentLocationName, int currentLayer,
+                       Map<Creature, Location> heroes) {
         this.name = name;
         this.lastPos = lastPos;
         this.currentLocationName = currentLocationName;
         this.currentLayer = currentLayer;
+        this.heroes = heroes;
+
     }
 
     public String getName() {
@@ -62,5 +68,13 @@ public class SaveMemento implements Serializable {
 
     public void setCurrentLayer(int currentLayer) {
         this.currentLayer = currentLayer;
+    }
+
+    public Map<Creature, Location> getHeroes() {
+        return heroes;
+    }
+
+    public void setHeroes(Map<Creature, Location> heroes) {
+        this.heroes = heroes;
     }
 }

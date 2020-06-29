@@ -152,19 +152,22 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof PosItem)) return false;
+        if (!super.equals(o)) return false;
         PosItem<?> item = (PosItem<?>) o;
-        return Objects.equals(prototype, item.prototype) &&
-                Objects.equals(visible.get(), item.visible.get()) &&
-                Objects.equals(pos, item.pos) &&
-                Objects.equals(level, item.level) &&
-                Objects.equals(coverLine, item.coverLine) &&
-                Objects.equals(collisionPolygons, item.collisionPolygons);
+        return Objects.equals(getPrototype(), item.getPrototype()) &&
+                Objects.equals(getVisible(), item.getVisible()) &&
+                Objects.equals(getPos(), item.getPos()) &&
+                Objects.equals(getLevel(), item.getLevel()) &&
+                Objects.equals(getCoverLine(), item.getCoverLine()) &&
+                Objects.equals(getCollisionPolygons(), item.getCollisionPolygons()) &&
+                Objects.equals(getDialog(), item.getDialog());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(prototype, visible, pos, level, coverLine, collisionPolygons);
+        return Objects.hash(super.hashCode(), getPrototype(), getVisible(), getPos(), getLevel(),
+                getCoverLine(), getCollisionPolygons(), getDialog());
     }
 
     @Override
