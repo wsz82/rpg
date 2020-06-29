@@ -2,6 +2,7 @@ package game.view.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
 import io.wsz.model.location.Location;
 import javafx.geometry.Bounds;
 import javafx.scene.SnapshotParameters;
@@ -18,11 +19,10 @@ import java.util.Map;
 public class BarView {
     private static final double RIGHT_VIEW_PART = 0.08;
     private static final double PORTRAIT_PART = 0.9;
-    private final Map<CreatureLocation, Double> portraitsPos = new HashMap<>(1);
+    private final Map<CreatureLocation, Double> portraitsWithPos = new HashMap<>(1);
     private final Canvas canvas;
     private final GraphicsContext gc;
     private CreatureLocation hoveredPortrait;
-    private CreatureLocation activePortrait;
 
     public BarView(Canvas canvas) {
         this.canvas = canvas;
@@ -33,15 +33,15 @@ public class BarView {
         double canvasWidth = canvas.getWidth();
         double barWidth = canvasWidth*RIGHT_VIEW_PART;
         double leftX = canvasWidth - barWidth;
-        double portraitSize = barWidth*PORTRAIT_PART;
 
         drawBackground(leftX, barWidth);
 
+        double portraitSize = barWidth*PORTRAIT_PART;
         double padding = (barWidth-portraitSize) / 2;
 
-        drawHeroes(leftX, portraitSize, padding);
+        drawHeroes(leftX, padding, portraitSize);
 
-        checkPos(leftX, portraitSize, padding);
+        checkPos(leftX, padding, portraitSize);
 
         updateHoveredPortrait(leftX, padding, portraitSize);
 
@@ -49,26 +49,28 @@ public class BarView {
     }
 
     private void updateActivePortrait(double leftX, double padding, double portraitSize) {
-        if (activePortrait == null) {
-            return;
+        for (CreatureLocation cl : portraitsWithPos.keySet()) {
+            Creature hero = cl.creature;
+            if (hero.getControl().equals(CreatureControl.CONTROL)) {
+                double portraitY = portraitsWithPos.get(cl);
+                gc.setStroke(Color.GREEN);
+                gc.setLineWidth(2);
+                gc.strokeRect(leftX + padding, portraitY, portraitSize, portraitSize);
+            }
         }
-        double portraitY = portraitsPos.get(activePortrait);
-        gc.setStroke(Color.DARKGREEN);
-        gc.setLineWidth(2);
-        gc.strokeRect(leftX + padding, portraitY, portraitSize, portraitSize);
     }
 
     private void updateHoveredPortrait(double leftX, double padding, double portraitSize) {
         if (hoveredPortrait == null) {
             return;
         }
-        double portraitY = portraitsPos.get(hoveredPortrait);
-        gc.setStroke(Color.GRAY);
+        double portraitY = portraitsWithPos.get(hoveredPortrait);
+        gc.setStroke(Color.LIGHTGREY);
         gc.setLineWidth(2);
         gc.strokeRect(leftX + padding, portraitY, portraitSize, portraitSize);
     }
 
-    private void checkPos(double leftOfView, double portraitSize, double padding) {
+    private void checkPos(double leftOfView, double padding, double portraitSize) {
         Bounds b = canvas.localToScreen(canvas.getBoundsInLocal());
         if (b == null) {
             return;
@@ -104,8 +106,8 @@ public class BarView {
     }
 
     private boolean pointWithinPortraits(double portraitSize, double y, double top) {
-        for (CreatureLocation cl : portraitsPos.keySet()) {
-            double portraitY = portraitsPos.get(cl);
+        for (CreatureLocation cl : portraitsWithPos.keySet()) {
+            double portraitY = portraitsWithPos.get(cl);
             if (y > top + portraitY && y < top + portraitY + portraitSize) {
                 if (hoveredPortrait != cl) {
                     hoveredPortrait = cl;
@@ -116,13 +118,13 @@ public class BarView {
         return false;
     }
 
-    private void drawHeroes(double leftX, double portraitSize, double padding) {
+    private void drawHeroes(double leftX, double padding, double portraitSize) {
         Map<Creature, Location> heroes = Controller.get().getHeroes();
 
         double y = padding;
         double portraitX = leftX + padding;
 
-        portraitsPos.clear();
+        portraitsWithPos.clear();
         int i = 1;
         for (Creature cr : heroes.keySet()) {
             gc.setFill(Color.DARKVIOLET);
@@ -138,7 +140,7 @@ public class BarView {
             Image img = iv.snapshot(sp, null);
 
             CreatureLocation cl = new CreatureLocation(cr, heroes.get(cr), i);
-            portraitsPos.put(cl, y);
+            portraitsWithPos.put(cl, y);
 
             gc.drawImage(img, portraitX, y);
 
@@ -148,7 +150,7 @@ public class BarView {
     }
 
     private void drawBackground(double leftX, double barWidth) {
-        gc.setFill(Color.SADDLEBROWN);
+        gc.setFill(Color.DARKGRAY);
         gc.fillRect(leftX, 0, barWidth, canvas.getHeight());
     }
 
