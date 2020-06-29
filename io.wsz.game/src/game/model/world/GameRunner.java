@@ -98,6 +98,19 @@ public class GameRunner {
             List<PosItem> items = l.getItems().get();
             for (PosItem pi : items) {
                 pi.setImage(null);
+                if (pi instanceof Containable) {
+                    Containable c = (Containable) pi;
+                    List<Equipment> equipment = c.getItems();
+                    if (!equipment.isEmpty()) {
+                        for (Equipment e : equipment) {
+                            e.setImage(null);
+                        }
+                    }
+                }
+                if (pi instanceof Creature) {
+                    Creature c = (Creature) pi;
+                    c.setPortrait(null);
+                }
             }
         }
         loadImages();
@@ -152,7 +165,8 @@ public class GameRunner {
             Location l = cl.getLocation();
             if (!l.getName().equals(locationToUpdate.getName())) {
                 cl.setLocation(locationToUpdate);
-                Platform.runLater(this::loadImages);
+
+                Platform.runLater(this::clearImagesAndReload);
             }
         }
     }
@@ -188,14 +202,12 @@ public class GameRunner {
                     List<Equipment> equipment = c.getItems();
                     if (!equipment.isEmpty()) {
                         for (Equipment e : equipment) {
-                            e.setImage(null);
                             e.getImage();
                         }
                     }
                 }
                 if (item instanceof Creature) {
                     Creature c = (Creature) item;
-                    c.setPortrait(null);
                     c.getPortrait();
                 }
                 updateProgress(i, total);
