@@ -552,4 +552,9 @@ public class Board {
                 .map(pi -> (Creature) pi)
                 .collect(Collectors.toList());
     }
+
+    public void looseCreaturesControl() {
+        List<Creature> creatures = getControlledCreatures();
+        Controller.get().getCreaturesToLooseControl().addAll(creatures);
+    }
 }

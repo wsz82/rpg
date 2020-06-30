@@ -266,6 +266,12 @@ public class GameView extends Canvas {
         clickEvent = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
+                if (Settings.isShowBar()) {
+                    double barLeft = barView.getLeft();
+                    if (e.getX() > barLeft) {
+                        return;
+                    }
+                }
                 e.consume();
                 Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
                 Coords translated = pos.add(currentPos);
@@ -274,55 +280,69 @@ public class GameView extends Canvas {
                 PosItem pi = controller.getBoard().lookForContent(poss, types, true);
                 if (pi != null) {
                     ItemType type = pi.getType();
-                    boolean success = switch (type) {
-                        case CREATURE -> interact((Creature) pi);
-                        default -> false;
-                    };
-                    if (!success) {
-                        commandControllable(translated);
+                    synchronized (gameController.getGameRunner()) {
+                        boolean success = switch (type) {
+                            case CREATURE -> interact((Creature) pi);
+                            default -> false;
+                        };
+                        if (!success) {
+                            commandControllable(translated);
+                        }
                     }
                 } else {
-                    commandControllable(translated);
+                    synchronized (gameController.getGameRunner()) {
+                        commandControllable(translated);
+                    }
                 }
             } else if (button.equals(MouseButton.SECONDARY)) {
                 e.consume();
-                looseAllControl();
+                synchronized (gameController.getGameRunner()) {
+                    board.looseCreaturesControl();
+                }
             }
         };
         keyboardEvent = e -> {
-            KeyCode key = e.getCode();
-            switch (key) {
-                case I -> {
-                    e.consume();
-                    openInventory();
-                }
-                case SPACE -> {
-                    e.consume();
-                    handlePause();
-                }
-                case PAGE_UP -> {
-                    e.consume();
-                    Layer layer = controller.getCurrentLayer().getLayer();
-                    Layer next = layer;
-                    for (int i = 0; i < layers.size() - 1; i++) {
-                        Layer current = layers.get(i);
-                        if (current == layer) {
-                            next = layers.get(i + 1);
+            synchronized (gameController.getGameRunner()) {
+                KeyCode key = e.getCode();
+                switch (key) {
+                    case I -> {
+                        e.consume();
+                        synchronized (gameController.getGameRunner()) {
+                            openInventory();
                         }
                     }
-                    controller.getCurrentLayer().setLayer(next);
-                }
-                case PAGE_DOWN -> {
-                    e.consume();
-                    Layer layer = controller.getCurrentLayer().getLayer();
-                    Layer prev = layer;
-                    for (int i = 1; i < layers.size(); i++) {
-                        Layer current = layers.get(i);
-                        if (current == layer) {
-                            prev = layers.get(i - 1);
+                    case SPACE -> {
+                        e.consume();
+                        handlePause();
+                    }
+                    case PAGE_UP -> {
+                        e.consume();
+                        synchronized (gameController.getGameRunner()) {
+                            Layer layer = controller.getCurrentLayer().getLayer();
+                            Layer next = layer;
+                            for (int i = 0; i < layers.size() - 1; i++) {
+                                Layer current = layers.get(i);
+                                if (current == layer) {
+                                    next = layers.get(i + 1);
+                                }
+                            }
+                            controller.getCurrentLayer().setLayer(next);
                         }
                     }
-                    controller.getCurrentLayer().setLayer(prev);
+                    case PAGE_DOWN -> {
+                        e.consume();
+                        synchronized (gameController.getGameRunner()) {
+                            Layer layer = controller.getCurrentLayer().getLayer();
+                            Layer prev = layer;
+                            for (int i = 1; i < layers.size(); i++) {
+                                Layer current = layers.get(i);
+                                if (current == layer) {
+                                    prev = layers.get(i - 1);
+                                }
+                            }
+                            controller.getCurrentLayer().setLayer(prev);
+                        }
+                    }
                 }
             }
         };
@@ -348,16 +368,11 @@ public class GameView extends Canvas {
             cr.setControl(CONTROLLABLE);
             return true;
         } else if (control == CONTROLLABLE) {
-            looseAllControl();
+            board.looseCreaturesControl();
             cr.setControl(CONTROL);
             return true;
         }
         return false;
-    }
-
-    private void looseAllControl() {
-        board.getControlledCreatures()
-                .forEach(Creature::loseControl);
     }
 
     private void handlePause() {
@@ -395,8 +410,10 @@ public class GameView extends Canvas {
     }
 
     private void commandControllable(Coords pos) {
-        board.getControlledCreatures()
-                .forEach(c -> c.onInteractWith(pos));
+        synchronized (gameController.getGameRunner()) {
+            board.getControlledCreatures()
+                    .forEach(c -> c.onInteractWith(pos));
+        }
     }
 
     private void setSize() {

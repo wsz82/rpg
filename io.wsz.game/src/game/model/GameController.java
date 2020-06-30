@@ -256,6 +256,10 @@ public class GameController {
         this.gameStage = gameStage;
     }
 
+    public GameRunner getGameRunner() {
+        return gameRunner;
+    }
+
     public boolean isDialog() {
         return isDialog.get();
     }

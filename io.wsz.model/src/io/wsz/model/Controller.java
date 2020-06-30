@@ -17,13 +17,17 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Controller {
     private static Controller singleton;
     private static File programDir;
     private final IdentityHashMap<Creature, Location> heroes = new IdentityHashMap<>(6);
+    private final List<Creature> creaturesToControl = new ArrayList<>(0);
+    private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private Location locationToUpdate;
     private Coords posToCenter;
     private Creature creatureToOpenContainer;
@@ -159,11 +163,24 @@ public class Controller {
     }
 
     public void initNewGameHeroes() {
-        heroes.clear();
+        this.heroes.clear();
         List<Creature> controllables = Controller.get().getBoard().getControllableCreatures();
         Location current = Controller.get().getCurrentLocation().getLocation();
         for (Creature cr : controllables) {
-            heroes.put(cr, current);
+            this.heroes.put(cr, current);
         }
+    }
+
+    public List<Creature> getCreaturesToControl() {
+        return creaturesToControl;
+    }
+
+    public List<Creature> getCreaturesToLooseControl() {
+        return creaturesToLooseControl;
+    }
+
+    public void initLoadGameHeroes(Map<Creature, Location> heroes) {
+        this.heroes.clear();
+        this.heroes.putAll(heroes);
     }
 }

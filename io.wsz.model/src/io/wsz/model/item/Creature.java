@@ -120,10 +120,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         return new Coords[] {N, NW, W, SW, S, SE, E, NE};
     }
 
-    public void loseControl() {
-        setControl(CONTROLLABLE);
-    }
-
     public void onInteractWith(Coords pos) {
         Coords[] poss = new Coords[] {pos};
         ItemType[] types = ItemType.values();

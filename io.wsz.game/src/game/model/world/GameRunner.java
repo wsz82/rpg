@@ -66,6 +66,7 @@ public class GameRunner {
                         addItems(l);
                         removeItems(l);
                     }
+                    updateControls();
                     updateLocation();
                     tryToStartDialog();
                 }
@@ -75,6 +76,7 @@ public class GameRunner {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
                 Platform.runLater(() -> {
                     synchronized (this) {
                         if (Sizes.isReloadImages()) {
@@ -92,7 +94,25 @@ public class GameRunner {
         gameThread.start();
     }
 
+    private void updateControls() {
+        List<Creature> creaturesToLooseControl = controller.getCreaturesToLooseControl();
+        if (!creaturesToLooseControl.isEmpty()) {
+            for (Creature cr : creaturesToLooseControl) {
+                cr.setControl(CreatureControl.CONTROLLABLE);
+            }
+            creaturesToLooseControl.clear();
+        }
+        List<Creature> creaturesToControl = controller.getCreaturesToControl();
+        if (!creaturesToControl.isEmpty()) {
+            for (Creature cr : creaturesToControl) {
+                cr.setControl(CreatureControl.CONTROL);
+            }
+            creaturesToControl.clear();
+        }
+    }
+
     private void clearImagesAndReload() {
+        gameController.setGame(false);
         List<Location> locations = Controller.get().getLocationsList();
         for (Location l : locations) {
             List<PosItem> items = l.getItems().get();
@@ -166,7 +186,7 @@ public class GameRunner {
             if (!l.getName().equals(locationToUpdate.getName())) {
                 cl.setLocation(locationToUpdate);
 
-                Platform.runLater(this::clearImagesAndReload);
+                Sizes.setReloadImages(true);
             }
         }
     }
@@ -178,6 +198,7 @@ public class GameRunner {
     private void loadSave(SaveMemento memento) {
         gameController.loadSaveToLists(memento);
         gameController.initLoadedGameSettings(memento);
+        controller.initLoadGameHeroes(memento.getHeroes());
     }
 
     private void loadNewGame() {

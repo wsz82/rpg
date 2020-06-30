@@ -51,16 +51,18 @@ public class DialogView {
     private boolean isToRefresh = true;
 
     private final EventHandler<MouseEvent> clickEvent = e -> {
-        MouseButton button = e.getButton();
-        if (button.equals(MouseButton.PRIMARY)) {
-            e.consume();
-            if (activeQuestion != null) {
-                addQuestionAndAnswer();
-            }
-        } else if (button.equals(MouseButton.SECONDARY)) {
-            e.consume();
-            if (finished) {
-                endDialog();
+        synchronized (GameController.get().getGameRunner()) {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                if (activeQuestion != null) {
+                    addQuestionAndAnswer();
+                }
+            } else if (button.equals(MouseButton.SECONDARY)) {
+                e.consume();
+                if (finished) {
+                    endDialog();
+                }
             }
         }
     };
