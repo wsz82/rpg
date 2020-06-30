@@ -151,7 +151,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
     }
 
-    private void goTo(Coords pos) {
+    public void goTo(Coords pos) {
         Task task = new Task(this, reverseCenterBottomPos(pos));
         tasks.clear();
         tasks.push(task);

@@ -45,6 +45,7 @@ public class GameView extends Canvas {
     private EventHandler<KeyEvent> keyboardEvent;
     private DialogView dialogView;
     private boolean dialogStarted = true;
+    private boolean constantWalk;
 
     public GameView(Stage parent) {
         this.parent = parent;
@@ -142,11 +143,43 @@ public class GameView extends Canvas {
         }
     }
 
+    private Coords getMouseCoords(double mouseX, double mouseY, double left, double top) {
+        double x = (mouseX - left) / Sizes.getMeter();
+        double y = (mouseY - top) / Sizes.getMeter();
+        return new Coords(x, y);
+    }
+
     private void updatePos() {
         Coords posToCenter = controller.getPosToCenter();
         if (posToCenter != null) {
             centerScreenOn(posToCenter);
             controller.setPosToCenter(null);
+            return;
+        }
+
+        Bounds b = localToScreen(getBoundsInLocal());
+        if (b == null) {
+            return;
+        }
+        double left = b.getMinX();
+        double top = b.getMinY();
+        double right = b.getMaxX();
+        double bottom = b.getMaxY();
+        double locWidth = controller.getCurrentLocation().getWidth();
+        double locHeight = controller.getCurrentLocation().getHeight();
+
+        Point p = MouseInfo.getPointerInfo().getLocation();
+        int x = p.x;
+        int y = p.y;
+
+        if (x < left || x > right || y < top || y > bottom) {
+            return;
+        }
+
+        if (constantWalk) {
+            Coords pos = getMouseCoords(x, y, left, top);
+            Coords translated = pos.add(currentPos);
+            commandControllableGoTo(translated);
         }
 
         if (Settings.isCenterOnPC()) {
@@ -160,63 +193,44 @@ public class GameView extends Canvas {
             }
         }
 
-        Bounds b = localToScreen(getBoundsInLocal());
-        if (b == null) {
-            return;
-        }
-        int leftX = (int) b.getMinX();
-        int topY = (int) b.getMinY();
-        int rightX = (int) b.getMaxX();
-        int bottomY = (int) b.getMaxY();
-        double locWidth = controller.getCurrentLocation().getWidth();
-        double locHeight = controller.getCurrentLocation().getHeight();
-
-        Point p = MouseInfo.getPointerInfo().getLocation();
-        int x = p.x;
-        int y = p.y;
-
-        if (x < leftX || x > rightX || y < topY || y > bottomY) {
+        if (x >= left+OFFSET && x <= right-OFFSET
+                && y >= top+OFFSET && y <= bottom-OFFSET) {
             return;
         }
 
-        if (x >= leftX+OFFSET && x <= rightX-OFFSET
-                && y >= topY+OFFSET && y <= bottomY-OFFSET) {
-            return;
-        }
-
-        if (x < leftX+OFFSET && x >= leftX
-                && y > topY+OFFSET && y < bottomY-OFFSET) {
+        if (x < left+OFFSET && x >= left
+                && y > top+OFFSET && y < bottom-OFFSET) {
             scrollLeft();
         } else
-        if (x > rightX-OFFSET && x <= rightX
-                && y > topY+OFFSET && y < bottomY-OFFSET) {
+        if (x > right-OFFSET && x <= right
+                && y > top+OFFSET && y < bottom-OFFSET) {
             scrollRight(locWidth);
         } else
-        if (y < topY+OFFSET && y >= topY
-                && x > leftX+OFFSET && x < rightX-OFFSET) {
+        if (y < top+OFFSET && y >= top
+                && x > left+OFFSET && x < right-OFFSET) {
             scrollUp();
         } else
-        if (y > bottomY-OFFSET && y <= bottomY
-                && x > leftX+OFFSET && x < rightX-OFFSET) {
+        if (y > bottom-OFFSET && y <= bottom
+                && x > left+OFFSET && x < right-OFFSET) {
             scrollDown(locHeight);
         } else
-        if (x < leftX+OFFSET && x >= leftX
-                && y >= topY && y < topY+OFFSET) {
+        if (x < left+OFFSET && x >= left
+                && y >= top && y < top+OFFSET) {
             scrollLeft();
             scrollUp();
         } else
-        if (x > rightX-OFFSET && x <= rightX
-                && y >= topY && y < topY+OFFSET) {
+        if (x > right-OFFSET && x <= right
+                && y >= top && y < top+OFFSET) {
             scrollRight(locWidth);
             scrollUp();
         } else
-        if (x < leftX+OFFSET && x >= leftX
-                && y >= bottomY-OFFSET && y < bottomY) {
+        if (x < left+OFFSET && x >= left
+                && y >= bottom-OFFSET && y < bottom) {
             scrollLeft();
             scrollDown(locHeight);
         } else
-        if (x > rightX-OFFSET && x <= rightX
-                && y >= bottomY-OFFSET && y < bottomY) {
+        if (x > right-OFFSET && x <= right
+                && y >= bottom-OFFSET && y < bottom) {
             scrollRight(locWidth);
             scrollDown(locHeight);
         }
@@ -274,27 +288,8 @@ public class GameView extends Canvas {
                     }
                 }
                 e.consume();
-                Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
-                Coords translated = pos.add(currentPos);
-                Coords[] poss = new Coords[]{translated};
-                ItemType[] types = new ItemType[]{ItemType.CREATURE};
-                PosItem pi = controller.getBoard().lookForContent(poss, types, true);
-                if (pi != null) {
-                    ItemType type = pi.getType();
-                    boolean multiple = e.isShiftDown();
-                    synchronized (gameController.getGameRunner()) {
-                        boolean success = switch (type) {
-                            case CREATURE -> interact((Creature) pi, multiple);
-                            default -> false;
-                        };
-                        if (!success) {
-                            commandControllable(translated);
-                        }
-                    }
-                } else {
-                    synchronized (gameController.getGameRunner()) {
-                        commandControllable(translated);
-                    }
+                synchronized (gameController.getGameRunner()) {
+                    onMapPrimaryButtonClick(e.getX(), e.getY(), e.isShiftDown());
                 }
             } else if (button.equals(MouseButton.SECONDARY)) {
                 e.consume();
@@ -360,13 +355,42 @@ public class GameView extends Canvas {
         });
     }
 
+    private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
+        Coords pos = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter());
+        Coords translated = pos.add(currentPos);
+        Coords[] poss = new Coords[]{translated};
+        ItemType[] types = new ItemType[]{ItemType.CREATURE};
+        PosItem pi = controller.getBoard().lookForContent(poss, types, true);
+        if (pi != null) {
+            ItemType type = pi.getType();
+            boolean success = switch (type) {
+                case CREATURE -> interact((Creature) pi, multiple);
+                default -> false;
+            };
+            if (!success) {
+                commandControllable(translated);
+                constantWalk = true;
+            }
+        } else {
+            commandControllable(translated);
+            constantWalk = true;
+        }
+    }
+
     private void hookUpRemovableEvents() {
-        addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                constantWalk = false;
+            }
+        });
+        addEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
         addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
     private void removeEvents() {
-        removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
         removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
@@ -420,10 +444,13 @@ public class GameView extends Canvas {
     }
 
     private void commandControllable(Coords pos) {
-        synchronized (gameController.getGameRunner()) {
-            board.getControlledCreatures()
-                    .forEach(c -> c.onInteractWith(pos));
-        }
+        board.getControlledCreatures()
+                .forEach(c -> c.onInteractWith(pos));
+    }
+
+    private void commandControllableGoTo(Coords pos) {
+        board.getControlledCreatures()
+                .forEach(c -> c.goTo(pos));
     }
 
     private void setSize() {
