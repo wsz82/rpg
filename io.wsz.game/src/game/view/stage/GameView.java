@@ -281,9 +281,10 @@ public class GameView extends Canvas {
                 PosItem pi = controller.getBoard().lookForContent(poss, types, true);
                 if (pi != null) {
                     ItemType type = pi.getType();
+                    boolean multiple = e.isShiftDown();
                     synchronized (gameController.getGameRunner()) {
                         boolean success = switch (type) {
-                            case CREATURE -> interact((Creature) pi);
+                            case CREATURE -> interact((Creature) pi, multiple);
                             default -> false;
                         };
                         if (!success) {
@@ -369,13 +370,15 @@ public class GameView extends Canvas {
         removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
-    private boolean interact(Creature cr) {
+    private boolean interact(Creature cr, boolean multiple) {
         CreatureControl control = cr.getControl();
         if (control == CONTROL) {
             cr.setControl(CONTROLLABLE);
             return true;
         } else if (control == CONTROLLABLE) {
-            board.looseCreaturesControl();
+            if (!multiple) {
+                board.looseCreaturesControl();
+            }
             cr.setControl(CONTROL);
             return true;
         }

@@ -45,7 +45,7 @@ public class BarView {
                 e.consume();
                 if (hoveredPortrait != -1) {
                     synchronized (GameController.get().getGameRunner()) {
-                        resolveHeroControlAndLocation();
+                        resolveHeroControlAndLocation(e.isShiftDown());
                     }
                 }
             }
@@ -54,29 +54,34 @@ public class BarView {
 
         EventHandler<KeyEvent> keyboardEvent = e -> {
             KeyCode key = e.getCode();
+            boolean multiple = e.isShiftDown();
             switch (key) {
-                case DIGIT1 -> handleHeroEventAndConsume(e, 0);
-                case DIGIT2 -> handleHeroEventAndConsume(e, 1);
-                case DIGIT3 -> handleHeroEventAndConsume(e, 2);
-                case DIGIT4 -> handleHeroEventAndConsume(e, 3);
-                case DIGIT5 -> handleHeroEventAndConsume(e, 4);
-                case DIGIT6 -> handleHeroEventAndConsume(e, 5);
+                case DIGIT1 -> handleHeroEventAndConsume(e, 0, multiple);
+                case DIGIT2 -> handleHeroEventAndConsume(e, 1, multiple);
+                case DIGIT3 -> handleHeroEventAndConsume(e, 2, multiple);
+                case DIGIT4 -> handleHeroEventAndConsume(e, 3, multiple);
+                case DIGIT5 -> handleHeroEventAndConsume(e, 4, multiple);
+                case DIGIT6 -> handleHeroEventAndConsume(e, 5, multiple);
             }
         };
         canvas.addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
-    private void handleHeroEventAndConsume(KeyEvent e, int i) {
+    private void handleHeroEventAndConsume(KeyEvent e, int i, boolean multiple) {
         e.consume();
         if (i >= portraits.size()) {
             return;
         }
-        Controller.get().getBoard().looseCreaturesControl();
+        if (!multiple) {
+            Controller.get().getBoard().looseCreaturesControl();
+        }
         resolveCreatureControlAndLocation(portraits.get(i));
     }
 
-    private void resolveHeroControlAndLocation() {
-        Controller.get().getBoard().looseCreaturesControl();
+    private void resolveHeroControlAndLocation(boolean multiple) {
+        if (!multiple){
+            Controller.get().getBoard().looseCreaturesControl();
+        }
         CreatureLocation cl = portraits.get(hoveredPortrait);
         resolveCreatureControlAndLocation(cl);
     }
