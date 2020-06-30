@@ -305,6 +305,10 @@ public class GameView extends Canvas {
             synchronized (gameController.getGameRunner()) {
                 KeyCode key = e.getCode();
                 switch (key) {
+                    case P -> {
+                        e.consume();
+                        Settings.setShowBar(!Settings.isShowBar());
+                    }
                     case I -> {
                         e.consume();
                         synchronized (gameController.getGameRunner()) {

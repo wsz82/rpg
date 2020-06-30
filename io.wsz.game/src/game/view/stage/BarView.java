@@ -151,7 +151,8 @@ public class BarView {
         for (int i = 0; i < portraits.size(); i++) {
             CreatureLocation cl = portraits.get(i);
             double portraitY = cl.y;
-            if (y > top + portraitY && y < top + portraitY + portraitSize) {
+            double screenY = top + portraitY;
+            if (y > screenY && y < screenY + portraitSize) {
                 if (hoveredPortrait != i) {
                     hoveredPortrait = i;
                 }
