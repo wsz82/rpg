@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
@@ -302,50 +303,52 @@ public class GameView extends Canvas {
             }
         };
         keyboardEvent = e -> {
-            synchronized (gameController.getGameRunner()) {
-                KeyCode key = e.getCode();
-                switch (key) {
-                    case P -> {
-                        e.consume();
-                        Settings.setShowBar(!Settings.isShowBar());
+            KeyCode key = e.getCode();
+            List<KeyCode> barKeys = List.of(DIGIT1, DIGIT2, DIGIT3, DIGIT4, DIGIT5 ,DIGIT6);
+            if (barKeys.contains(key)) {
+                return;
+            }
+            switch (key) {
+                case P -> {
+                    e.consume();
+                    Settings.setShowBar(!Settings.isShowBar());
+                }
+                case I -> {
+                    e.consume();
+                    synchronized (gameController.getGameRunner()) {
+                        openInventory();
                     }
-                    case I -> {
-                        e.consume();
-                        synchronized (gameController.getGameRunner()) {
-                            openInventory();
-                        }
-                    }
-                    case SPACE -> {
-                        e.consume();
-                        handlePause();
-                    }
-                    case PAGE_UP -> {
-                        e.consume();
-                        synchronized (gameController.getGameRunner()) {
-                            Layer layer = controller.getCurrentLayer().getLayer();
-                            Layer next = layer;
-                            for (int i = 0; i < layers.size() - 1; i++) {
-                                Layer current = layers.get(i);
-                                if (current == layer) {
-                                    next = layers.get(i + 1);
-                                }
+                }
+                case SPACE -> {
+                    e.consume();
+                    handlePause();
+                }
+                case PAGE_UP -> {
+                    e.consume();
+                    synchronized (gameController.getGameRunner()) {
+                        Layer layer = controller.getCurrentLayer().getLayer();
+                        Layer next = layer;
+                        for (int i = 0; i < layers.size() - 1; i++) {
+                            Layer current = layers.get(i);
+                            if (current == layer) {
+                                next = layers.get(i + 1);
                             }
-                            controller.getCurrentLayer().setLayer(next);
                         }
+                        controller.getCurrentLayer().setLayer(next);
                     }
-                    case PAGE_DOWN -> {
-                        e.consume();
-                        synchronized (gameController.getGameRunner()) {
-                            Layer layer = controller.getCurrentLayer().getLayer();
-                            Layer prev = layer;
-                            for (int i = 1; i < layers.size(); i++) {
-                                Layer current = layers.get(i);
-                                if (current == layer) {
-                                    prev = layers.get(i - 1);
-                                }
+                }
+                case PAGE_DOWN -> {
+                    e.consume();
+                    synchronized (gameController.getGameRunner()) {
+                        Layer layer = controller.getCurrentLayer().getLayer();
+                        Layer prev = layer;
+                        for (int i = 1; i < layers.size(); i++) {
+                            Layer current = layers.get(i);
+                            if (current == layer) {
+                                prev = layers.get(i - 1);
                             }
-                            controller.getCurrentLayer().setLayer(prev);
                         }
+                        controller.getCurrentLayer().setLayer(prev);
                     }
                 }
             }

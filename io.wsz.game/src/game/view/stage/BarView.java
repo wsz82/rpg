@@ -12,6 +12,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -30,18 +32,6 @@ public class BarView {
     private final GraphicsContext gc;
     private int hoveredPortrait;
 
-    private final EventHandler<MouseEvent> clickEvent = e -> {
-        MouseButton button = e.getButton();
-        if (button.equals(MouseButton.PRIMARY)) {
-            e.consume();
-            if (hoveredPortrait != -1) {
-                synchronized (GameController.get().getGameRunner()) {
-                    resolveHeroControlAndLocation();
-                }
-            }
-        }
-    };
-
     public BarView(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
@@ -49,12 +39,52 @@ public class BarView {
     }
 
     private void hookupEvents() {
+        EventHandler<MouseEvent> clickEvent = e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                if (hoveredPortrait != -1) {
+                    synchronized (GameController.get().getGameRunner()) {
+                        resolveHeroControlAndLocation();
+                    }
+                }
+            }
+        };
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+
+        EventHandler<KeyEvent> keyboardEvent = e -> {
+            KeyCode key = e.getCode();
+            switch (key) {
+                case DIGIT1 -> handleHeroEventAndConsume(e, 0);
+                case DIGIT2 -> handleHeroEventAndConsume(e, 1);
+                case DIGIT3 -> handleHeroEventAndConsume(e, 2);
+                case DIGIT4 -> handleHeroEventAndConsume(e, 3);
+                case DIGIT5 -> handleHeroEventAndConsume(e, 4);
+                case DIGIT6 -> handleHeroEventAndConsume(e, 5);
+            }
+        };
+        canvas.addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
+    }
+
+    private void handleHeroEventAndConsume(KeyEvent e, int i) {
+        e.consume();
+        if (i >= portraits.size()) {
+            return;
+        }
+        Controller.get().getBoard().looseCreaturesControl();
+        resolveCreatureControlAndLocation(portraits.get(i));
     }
 
     private void resolveHeroControlAndLocation() {
         Controller.get().getBoard().looseCreaturesControl();
         CreatureLocation cl = portraits.get(hoveredPortrait);
+        resolveCreatureControlAndLocation(cl);
+    }
+
+    private void resolveCreatureControlAndLocation(CreatureLocation cl) {
+        if (cl == null) {
+            return;
+        }
         Creature cr = cl.creature;
         CreatureControl control = cr.getControl();
         if (control == CreatureControl.CONTROLLABLE) {
@@ -65,7 +95,6 @@ public class BarView {
         Location current = Controller.get().getCurrentLocation().getLocation();
         Location heroLocation = cl.location;
         if (current != heroLocation) {
-//            Controller.get().getCurrentLocation().setLocation(heroLocation);
             Controller.get().setLocationToUpdate(heroLocation);
         }
     }
