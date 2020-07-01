@@ -21,7 +21,13 @@ import static java.lang.Math.*;
 public class Board {
     private static Board singleton;
     private final Coords boardPos = new Coords(0, 0);
-    private final List<Coords> obstacleCoords = new ArrayList<>(0);
+    private final List<Coords> itemCoords = new ArrayList<>(0);
+    private final LinkedList<Coords> i1_list = new LinkedList<>();
+    private final LinkedList<Coords> i2_list = new LinkedList<>();
+    private final Coords i1_left = new Coords();
+    private final Coords i1_right = new Coords();
+    private final Coords i2_left = new Coords();
+    private final Coords i2_right = new Coords();
 
     public static Board get() {
         if (singleton == null) {
@@ -111,15 +117,18 @@ public class Board {
         final double i1_posY = i1_pos.y;
         final double i1_imgWidth = i1_img.getWidth() / Sizes.getMeter();
         final double i1_imgHeight = i1_img.getHeight() / Sizes.getMeter();
-        final LinkedList<Coords> i1_list = new LinkedList<>();
+        i1_list.clear();
         if (!i1_cl.isEmpty()) {
             looseCoordsReference(i1_cl, i1_list);
             translateCoords(i1_list, i1_posX, i1_posY);
         } else {
-            Coords SW = new Coords(i1_posX, i1_posY+i1_imgHeight);
-            Coords SE = new Coords(i1_posX+i1_imgWidth, i1_posY+i1_imgHeight);
-            i1_list.add(SW);
-            i1_list.add(SE);
+            i1_left.x = i1_posX;
+            i1_left.y = i1_posY + i1_imgHeight;
+            i1_right.x = i1_posX + i1_imgWidth;
+            i1_right.y = i1_posY+i1_imgHeight;
+
+            i1_list.add(i1_left);
+            i1_list.add(i1_right);
         }
 
         final List<Coords> i2_cl = i2.getCoverLine();
@@ -129,16 +138,19 @@ public class Board {
         final double i2_posY = i2_pos.y;
         final double i2_imgWidth = i2_img.getWidth() / Sizes.getMeter();
         final double i2_imgHeight = i2_img.getHeight() / Sizes.getMeter();
-        final LinkedList<Coords> i2_list = new LinkedList<>();
+        i2_list.clear();
         if (!i2_cl.isEmpty()) {
             looseCoordsReference(i2_cl, i2_list);
             translateCoords(i2_list, i2_posX, i2_posY);
             addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
         } else {
-            Coords SW = new Coords(i2_posX, i2_posY+i2_imgHeight);
-            Coords SE = new Coords(i2_posX+i2_imgWidth, i2_posY+i2_imgHeight);
-            i2_list.add(SW);
-            i2_list.add(SE);
+            i2_left.x = i2_posX;
+            i2_left.y = i2_posY + i2_imgHeight;
+            i2_right.x = i2_posX + i2_imgWidth;
+            i2_right.y = i2_posY + i2_imgHeight;
+
+            i2_list.add(i2_left);
+            i2_list.add(i2_right);
         }
 
         return isCoverLineAbove(i1_list, i2_list);
@@ -249,15 +261,17 @@ public class Board {
     private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
         Coords first = linkedCoords.getFirst();
         if (first.x != i2_posX) {
-            Coords left = new Coords(i2_posX, first.y);
-            linkedCoords.addFirst(left);
+            i2_left.x = i2_posX;
+            i2_left.y = first.y;
+            linkedCoords.addFirst(i2_left);
         }
 
         Coords last = linkedCoords.getLast();
         double rightX = i2_posX + i2_imgWidth;
         if (last.x != rightX) {
-            Coords right = new Coords(rightX, last.y);
-            linkedCoords.addLast(right);
+            i2_right.x = rightX;
+            i2_right.y = last.y;
+            linkedCoords.addLast(i2_right);
         }
     }
 
@@ -266,47 +280,6 @@ public class Board {
                     c.x = i2_posX + c.x;
                     c.y = i2_posY + c.y;
                 });
-    }
-
-    public Coords getFreePosCreature(Coords[] corners, Creature cr) {
-        List<Coords> coordsList = new ArrayList<>();
-        Collections.addAll(coordsList, corners);
-        Collections.shuffle(coordsList);
-        for (Coords pos : coordsList) {
-            int x = (int) (pos.x * Sizes.getMeter());
-            int y = (int) (pos.y * Sizes.getMeter());
-            Coords cPos = cr.getPos();
-            Image img = cr.getImage();
-
-            int cX = (int) (cPos.x * Sizes.getMeter());
-            int cWidth = (int) img.getWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
-                return pos;
-            }
-
-            int cY = (int) (cPos.y * Sizes.getMeter());
-            int cYbottom = cY + (int) img.getHeight();
-            int cSizeHeight = (int) (cr.getSize().getHeight()/2 * Sizes.getMeter());
-            boolean fitY = y <= cYbottom && y >= cYbottom + cSizeHeight;
-            if (!fitY) {
-                return pos;
-            }
-
-            int imgX = x - cX;
-            int imgY = y - cY;
-            Color color;
-            try {
-                color = img.getPixelReader().getColor(imgX, imgY);
-            } catch (IndexOutOfBoundsException e) {
-                return pos;
-            }
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                return pos;
-            }
-        }
-        return null;
     }
 
     public List<Creature> getCreatures() {
@@ -397,15 +370,15 @@ public class Board {
 
                 final List<List<Coords>> cp = pi.getCollisionPolygons();
                 for (final List<Coords> polygon : cp) {
-                    obstacleCoords.clear();
-                    looseCoordsReference(polygon, obstacleCoords);
-                    translateCoords(obstacleCoords, cX, cY);
+                    itemCoords.clear();
+                    looseCoordsReference(polygon, itemCoords);
+                    translateCoords(itemCoords, cX, cY);
 
-                    double maxObstacleX = obstacleCoords.stream()
+                    double maxObstacleX = itemCoords.stream()
                             .mapToDouble(p -> p.x)
                             .max()
                             .getAsDouble();
-                    double minObstacleX = obstacleCoords.stream()
+                    double minObstacleX = itemCoords.stream()
                             .mapToDouble(p -> p.x)
                             .min()
                             .getAsDouble();
@@ -414,11 +387,11 @@ public class Board {
                         continue;
                     }
 
-                    double maxObstacleY = obstacleCoords.stream()
+                    double maxObstacleY = itemCoords.stream()
                             .mapToDouble(p -> p.y)
                             .max()
                             .getAsDouble();
-                    double minObstacleY = obstacleCoords.stream()
+                    double minObstacleY = itemCoords.stream()
                             .mapToDouble(p -> p.y)
                             .min()
                             .getAsDouble();
@@ -427,7 +400,7 @@ public class Board {
                         continue;
                     }
 
-                    boolean isInsidePolygon = pos.isInsidePolygon(obstacleCoords, maxObstacleX);
+                    boolean isInsidePolygon = pos.isInsidePolygon(itemCoords, maxObstacleX);
                     if (isInsidePolygon) {
                         return pi;
                     }
