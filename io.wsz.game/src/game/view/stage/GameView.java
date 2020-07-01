@@ -353,8 +353,17 @@ public class GameView extends Canvas {
             }
         };
 
+        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                constantWalk = false;
+            }
+        });
+
         CurrentLocation.get().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
+            constantWalk = false;
         });
 
         widthProperty().addListener((observable, oldValue, newValue) -> {
@@ -388,13 +397,6 @@ public class GameView extends Canvas {
     }
 
     private void hookUpRemovableEvents() {
-        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            MouseButton button = e.getButton();
-            if (button.equals(MouseButton.PRIMARY)) {
-                e.consume();
-                constantWalk = false;
-            }
-        });
         addEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
         addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
