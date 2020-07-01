@@ -31,6 +31,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     private final Coords[] corners = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
             new Coords(), new Coords(), new Coords(), new Coords()};
     private final Coords[] interactionCoords = new Coords[]{new Coords()};
+    private final Coords centerBottom = new Coords();
+    private final Coords reversCenterBottom = new Coords();
 
     private Image portrait;
     private String portraitPath;
@@ -90,9 +92,9 @@ public class Creature extends PosItem<Creature> implements Containable {
     public Coords getCenterBottomPos(Coords pos) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
-        double x = pos.x + width/2;
-        double y = pos.y + height;
-        return new Coords(x, y);
+        centerBottom.x = pos.x + width/2;
+        centerBottom.y = pos.y + height;
+        return centerBottom;
     }
 
     public Coords reverseCenterBottomPos(Coords difPos) {
@@ -101,9 +103,9 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
-        double x = difPos.x - width/2;
-        double y = difPos.y - height;
-        return new Coords(x, y);
+        reversCenterBottom.x = difPos.x - width/2;
+        reversCenterBottom.y = difPos.y - height;
+        return reversCenterBottom;
     }
 
     public Coords[] getCorners() {

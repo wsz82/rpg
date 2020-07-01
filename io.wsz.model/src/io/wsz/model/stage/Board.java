@@ -21,6 +21,9 @@ import static java.lang.Math.*;
 public class Board {
     private static Board singleton;
     private final Coords boardPos = new Coords(0, 0);
+    private final List<PosItem> items = new ArrayList<>(0);
+    private final List<Equipment> equipment = new ArrayList<>(0);
+    private final List<Creature> creatures = new ArrayList<>(0);
     private final List<Coords> itemCoords = new ArrayList<>(0);
     private final LinkedList<Coords> i1_list = new LinkedList<>();
     private final LinkedList<Coords> i2_list = new LinkedList<>();
@@ -28,6 +31,7 @@ public class Board {
     private final Coords i1_right = new Coords();
     private final Coords i2_left = new Coords();
     private final Coords i2_right = new Coords();
+    private final Coords resultCoords = new Coords();
 
     public static Board get() {
         if (singleton == null) {
@@ -283,25 +287,29 @@ public class Board {
     }
 
     public List<Creature> getCreatures() {
-        return Controller.get().getCurrentLocation().getItems().stream()
+        creatures.clear();
+        Controller.get().getCurrentLocation().getItems().stream()
                 .filter(pi -> {
                     int level = Controller.get().getCurrentLayer().getLevel();
                     return pi.getLevel().equals(level);
                 })
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .map(pi -> (Creature) pi)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> creatures));
+        return creatures;
     }
 
     public List<Creature> getControlledCreatures() {
-        return Controller.get().getCurrentLocation().getItems().stream()
+        creatures.clear();
+        Controller.get().getCurrentLocation().getItems().stream()
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
                     return cr.getControl().equals(CreatureControl.CONTROL);
                 })
                 .map(pi -> (Creature) pi)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> creatures));
+        return creatures;
     }
 
     public Creature getCornersCreature(Coords[] corners, Creature cr) {
@@ -334,14 +342,15 @@ public class Board {
     }
 
     public PosItem lookForObstacle(Coords[] poss) {
-        List<PosItem> items = Controller.get().getCurrentLocation().getItems().stream()
+        items.clear();
+        Controller.get().getCurrentLocation().getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(pi -> {
                     int level = Controller.get().getCurrentLayer().getLevel();
                     return pi.getLevel().equals(level);
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) {
             return null;
         }
@@ -369,7 +378,7 @@ public class Board {
                 }
 
                 final List<List<Coords>> cp = pi.getCollisionPolygons();
-                for (final List<Coords> polygon : cp) {
+                for (List<Coords> polygon : cp) {
                     itemCoords.clear();
                     looseCoordsReference(polygon, itemCoords);
                     translateCoords(itemCoords, cX, cY);
@@ -411,14 +420,16 @@ public class Board {
     }
 
     public List<Equipment> getEquipmentWithinRange(Coords[] poss, Creature cr) {
-        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
-        List<Equipment> equipment = items.stream()
+        items.clear();
+        items.addAll(Controller.get().getCurrentLocation().getItems());
+        equipment.clear();
+        items.stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getLevel().equals(cr.getLevel()))
                 .filter(pi -> pi instanceof Equipment)
                 .map(pi -> (Equipment) pi)
-                .collect(Collectors.toList());
-        if (items.isEmpty()) {
+                .collect(Collectors.toCollection(() -> equipment));
+        if (equipment.isEmpty()) {
             return null;
         }
         sortItems(items);
@@ -502,11 +513,12 @@ public class Board {
                     continue;
                 }
 
-                Coords nextPos = new Coords(x, y);
-                PosItem pi = cr.getCollision(nextPos);
+                resultCoords.x = x;
+                resultCoords.y = y;
+                PosItem pi = cr.getCollision(resultCoords);
 
                 if (pi == null) {
-                    return nextPos;
+                    return resultCoords;
                 }
                 angle = (int) (angleScope * j);
             }
