@@ -21,6 +21,7 @@ import static java.lang.Math.*;
 public class Board {
     private static Board singleton;
     private final Coords boardPos = new Coords(0, 0);
+    private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
     private final List<Equipment> equipment = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
@@ -195,12 +196,17 @@ public class Board {
     }
 
     public PosItem lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
-        List<ItemType> typesList = new ArrayList<>(1);
-        Collections.addAll(typesList, types);
-        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
-        items = items.stream()
+        allItems.clear();
+        allItems.addAll(Controller.get().getCurrentLocation().getItems());
+        items.clear();
+        allItems.stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> typesList.contains(pi.getType()))
+                .filter(pi -> {
+                    for (ItemType type : types) {
+                        if (type == pi.getType()) return true;
+                    }
+                    return false;
+                })
                 .filter(pi -> {
                     int level = pi.getLevel();
                     int actualLevel = Controller.get().getCurrentLayer().getLevel();
@@ -210,7 +216,7 @@ public class Board {
                         return level == actualLevel;
                     }
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) {
             return null;
         }
@@ -241,7 +247,7 @@ public class Board {
                 int imgY = y - cY;
                 Color color;
                 try {
-                    color = img.getPixelReader().getColor(imgX, imgY);    //TODO fix index ot of bounds exception
+                    color = img.getPixelReader().getColor(imgX, imgY);
                 } catch (IndexOutOfBoundsException e) {
                     continue;
                 }

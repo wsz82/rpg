@@ -400,7 +400,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         Coords rawPos = new Coords(targetX, targetY);
-        pos = reverseCenterBottomPos(rawPos);
+        pos = reverseCenterBottomPos(rawPos).clone();
         task.clear();
 
         Map<Creature, Location> heroes = Controller.get().getHeroes();
