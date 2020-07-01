@@ -21,6 +21,7 @@ import static java.lang.Math.*;
 public class Board {
     private static Board singleton;
     private final Coords boardPos = new Coords(0, 0);
+    private final Graph graph = new Graph(new ArrayList<>(0));
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
     private final List<Equipment> equipment = new ArrayList<>(0);
@@ -53,8 +54,8 @@ public class Board {
             return;
         }
 
-        Graph graph = new Graph(new ArrayList<>(0));
         List<Node> nodes = graph.getNodes();
+        nodes.clear();
 
         for (PosItem pi : items) {
             Node newNode = new Node(pi, new ArrayList<>(0), new ArrayList<>(0));
@@ -533,14 +534,16 @@ public class Board {
     }
 
     public List<Creature> getControllableCreatures() {
-        return Controller.get().getCurrentLocation().getItems().stream()
+        creatures.clear();
+        Controller.get().getCurrentLocation().getItems().stream()
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
                     return cr.getControl().equals(CreatureControl.CONTROLLABLE);
                 })
                 .map(pi -> (Creature) pi)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> creatures));
+        return creatures;
     }
 
     public void looseCreaturesControl() {

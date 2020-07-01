@@ -69,7 +69,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void onDrop(Creature cr) {
         visible.set(true);
-        this.pos = cr.getCenterBottomPos();
+        this.pos = cr.getCenterBottomPos().clone();
         this.level = cr.getLevel();
         Controller.get().getCurrentLocation().getLocation().getItemsToAdd().add(this);
     }
