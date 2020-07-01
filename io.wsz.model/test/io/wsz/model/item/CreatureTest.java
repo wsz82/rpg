@@ -6,7 +6,6 @@ import io.wsz.model.stage.Coords;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,23 +36,17 @@ class CreatureTest {
         Inventory inventoryA = new Inventory(a);
         a.setInventory(inventoryA);
 
-        Task taskA = new Task(a, new Coords(12, 7));
-        LinkedList<Task> tasksA = new LinkedList<>();
-        tasksA.add(taskA);
-        a.setTasks(tasksA);
+        a.getTask().setDest(new Coords(12, 7));
 
         List<Coords> bcl = new ArrayList<>(0);
         List<List<Coords>> bcp = new ArrayList<>(0);
         Creature b = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
                 true, pos.clone(), level, bcl, bcp);
 
-        Task taskB = taskA.clone(b);
+        a.getTask().clone(b);
 
         Inventory inventoryB = new Inventory(b);
         b.setInventory(inventoryB);
-        LinkedList<Task> tasksB = new LinkedList<>();
-        tasksB.add(taskB);
-        b.setTasks(tasksB);
 
         assertEquals(a, b);
     }

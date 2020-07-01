@@ -15,7 +15,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.net.MalformedURLException;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
@@ -26,7 +28,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private Image portrait;
     private String portraitPath;
-    private LinkedList<Task> tasks;
+    private final Task task = new Task(this);
     private Inventory inventory;
 
     private CreatureSize size;
@@ -134,10 +136,8 @@ public class Creature extends PosItem<Creature> implements Containable {
         switch (type) {
             case CREATURE ->
                     resolveInteractionWithCreature((Creature) pi);
-            case WEAPON ->
-                    takeItem((Equipment) pi);
-            case CONTAINER ->
-                    openContainer((Container) pi);
+            case WEAPON, CONTAINER ->
+                    setItemTask(pi);
             default ->
                     goTo(pos);
         }
@@ -149,32 +149,16 @@ public class Creature extends PosItem<Creature> implements Containable {
             cr.setControl(CONTROL);
             this.setControl(CONTROLLABLE);
         } else if (control.equals(NEUTRAL)) {
-            startConversation(cr);
+            setItemTask(cr);
         }
     }
 
     public void goTo(Coords pos) {
-        Task task = new Task(this, reverseCenterBottomPos(pos));
-        tasks.clear();
-        tasks.push(task);
+        this.task.setDest(reverseCenterBottomPos(pos));
     }
 
-    private void takeItem(Equipment e) {
-        Task task = new Task(this, e);
-        tasks.clear();
-        tasks.push(task);
-    }
-
-    private void openContainer(Container c) {
-        Task task = new Task(this, c);
-        tasks.clear();
-        tasks.push(task);
-    }
-
-    private void startConversation(Creature cr) {
-        Task task = new Task(this, cr);
-        tasks.clear();
-        tasks.push(task);
+    private void setItemTask(PosItem e) {
+        this.task.setItem(e);
     }
 
     public boolean creatureWithinRange(Creature cr) {
@@ -210,34 +194,15 @@ public class Creature extends PosItem<Creature> implements Containable {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
-    private void checkTasks() {
-        if (tasks.isEmpty()) {
+    private void checkTask() {
+        if (task.getDest() == null && task.getItem() == null) {
             return;
         }
-        Task priority = tasks.getFirst();
-        priority.doTask();
-        if (priority.isFinished()) {
-            tasks.remove(priority);
-        }
+        task.doTask();
     }
 
-    public LinkedList<Task> getIndividualTasks() {
-        return tasks;
-    }
-
-    public LinkedList<Task> getTasks() {
-        if (tasks == null) {
-            if (prototype == null) {
-                return new LinkedList<>();
-            }
-            return prototype.tasks;
-        } else {
-            return tasks;
-        }
-    }
-
-    public void setTasks(LinkedList<Task> tasks) {
-        this.tasks = tasks;
+    public Task getTask() {
+        return task;
     }
 
     public Inventory getIndividualInventory() {
@@ -422,7 +387,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         Coords rawPos = new Coords(targetX, targetY);
         pos = reverseCenterBottomPos(rawPos);
-        tasks.clear();
+        task.clear();
 
         Map<Creature, Location> heroes = Controller.get().getHeroes();
         if (heroes.containsKey(this)) {
@@ -433,7 +398,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void update() {
         checkSurrounding();
-        checkTasks();
+        checkTask();
     }
 
     @Override
@@ -447,7 +412,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Creature creature = (Creature) o;
-        return Objects.equals(getTasks(), creature.getTasks()) &&
+        return Objects.equals(getTask(), creature.getTask()) &&
                 Objects.equals(getInventory(), creature.getInventory()) &&
                 getSize() == creature.getSize() &&
                 getControl() == creature.getControl() &&
@@ -458,14 +423,14 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getTasks(), getInventory(), getSize(), getControl(), getSpeed(), getRange(), getStrength());
+        return Objects.hash(super.hashCode(), getTask(), getInventory(), getSize(), getControl(), getSpeed(), getRange(), getStrength());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
 
-        out.writeObject(tasks);
+        out.writeObject(task);
 
         out.writeObject(inventory);
 
@@ -486,7 +451,9 @@ public class Creature extends PosItem<Creature> implements Containable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
 
-        tasks = (LinkedList<Task>) in.readObject();
+        Task readTask = (Task) in.readObject();
+        task.setDest(readTask.getDest());
+        task.setItem(readTask.getItem());
 
         inventory = (Inventory) in.readObject();
 

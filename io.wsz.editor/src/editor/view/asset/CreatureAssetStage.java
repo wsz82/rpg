@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
@@ -214,7 +213,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 null, name, getType(), relativePath,
                 true, null, null,
                 new ArrayList<>(0), new ArrayList<>(0));
-        cr.setTasks(new LinkedList<>());
         cr.setInventory(new Inventory(cr));
         return cr;
     }

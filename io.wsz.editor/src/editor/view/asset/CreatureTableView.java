@@ -13,7 +13,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 class CreatureTableView extends AssetsTableView<Creature> {
@@ -94,7 +93,8 @@ class CreatureTableView extends AssetsTableView<Creature> {
                     true, clone, level,
                     coverLine, collisionPolygons);
 
-            cloneTasks(p, cr);
+            Task pTasks = p.getTask();
+            pTasks.clone(cr);
 
             cr.setInventory(new Inventory(cr));
             cr.getInventory().getItems().addAll(p.getInventory().getItems());
@@ -102,15 +102,6 @@ class CreatureTableView extends AssetsTableView<Creature> {
             output.add(cr);
         }
         return output;
-    }
-
-    private void cloneTasks(Creature p, Creature cr) {
-        LinkedList<Task> pTasks = p.getTasks();
-        LinkedList<Task> tasks = new LinkedList<>();
-        for (Task task : pTasks) {
-            tasks.add(task.clone(cr));
-        }
-        cr.setTasks(tasks);
     }
 
     @Override

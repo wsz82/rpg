@@ -10,6 +10,8 @@ import java.util.Objects;
 import static io.wsz.model.sizes.Sizes.SECOND;
 
 public class Task implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Creature creature;
     private PosItem item;
     private Coords dest;
@@ -19,27 +21,10 @@ public class Task implements Serializable {
         this.creature = creature;
     }
 
-    public Task(Creature creature, Coords dest) {
-        this.creature = creature;
-        this.dest = dest;
-    }
-
-    public Task(Creature creature, PosItem item) {
-        this.creature = creature;
-        this.item = item;
-        if (item instanceof Creature) {
-            this.dest = creature.reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
-        } else {
-            this.dest = creature.reverseCenterBottomPos(item.getPos());
-        }
-    }
-
-    public Task clone(Creature cr) {
-        Task task = new Task(cr);
-        task.item = this.item;
-        task.dest = this.dest;
-        task.finished = this.finished;
-        return task;
+    public void clone(Creature cr) {
+        Task task = cr.getTask();
+        task.setItem(this.item);
+        task.setDest(this.dest);
     }
 
     public void doTask() {
@@ -111,6 +96,11 @@ public class Task implements Serializable {
         creature.pos = nextPos;
     }
 
+    public void clear() {
+        this.dest = null;
+        this.item = null;
+    }
+
     public Creature getCreature() {
         return creature;
     }
@@ -121,6 +111,14 @@ public class Task implements Serializable {
 
     public void setItem(PosItem item) {
         this.item = item;
+        if (item == null) {
+            return;
+        }
+        if (item instanceof Creature) {
+            this.dest = creature.reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
+        } else {
+            this.dest = creature.reverseCenterBottomPos(item.getPos());
+        }
     }
 
     public Coords getDest() {

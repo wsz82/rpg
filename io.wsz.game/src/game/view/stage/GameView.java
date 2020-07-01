@@ -67,6 +67,7 @@ public class GameView extends Canvas {
             return;
         }
         if (!dialogStarted) {
+            constantWalk = false;
             dialogStarted = true;
             hookUpRemovableEvents();
         }
@@ -314,6 +315,7 @@ public class GameView extends Canvas {
                 }
                 case I -> {
                     e.consume();
+                    constantWalk = false;
                     synchronized (gameController.getGameRunner()) {
                         openInventory();
                     }
