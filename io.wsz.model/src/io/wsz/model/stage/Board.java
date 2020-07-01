@@ -21,6 +21,7 @@ import static java.lang.Math.*;
 public class Board {
     private static Board singleton;
     private final Coords boardPos = new Coords(0, 0);
+    private final List<Coords> obstacleCoords = new ArrayList<>(0);
 
     public static Board get() {
         if (singleton == null) {
@@ -360,8 +361,7 @@ public class Board {
     }
 
     public PosItem lookForObstacle(Coords[] poss) {
-        List<PosItem> items = new ArrayList<>(Controller.get().getCurrentLocation().getItems());
-        items = items.stream()
+        List<PosItem> items = Controller.get().getCurrentLocation().getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(pi -> {
@@ -397,16 +397,15 @@ public class Board {
 
                 final List<List<Coords>> cp = pi.getCollisionPolygons();
                 for (final List<Coords> polygon : cp) {
-                    List<Coords> tc = new ArrayList<>();
-                    looseCoordsReference(polygon, tc);
-                    translateCoords(tc, cX, cY);
+                    obstacleCoords.clear();
+                    looseCoordsReference(polygon, obstacleCoords);
+                    translateCoords(obstacleCoords, cX, cY);
 
-
-                    double maxObstacleX = tc.stream()
+                    double maxObstacleX = obstacleCoords.stream()
                             .mapToDouble(p -> p.x)
                             .max()
                             .getAsDouble();
-                    double minObstacleX = tc.stream()
+                    double minObstacleX = obstacleCoords.stream()
                             .mapToDouble(p -> p.x)
                             .min()
                             .getAsDouble();
@@ -415,11 +414,11 @@ public class Board {
                         continue;
                     }
 
-                    double maxObstacleY = tc.stream()
+                    double maxObstacleY = obstacleCoords.stream()
                             .mapToDouble(p -> p.y)
                             .max()
                             .getAsDouble();
-                    double minObstacleY = tc.stream()
+                    double minObstacleY = obstacleCoords.stream()
                             .mapToDouble(p -> p.y)
                             .min()
                             .getAsDouble();
@@ -428,7 +427,7 @@ public class Board {
                         continue;
                     }
 
-                    boolean isInsidePolygon = pos.isInsidePolygon(tc, maxObstacleX);
+                    boolean isInsidePolygon = pos.isInsidePolygon(obstacleCoords, maxObstacleX);
                     if (isInsidePolygon) {
                         return pi;
                     }
