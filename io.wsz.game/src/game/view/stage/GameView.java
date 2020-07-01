@@ -37,6 +37,7 @@ public class GameView extends Canvas {
     private final Stage parent;
     private final Controller controller = Controller.get();
     private final Board board = controller.getBoard();
+    private final List<PosItem> items = new ArrayList<>(0);
     private final Coords currentPos = controller.getBoardPos();
     private final GameController gameController = GameController.get();
     private final BarView barView = new BarView(this);
@@ -85,9 +86,8 @@ public class GameView extends Canvas {
         double topY = currentPos.y;
         double bottomY = topY + getHeight()/Sizes.getMeter();
 
-        List<PosItem> items = controller.getCurrentLocation().getItems();
-        Board.get().sortItems(items);
-        items = items.stream()
+        items.clear();
+        controller.getCurrentLocation().getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> {
                     Coords pos = pi.getPos();
@@ -101,7 +101,10 @@ public class GameView extends Canvas {
                             piLeftX, piTopY, piRightX, piBottomY);
                 })
                 .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> items));
+
+        board.sortItems(items);
+
         for (PosItem pi : items) {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();

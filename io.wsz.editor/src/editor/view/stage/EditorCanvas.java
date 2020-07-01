@@ -66,6 +66,7 @@ public class EditorCanvas extends Canvas {
                     piLeftX, piTopY, piRightX, piBottomY);
                 })
                 .collect(Collectors.toList());
+
         Board.get().sortItems(items);
 
         boolean activeContentMarked = false;
