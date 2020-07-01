@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.layer.Layer;
@@ -45,10 +44,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         double centerX = pos.x + getImage().getWidth()/ Sizes.getMeter();
         double centerY = pos.y + getImage().getHeight()/ Sizes.getMeter();
         return new Coords(centerX, centerY);
-    }
-
-    public void centerScreenOn(Coords targetPos) {
-        Controller.get().setPosToCenter(targetPos);
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {

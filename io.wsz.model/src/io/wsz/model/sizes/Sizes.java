@@ -1,5 +1,6 @@
 package io.wsz.model.sizes;
 
+import io.wsz.model.Controller;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
@@ -13,6 +14,7 @@ public class Sizes {
 
     private static int meter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
+    private static int portraitSize;
 
     private static boolean resizeWithResolution;
     private static boolean reloadImages;
@@ -31,6 +33,7 @@ public class Sizes {
 
     public static void setMeter(int resWidth) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
+        Controller.get().clearHeroesPortraits();
     }
 
     public static FontSize getFontSize() {
@@ -59,5 +62,13 @@ public class Sizes {
 
     public static void setReloadImages(boolean reloadImages) {
         Sizes.reloadImages = reloadImages;
+    }
+
+    public static int getPortraitSize() {
+        return portraitSize;
+    }
+
+    public static void setPortraitSize(int portraitSize) {
+        Sizes.portraitSize = portraitSize;
     }
 }

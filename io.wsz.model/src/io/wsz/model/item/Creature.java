@@ -8,16 +8,18 @@ import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.IdentityHashMap;
-import java.util.LinkedList;
+import java.net.MalformedURLException;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
+import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
@@ -354,9 +356,42 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public Image getPortrait() {
         if (this.portrait == null) {
-            setPortrait(loadImageFromPath(getPortraitPath()));
+            setPortrait(loadPortraitFromPath(getPortraitPath()));
         }
         return portrait;
+    }
+
+    private Image loadPortraitFromPath(String fileName) {
+        String path = getRelativeTypePath(getType()) + File.separator + fileName;
+        if (path.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        File fixedFile = new File(Controller.getProgramDir() + path);
+        String url = null;
+        try {
+            url = fixedFile.toURI().toURL().toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (url == null) {
+            return null;
+        }
+
+        int portraitSize = Sizes.getPortraitSize();
+        if (portraitSize == 0) {
+            return null;
+        }
+
+        if (Sizes.getTrueMeter() == CONSTANT_METER) {
+            return new Image(url, portraitSize, portraitSize, false, false, true);
+        } else {
+            Dimension d = new Dimension(portraitSize, portraitSize);
+            if (d == null) {
+                throw new NullPointerException(url + " dimension is null");
+            }
+            Dimension rd = getRequestedDimension(d);
+            return getChangedImage(url, d, rd);
+        }
     }
 
     public void setPortrait(Image portrait) {
@@ -389,7 +424,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         pos = reverseCenterBottomPos(rawPos);
         tasks.clear();
 
-        IdentityHashMap<Creature, Location> heroes = Controller.get().getHeroes();
+        Map<Creature, Location> heroes = Controller.get().getHeroes();
         if (heroes.containsKey(this)) {
             heroes.put(this, target);
         }

@@ -25,7 +25,7 @@ import java.util.Map;
 public class Controller {
     private static Controller singleton;
     private static File programDir;
-    private final IdentityHashMap<Creature, Location> heroes = new IdentityHashMap<>(6);
+    private final Map<Creature, Location> heroes = new IdentityHashMap<>(6);
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private Location locationToUpdate;
@@ -158,7 +158,7 @@ public class Controller {
     }
 
 
-    public IdentityHashMap<Creature, Location> getHeroes() {
+    public Map<Creature, Location> getHeroes() {
         return heroes;
     }
 
@@ -182,5 +182,11 @@ public class Controller {
     public void initLoadGameHeroes(Map<Creature, Location> heroes) {
         this.heroes.clear();
         this.heroes.putAll(heroes);
+    }
+
+    public void clearHeroesPortraits() {
+        for (Creature hero : Controller.get().getHeroes().keySet()) {
+            hero.setPortrait(null);
+        }
     }
 }

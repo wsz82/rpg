@@ -5,13 +5,12 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -27,15 +26,48 @@ import java.util.Map;
 public class BarView {
     private static final double RIGHT_VIEW_PART = 0.08;
     private static final double PORTRAIT_PART = 0.9;
-    private final LinkedList<CreatureLocation> portraits = new LinkedList<>();
     private final Canvas canvas;
     private final GraphicsContext gc;
+    private final LinkedList<CreatureLocation> portraits;
+    private final List<Creature> creatures = new ArrayList<>(6);
+    private final Map<Creature, Location> heroes = Controller.get().getHeroes();
     private int hoveredPortrait;
 
     public BarView(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
+        this.portraits = new LinkedList<>();
+        for (int i = 0; i < 6; i++) {
+            portraits.add(i, new CreatureLocation(null, null, null, 0));
+        }
         hookupEvents();
+    }
+
+    public void refresh() {
+        double canvasWidth = canvas.getWidth();
+        if (canvasWidth == 0) {
+            return;
+        }
+        double barWidth = canvasWidth*RIGHT_VIEW_PART;
+        double leftX = canvasWidth - barWidth;
+
+        drawBackground(leftX, barWidth);
+
+        double canvasHeight = canvas.getHeight();
+        double portraitSize = barWidth*PORTRAIT_PART;
+        if (portraitSize*9 > canvasHeight) {
+            portraitSize = canvasHeight/9;
+        }
+        Sizes.setPortraitSize((int) portraitSize);
+        double padding = portraitSize / 10;
+
+        drawHeroes(leftX, padding, portraitSize);
+
+        checkPos(leftX, padding, portraitSize);
+
+        updateHoveredPortrait(leftX, padding, portraitSize);
+
+        updateActivePortrait(leftX, padding, portraitSize);
     }
 
     private void hookupEvents() {
@@ -102,30 +134,15 @@ public class BarView {
         if (current != heroLocation) {
             Controller.get().setLocationToUpdate(heroLocation);
         }
-    }
-
-    public void refresh() {
-        double canvasWidth = canvas.getWidth();
-        double barWidth = canvasWidth*RIGHT_VIEW_PART;
-        double leftX = canvasWidth - barWidth;
-
-        drawBackground(leftX, barWidth);
-
-        double portraitSize = barWidth*PORTRAIT_PART;
-        double padding = (barWidth-portraitSize) / 2;
-
-        drawHeroes(leftX, padding, portraitSize);
-
-        checkPos(leftX, padding, portraitSize);
-
-        updateHoveredPortrait(leftX, padding, portraitSize);
-
-        updateActivePortrait(leftX, padding, portraitSize);
+        Controller.get().setPosToCenter(cr.getCenter());
     }
 
     private void updateActivePortrait(double leftX, double padding, double portraitSize) {
         for (CreatureLocation cl : portraits) {
             Creature hero = cl.creature;
+            if (hero == null) {
+                return;
+            }
             if (hero.getControl().equals(CreatureControl.CONTROL)) {
                 double portraitY = cl.y;
                 gc.setStroke(Color.GREEN);
@@ -141,6 +158,9 @@ public class BarView {
         }
         CreatureLocation cl = portraits.get(hoveredPortrait);
         double portraitY = cl.y;
+        if (portraitY == 0) {
+            return;
+        }
         gc.setStroke(Color.LIGHTGREY);
         gc.setLineWidth(2);
         gc.strokeRect(leftX + padding, portraitY, portraitSize, portraitSize);
@@ -197,34 +217,31 @@ public class BarView {
     }
 
     private void drawHeroes(double leftX, double padding, double portraitSize) {
-        Map<Creature, Location> heroes = Controller.get().getHeroes();
-
         double y = padding;
         double portraitX = leftX + padding;
 
-        portraits.clear();
-        List<Creature> creatures = new ArrayList<>(heroes.keySet());
+        clearPortraits(padding, portraitSize, y, portraitX);
+
+        creatures.clear();
+        creatures.addAll(heroes.keySet());
         for (int i = 0; i < creatures.size(); i++) {
+            CreatureLocation cl = portraits.get(i);
             Creature cr = creatures.get(i);
+
+            cl.creature = cr;
+            cl.location = heroes.get(cr);
+            cl.image = cr.getPortrait();
+            cl.y = y;
+            gc.drawImage(cl.image, portraitX, y);
+
+            y += portraitSize + 2*padding;
+        }
+    }
+
+    private void clearPortraits(double padding, double portraitSize, double y, double portraitX) {
+        for (int i = 0; i < portraits.size(); i++) {
             gc.setFill(Color.DARKVIOLET);
             gc.fillRect(portraitX, y, portraitSize, portraitSize);
-
-            if (cr != null) {
-                Image raw = cr.getPortrait();
-                ImageView iv = new ImageView(raw);
-                iv.setFitWidth(portraitSize);
-                iv.setFitHeight(portraitSize);
-
-                SnapshotParameters sp = new SnapshotParameters();
-                sp.setFill(Color.TRANSPARENT);
-                Image img = iv.snapshot(sp, null);
-
-                CreatureLocation cl = new CreatureLocation(cr, heroes.get(cr), y);
-                portraits.add(i, cl);
-
-                gc.drawImage(img, portraitX, y);
-            }
-
             y += portraitSize + 2*padding;
         }
     }
@@ -241,13 +258,15 @@ public class BarView {
     }
 
     private class CreatureLocation {
-        private final Creature creature;
-        private final Location location;
-        private final double y;
+        private Creature creature;
+        private Location location;
+        private Image image;
+        private double y;
 
-        public CreatureLocation(Creature creature, Location location, double y) {
+        public CreatureLocation(Creature creature, Location location, Image image, double y) {
             this.creature = creature;
             this.location = location;
+            this.image = image;
             this.y = y;
         }
     }

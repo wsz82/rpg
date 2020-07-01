@@ -57,7 +57,7 @@ public class Teleport extends PosItem<Teleport> {
             if (cr.getControl().equals(CONTROL)) {
                 Controller.get().setLocationToUpdate(target);
                 Controller.get().getCurrentLayer().setLayer(targetLayer);
-                cr.centerScreenOn(targetPos);
+                Controller.get().setPosToCenter(targetPos);
             }
         }
     }

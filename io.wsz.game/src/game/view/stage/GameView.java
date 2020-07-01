@@ -71,6 +71,9 @@ public class GameView extends Canvas {
             hookUpRemovableEvents();
         }
         setSize();
+        if (getWidth() == 0) {
+            return;
+        }
         updatePos();
 
         GraphicsContext gc = getGraphicsContext2D();
@@ -352,6 +355,13 @@ public class GameView extends Canvas {
 
         CurrentLocation.get().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
+        });
+
+        widthProperty().addListener((observable, oldValue, newValue) -> {
+            Controller.get().clearHeroesPortraits();
+        });
+        heightProperty().addListener((observable, oldValue, newValue) -> {
+            Controller.get().clearHeroesPortraits();
         });
     }
 

@@ -127,10 +127,6 @@ public class GameRunner {
                         }
                     }
                 }
-                if (pi instanceof Creature) {
-                    Creature c = (Creature) pi;
-                    c.setPortrait(null);
-                }
             }
         }
         loadImages();
@@ -226,10 +222,6 @@ public class GameRunner {
                             e.getImage();
                         }
                     }
-                }
-                if (item instanceof Creature) {
-                    Creature c = (Creature) item;
-                    c.getPortrait();
                 }
                 updateProgress(i, total);
             }

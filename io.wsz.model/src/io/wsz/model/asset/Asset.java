@@ -88,7 +88,7 @@ public abstract class Asset implements Externalizable {
         return image.get();
     }
 
-    protected Image loadImageFromPath(String fileName) {
+    private Image loadImageFromPath(String fileName) {
         String path = getRelativeTypePath(getType()) + File.separator + fileName;
         if (path.isEmpty()) {
             throw new NoSuchElementException();
@@ -116,13 +116,12 @@ public abstract class Asset implements Externalizable {
             if (Sizes.isResizeWithResolution()) {
                 return new Image(url, rd.width, rd.height, false, false);
             } else {
-                Image result = getChangedImage(url, d, rd);
-                return result;
+                return getChangedImage(url, d, rd);
             }
         }
     }
 
-    private Image getChangedImage(String url, Dimension d, Dimension rd) {
+    protected Image getChangedImage(String url, Dimension d, Dimension rd) {
         Image img = new Image(url, rd.width, rd.height, false, false);
         BufferedImage bInput = SwingFXUtils.fromFXImage(img, null);
         java.awt.Image imgInput = bInput.getScaledInstance(d.width, d.height, java.awt.Image.SCALE_DEFAULT);
@@ -140,7 +139,7 @@ public abstract class Asset implements Externalizable {
     }
 
 
-    private Dimension getRequestedDimension(Dimension d) {
+    protected Dimension getRequestedDimension(Dimension d) {
         double ratio = (double) Sizes.getTrueMeter() / (double) CONSTANT_METER;
         int rw = (int) (d.width * ratio);
         int rh = (int) (d.height * ratio);
