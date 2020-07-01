@@ -10,6 +10,8 @@ public class Coords implements Serializable {
     public double x;
     public double y;
 
+    public Coords() {}
+
     public Coords(double x, double y) {
         this.x = x;
         this.y = y;

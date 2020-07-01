@@ -26,6 +26,12 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
+    private static final ItemType[] CHECK_SURROUNDING_TYPES = new ItemType[] {TELEPORT};
+
+    private final Coords[] corners = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
+            new Coords(), new Coords(), new Coords(), new Coords()};
+    private final Coords[] interactionCoords = new Coords[]{new Coords()};
+
     private Image portrait;
     private String portraitPath;
     private final Task task = new Task(this);
@@ -49,17 +55,15 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(nextPos);
-        PosItem collidedObstacle = Board.get().lookForObstacle(poss);
+        PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(poss);
         if (collidedObstacle == null) {
-            Creature collidedCreature = Board.get().getCornersCreature(poss, this);
-            return collidedCreature;
+            return Controller.get().getBoard().getCornersCreature(poss, this);
         }
         return collidedObstacle;
     }
 
     private void checkSurrounding() {
-        ItemType[] types = new ItemType[] {TELEPORT};
-        PosItem pi = getCornersContent(types);
+        PosItem pi = getCornersContent(CHECK_SURROUNDING_TYPES);
         if (pi != null) {
             ItemType type = pi.getType();
             switch (type) {
@@ -113,21 +117,29 @@ public class Creature extends PosItem<Creature> implements Containable {
         double centerX = pos.x;
         double centerY = pos.y;
 
-        Coords N = new Coords(centerX, centerY - halfHeight);
-        Coords W = new Coords(centerX - halfWidth, centerY);
-        Coords S = new Coords(centerX, centerY + halfHeight);
-        Coords E = new Coords(centerX + halfWidth, centerY);
-        Coords NE = new Coords(centerX + 3/5.0*halfWidth, centerY - 2/3.0*halfHeight);
-        Coords NW = new Coords(centerX - 3/5.0*halfWidth, centerY - 2/3.0*halfHeight);
-        Coords SE = new Coords(centerX + 3/5.0*halfWidth, centerY + 2/3.0*halfHeight);
-        Coords SW = new Coords(centerX - 3/5.0*halfWidth, centerY + 2/3.0*halfHeight);
-        return new Coords[] {N, NW, W, SW, S, SE, E, NE};
+        corners[0].x = centerX;
+        corners[0].y = centerY - halfHeight;
+        corners[1].x = centerX - halfWidth;
+        corners[1].y = centerY;
+        corners[2].x = centerX;
+        corners[2].y = centerY + halfHeight;
+        corners[3].x = centerX + halfWidth;
+        corners[3].y = centerY;
+        corners[4].x = centerX + 3/5.0*halfWidth;
+        corners[4].y = centerY - 2/3.0*halfHeight;
+        corners[5].x = centerX - 3/5.0*halfWidth;
+        corners[5].y = centerY - 2/3.0*halfHeight;
+        corners[6].x = centerX + 3/5.0*halfWidth;
+        corners[6].y = centerY + 2/3.0*halfHeight;
+        corners[7].x = centerX - 3/5.0*halfWidth;
+        corners[7].y = centerY + 2/3.0*halfHeight;
+        return corners;
     }
 
     public void onInteractWith(Coords pos) {
-        Coords[] poss = new Coords[] {pos};
+        interactionCoords[0] = pos;
         ItemType[] types = ItemType.values();
-        PosItem pi = Controller.get().getBoard().lookForContent(poss, types, true);
+        PosItem pi = Controller.get().getBoard().lookForContent(interactionCoords, types, true);
         if (pi == null) {
             return;
         }
