@@ -77,7 +77,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         List<Teleport> output = new ArrayList<>(1);
         for (Teleport p
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -87,7 +87,6 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -99,8 +98,9 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
 
             Teleport t = new Teleport(
                     p, name, type, path,
-                    true, clonePos, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            t.setPos(pos);
             output.add(t);
         }
         return output;

@@ -72,7 +72,8 @@ public class EditorCanvas extends Canvas {
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
             Coords pos = pi.getPos();
-            Coords translated = pos.subtract(currentPos);
+            Coords translated = pos.clonePos();
+            translated.subtract(currentPos);
             int x = (int) (translated.x * Sizes.getMeter());
             int y = (int) (translated.y * Sizes.getMeter());
 
@@ -113,7 +114,8 @@ public class EditorCanvas extends Canvas {
             if (mark == null) {
                 return;
             }
-            Coords translated = mark.subtract(currentPos);
+            Coords translated = mark.clonePos();
+            translated.subtract(currentPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
                 return;
@@ -125,7 +127,8 @@ public class EditorCanvas extends Canvas {
     }
 
     private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
-        Coords translated = pi.getPos().subtract(currentPos);
+        Coords translated = pi.getPos().clonePos();
+        translated.subtract(currentPos);
         double width = pi.getImage().getWidth();
         double height = pi.getImage().getHeight();
         gc.setStroke(Color.RED);
@@ -218,7 +221,8 @@ public class EditorCanvas extends Canvas {
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
                     Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
-                    Coords translated = pos.add(currentPos);
+                    Coords translated = pos.clonePos();
+                    translated.add(currentPos);
                     Coords[] poss = new Coords[]{translated};
                     ItemType[] types = ItemType.values();
                     pi = Controller.get().getBoard().lookForContent(poss, types, true);
@@ -256,6 +260,7 @@ public class EditorCanvas extends Canvas {
             boolean success = false;
             if (db.hasImage()) {
                 Coords dragPos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+                dragPos.add(Controller.get().getBoardPos());
                 EditorController.get().setDragPos(dragPos);
                 success = true;
             }

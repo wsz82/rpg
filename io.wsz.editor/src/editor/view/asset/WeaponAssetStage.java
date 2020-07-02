@@ -128,7 +128,7 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     protected Weapon createNewAsset(String name, String relativePath) {
         return new Weapon(
                 null, name, getType(), relativePath,
-                true, null, null,
+                true, null,
                 new ArrayList<>(0), new ArrayList<>(0));
     }
 

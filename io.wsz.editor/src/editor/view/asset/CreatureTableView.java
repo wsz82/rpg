@@ -68,7 +68,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
         List<Creature> output = new ArrayList<>(1);
         for (Creature p
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -78,7 +78,6 @@ class CreatureTableView extends AssetsTableView<Creature> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clone = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -90,8 +89,9 @@ class CreatureTableView extends AssetsTableView<Creature> {
 
             Creature cr = new Creature(
                     p, name, type, path,
-                    true, clone, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            cr.setPos(pos);
 
             Task pTasks = p.getTask();
             pTasks.clone(cr);

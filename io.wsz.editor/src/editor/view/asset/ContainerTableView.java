@@ -56,7 +56,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
         List<Container> output = new ArrayList<>(1);
         for (Container p
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -66,7 +66,6 @@ public class ContainerTableView extends AssetsTableView<Container> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -78,8 +77,9 @@ public class ContainerTableView extends AssetsTableView<Container> {
 
             Container c = new Container(
                     p, name, type, path,
-                    true, clonePos, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            c.setPos(pos);
             output.add(c);
 
             c.getItems().addAll(p.getItems());

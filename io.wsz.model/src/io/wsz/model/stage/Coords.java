@@ -21,20 +21,18 @@ public class Coords implements Serializable {
         return x == 0 && y == 0;
     }
 
-    public Coords clone() {
+    public Coords clonePos() {
         return new Coords(this.x, this.y);
     }
 
-    public Coords add(Coords pos2) {
-        double x = this.x + pos2.x;
-        double y = this.y + pos2.y;
-        return new Coords(x, y);
+    public void add(Coords pos2) {
+        this.x += pos2.x;
+        this.y += pos2.y;
     }
 
-    public Coords subtract(Coords pos2) {
-        double x = this.x - pos2.x;
-        double y = this.y - pos2.y;
-        return new Coords(x, y);
+    public void subtract(Coords pos2) {
+        this.x -= pos2.x;
+        this.y -= pos2.y;
     }
 
     public boolean isInsidePolygon(List<Coords> polygon, double maxX) {

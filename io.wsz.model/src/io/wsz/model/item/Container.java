@@ -19,9 +19,9 @@ public class Container extends Equipment<Container> implements Containable {
     public Container() {}
 
     public Container(Container prototype, String name, ItemType type, String path,
-                     Boolean visible, Coords pos, Integer level,
+                     Boolean visible, Integer level,
                      List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path, visible, level, coverLine, collisionPolygons);
     }
 
     public boolean add(Equipment e) {

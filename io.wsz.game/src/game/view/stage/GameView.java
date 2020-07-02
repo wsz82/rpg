@@ -39,6 +39,8 @@ public class GameView extends Canvas {
     private final Board board = controller.getBoard();
     private final List<PosItem> items = new ArrayList<>(0);
     private final Coords currentPos = controller.getBoardPos();
+    private final Coords mousePos = new Coords();
+    private final Coords modifiedCoords = new Coords();
     private final GameController gameController = GameController.get();
     private final BarView barView = new BarView(this);
     private List<Layer> layers;
@@ -108,9 +110,11 @@ public class GameView extends Canvas {
         for (PosItem pi : items) {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
-            Coords translated = pos.subtract(currentPos);
-            final int x = (int) (translated.x * Sizes.getMeter());
-            final int y = (int) (translated.y * Sizes.getMeter());
+            modifiedCoords.x = pos.x;
+            modifiedCoords.y = pos.y;
+            modifiedCoords.subtract(currentPos);
+            final int x = (int) (modifiedCoords.x * Sizes.getMeter());
+            final int y = (int) (modifiedCoords.y * Sizes.getMeter());
 
             if (pi.getVisible()) {
                 switch (type) {
@@ -151,16 +155,16 @@ public class GameView extends Canvas {
     }
 
     private Coords getMouseCoords(double mouseX, double mouseY, double left, double top) {
-        double x = (mouseX - left) / Sizes.getMeter();
-        double y = (mouseY - top) / Sizes.getMeter();
-        return new Coords(x, y);
+        mousePos.x = (mouseX - left) / Sizes.getMeter();
+        mousePos.y = (mouseY - top) / Sizes.getMeter();
+        return mousePos;
     }
 
     private void updatePos() {
         Coords posToCenter = controller.getPosToCenter();
-        if (posToCenter != null) {
+        if (posToCenter.x != -1) {
             centerScreenOn(posToCenter);
-            controller.setPosToCenter(null);
+            posToCenter.x = -1;
             return;
         }
 
@@ -185,8 +189,10 @@ public class GameView extends Canvas {
 
         if (constantWalk) {
             Coords pos = getMouseCoords(x, y, left, top);
-            Coords translated = pos.add(currentPos);
-            commandControllableGoTo(translated);
+            modifiedCoords.x = pos.x;
+            modifiedCoords.y = pos.y;
+            modifiedCoords.add(currentPos);
+            commandControllableGoTo(modifiedCoords);
         }
 
         if (Settings.isCenterOnPC()) {
@@ -271,9 +277,11 @@ public class GameView extends Canvas {
         }
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenterBottomPos();
-        Coords translated = centerBottomPos.subtract(currentPos);
-        double x = translated.x * Sizes.getMeter();
-        double y = translated.y * Sizes.getMeter();
+        modifiedCoords.x = centerBottomPos.x;
+        modifiedCoords.y = centerBottomPos.y;
+        modifiedCoords.subtract(currentPos);
+        double x = modifiedCoords.x * Sizes.getMeter();
+        double y = modifiedCoords.y * Sizes.getMeter();
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
@@ -381,8 +389,10 @@ public class GameView extends Canvas {
 
     private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
         Coords pos = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter());
-        Coords translated = pos.add(currentPos);
-        Coords[] poss = new Coords[]{translated};
+        modifiedCoords.x = pos.x;
+        modifiedCoords.y = pos.y;
+        modifiedCoords.add(currentPos);
+        Coords[] poss = new Coords[]{modifiedCoords};
         ItemType[] types = new ItemType[]{ItemType.CREATURE};
         PosItem pi = controller.getBoard().lookForContent(poss, types, true);
         if (pi != null) {
@@ -392,11 +402,11 @@ public class GameView extends Canvas {
                 default -> false;
             };
             if (!success) {
-                commandControllable(translated);
+                commandControllable(modifiedCoords);
                 constantWalk = true;
             }
         } else {
-            commandControllable(translated);
+            commandControllable(modifiedCoords);
             constantWalk = true;
         }
     }
@@ -457,7 +467,6 @@ public class GameView extends Canvas {
         } else {
             currentPos.y = Math.max(y, 0);
         }
-        controller.setPosToCenter(null);
     }
 
     private void commandControllable(Coords pos) {

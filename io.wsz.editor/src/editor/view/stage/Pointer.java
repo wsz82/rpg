@@ -17,8 +17,9 @@ public class Pointer {
         public void handle(MouseEvent event) {
             event.consume();
             if (event.getButton().equals(MouseButton.PRIMARY)) {
-                Coords mousePos = new Coords(event.getX() / Sizes.getMeter(), event.getY() / Sizes.getMeter());
-                mark = mousePos.add(Controller.get().getBoardPos());
+                mark.x = event.getX() / Sizes.getMeter();
+                mark.y = event.getY() / Sizes.getMeter();
+                mark.add(Controller.get().getBoardPos());
                 if (markerImage == null) {
                     loadMarkerImage();
                 }
@@ -26,7 +27,7 @@ public class Pointer {
             }
         }
     };
-    private Coords mark;
+    private final Coords mark = new Coords();
     private boolean active;
     private Image markerImage;
     private EditorCanvas editorCanvas;
@@ -53,23 +54,15 @@ public class Pointer {
     }
 
     public Coords getMark() {
-        if (mark != null && active) {
+        if (mark.x != -1 && active) {
             return mark;
         } else {
             return new Coords(0, 0);
         }
     }
 
-    public void setMark(Coords mark) {
-        this.mark = mark;
-    }
-
     public boolean isActive() {
         return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public Image getMarkerImage() {

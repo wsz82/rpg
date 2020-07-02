@@ -13,8 +13,10 @@ public class Task implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Creature creature;
+    private final Coords nextPos = new Coords(-1, -1);
+
+    private final Coords dest = new Coords(-1, -1);
     private PosItem item;
-    private Coords dest;
     private boolean finished;
 
     public Task(Creature creature) {
@@ -28,7 +30,7 @@ public class Task implements Serializable {
     }
 
     public void doTask() {
-        if (dest != null) {
+        if (dest.x != -1) {
             move();
             if (item != null) {
                 if (item instanceof Equipment) {
@@ -48,7 +50,7 @@ public class Task implements Serializable {
             Controller.get().setAsking(creature);
             Controller.get().setAnswering(cr);
             item = null;
-            dest = null;
+            dest.x = -1;
         }
     }
 
@@ -63,7 +65,7 @@ public class Task implements Serializable {
                 }
             }
             item = null;
-            dest = null;
+            dest.x = -1;
         }
     }
 
@@ -77,7 +79,7 @@ public class Task implements Serializable {
         double y2 = dest.y;
         if (x1 <= x2 + 10.0/ Sizes.getMeter() && x1 >= x2 - 10.0/ Sizes.getMeter()
                 && y1 <= y2 + 10.0/ Sizes.getMeter() && y1 >= y2 - 10.0/ Sizes.getMeter()) {
-            dest = null;
+            dest.x = -1;
             return;
         }
         double dist = creature.getDistance(x1, x2, y1, y2);
@@ -87,17 +89,20 @@ public class Task implements Serializable {
         }
         double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
         double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
-        Coords nextPos = new Coords(x3, y3);
+        nextPos.x = x3;
+        nextPos.y = y3;
         PosItem pi = creature.getCollision(creature.getCenterBottomPos(nextPos));
         if (pi != null) {
-            dest = null;
+            dest.x = -1;
             return;
         }
-        creature.pos = nextPos;
+        creature.pos.x = nextPos.x;
+        creature.pos.y = nextPos.y;
     }
 
     public void clear() {
-        this.dest = null;
+        this.dest.x = -1;
+        this.dest.y = -1;
         this.item = null;
     }
 
@@ -115,9 +120,13 @@ public class Task implements Serializable {
             return;
         }
         if (item instanceof Creature) {
-            this.dest = creature.reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
+            Coords dest = creature.reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
+            this.dest.x = dest.x;
+            this.dest.y = dest.y;
         } else {
-            this.dest = creature.reverseCenterBottomPos(item.getPos());
+            Coords dest = creature.reverseCenterBottomPos(item.getPos());
+            this.dest.x = dest.x;
+            this.dest.y = dest.y;
         }
     }
 
@@ -126,7 +135,8 @@ public class Task implements Serializable {
     }
 
     public void setDest(Coords dest) {
-        this.dest = dest;
+        this.dest.x = dest.x;
+        this.dest.y = dest.y;
     }
 
     public boolean isFinished() {

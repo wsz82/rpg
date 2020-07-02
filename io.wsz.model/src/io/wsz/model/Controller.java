@@ -28,8 +28,8 @@ public class Controller {
     private final Map<Creature, Location> heroes = new IdentityHashMap<>(6);
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
+    private final Coords posToCenter = new Coords();
     private Location locationToUpdate;
-    private Coords posToCenter;
     private Creature creatureToOpenContainer;
     private Container containerToOpen;
     private PosItem asking;
@@ -104,7 +104,8 @@ public class Controller {
     }
 
     public void setPosToCenter(Coords posToCenter) {
-        this.posToCenter = posToCenter;
+        this.posToCenter.x = posToCenter.x;
+        this.posToCenter.y = posToCenter.y;
     }
 
     public Plugin loadPluginMetadata(String name) {

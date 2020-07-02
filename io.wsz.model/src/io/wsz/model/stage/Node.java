@@ -2,17 +2,16 @@ package io.wsz.model.stage;
 
 import io.wsz.model.item.PosItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
     private PosItem content;
-    private List<Node> greater;
-    private List<Node> lesser;
+    private final List<Node> greater = new ArrayList<>(0);
+    private final List<Node> lesser = new ArrayList<>(0);
 
-    public Node(PosItem content, List<Node> greater, List<Node> lesser) {
+    public Node(PosItem content) {
         this.content = content;
-        this.greater = greater;
-        this.lesser = lesser;
     }
 
     public PosItem getItem() {
@@ -27,16 +26,8 @@ public class Node {
         return greater;
     }
 
-    public void setGreater(List<Node> greater) {
-        this.greater = greater;
-    }
-
     public List<Node> getLesser() {
         return lesser;
-    }
-
-    public void setLesser(List<Node> lesser) {
-        this.lesser = lesser;
     }
 
     @Override

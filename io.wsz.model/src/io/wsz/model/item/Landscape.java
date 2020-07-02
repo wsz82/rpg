@@ -13,10 +13,10 @@ public class Landscape extends PosItem<Landscape> {
     public Landscape() {}
 
     public Landscape(Landscape prototype, String name, ItemType type, String path,
-                     Boolean visible, Coords pos, Integer level,
+                     Boolean visible, Integer level,
                      List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(prototype, name, type, path,
-                visible, pos, level,
+                visible, level,
                 coverLine, collisionPolygons);
     }
 

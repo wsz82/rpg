@@ -17,9 +17,11 @@ public class Weapon extends Equipment<Weapon> {
     public Weapon() {}
 
     public Weapon(Weapon prototype, String name, ItemType type, String path,
-                  Boolean visible, Coords pos, Integer level,
+                  Boolean visible, Integer level,
                   List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, level,
+                coverLine, collisionPolygons);
     }
 
     public Double getIndividualDamage() {

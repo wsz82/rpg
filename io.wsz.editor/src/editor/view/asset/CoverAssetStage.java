@@ -42,7 +42,8 @@ public class CoverAssetStage extends AssetStage<Cover> {
     @Override
     protected Cover createNewAsset(String name, String relativePath) {
         return new Cover(null, name, getType(), relativePath,
-                true, null, null, new ArrayList<>(0), new ArrayList<>(0));
+                true, null,
+                new ArrayList<>(0), new ArrayList<>(0));
     }
 
     @Override

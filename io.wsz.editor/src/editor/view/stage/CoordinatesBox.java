@@ -11,16 +11,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 class CoordinatesBox extends HBox {
+    private final Coords mousePos = new Coords();
     private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
             if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                Coords mousePos = new Coords(event.getX() / Sizes.getMeter(), event.getY() / Sizes.getMeter());
+                mousePos.x = event.getX() / Sizes.getMeter();
+                mousePos.y = event.getY() / Sizes.getMeter();
                 Controller.get();
                 Coords boardPos = Controller.get().getBoardPos();
-                Coords translated = mousePos.add(boardPos);
-                mouseX.setText("X: " + String.format("%.2f", translated.x));
-                mouseY.setText("Y: " + String.format("%.2f", translated.y));
+                mousePos.add(boardPos);
+                mouseX.setText("X: " + String.format("%.2f", mousePos.x));
+                mouseY.setText("Y: " + String.format("%.2f", mousePos.y));
             }
         }
     };

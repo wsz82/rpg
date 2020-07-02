@@ -22,7 +22,7 @@ import java.util.List;
 public class EditorController {
     private static EditorController singleton;
     private final Controller controller = Controller.get();
-    private Coords dragPos;
+    private final Coords dragPos = new Coords();
     private ItemsStage itemsStage;
 
     public static EditorController get() {
@@ -136,7 +136,8 @@ public class EditorController {
     }
 
     public void setDragPos(Coords pos) {
-        this.dragPos = pos;
+        this.dragPos.x = pos.x;
+        this.dragPos.y = pos.y;
     }
 
     public Coords getDragPos() {

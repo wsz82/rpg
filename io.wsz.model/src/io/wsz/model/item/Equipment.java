@@ -18,9 +18,11 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public Equipment() {}
 
     public Equipment(E prototype, String name, ItemType type, String path,
-                     Boolean visible, Coords pos, Integer level,
+                     Boolean visible, Integer level,
                      List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, visible, pos, level, coverLine, collisionPolygons);
+        super(prototype, name, type, path,
+                visible, level,
+                coverLine, collisionPolygons);
     }
     public Double getIndividualWeight() {
         return weight;
@@ -61,7 +63,8 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void onTake(Creature cr) {
         visible.set(false);
-        pos = cr.pos;
+        pos.x = cr.pos.x;
+        pos.y = cr.pos.y;
         level = cr.level;
         Controller.get().getCurrentLocation().getLocation().getItemsToRemove().add(this);
     }
@@ -69,7 +72,9 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void onDrop(Creature cr) {
         visible.set(true);
-        this.pos = cr.getCenterBottomPos().clone();
+        Coords centerBottomPos = cr.getCenterBottomPos();
+        this.pos.x = centerBottomPos.x;
+        this.pos.y = centerBottomPos.y;
         this.level = cr.getLevel();
         Controller.get().getCurrentLocation().getLocation().getItemsToAdd().add(this);
     }

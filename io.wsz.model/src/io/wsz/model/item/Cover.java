@@ -14,10 +14,10 @@ public class Cover extends PosItem<Cover> implements Externalizable {
     public Cover() {}
 
     public Cover(Cover prototype, String name, ItemType type, String path,
-                 Boolean visible, Coords pos, Integer level,
+                 Boolean visible, Integer level,
                  List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(prototype, name, type, path,
-                visible, pos, level,
+                visible, level,
                 coverLine, collisionPolygons);
     }
 

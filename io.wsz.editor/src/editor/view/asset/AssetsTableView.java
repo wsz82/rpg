@@ -64,9 +64,9 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                 EditorController editorController = EditorController.get();
                 Coords dragPos = editorController.getDragPos();
                 ItemsStage itemsStage;
-                if (dragPos != null) {
+                if (dragPos.x != -1) {
                     addItemsToStage(dragPos);
-                    editorController.setDragPos(null);
+                    dragPos.x = -1;
                 } else if ((itemsStage = editorController.getItemsStageToAddItems()) != null) {
                     addItemsToContainable(itemsStage);
                     editorController.setItemsStageToAddItems(null);

@@ -23,8 +23,10 @@ public class Board {
     private final Coords boardPos = new Coords(0, 0);
     private final Graph graph = new Graph(new ArrayList<>(0));
     private final List<PosItem> allItems = new ArrayList<>(0);
+    private final List<PosItem> sortedItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
     private final List<Equipment> equipment = new ArrayList<>(0);
+    private final List<Equipment> equipmentResult = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
     private final List<Coords> itemCoords = new ArrayList<>(0);
     private final LinkedList<Coords> i1_list = new LinkedList<>();
@@ -58,7 +60,7 @@ public class Board {
         nodes.clear();
 
         for (PosItem pi : items) {
-            Node newNode = new Node(pi, new ArrayList<>(0), new ArrayList<>(0));
+            Node newNode = new Node(pi);
 
             for (Node n : nodes) {
                 Comparison result = compare(pi, n);
@@ -74,8 +76,7 @@ public class Board {
             nodes.add(newNode);
         }
 
-        List<PosItem> sortedItems = new ArrayList<>(1);
-
+        sortedItems.clear();
         if (!nodes.isEmpty()) {
             Node n = nodes.get(0);
             int size  = nodes.size();
@@ -264,7 +265,7 @@ public class Board {
 
     private void looseCoordsReference(List<Coords> from, List<Coords> to) {
         for (Coords pos : from) {
-            Coords newPos = pos.clone();
+            Coords newPos = pos.clonePos();
             to.add(newPos);
         }
     }
@@ -427,6 +428,7 @@ public class Board {
     }
 
     public List<Equipment> getEquipmentWithinRange(Coords[] poss, Creature cr) {
+        equipmentResult.clear();
         items.clear();
         items.addAll(Controller.get().getCurrentLocation().getItems());
         equipment.clear();
@@ -437,24 +439,23 @@ public class Board {
                 .map(pi -> (Equipment) pi)
                 .collect(Collectors.toCollection(() -> equipment));
         if (equipment.isEmpty()) {
-            return null;
+            return equipmentResult;
         }
         sortItems(items);
         Collections.reverse(items);
 
-        List<Equipment> output = new ArrayList<>(0);
         Double range = cr.getRange();
         for (Equipment e : equipment) {
             Coords eCenter = e.getCenter();
             for (Coords pos : poss) {
                 if (pointWithinRange(pos, range, eCenter)) {
-                    if (!output.contains(e)) {
-                        output.add(e);
+                    if (!equipmentResult.contains(e)) {
+                        equipmentResult.add(e);
                     }
                 }
             }
         }
-        return output;
+        return equipmentResult;
     }
 
     private boolean pointWithinRange(Coords pos, Double range, Coords eCenter) {

@@ -38,7 +38,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
         List<Landscape> output = new ArrayList<>(1);
         for (Landscape p
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -48,7 +48,6 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -60,8 +59,9 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
 
             Landscape l = new Landscape(
                     p, name, type, path,
-                    true, clonePos, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            l.setPos(pos);
             output.add(l);
         }
         return output;

@@ -23,10 +23,10 @@ public class Teleport extends PosItem<Teleport> {
     public Teleport() {}
 
     public Teleport(Teleport prototype, String name, ItemType type, String path,
-                    Boolean visible, Coords pos, Integer level,
+                    Boolean visible, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(prototype, name, type, path,
-                visible, pos, level,
+                visible, level,
                 coverLine, collisionPolygons);
     }
 
@@ -97,7 +97,12 @@ public class Teleport extends PosItem<Teleport> {
     }
 
     public void setExit(Coords exit) {
-        this.exit = exit;
+        if (this.exit == null) {
+            this.exit = exit;
+        } else {
+            this.exit.x = exit.x;
+            this.exit.y = exit.y;
+        }
     }
 
     public Integer getIndividualExitLevel() {

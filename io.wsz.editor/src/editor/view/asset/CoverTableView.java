@@ -38,7 +38,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
         List<Cover> output = new ArrayList<>(1);
         for (Cover c
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = c.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -48,7 +48,6 @@ public class CoverTableView extends AssetsTableView<Cover> {
             ItemType type = c.getType();
             String path = c.getRelativePath();
 
-            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (c.getCoverLine() != null) {
                 coverLine.addAll(c.getCoverLine());
@@ -60,8 +59,9 @@ public class CoverTableView extends AssetsTableView<Cover> {
 
             Cover cover = new Cover(
                     c, name, type, path,
-                    true, clonePos, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            cover.setPos(pos);
             output.add(cover);
         }
         return output;

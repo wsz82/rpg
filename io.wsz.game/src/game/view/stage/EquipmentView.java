@@ -48,7 +48,8 @@ public class EquipmentView extends Pane {
         this.parent = parent;
         this.equipmentToHold.addAll(cr.getItems());
         if (container == null) {
-            this.equipmentToDrop.addAll(cr.getEquipmentWithinRange());
+            List<Equipment> equipmentWithinRange = cr.getEquipmentWithinRange();
+            this.equipmentToDrop.addAll(equipmentWithinRange);
         } else {
             this.equipmentToDrop.addAll(container.getItems());
         }

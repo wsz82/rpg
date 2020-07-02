@@ -41,7 +41,8 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     @Override
     protected Landscape createNewAsset(String name, String relativePath) {
         return new Landscape(null, name, getType(), relativePath,
-                true, null, null, new ArrayList<>(0), new ArrayList<>(0));
+                true, null,
+                new ArrayList<>(0), new ArrayList<>(0));
     }
 
     @Override

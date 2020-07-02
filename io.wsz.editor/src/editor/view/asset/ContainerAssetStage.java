@@ -116,7 +116,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     protected Container createNewAsset(String name, String relativePath) {
         return new Container(
                 null, name, getType(), relativePath,
-                true, null, null,
+                true, null,
                 new ArrayList<>(0), new ArrayList<>(0));
     }
 

@@ -18,9 +18,11 @@ import java.util.Objects;
 public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
     private static final long serialVersionUID = 1L;
 
+    protected final Coords center = new Coords();
+
     protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
-    protected Coords pos;
+    protected final Coords pos = new Coords();
     protected Integer level;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
@@ -29,21 +31,20 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     public PosItem() {}
 
     public PosItem(A prototype, String name, ItemType type, String path,
-                   Boolean visible, Coords pos, Integer level,
+                   Boolean visible, Integer level,
                    List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(name, type, path);
         this.prototype = prototype;
         this.visible.set(visible);
-        this.pos = pos;
         this.level = level;
         this.coverLine = coverLine;
         this.collisionPolygons = collisionPolygons;
     }
 
     public Coords getCenter() {
-        double centerX = pos.x + getImage().getWidth()/ Sizes.getMeter();
-        double centerY = pos.y + getImage().getHeight()/ Sizes.getMeter();
-        return new Coords(centerX, centerY);
+        center.x = pos.x + getImage().getWidth() / Sizes.getMeter();
+        center.y = pos.y + getImage().getHeight() / Sizes.getMeter();
+        return center;
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
@@ -74,7 +75,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public void setPos(Coords pos) {
-        this.pos = pos;
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
     }
 
     public Integer getLevel() {
@@ -197,7 +199,9 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
         visible.set(in.readBoolean());
 
-        pos = (Coords) in.readObject();
+        Coords pos = (Coords) in.readObject();
+        this.pos.x = pos.x;
+        this.pos.y = pos.y;
 
         level = (Integer) in.readObject();
 

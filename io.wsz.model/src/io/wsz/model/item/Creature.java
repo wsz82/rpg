@@ -48,10 +48,10 @@ public class Creature extends PosItem<Creature> implements Containable {
     public Creature() {}
 
     public Creature(Creature prototype, String name, ItemType type, String path,
-                    Boolean visible, Coords pos, Integer level,
+                    Boolean visible, Integer level,
                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
         super(prototype, name, type, path,
-                visible, pos, level,
+                visible, level,
                 coverLine, collisionPolygons);
     }
 
@@ -76,7 +76,9 @@ public class Creature extends PosItem<Creature> implements Containable {
         PosItem collided = getCollision(getCenterBottomPos());
         if (collided != null) {
             Coords freePos = Board.get().getFreePosAround(this);
-            pos = reverseCenterBottomPos(freePos);
+            Coords reversed = reverseCenterBottomPos(freePos);
+            pos.x = reversed.x;
+            pos.y = reversed.y;
         }
     }
 
@@ -139,7 +141,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public void onInteractWith(Coords pos) {
-        interactionCoords[0] = pos;
+        interactionCoords[0].x = pos.x;
+        interactionCoords[0].y = pos.y;
         ItemType[] types = ItemType.values();
         PosItem pi = Controller.get().getBoard().lookForContent(interactionCoords, types, true);
         if (pi == null) {
@@ -400,7 +403,9 @@ public class Creature extends PosItem<Creature> implements Containable {
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
         Coords rawPos = new Coords(targetX, targetY);
-        pos = reverseCenterBottomPos(rawPos).clone();
+        Coords reversed = reverseCenterBottomPos(rawPos);
+        this.pos.x = reversed.x;
+        this.pos.y = reversed.y;
         task.clear();
 
         Map<Creature, Location> heroes = Controller.get().getHeroes();

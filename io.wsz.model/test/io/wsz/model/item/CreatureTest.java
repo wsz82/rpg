@@ -17,7 +17,7 @@ class CreatureTest {
         List<Coords> pcl = new ArrayList<>(0);
         List<List<Coords>> pcp = new ArrayList<>(0);
         Creature p = new Creature(null, "Enemy", ItemType.CREATURE, "C:/enemy.png",
-                true, null, null, pcl, pcp);
+                true, null, pcl, pcp);
         List<Answer> answers = new ArrayList<>(1);
         Answer sample = new Answer("sample", new ArrayList<>(0));
         answers.add(sample);
@@ -31,7 +31,8 @@ class CreatureTest {
         List<Coords> acl = new ArrayList<>(0);
         List<List<Coords>> acp = new ArrayList<>(0);
         Creature a = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
-                true, pos.clone(), level, acl, acp);
+                true, level, acl, acp);
+        a.setPos(pos);
 
         Inventory inventoryA = new Inventory(a);
         a.setInventory(inventoryA);
@@ -41,7 +42,8 @@ class CreatureTest {
         List<Coords> bcl = new ArrayList<>(0);
         List<List<Coords>> bcp = new ArrayList<>(0);
         Creature b = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
-                true, pos.clone(), level, bcl, bcp);
+                true, level, bcl, bcp);
+        b.setPos(pos);
 
         a.getTask().clone(b);
 

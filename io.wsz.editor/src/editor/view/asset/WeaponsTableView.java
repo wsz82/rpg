@@ -78,7 +78,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
         List<Weapon> output = new ArrayList<>(1);
         for (Weapon p
                 : selectedAssets) {
-            Coords pos = rawPos.clone();
+            Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
                 double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
@@ -88,7 +88,6 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Coords clonePos = pos.clone();
             List<Coords> coverLine = new ArrayList<>();
             if (p.getCoverLine() != null) {
                 coverLine.addAll(p.getCoverLine());
@@ -100,8 +99,9 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
 
             Weapon w = new Weapon(
                     p, name, type, path,
-                    true, clonePos, level,
+                    true, level,
                     coverLine, collisionPolygons);
+            w.setPos(pos);
             output.add(w);
         }
         return output;
