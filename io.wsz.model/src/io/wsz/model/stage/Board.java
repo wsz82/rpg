@@ -130,9 +130,17 @@ public class Board {
             translateCoords(i1_list, i1_posX, i1_posY);
         } else {
             i1_left.x = i1_posX;
-            i1_left.y = i1_posY + i1_imgHeight;
+            double bottom = i1_posY + i1_imgHeight;
             i1_right.x = i1_posX + i1_imgWidth;
-            i1_right.y = i1_posY+i1_imgHeight;
+
+            if (i1 instanceof Creature) {
+                Creature c1 = (Creature) i1;
+                bottom = c1.getCreatureBottom(bottom);
+                i1_right.x = c1.getCreatureRight(i1_imgWidth, i1_right.x);
+                i1_left.x = c1.getCreatureLeft(i1_left.x, i1_imgWidth);
+            }
+
+            i1_left.y = i1_right.y = bottom;
 
             i1_list.add(i1_left);
             i1_list.add(i1_right);
@@ -152,9 +160,17 @@ public class Board {
             addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
         } else {
             i2_left.x = i2_posX;
-            i2_left.y = i2_posY + i2_imgHeight;
+            double bottom = i2_posY + i2_imgHeight;
             i2_right.x = i2_posX + i2_imgWidth;
-            i2_right.y = i2_posY + i2_imgHeight;
+
+            if (i2 instanceof Creature) {
+                Creature c2 = (Creature) i2;
+                bottom = c2.getCreatureBottom(bottom);
+                i2_right.x = c2.getCreatureRight(i2_imgWidth, i2_right.x);
+                i2_left.x = c2.getCreatureLeft(i2_left.x, i2_imgWidth);
+            }
+
+            i2_left.y = i2_right.y = bottom;
 
             i2_list.add(i2_left);
             i2_list.add(i2_right);
@@ -191,6 +207,36 @@ public class Board {
                     return GREAT;
                 } else {
                     return LESS;
+                }
+            }
+        }
+        for (int i = 0; i < i1_list.size() - 1; i++) {
+            Coords first = i1_list.get(i);
+            double x1 = first.x;
+            double y1 = first.y;
+            Coords second = i1_list.get(i+1);
+            double x2 = second.x;
+            double y2 = second.y;
+
+            if (x1 == x2) {
+                continue;
+            }
+
+            for (Coords compared : i2_list) {
+                double x = compared.x;
+                if (x == x1) {
+                    continue;
+                }
+                boolean xIsBetweenLine = x >= x1 && x <= x2;
+                if (!xIsBetweenLine) {
+                    continue;
+                }
+                double y = compared.y;
+                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
+                if (y > func) {
+                    return LESS;
+                } else {
+                    return GREAT;
                 }
             }
         }

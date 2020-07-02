@@ -54,25 +54,6 @@ public class GameStage extends Stage {
             }
         }
     };
-    private final EventHandler<KeyEvent> gameMenuReturn = event -> {
-        if (event.getCode() == KeyCode.ESCAPE) {
-            event.consume();
-            setGameMenuForCenter();
-            gameController.setGame(false);
-        }
-    };
-    private final EventHandler<KeyEvent> mainMenuReturn = event -> {
-        if (event.getCode() == KeyCode.ESCAPE) {
-            event.consume();
-            showMainMenu();
-        }
-    };
-    private final EventHandler<KeyEvent> gameReturn = event -> {
-        if (event.getCode() == KeyCode.ESCAPE) {
-            event.consume();
-            gameController.resumeGame();
-        }
-    };
 
     public GameStage() {
         super(StageStyle.DECORATED);

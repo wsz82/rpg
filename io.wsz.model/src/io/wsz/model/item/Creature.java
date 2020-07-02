@@ -218,6 +218,44 @@ public class Creature extends PosItem<Creature> implements Containable {
         task.doTask();
     }
 
+    public double getCreatureLeft(double imgLeft, double imgWidth) {
+        double width = getSize().getWidth();
+        if (imgWidth < width) {
+            double halfDif = (width - imgWidth) / 2;
+            imgLeft -= halfDif;
+        }
+        return imgLeft;
+    }
+
+    public double getCreatureRight(double imgWidth, double imgRight) {
+        double width = getSize().getWidth();
+        if (imgWidth < width) {
+            double halfDif = (width - imgWidth) / 2;
+            imgRight += halfDif;
+        }
+        return imgRight;
+    }
+
+    public double getCreatureTop(double imgTop, double imgHeight) {
+        double halfHeight = getCreatureHalfHeight();
+        double imgBottom = imgTop + imgHeight;
+        if (imgHeight < halfHeight) {
+            imgTop = imgBottom - halfHeight;
+        }
+        return imgTop;
+    }
+
+    public double getCreatureBottom(double imgBottom) {
+        double halfHeight = getCreatureHalfHeight();
+        imgBottom += halfHeight;
+        return imgBottom;
+    }
+
+    private double getCreatureHalfHeight() {
+        double height = getSize().getHeight();
+        return height / 2;
+    }
+
     public Task getTask() {
         return task;
     }
