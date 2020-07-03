@@ -19,6 +19,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
+    protected final double[] imgEdges = new double[4];
 
     protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
@@ -45,6 +46,14 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         center.x = pos.x + getImage().getWidth() / Sizes.getMeter();
         center.y = pos.y + getImage().getHeight() / Sizes.getMeter();
         return center;
+    }
+
+    public double[] getLeftTopRightBottomEdges() {
+        imgEdges[0] = pos.x;
+        imgEdges[1] = pos.y;
+        imgEdges[2] = pos.x + getImage().getWidth() / Sizes.getMeter();
+        imgEdges[3] = pos.y + getImage().getHeight() / Sizes.getMeter();
+        return imgEdges;
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {

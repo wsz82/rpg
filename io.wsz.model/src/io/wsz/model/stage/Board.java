@@ -243,6 +243,37 @@ public class Board {
         return INCOMPARABLE;
     }
 
+    private void looseCoordsReference(List<Coords> from, List<Coords> to) {
+        for (Coords pos : from) {
+            Coords newPos = pos.clonePos();
+            to.add(newPos);
+        }
+    }
+
+    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
+        Coords first = linkedCoords.getFirst();
+        if (first.x != i2_posX) {
+            i2_left.x = i2_posX;
+            i2_left.y = first.y;
+            linkedCoords.addFirst(i2_left);
+        }
+
+        Coords last = linkedCoords.getLast();
+        double rightX = i2_posX + i2_imgWidth;
+        if (last.x != rightX) {
+            i2_right.x = rightX;
+            i2_right.y = last.y;
+            linkedCoords.addLast(i2_right);
+        }
+    }
+
+    private void translateCoords(List<Coords> list, double i2_posX, double i2_posY) {
+        list.forEach(c -> {
+                    c.x = i2_posX + c.x;
+                    c.y = i2_posY + c.y;
+                });
+    }
+
     public PosItem lookForContent(Location location, Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         allItems.addAll(location.getItems().get());
@@ -307,37 +338,6 @@ public class Board {
             }
         }
         return null;
-    }
-
-    private void looseCoordsReference(List<Coords> from, List<Coords> to) {
-        for (Coords pos : from) {
-            Coords newPos = pos.clonePos();
-            to.add(newPos);
-        }
-    }
-
-    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
-        Coords first = linkedCoords.getFirst();
-        if (first.x != i2_posX) {
-            i2_left.x = i2_posX;
-            i2_left.y = first.y;
-            linkedCoords.addFirst(i2_left);
-        }
-
-        Coords last = linkedCoords.getLast();
-        double rightX = i2_posX + i2_imgWidth;
-        if (last.x != rightX) {
-            i2_right.x = rightX;
-            i2_right.y = last.y;
-            linkedCoords.addLast(i2_right);
-        }
-    }
-
-    private void translateCoords(List<Coords> list, double i2_posX, double i2_posY) {
-        list.forEach(c -> {
-                    c.x = i2_posX + c.x;
-                    c.y = i2_posY + c.y;
-                });
     }
 
     public List<Creature> getCreatures(Location location) {
@@ -601,5 +601,41 @@ public class Board {
     public void looseCreaturesControl(Location location) {
         List<Creature> creatures = getControlledCreatures(location);
         Controller.get().getCreaturesToLooseControl().addAll(creatures);
+    }
+
+    public List<Creature> getControllablesWithinRectangle(Coords first, Coords second, Location location) {
+        double left;
+        double right;
+        if (first.x <= second.x) {
+            left = first.x;
+            right = second.x;
+        } else {
+            left = second.x;
+            right = first.x;
+        }
+        double top;
+        double bottom;
+        if (first.y <= second.y) {
+            top = first.y;
+            bottom = second.y;
+        } else {
+            top = second.y;
+            bottom = first.y;
+        }
+        creatures.clear();
+        location.getItems().get().stream()
+                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .map(pi -> (Creature) pi)
+                .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
+                        || c.getControl().equals(CreatureControl.CONTROL))
+                .filter(c -> {
+                    Coords centerBottom = c.getCenterBottomPos();
+                    double x = centerBottom.x;
+                    double y = centerBottom.y;
+                    return x > left && x < right
+                            && y > top && y < bottom;
+                })
+                .collect(Collectors.toCollection(() -> creatures));
+        return creatures;
     }
 }

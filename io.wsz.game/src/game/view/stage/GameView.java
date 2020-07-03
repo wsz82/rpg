@@ -42,6 +42,8 @@ public class GameView extends Canvas {
     private final Coords currentPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
+    private final Coords selFirst = new Coords(-1, -1, null);
+    private final Coords selSecond = new Coords(-1, -1, null);
     private final GameController gameController = GameController.get();
     private final BarView barView = new BarView(this);
     private List<Layer> layers;
@@ -50,10 +52,12 @@ public class GameView extends Canvas {
     private DialogView dialogView;
     private boolean dialogStarted = true;
     private boolean constantWalk;
+    private boolean selectionMode;
 
     public GameView(Stage parent) {
         this.parent = parent;
-        defineEvents();
+        hookUpEvents();
+        defineRemovableEvents();
         hookUpRemovableEvents();
     }
 
@@ -111,9 +115,7 @@ public class GameView extends Canvas {
         for (PosItem pi : items) {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
-            modifiedCoords.x = pos.x;
-            modifiedCoords.y = pos.y;
-            modifiedCoords.subtract(currentPos);
+            translateCoordsToScreenCoords(pos);
             final int x = (int) (modifiedCoords.x * Sizes.getMeter());
             final int y = (int) (modifiedCoords.y * Sizes.getMeter());
 
@@ -153,6 +155,38 @@ public class GameView extends Canvas {
         if (Settings.isShowBar()) {
             barView.refresh();
         }
+
+        if (selectionMode) {
+            drawSelection(gc);
+        }
+    }
+
+    private void drawSelection(GraphicsContext gc) {
+        if (selFirst.x == -1 | selSecond.x == -1) {
+            return;
+        }
+        final Coords first = selFirst;
+        translateCoordsToScreenCoords(first);
+        final int firstX = (int) (modifiedCoords.x * Sizes.getMeter());
+        final int firstY = (int) (modifiedCoords.y * Sizes.getMeter());
+
+        final Coords second = selSecond;
+        translateCoordsToScreenCoords(second);
+        final int secondX = (int) (modifiedCoords.x * Sizes.getMeter());
+        final int secondY = (int) (modifiedCoords.y * Sizes.getMeter());
+
+        int x = Math.min(firstX, secondX);
+        int y = Math.min(firstY, secondY);
+        int width = Math.abs(firstX - secondX);
+        int height = Math.abs(firstY - secondY);
+        gc.setStroke(Color.DARKOLIVEGREEN);
+        gc.strokeRect(x, y, width, height);
+    }
+
+    private void translateCoordsToScreenCoords(Coords first) {
+        modifiedCoords.x = first.x;
+        modifiedCoords.y = first.y;
+        modifiedCoords.subtract(currentPos);
     }
 
     private Coords getMouseCoords(double mouseX, double mouseY, double left, double top) {
@@ -186,6 +220,21 @@ public class GameView extends Canvas {
 
         if (x < left || x > right || y < top || y > bottom) {
             return;
+        }
+
+        if (selectionMode) {
+            Coords pos = getMouseCoords(x, y, left, top);
+            modifiedCoords.x = pos.x;
+            modifiedCoords.y = pos.y;
+            modifiedCoords.add(currentPos);
+
+            if (selFirst.x == -1) {
+                selFirst.x = modifiedCoords.x;
+                selFirst.y = modifiedCoords.y;
+            } else {
+                selSecond.x = modifiedCoords.x;
+                selSecond.y = modifiedCoords.y;
+            }
         }
 
         if (constantWalk) {
@@ -279,9 +328,7 @@ public class GameView extends Canvas {
         }
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenterBottomPos();
-        modifiedCoords.x = centerBottomPos.x;
-        modifiedCoords.y = centerBottomPos.y;
-        modifiedCoords.subtract(currentPos);
+        translateCoordsToScreenCoords(centerBottomPos);
         double x = modifiedCoords.x * Sizes.getMeter();
         double y = modifiedCoords.y * Sizes.getMeter();
         switch (control) {
@@ -293,8 +340,64 @@ public class GameView extends Canvas {
                 size.getWidth() * Sizes.getMeter(), size.getHeight() * Sizes.getMeter());
     }
 
-    private void defineEvents() {
+    private void hookUpEvents() {
         setFocusTraversable(true);
+
+        addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.MIDDLE)) {
+                e.consume();
+                selectionMode = true;
+            }
+        });
+
+        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.MIDDLE)) {
+                e.consume();
+                selectionMode = false;
+                boolean multiple = e.isShiftDown();
+                synchronized (gameController.getGameRunner()) {
+                    resolveSelection(selFirst, selSecond, multiple);
+                }
+                selFirst.x = -1;
+                selFirst.y = -1;
+                selSecond.x = -1;
+                selSecond.y = -1;
+            }
+        });
+
+        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                constantWalk = false;
+            }
+        });
+
+        CurrentLocation.get().locationProperty().addListener(observable -> {
+            layers = getSortedLayers();
+            constantWalk = false;
+        });
+
+        widthProperty().addListener((observable, oldValue, newValue) -> {
+            Controller.get().clearHeroesPortraits();
+        });
+        heightProperty().addListener((observable, oldValue, newValue) -> {
+            Controller.get().clearHeroesPortraits();
+        });
+    }
+
+    private void resolveSelection(Coords selFirst, Coords selSecond, boolean multiple) {
+        Location location = controller.getCurrentLocation().getLocation();
+        List<Creature> creatures = board.getControllablesWithinRectangle(selFirst, selSecond, location);
+        creatures.forEach(c -> controller.getCreaturesToControl().add(c));
+        if (!creatures.isEmpty() && !multiple) {
+            board.looseCreaturesControl(location);
+        }
+    }
+
+    private void defineRemovableEvents() {
         clickEvent = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
@@ -368,26 +471,6 @@ public class GameView extends Canvas {
                 }
             }
         };
-
-        addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            MouseButton button = e.getButton();
-            if (button.equals(MouseButton.PRIMARY)) {
-                e.consume();
-                constantWalk = false;
-            }
-        });
-
-        CurrentLocation.get().locationProperty().addListener(observable -> {
-            layers = getSortedLayers();
-            constantWalk = false;
-        });
-
-        widthProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearHeroesPortraits();
-        });
-        heightProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearHeroesPortraits();
-        });
     }
 
     private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
