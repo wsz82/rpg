@@ -33,6 +33,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     private final Coords centerBottom = new Coords();
     private final Coords reversCenterBottom = new Coords();
 
+    private Location enteredToFlag;
+
     private Image portrait;
     private String portraitPath;
     private final Task task = new Task(this);
@@ -72,12 +74,15 @@ public class Creature extends PosItem<Creature> implements Containable {
             }
         }
 
-        PosItem collided = getCollision(getCenterBottomPos());
-        if (collided != null) {
-            Coords freePos = Board.get().getFreePosAround(this);
-            Coords reversed = reverseCenterBottomPos(freePos);
-            pos.x = reversed.x;
-            pos.y = reversed.y;
+        if (enteredToFlag != null && enteredToFlag == pos.getLocation()) {
+            enteredToFlag = null;
+            PosItem collided = getCollision(getCenterBottomPos());
+            if (collided != null) {
+                Coords freePos = Board.get().getFreePosAround(this);
+                Coords reversed = reverseCenterBottomPos(freePos);
+                pos.x = reversed.x;
+                pos.y = reversed.y;
+            }
         }
     }
 
@@ -444,6 +449,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;
         task.clear();
+        enteredToFlag = target;
     }
 
     @Override
