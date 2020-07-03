@@ -91,7 +91,7 @@ public class GameController {
     public SaveMemento loadSaveMemento(String name, File programDir) {
         SaveCaretaker sc = new SaveCaretaker(programDir);
         SaveMemento memento = sc.loadMemento(name);
-        controller.getHeroes().putAll(memento.getHeroes());
+        controller.getHeroes().addAll(memento.getHeroes());
         return memento;
     }
 

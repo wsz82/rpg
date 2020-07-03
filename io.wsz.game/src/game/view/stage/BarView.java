@@ -21,24 +21,21 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class BarView {
     private static final double RIGHT_VIEW_PART = 0.08;
     private static final double PORTRAIT_PART = 0.9;
     private final Canvas canvas;
     private final GraphicsContext gc;
-    private final LinkedList<CreatureLocation> portraits;
+    private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
-    private final Map<Creature, Location> heroes = Controller.get().getHeroes();
     private int hoveredPortrait;
 
     public BarView(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
-        this.portraits = new LinkedList<>();
         for (int i = 0; i < 6; i++) {
-            portraits.add(i, new CreatureLocation(null, null, null, 0));
+            portraits.add(i, new Portrait(null, null, 0));
         }
         hookupEvents();
     }
@@ -114,11 +111,11 @@ public class BarView {
         if (!multiple){
             Controller.get().getBoard().looseCreaturesControl();
         }
-        CreatureLocation cl = portraits.get(hoveredPortrait);
+        Portrait cl = portraits.get(hoveredPortrait);
         resolveCreatureControlAndLocation(cl);
     }
 
-    private void resolveCreatureControlAndLocation(CreatureLocation cl) {
+    private void resolveCreatureControlAndLocation(Portrait cl) {
         if (cl == null) {
             return;
         }
@@ -130,7 +127,7 @@ public class BarView {
             Controller.get().getCreaturesToLooseControl().add(cr);
         }
         Location current = Controller.get().getCurrentLocation().getLocation();
-        Location heroLocation = cl.location;
+        Location heroLocation = cr.getPos().getLocation();
         if (current != heroLocation) {
             Controller.get().setLocationToUpdate(heroLocation);
         }
@@ -138,7 +135,7 @@ public class BarView {
     }
 
     private void updateActivePortrait(double leftX, double padding, double portraitSize) {
-        for (CreatureLocation cl : portraits) {
+        for (Portrait cl : portraits) {
             Creature hero = cl.creature;
             if (hero == null) {
                 return;
@@ -156,7 +153,7 @@ public class BarView {
         if (hoveredPortrait == -1) {
             return;
         }
-        CreatureLocation cl = portraits.get(hoveredPortrait);
+        Portrait cl = portraits.get(hoveredPortrait);
         double portraitY = cl.y;
         if (portraitY == 0) {
             return;
@@ -203,7 +200,7 @@ public class BarView {
 
     private boolean pointWithinPortraits(double portraitSize, double y, double top) {
         for (int i = 0; i < portraits.size(); i++) {
-            CreatureLocation cl = portraits.get(i);
+            Portrait cl = portraits.get(i);
             double portraitY = cl.y;
             double screenY = top + portraitY;
             if (y > screenY && y < screenY + portraitSize) {
@@ -223,13 +220,12 @@ public class BarView {
         clearPortraits(padding, portraitSize, y, portraitX);
 
         creatures.clear();
-        creatures.addAll(heroes.keySet());
+        creatures.addAll(Controller.get().getHeroes());
         for (int i = 0; i < creatures.size(); i++) {
-            CreatureLocation cl = portraits.get(i);
+            Portrait cl = portraits.get(i);
             Creature cr = creatures.get(i);
 
             cl.creature = cr;
-            cl.location = heroes.get(cr);
             cl.image = cr.getPortrait();
             cl.y = y;
             gc.drawImage(cl.image, portraitX, y);
@@ -257,15 +253,13 @@ public class BarView {
         return canvasWidth - barWidth;
     }
 
-    private class CreatureLocation {
+    private class Portrait {
         private Creature creature;
-        private Location location;
         private Image image;
         private double y;
 
-        public CreatureLocation(Creature creature, Location location, Image image, double y) {
+        public Portrait(Creature creature, Image image, double y) {
             this.creature = creature;
-            this.location = location;
             this.image = image;
             this.y = y;
         }

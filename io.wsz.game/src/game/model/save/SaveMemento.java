@@ -5,8 +5,8 @@ import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class SaveMemento implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -16,18 +16,17 @@ public class SaveMemento implements Serializable {
     private List<Location> locations;
     private String currentLocationName;
     private int currentLayer;
-    private Map<Creature, Location> heroes;
+    private LinkedList<Creature> heroes;
 
     public SaveMemento() {}
 
     public SaveMemento(String name, Coords lastPos, String currentLocationName, int currentLayer,
-                       Map<Creature, Location> heroes) {
+                       LinkedList<Creature> heroes) {
         this.name = name;
         this.lastPos = lastPos;
         this.currentLocationName = currentLocationName;
         this.currentLayer = currentLayer;
         this.heroes = heroes;
-
     }
 
     public String getName() {
@@ -70,11 +69,11 @@ public class SaveMemento implements Serializable {
         this.currentLayer = currentLayer;
     }
 
-    public Map<Creature, Location> getHeroes() {
+    public LinkedList<Creature> getHeroes() {
         return heroes;
     }
 
-    public void setHeroes(Map<Creature, Location> heroes) {
+    public void setHeroes(LinkedList<Creature> heroes) {
         this.heroes = heroes;
     }
 }

@@ -17,12 +17,15 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 public class Controller {
     private static Controller singleton;
     private static File programDir;
-    private final Map<Creature, Location> heroes = new IdentityHashMap<>(6);
+    private final LinkedList<Creature> heroes = new LinkedList<>();
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private final Coords posToCenter = new Coords();
@@ -180,16 +183,15 @@ public class Controller {
     }
 
 
-    public Map<Creature, Location> getHeroes() {
+    public LinkedList<Creature> getHeroes() {
         return heroes;
     }
 
     public void initNewGameHeroes() {
         this.heroes.clear();
         List<Creature> controllables = Controller.get().getBoard().getControllableCreatures();
-        Location current = Controller.get().getCurrentLocation().getLocation();
         for (Creature cr : controllables) {
-            this.heroes.put(cr, current);
+            this.heroes.addLast(cr);
         }
     }
 
@@ -201,13 +203,13 @@ public class Controller {
         return creaturesToLooseControl;
     }
 
-    public void initLoadGameHeroes(Map<Creature, Location> heroes) {
+    public void initLoadGameHeroes(LinkedList<Creature> heroes) {
         this.heroes.clear();
-        this.heroes.putAll(heroes);
+        this.heroes.addAll(heroes);
     }
 
     public void clearHeroesPortraits() {
-        for (Creature hero : Controller.get().getHeroes().keySet()) {
+        for (Creature hero : Controller.get().getHeroes()) {
             hero.setPortrait(null);
         }
     }

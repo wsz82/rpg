@@ -15,7 +15,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.net.MalformedURLException;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -445,11 +444,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;
         task.clear();
-
-        Map<Creature, Location> heroes = Controller.get().getHeroes();
-        if (heroes.containsKey(this)) {
-            heroes.put(this, target);
-        }
     }
 
     @Override
