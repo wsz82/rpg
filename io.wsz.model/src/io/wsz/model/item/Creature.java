@@ -27,8 +27,8 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private static final ItemType[] CHECK_SURROUNDING_TYPES = new ItemType[] {TELEPORT};
 
-    private final Coords[] corners = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
-            new Coords(), new Coords(), new Coords(), new Coords()};
+    private final Coords[] cornersAndCenter = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
+            new Coords(), new Coords(), new Coords(), new Coords(), new Coords()};
     private final Coords[] interactionCoords = new Coords[]{new Coords()};
     private final Coords centerBottom = new Coords();
     private final Coords reversCenterBottom = new Coords();
@@ -57,7 +57,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public PosItem getCollision(Coords nextPos) {
-        Coords[] poss = getCorners(nextPos);
+        Coords[] poss = getCornersAndCenter(nextPos);
         PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(poss, pos.getLocation());
         if (collidedObstacle == null) {
             return Controller.get().getBoard().getCornersCreature(poss, this);
@@ -87,7 +87,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private PosItem getCornersContent(ItemType[] types) {
-        Coords[] poss = getCorners();
+        Coords[] poss = getCornersAndCenter();
         return Controller.get().getBoard().lookForContent(this.pos.getLocation(), poss, types, false);
     }
 
@@ -114,34 +114,36 @@ public class Creature extends PosItem<Creature> implements Containable {
         return reversCenterBottom;
     }
 
-    public Coords[] getCorners() {
+    public Coords[] getCornersAndCenter() {
         Coords centerBottomPos = getCenterBottomPos();
-        return getCorners(centerBottomPos);
+        return getCornersAndCenter(centerBottomPos);
     }
 
-    public Coords[] getCorners(Coords pos) {
+    public Coords[] getCornersAndCenter(Coords pos) {
         double halfWidth = getSize().getWidth()/2;
         double halfHeight = getSize().getHeight()/2;
         double centerX = pos.x;
         double centerY = pos.y;
 
-        corners[0].x = centerX;
-        corners[0].y = centerY - halfHeight;
-        corners[1].x = centerX - halfWidth;
-        corners[1].y = centerY;
-        corners[2].x = centerX;
-        corners[2].y = centerY + halfHeight;
-        corners[3].x = centerX + halfWidth;
-        corners[3].y = centerY;
-        corners[4].x = centerX + 3/5.0*halfWidth;
-        corners[4].y = centerY - 2/3.0*halfHeight;
-        corners[5].x = centerX - 3/5.0*halfWidth;
-        corners[5].y = centerY - 2/3.0*halfHeight;
-        corners[6].x = centerX + 3/5.0*halfWidth;
-        corners[6].y = centerY + 2/3.0*halfHeight;
-        corners[7].x = centerX - 3/5.0*halfWidth;
-        corners[7].y = centerY + 2/3.0*halfHeight;
-        return corners;
+        cornersAndCenter[0].x = centerX;
+        cornersAndCenter[0].y = centerY - halfHeight;
+        cornersAndCenter[1].x = centerX - halfWidth;
+        cornersAndCenter[1].y = centerY;
+        cornersAndCenter[2].x = centerX;
+        cornersAndCenter[2].y = centerY + halfHeight;
+        cornersAndCenter[3].x = centerX + halfWidth;
+        cornersAndCenter[3].y = centerY;
+        cornersAndCenter[4].x = centerX + 3/5.0*halfWidth;
+        cornersAndCenter[4].y = centerY - 2/3.0*halfHeight;
+        cornersAndCenter[5].x = centerX - 3/5.0*halfWidth;
+        cornersAndCenter[5].y = centerY - 2/3.0*halfHeight;
+        cornersAndCenter[6].x = centerX + 3/5.0*halfWidth;
+        cornersAndCenter[6].y = centerY + 2/3.0*halfHeight;
+        cornersAndCenter[7].x = centerX - 3/5.0*halfWidth;
+        cornersAndCenter[7].y = centerY + 2/3.0*halfHeight;
+        cornersAndCenter[8].x = centerX;
+        cornersAndCenter[8].y = centerY;
+        return cornersAndCenter;
     }
 
     public void onInteractWith(Coords pos) {
@@ -184,7 +186,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public boolean creatureWithinRange(Creature cr) {
         Coords ePos = cr.getCenterBottomPos();
-        Coords[] poss = getCorners();
+        Coords[] poss = getCornersAndCenter();
         for (Coords corner : poss) {
             double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
             if (dist <= getRange()) {
@@ -196,7 +198,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public boolean withinRange(PosItem e) {
         Coords ePos = e.getCenter();
-        Coords[] poss = getCorners();
+        Coords[] poss = getCornersAndCenter();
         for (Coords corner : poss) {
             double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
             if (dist <= getRange()) {
@@ -207,7 +209,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public List<Equipment> getEquipmentWithinRange() {
-        Coords[] poss = getCorners();
+        Coords[] poss = getCornersAndCenter();
         return Controller.get().getBoard().getEquipmentWithinRange(poss, this);
     }
 

@@ -10,13 +10,17 @@ import io.wsz.model.sizes.Sizes;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
     private final GameController gameController = GameController.get();
     private final Controller controller = Controller.get();
+    private final Set<Location> heroesLocations = new HashSet<>(1);
     private Thread gameThread;
 
     public GameRunner() {}
@@ -57,7 +61,8 @@ public class GameRunner {
                     continue;
                 }
                 synchronized (this) {
-                    List<PosItem> items = controller.getCurrentLocation().getItems();
+                    Location currentLocation = controller.getCurrentLocation().getLocation();
+                    List<PosItem> items = currentLocation.getItems().get();
 
                     for (PosItem pi : items) {
                         pi.update();
@@ -66,6 +71,19 @@ public class GameRunner {
                         addItems(l);
                         removeItems(l);
                     }
+
+                    heroesLocations.clear();
+                    controller.getHeroes().stream()
+                            .map(h -> h.getPos().getLocation())
+                            .collect(Collectors.toCollection(() -> heroesLocations));
+                    heroesLocations.remove(currentLocation);
+
+                    for (Location l : heroesLocations) {
+                        for (PosItem pi : l.getItems().get()) {
+                            pi.update();
+                        }
+                    }
+
                     updateControls();
                     updateLocation();
                     tryToStartDialog();
