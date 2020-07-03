@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
@@ -63,10 +62,11 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void onTake(Creature cr) {
         visible.set(false);
-        pos.x = cr.pos.x;
-        pos.y = cr.pos.y;
+        Coords crPos = cr.pos;
+        this.pos.x = crPos.x;
+        this.pos.y = crPos.y;
         level = cr.level;
-        Controller.get().getCurrentLocation().getLocation().getItemsToRemove().add(this);
+        crPos.getLocation().getItemsToRemove().add(this);
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         this.pos.x = centerBottomPos.x;
         this.pos.y = centerBottomPos.y;
         this.level = cr.getLevel();
-        Controller.get().getCurrentLocation().getLocation().getItemsToAdd().add(this);
+        cr.getPos().getLocation().getItemsToAdd().add(this);
     }
 
     @Override

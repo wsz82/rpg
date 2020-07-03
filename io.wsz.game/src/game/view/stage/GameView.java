@@ -388,7 +388,8 @@ public class GameView extends Canvas {
     }
 
     private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
-        Coords pos = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter());
+        Coords pos = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter(),
+                Controller.get().getCurrentLocation().getLocation());
         modifiedCoords.x = pos.x;
         modifiedCoords.y = pos.y;
         modifiedCoords.add(currentPos);

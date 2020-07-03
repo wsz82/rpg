@@ -115,6 +115,7 @@ public class EditorCanvas extends Canvas {
                 return;
             }
             Coords translated = mark.clonePos();
+            translated.setLocation(Controller.get().getCurrentLocation().getLocation());
             translated.subtract(currentPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
@@ -220,7 +221,8 @@ public class EditorCanvas extends Canvas {
                 }
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+                    Coords pos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter(),
+                            Controller.get().getCurrentLocation().getLocation());
                     Coords translated = pos.clonePos();
                     translated.add(currentPos);
                     Coords[] poss = new Coords[]{translated};
@@ -259,7 +261,9 @@ public class EditorCanvas extends Canvas {
             Dragboard db = e.getDragboard();
             boolean success = false;
             if (db.hasImage()) {
-                Coords dragPos = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+                Coords dragPos = new Coords(
+                        e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter(),
+                        Controller.get().getCurrentLocation().getLocation());
                 dragPos.add(Controller.get().getBoardPos());
                 EditorController.get().setDragPos(dragPos);
                 success = true;
@@ -392,6 +396,7 @@ public class EditorCanvas extends Canvas {
             y = newPos.y - pi.getImage().getHeight()/Sizes.getMeter();
         }
         pos.y = y;
+        pos.setLocation(Controller.get().getCurrentLocation().getLocation());
         contentTableView.refresh();
         refresh();
     }

@@ -122,6 +122,8 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         removeAsset.setOnAction(event -> removeAssets());
         addItemsToStage.setOnAction(event -> {
             Coords mark = pointer.getMark();
+            Coords cloned = mark.clonePos();
+            cloned.setLocation(Controller.get().getCurrentLocation().getLocation());
             addItemsToStage(mark);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
@@ -146,7 +148,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private void addItemsToContainable(ItemsStage itemsStage) {
-        Coords pos = new Coords(0, 0);
+        Coords pos = new Coords(0, 0, null);
         List<A> createdItems = createItems(pos, 0);
         for (A item : createdItems) {
             if (item instanceof Equipment) {

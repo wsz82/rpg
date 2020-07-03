@@ -14,7 +14,6 @@ import game.view.stage.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
-import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
@@ -26,6 +25,7 @@ import javafx.concurrent.Task;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -196,20 +196,29 @@ public class GameController {
 
         Plugin p = ActivePlugin.get().getPlugin();
 
+        String startLocation = p.getStartLocation();
         if (p.isStartingLocation()) {
-            List<Location> startLocation = p.getLocations().stream()
-                    .filter(l -> l.getName().equals(p.getStartLocation()))
-                    .collect(Collectors.toList());
-            Location first = startLocation.get(0);
+            Optional<Location> optLocation = p.getLocations().stream()
+                    .filter(l -> l.getName().equals(startLocation))
+                    .findFirst();
+            Location first = optLocation.orElse(null);
+            if (first == null) {
+                throw new NullPointerException("Starting location \"" + startLocation + "\" does not exist in list");
+            }
+            int serLayer = p.getStartLayer();
             controller.getCurrentLocation().setLocation(first);
-            List<Layer> startLayer = first.getLayers().get().stream()
-                    .filter(l -> l.getLevel() == p.getStartLayer())
-                    .collect(Collectors.toList());
-            CurrentLayer.get().setLayer(startLayer.get(0));
+            Optional<Layer> optLayer = first.getLayers().get().stream()
+                    .filter(l -> l.getLevel() == serLayer)
+                    .findFirst();
+            Layer startLayer = optLayer.orElse(null);
+            if (startLayer == null) {
+                throw new NullPointerException("Start layer \"" + serLayer + "\" does not exist in start location");
+            }
+            controller.getCurrentLayer().setLayer(startLayer);
         }
 
         controller.getAssetsList().addAll(p.getAssets());
-        controller.getLocationsList().setAll(p.getLocations());
+        controller.fillLocationsList(p.getLocations());
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {

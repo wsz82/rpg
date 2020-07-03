@@ -3,6 +3,7 @@ package io.wsz.model.stage;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -20,7 +21,7 @@ import static java.lang.Math.*;
 
 public class Board {
     private static Board singleton;
-    private final Coords boardPos = new Coords(0, 0);
+    private final Coords boardPos = new Coords(0, 0, null);
     private final Graph graph = new Graph(new ArrayList<>(0));
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> sortedItems = new ArrayList<>(0);
@@ -395,9 +396,12 @@ public class Board {
         return null;
     }
 
-    public PosItem lookForObstacle(Coords[] poss) {
+    public PosItem lookForObstacle(Coords[] poss, Location location) {
+        if (location == null) {
+            return null;
+        }
         items.clear();
-        Controller.get().getCurrentLocation().getItems().stream()
+        location.getItems().get().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(pi -> {

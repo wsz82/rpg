@@ -205,7 +205,7 @@ public class CollisionEditStage extends ChildStage {
         for (int i = 0; i < size - 1; i = i + 2) {
             double px = points.get(i) / Sizes.getMeter();
             double py = points.get(i + 1) / Sizes.getMeter();
-            Coords point = new Coords(px, py);
+            Coords point = new Coords(px, py, null);
             coordsList.add(point);
         }
         return coordsList;

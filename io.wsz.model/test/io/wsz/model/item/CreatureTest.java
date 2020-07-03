@@ -25,25 +25,21 @@ class CreatureTest {
         p.setDialog(dialog);
 
         Integer level = 0;
-        Coords pos = new Coords(0, 0);
-
 
         List<Coords> acl = new ArrayList<>(0);
         List<List<Coords>> acp = new ArrayList<>(0);
         Creature a = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
                 true, level, acl, acp);
-        a.setPos(pos);
 
         Inventory inventoryA = new Inventory(a);
         a.setInventory(inventoryA);
 
-        a.getTask().setDest(new Coords(12, 7));
+        a.getTask().setDest(new Coords(12, 7, null));
 
         List<Coords> bcl = new ArrayList<>(0);
         List<List<Coords>> bcp = new ArrayList<>(0);
         Creature b = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
                 true, level, bcl, bcp);
-        b.setPos(pos);
 
         a.getTask().clone(b);
 

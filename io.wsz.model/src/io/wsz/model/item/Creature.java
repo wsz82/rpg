@@ -57,7 +57,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public PosItem getCollision(Coords nextPos) {
         Coords[] poss = getCorners(nextPos);
-        PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(poss);
+        PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(poss, pos.getLocation());
         if (collidedObstacle == null) {
             return Controller.get().getBoard().getCornersCreature(poss, this);
         }
@@ -440,7 +440,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
         super.changeLocation(from, target, targetLayer, targetX, targetY);
-        Coords rawPos = new Coords(targetX, targetY);
+        Coords rawPos = new Coords(targetX, targetY, null);
         Coords reversed = reverseCenterBottomPos(rawPos);
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;

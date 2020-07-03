@@ -77,6 +77,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     public void setPos(Coords pos) {
         this.pos.x = pos.x;
         this.pos.y = pos.y;
+        this.pos.setLocation(pos.getLocation());
     }
 
     public Integer getLevel() {
@@ -202,6 +203,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         Coords pos = (Coords) in.readObject();
         this.pos.x = pos.x;
         this.pos.y = pos.y;
+        this.pos.setLocation(pos.getLocation());
 
         level = (Integer) in.readObject();
 

@@ -88,6 +88,11 @@ public class Location implements Externalizable {
     }
 
     @Override
+    public String toString() {
+        return name.get();
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(name.get());
 

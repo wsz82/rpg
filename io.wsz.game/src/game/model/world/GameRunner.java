@@ -161,6 +161,9 @@ public class GameRunner {
             return;
         }
         l.getItems().get().addAll(p);
+        for (PosItem pi : p) {
+            pi.getPos().setLocation(l);
+        }
         p.clear();
     }
 

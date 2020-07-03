@@ -13,6 +13,5 @@ public class LocationsList {
         return locations;
     }
 
-    private LocationsList() {
-    }
+    private LocationsList() {}
 }

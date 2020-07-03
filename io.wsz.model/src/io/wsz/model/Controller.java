@@ -17,10 +17,7 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Controller {
     private static Controller singleton;
@@ -85,6 +82,30 @@ public class Controller {
 
     public CurrentLocation getCurrentLocation() {
         return CurrentLocation.get();
+    }
+
+    public void fillLocationsList(List<Location> locations) {
+        getLocationsList().addAll(locations);
+        restoreCoordsLocations();
+    }
+
+    private void restoreCoordsLocations() {
+        List<Location> locations = getLocationsList();
+        for (Location l : locations) {
+            for (PosItem pi : l.getItems().get()) {
+                Location serLoc = pi.getPos().getLocation();
+                if (serLoc != null) {
+                    Optional<Location> optionalLocation = getLocationsList().stream()
+                            .filter(refLoc -> refLoc.getName().equals(serLoc.getName()))
+                            .findFirst();
+                    Location foundLoc = optionalLocation.orElse(null);
+                    if (foundLoc == null) {
+                        throw new NullPointerException("Location \"" + serLoc.getName() + "\" should be in locations list");
+                    }
+                    pi.getPos().setLocation(foundLoc);
+                }
+            }
+        }
     }
 
     public ObservableList<Location> getLocationsList() {

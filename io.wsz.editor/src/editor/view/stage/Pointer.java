@@ -57,7 +57,7 @@ public class Pointer {
         if (mark.x != -1 && active) {
             return mark;
         } else {
-            return new Coords(0, 0);
+            return new Coords(0, 0, null);
         }
     }
 

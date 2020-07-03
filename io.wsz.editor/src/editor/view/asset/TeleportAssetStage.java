@@ -159,12 +159,12 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
             if (isContent) {
                 item.setExit(null);
             } else {
-                item.setExit(new Coords(0, 0));
+                item.setExit(new Coords(0, 0, null));
             }
         } else {
             double x = Double.parseDouble(exitX);
             double y = Double.parseDouble(exitY);
-            Coords exitPos = new Coords(x, y);
+            Coords exitPos = new Coords(x, y, null);
             item.setExit(exitPos);
         }
     }

@@ -1,20 +1,30 @@
 package io.wsz.model.stage;
 
-import java.io.Serializable;
+import io.wsz.model.location.Location;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
 
-public class Coords implements Serializable {
+public class Coords implements Externalizable {
     private static final long serialVersionUID = 1L;
+
+    private static final Coords EXTREME = new Coords();
 
     public double x;
     public double y;
 
+    private Location location;
+
     public Coords() {}
 
-    public Coords(double x, double y) {
+    public Coords(double x, double y, Location location) {
         this.x = x;
         this.y = y;
+        this.location = location;
     }
 
     public boolean is0() {
@@ -22,7 +32,7 @@ public class Coords implements Serializable {
     }
 
     public Coords clonePos() {
-        return new Coords(this.x, this.y);
+        return new Coords(this.x, this.y, this.location);
     }
 
     public void add(Coords pos2) {
@@ -41,7 +51,8 @@ public class Coords implements Serializable {
             return false;
         }
 
-        Coords extreme = new Coords(maxX, this.y);
+        EXTREME.x = maxX;
+        EXTREME.y = this.y;
 
         int count = 0, i = 0;
         boolean intersectedOnVertex = false;
@@ -50,7 +61,7 @@ public class Coords implements Serializable {
 
             Coords pi = polygon.get(i);
             Coords pNext = polygon.get(next);
-            inner: if (doIntersect(pi, pNext, this, extreme)) {
+            inner: if (doIntersect(pi, pNext, this, EXTREME)) {
                 if (orientation(pi, this, pNext) == 0) {
                     return onSegment(pi, this,
                             pNext);
@@ -109,9 +120,23 @@ public class Coords implements Serializable {
         return o4 == 0 && onSegment(p2, q1, q2);
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
     @Override
     public String toString() {
-        return "X: " + x + ", Y: " + y;
+        String locationName;
+        if (location != null) {
+            locationName = location.getName();
+        } else {
+            locationName = null;
+        }
+        return locationName + ": " + "X: " + x + ", Y: " + y;
     }
 
     @Override
@@ -120,11 +145,37 @@ public class Coords implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Coords coords = (Coords) o;
         return Double.compare(coords.x, x) == 0 &&
-                Double.compare(coords.y, y) == 0;
+                Double.compare(coords.y, y) == 0 &&
+                Objects.equals(coords.location, location);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(x, y, location);
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeDouble(x);
+
+        out.writeDouble(y);
+
+        if (location != null) {
+            out.writeUTF(location.getName());
+        } else {
+            out.writeUTF("");
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        x = in.readDouble();
+
+        y = in.readDouble();
+
+        String locationName = in.readUTF();
+        if (!locationName.isEmpty()) {
+            location = new Location(locationName);
+        }
     }
 }

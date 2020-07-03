@@ -52,7 +52,7 @@ public class Teleport extends PosItem<Teleport> {
         double targetY = targetPos.y;
         double targetHeight = target.getHeight();
         if (targetX < targetWidth && targetY < targetHeight) {
-            Location from = Controller.get().getCurrentLocation().getLocation();
+            Location from = cr.getPos().getLocation();
             cr.changeLocation(from, target, targetLayer, targetX, targetY);
             if (cr.getControl().equals(CONTROL)) {
                 Controller.get().setLocationToUpdate(target);
@@ -88,7 +88,7 @@ public class Teleport extends PosItem<Teleport> {
     public Coords getExit() {
         if (exit == null) {
             if (prototype == null) {
-                return new Coords(0, 0);
+                return new Coords(0, 0, null);
             }
             return prototype.exit;
         } else {

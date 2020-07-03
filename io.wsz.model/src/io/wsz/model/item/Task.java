@@ -13,9 +13,9 @@ public class Task implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Creature creature;
-    private final Coords nextPos = new Coords(-1, -1);
+    private final Coords nextPos = new Coords(-1, -1, null);
 
-    private final Coords dest = new Coords(-1, -1);
+    private final Coords dest = new Coords(-1, -1, null);
     private PosItem item;
     private boolean finished;
 

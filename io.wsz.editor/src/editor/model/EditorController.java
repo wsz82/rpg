@@ -92,7 +92,7 @@ public class EditorController {
         p.setStartLocation(startLocation);
         double startX = pss.getStartX();
         double startY = pss.getStartY();
-        p.setStartPos(new Coords(startX, startY));
+        p.setStartPos(new Coords(startX, startY, null));
         int startLayer = pss.getStartLayer();
         p.setStartLayer(startLayer);
     }
@@ -131,13 +131,14 @@ public class EditorController {
         List<Asset> assets = controller.getAssetsList();
         assets.addAll(p.getAssets());
         ObservableAssets.get().fillLists(assets);
-        controller.getLocationsList().setAll(p.getLocations());
+        controller.fillLocationsList(p.getLocations());
         return true;
     }
 
     public void setDragPos(Coords pos) {
         this.dragPos.x = pos.x;
         this.dragPos.y = pos.y;
+        this.dragPos.setLocation(pos.getLocation());
     }
 
     public Coords getDragPos() {

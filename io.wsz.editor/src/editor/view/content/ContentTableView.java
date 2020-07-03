@@ -7,6 +7,7 @@ import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -152,13 +153,16 @@ public class ContentTableView extends TableView<PosItem> {
     public void moveToPointer() {
         List<PosItem> itemsToMove = getSelectionModel().getSelectedItems();
         Coords newPos = pointer.getMark();
+        Location location = Controller.get().getCurrentLocation().getLocation();
         for (PosItem pi : itemsToMove) {
-            pi.getPos().x = newPos.x;
+            Coords pos = pi.getPos();
+            pos.x = newPos.x;
             double y = 0;
             if (newPos.y != 0) {
                 y = newPos.y - pi.getImage().getHeight() / Sizes.getMeter();
             }
-            pi.getPos().y = y;
+            pos.y = y;
+            pos.setLocation(location);
         }
         refresh();
         editorCanvas.refresh();
