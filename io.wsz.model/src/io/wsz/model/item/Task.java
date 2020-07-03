@@ -93,7 +93,6 @@ public class Task implements Serializable {
         nextPos.y = y3;
         PosItem pi = creature.getCollision(creature.getCenterBottomPos(nextPos));
         if (pi != null) {
-            dest.x = -1;
             return;
         }
         creature.pos.x = nextPos.x;
