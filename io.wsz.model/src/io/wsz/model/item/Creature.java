@@ -88,7 +88,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private PosItem getCornersContent(ItemType[] types) {
         Coords[] poss = getCorners();
-        return Controller.get().getBoard().lookForContent(poss, types, false);
+        return Controller.get().getBoard().lookForContent(this.pos.getLocation(), poss, types, false);
     }
 
     public Coords getCenterBottomPos() {
@@ -148,7 +148,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         interactionCoords[0].x = pos.x;
         interactionCoords[0].y = pos.y;
         ItemType[] types = ItemType.values();
-        PosItem pi = Controller.get().getBoard().lookForContent(interactionCoords, types, true);
+        PosItem pi = Controller.get().getBoard().lookForContent(this.pos.getLocation(), interactionCoords, types, true);
         if (pi == null) {
             return;
         }

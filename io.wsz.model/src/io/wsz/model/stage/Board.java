@@ -2,7 +2,6 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import javafx.scene.image.Image;
@@ -244,9 +243,9 @@ public class Board {
         return INCOMPARABLE;
     }
 
-    public PosItem lookForContent(Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
+    public PosItem lookForContent(Location location, Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
-        allItems.addAll(Controller.get().getCurrentLocation().getItems());
+        allItems.addAll(location.getItems().get());
         items.clear();
         allItems.stream()
                 .filter(PosItem::getVisible)
@@ -258,7 +257,7 @@ public class Board {
                 })
                 .filter(pi -> {
                     int level = pi.getLevel();
-                    int actualLevel = Controller.get().getCurrentLayer().getLevel();
+                    int actualLevel = Controller.get().getCurrentLayer().getLevel(); //TODO checked location
                     if (includeLevelsBelow) {
                         return level <= actualLevel;
                     } else {
@@ -341,11 +340,11 @@ public class Board {
                 });
     }
 
-    public List<Creature> getCreatures() {
+    public List<Creature> getCreatures(Location location) {
         creatures.clear();
-        Controller.get().getCurrentLocation().getItems().stream()
+        location.getItems().get().stream()
                 .filter(pi -> {
-                    int level = Controller.get().getCurrentLayer().getLevel();
+                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
                     return pi.getLevel().equals(level);
                 })
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
@@ -354,9 +353,9 @@ public class Board {
         return creatures;
     }
 
-    public List<Creature> getControlledCreatures() {
+    public List<Creature> getControlledCreatures(Location location) {
         creatures.clear();
-        Controller.get().getCurrentLocation().getItems().stream()
+        location.getItems().get().stream()
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
@@ -368,7 +367,8 @@ public class Board {
     }
 
     public Creature getCornersCreature(Coords[] corners, Creature cr) {
-        List<Creature> creatures = getCreatures();
+        Location location = cr.getPos().getLocation();
+        List<Creature> creatures = getCreatures(location);
         if (creatures.isEmpty()) {
             return null;
         }
@@ -405,7 +405,7 @@ public class Board {
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi.getCollisionPolygons() != null)
                 .filter(pi -> {
-                    int level = Controller.get().getCurrentLayer().getLevel();
+                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
                     return pi.getLevel().equals(level);
                 })
                 .collect(Collectors.toCollection(() -> items));
@@ -480,7 +480,8 @@ public class Board {
     public List<Equipment> getEquipmentWithinRange(Coords[] poss, Creature cr) {
         equipmentResult.clear();
         items.clear();
-        items.addAll(Controller.get().getCurrentLocation().getItems());
+        Location location = cr.getPos().getLocation();
+        items.addAll(location.getItems().get());
         equipment.clear();
         items.stream()
                 .filter(PosItem::getVisible)
@@ -563,11 +564,11 @@ public class Board {
                     y = pos.y - dyAngle;
                 }
 
-                CurrentLocation cl = Controller.get().getCurrentLocation();
-                if (x < 0 || x > cl.getWidth()) {
+                Location location = cr.getPos().getLocation();
+                if (x < 0 || x > location.getWidth()) {
                     continue;
                 }
-                if (y < 0 || y > cl.getHeight()) {
+                if (y < 0 || y > location.getHeight()) {
                     continue;
                 }
 
@@ -584,9 +585,9 @@ public class Board {
         return pos;
     }
 
-    public List<Creature> getControllableCreatures() {
+    public List<Creature> getControllableCreatures(Location location) {
         creatures.clear();
-        Controller.get().getCurrentLocation().getItems().stream()
+        location.getItems().get().stream()
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
@@ -597,8 +598,8 @@ public class Board {
         return creatures;
     }
 
-    public void looseCreaturesControl() {
-        List<Creature> creatures = getControlledCreatures();
+    public void looseCreaturesControl(Location location) {
+        List<Creature> creatures = getControlledCreatures(location);
         Controller.get().getCreaturesToLooseControl().addAll(creatures);
     }
 }

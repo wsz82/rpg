@@ -102,14 +102,16 @@ public class BarView {
             return;
         }
         if (!multiple) {
-            Controller.get().getBoard().looseCreaturesControl();
+            Location location = Controller.get().getCurrentLocation().getLocation();
+            Controller.get().getBoard().looseCreaturesControl(location);
         }
         resolveCreatureControlAndLocation(portraits.get(i));
     }
 
     private void resolveHeroControlAndLocation(boolean multiple) {
         if (!multiple){
-            Controller.get().getBoard().looseCreaturesControl();
+            Location location = Controller.get().getCurrentLocation().getLocation();
+            Controller.get().getBoard().looseCreaturesControl(location);
         }
         Portrait cl = portraits.get(hoveredPortrait);
         resolveCreatureControlAndLocation(cl);

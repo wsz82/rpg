@@ -6,6 +6,7 @@ import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Comparator;
@@ -227,7 +228,8 @@ public class EditorCanvas extends Canvas {
                     translated.add(currentPos);
                     Coords[] poss = new Coords[]{translated};
                     ItemType[] types = ItemType.values();
-                    pi = Controller.get().getBoard().lookForContent(poss, types, true);
+                    Location location = Controller.get().getCurrentLocation().getLocation();
+                    pi = Controller.get().getBoard().lookForContent(location, poss, types, true);
                 }
                 if (pi != null) {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {

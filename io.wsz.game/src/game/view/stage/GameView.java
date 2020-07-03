@@ -6,6 +6,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
@@ -196,7 +197,8 @@ public class GameView extends Canvas {
         }
 
         if (Settings.isCenterOnPC()) {
-            List<Creature> controlledCreatures = board.getControlledCreatures();
+            Location location = controller.getCurrentLocation().getLocation();
+            List<Creature> controlledCreatures = board.getControlledCreatures(location);
             if (!controlledCreatures.isEmpty()) {
                 Creature cr = controlledCreatures.get(0);
                 if (cr != null) {
@@ -309,7 +311,8 @@ public class GameView extends Canvas {
             } else if (button.equals(MouseButton.SECONDARY)) {
                 e.consume();
                 synchronized (gameController.getGameRunner()) {
-                    board.looseCreaturesControl();
+                    Location location = controller.getCurrentLocation().getLocation();
+                    board.looseCreaturesControl(location);
                 }
             }
         };
@@ -395,7 +398,8 @@ public class GameView extends Canvas {
         modifiedCoords.add(currentPos);
         Coords[] poss = new Coords[]{modifiedCoords};
         ItemType[] types = new ItemType[]{ItemType.CREATURE};
-        PosItem pi = controller.getBoard().lookForContent(poss, types, true);
+        Location location = Controller.get().getCurrentLocation().getLocation();
+        PosItem pi = controller.getBoard().lookForContent(location, poss, types, true);
         if (pi != null) {
             ItemType type = pi.getType();
             boolean success = switch (type) {
@@ -429,7 +433,7 @@ public class GameView extends Canvas {
             return true;
         } else if (control == CONTROLLABLE) {
             if (!multiple) {
-                board.looseCreaturesControl();
+                board.looseCreaturesControl(cr.getPos().getLocation());
             }
             cr.setControl(CONTROL);
             return true;
@@ -443,7 +447,8 @@ public class GameView extends Canvas {
     }
 
     private void openInventory() {
-        List<Creature> controlled = Board.get().getControlledCreatures();
+        Location location = controller.getCurrentLocation().getLocation();
+        List<Creature> controlled = Board.get().getControlledCreatures(location);
         if (controlled.isEmpty()) {
             return;
         }
@@ -471,12 +476,14 @@ public class GameView extends Canvas {
     }
 
     private void commandControllable(Coords pos) {
-        board.getControlledCreatures()
+        Location location = controller.getCurrentLocation().getLocation();
+        board.getControlledCreatures(location)
                 .forEach(c -> c.onInteractWith(pos));
     }
 
     private void commandControllableGoTo(Coords pos) {
-        board.getControlledCreatures()
+        Location location = controller.getCurrentLocation().getLocation();
+        board.getControlledCreatures(location)
                 .forEach(c -> c.goTo(pos));
     }
 

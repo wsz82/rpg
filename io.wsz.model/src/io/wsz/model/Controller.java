@@ -189,7 +189,8 @@ public class Controller {
 
     public void initNewGameHeroes() {
         this.heroes.clear();
-        List<Creature> controllables = Controller.get().getBoard().getControllableCreatures();
+        Location start = getCurrentLocation().getLocation();
+        List<Creature> controllables = Controller.get().getBoard().getControllableCreatures(start);
         for (Creature cr : controllables) {
             this.heroes.addLast(cr);
         }
