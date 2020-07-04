@@ -79,6 +79,12 @@ public class Comparator {
 
                 }
 
+                else if (i1 instanceof Equipment) {
+
+                    return isCovered(i1, i2);
+
+                }
+
             }
 
             else if ((t1.equals(CREATURE)) && !t2.equals(LANDSCAPE)) {
