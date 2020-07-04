@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.wsz.model.item.ItemType.*;
+import static io.wsz.model.item.ItemType.CREATURE;
+import static io.wsz.model.item.ItemType.LANDSCAPE;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 
 public class Comparator {
@@ -38,7 +39,8 @@ public class Comparator {
         double i1_right = i1.getRight();
         double i2_right = i2.getRight();
 
-        boolean doOverlap = doOverlap(i1_left, i1_top, i1_right, i1_bottom,
+        boolean doOverlap = Coords.doOverlap(
+                i1_left, i1_top, i1_right, i1_bottom,
                 i2_left, i2_top, i2_right, i2_bottom);
 
         if (!doOverlap) {
@@ -66,23 +68,10 @@ public class Comparator {
                     }
                 }
 
-                else if ((t1.equals(CREATURE))) {
-
+                else {
                     return isCovered(i1, i2);
-
                 }
 
-                else if (t1.equals(COVER)) {
-
-                    return isCovered(i1, i2);
-
-                }
-
-                else if (i1 instanceof Equipment) {
-
-                    return isCovered(i1, i2);
-
-                }
             }
 
             else if (!t1.equals(LANDSCAPE) && !t2.equals(LANDSCAPE)) {
@@ -120,6 +109,10 @@ public class Comparator {
                     }
 
                 }
+
+                else {
+                    return isCovered(i1, i2);
+                }
             }
 
             else {
@@ -134,14 +127,6 @@ public class Comparator {
             }
         }
         return INCOMPARABLE;
-    }
-
-    public static boolean doOverlap(double o1x_left, double o1y_top, double o1x_right, double o1y_bottom,
-                                    double o2x_left, double o2y_top, double o2x_right, double o2y_bottom) {
-        if (o1x_left > o2x_right || o2x_left > o1x_right) {
-            return false;
-        }
-        return o1y_top <= o2y_bottom && o2y_top <= o1y_bottom;
     }
 
     private static Comparison isCovered(PosItem i1, PosItem i2) {

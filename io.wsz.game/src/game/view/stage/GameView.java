@@ -88,24 +88,22 @@ public class GameView extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        double leftX = currentPos.x;
-        double rightX = leftX + getWidth()/Sizes.getMeter();
-        double topY = currentPos.y;
-        double bottomY = topY + getHeight()/Sizes.getMeter();
+        double left = currentPos.x;
+        double right = left + getWidth()/Sizes.getMeter();
+        double top = currentPos.y;
+        double bottom = top + getHeight()/Sizes.getMeter();
 
         items.clear();
         controller.getCurrentLocation().getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> {
-                    Coords pos = pi.getPos();
-                    Image img = pi.getImage();
-                    double piLeftX = pos.x;
-                    double piRightX = piLeftX + img.getWidth()/Sizes.getMeter();
-                    double piTopY = pos.y;
-                    double piBottomY = piTopY + img.getHeight()/Sizes.getMeter();
-                    return io.wsz.model.stage.Comparator.doOverlap(
-                            leftX, topY, rightX, bottomY,
-                            piLeftX, piTopY, piRightX, piBottomY);
+                    double piLeft = pi.getLeft();
+                    double piRight = pi.getRight();
+                    double piTop = pi.getTop();
+                    double piBottom = pi.getBottom();
+                    return Coords.doOverlap(
+                            left, top, right, bottom,
+                            piLeft, piTop, piRight, piBottom);
                 })
                 .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toCollection(() -> items));

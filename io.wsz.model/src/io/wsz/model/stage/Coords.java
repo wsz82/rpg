@@ -49,6 +49,14 @@ public class Coords implements Externalizable {
         });
     }
 
+    public static boolean doOverlap(double o1x_left, double o1y_top, double o1x_right, double o1y_bottom,
+                                    double o2x_left, double o2y_top, double o2x_right, double o2y_bottom) {
+        if (o1x_left > o2x_right || o2x_left > o1x_right) {
+            return false;
+        }
+        return o1y_top <= o2y_bottom && o2y_top <= o1y_bottom;
+    }
+
     public double x;
     public double y;
 
