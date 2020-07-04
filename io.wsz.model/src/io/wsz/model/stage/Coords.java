@@ -6,6 +6,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,6 +14,8 @@ public class Coords implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private static final Coords EXTREME = new Coords();
+    private static final List<Coords> lostReferences = new ArrayList<>(0);
+    private static final List<Coords> resultCoords = new ArrayList<>(0);
 
     public double x;
     public double y;
@@ -27,11 +30,25 @@ public class Coords implements Externalizable {
         this.location = location;
     }
 
-    public static void looseCoordsReference(List<Coords> from, List<Coords> to) {
-        for (Coords pos : from) {
-            Coords newPos = pos.clonePos(); //TODO
-            to.add(newPos);
+    public static List<Coords> looseCoordsReferences(List<Coords> from) {
+        int dif = from.size() - lostReferences.size();
+        if (dif > 0) {
+            for (int i = 0; i < dif; i++) {
+                lostReferences.add(new Coords());
+            }
         }
+        for (int i = 0; i < from.size(); i++) {
+            Coords fromCoords = from.get(i);
+            Coords actual = lostReferences.get(i);
+            actual.x = fromCoords.x;
+            actual.y = fromCoords.y;
+            actual.setLocation(fromCoords.getLocation());
+        }
+        resultCoords.clear();
+        for (int i = 0; i < from.size(); i++) {
+            resultCoords.add(lostReferences.get(i));
+        }
+        return resultCoords;
     }
 
     public static void translateCoords(List<Coords> list, double x, double y) {

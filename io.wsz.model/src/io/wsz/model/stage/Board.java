@@ -273,15 +273,14 @@ public class Board {
 
                 final List<List<Coords>> cp = pi.getCollisionPolygons();
                 for (List<Coords> polygon : cp) {
-                    itemCoords.clear();
-                    Coords.looseCoordsReference(polygon, itemCoords);
-                    Coords.translateCoords(itemCoords, cX, cY);
+                    List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
+                    Coords.translateCoords(lostRef, cX, cY);
 
-                    double maxObstacleX = itemCoords.stream()
+                    double maxObstacleX = lostRef.stream()
                             .mapToDouble(p -> p.x)
                             .max()
                             .getAsDouble();
-                    double minObstacleX = itemCoords.stream()
+                    double minObstacleX = lostRef.stream()
                             .mapToDouble(p -> p.x)
                             .min()
                             .getAsDouble();
@@ -290,11 +289,11 @@ public class Board {
                         continue;
                     }
 
-                    double maxObstacleY = itemCoords.stream()
+                    double maxObstacleY = lostRef.stream()
                             .mapToDouble(p -> p.y)
                             .max()
                             .getAsDouble();
-                    double minObstacleY = itemCoords.stream()
+                    double minObstacleY = lostRef.stream()
                             .mapToDouble(p -> p.y)
                             .min()
                             .getAsDouble();
@@ -303,7 +302,7 @@ public class Board {
                         continue;
                     }
 
-                    boolean isInsidePolygon = pos.isInsidePolygon(itemCoords, maxObstacleX);
+                    boolean isInsidePolygon = pos.isInsidePolygon(lostRef, maxObstacleX);
                     if (isInsidePolygon) {
                         return pi;
                     }

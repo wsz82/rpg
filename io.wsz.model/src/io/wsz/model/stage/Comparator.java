@@ -167,7 +167,8 @@ public class Comparator {
         final double i1_imgHeight = i1_img.getHeight() / Sizes.getMeter();
         i1_list.clear();
         if (!i1_cl.isEmpty()) {
-            Coords.looseCoordsReference(i1_cl, i1_list);
+            List<Coords> lostRef = Coords.looseCoordsReferences(i1_cl);
+            i1_list.addAll(lostRef);
             Coords.translateCoords(i1_list, i1_posX, i1_posY);
         } else {
             i1_left.x = i1_posX;
@@ -196,7 +197,8 @@ public class Comparator {
         final double i2_imgHeight = i2_img.getHeight() / Sizes.getMeter();
         i2_list.clear();
         if (!i2_cl.isEmpty()) {
-            Coords.looseCoordsReference(i2_cl, i2_list);
+            List<Coords> lostRef = Coords.looseCoordsReferences(i2_cl);
+            i2_list.addAll(lostRef);
             Coords.translateCoords(i2_list, i2_posX, i2_posY);
             addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
         } else {
