@@ -27,6 +27,20 @@ public class Coords implements Externalizable {
         this.location = location;
     }
 
+    public static void looseCoordsReference(List<Coords> from, List<Coords> to) {
+        for (Coords pos : from) {
+            Coords newPos = pos.clonePos(); //TODO
+            to.add(newPos);
+        }
+    }
+
+    public static void translateCoords(List<Coords> list, double x, double y) {
+        list.forEach(c -> {
+            c.x += x;
+            c.y += y;
+        });
+    }
+
     public boolean is0() {
         return x == 0 && y == 0;
     }

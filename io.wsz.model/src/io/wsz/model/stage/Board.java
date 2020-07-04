@@ -9,12 +9,12 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.wsz.model.stage.Comparator.Comparison;
-import static io.wsz.model.stage.Comparator.Comparison.*;
+import static io.wsz.model.stage.Comparator.Comparison.GREAT;
+import static io.wsz.model.stage.Comparator.Comparison.LESS;
 import static io.wsz.model.stage.Comparator.compare;
 import static java.lang.Math.*;
 
@@ -29,12 +29,6 @@ public class Board {
     private final List<Equipment> equipmentResult = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
     private final List<Coords> itemCoords = new ArrayList<>(0);
-    private final LinkedList<Coords> i1_list = new LinkedList<>();
-    private final LinkedList<Coords> i2_list = new LinkedList<>();
-    private final Coords i1_left = new Coords();
-    private final Coords i1_right = new Coords();
-    private final Coords i2_left = new Coords();
-    private final Coords i2_right = new Coords();
     private final Coords resultCoords = new Coords();
 
     public static Board get() {
@@ -114,164 +108,6 @@ public class Board {
             greater.getLesser().remove(n);
         }
         return n;
-    }
-
-    public Comparison isCovered(PosItem i1, PosItem i2) {
-        final List<Coords> i1_cl = i1.getCoverLine();
-        final Coords i1_pos = i1.getPos();
-        final Image i1_img = i1.getImage();
-        final double i1_posX = i1_pos.x;
-        final double i1_posY = i1_pos.y;
-        final double i1_imgWidth = i1_img.getWidth() / Sizes.getMeter();
-        final double i1_imgHeight = i1_img.getHeight() / Sizes.getMeter();
-        i1_list.clear();
-        if (!i1_cl.isEmpty()) {
-            looseCoordsReference(i1_cl, i1_list);
-            translateCoords(i1_list, i1_posX, i1_posY);
-        } else {
-            i1_left.x = i1_posX;
-            double bottom = i1_posY + i1_imgHeight;
-            i1_right.x = i1_posX + i1_imgWidth;
-
-            if (i1 instanceof Creature) {
-                Creature c1 = (Creature) i1;
-                bottom = c1.getCreatureBottom(bottom);
-                i1_right.x = c1.getCreatureRight(i1_imgWidth, i1_right.x);
-                i1_left.x = c1.getCreatureLeft(i1_left.x, i1_imgWidth);
-            }
-
-            i1_left.y = i1_right.y = bottom;
-
-            i1_list.add(i1_left);
-            i1_list.add(i1_right);
-        }
-
-        final List<Coords> i2_cl = i2.getCoverLine();
-        final Coords i2_pos = i2.getPos();
-        final Image i2_img = i2.getImage();
-        final double i2_posX = i2_pos.x;
-        final double i2_posY = i2_pos.y;
-        final double i2_imgWidth = i2_img.getWidth() / Sizes.getMeter();
-        final double i2_imgHeight = i2_img.getHeight() / Sizes.getMeter();
-        i2_list.clear();
-        if (!i2_cl.isEmpty()) {
-            looseCoordsReference(i2_cl, i2_list);
-            translateCoords(i2_list, i2_posX, i2_posY);
-            addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
-        } else {
-            i2_left.x = i2_posX;
-            double bottom = i2_posY + i2_imgHeight;
-            i2_right.x = i2_posX + i2_imgWidth;
-
-            if (i2 instanceof Creature) {
-                Creature c2 = (Creature) i2;
-                bottom = c2.getCreatureBottom(bottom);
-                i2_right.x = c2.getCreatureRight(i2_imgWidth, i2_right.x);
-                i2_left.x = c2.getCreatureLeft(i2_left.x, i2_imgWidth);
-            }
-
-            i2_left.y = i2_right.y = bottom;
-
-            i2_list.add(i2_left);
-            i2_list.add(i2_right);
-        }
-
-        return isCoverLineAbove(i1_list, i2_list);
-    }
-
-    private Comparison isCoverLineAbove(LinkedList<Coords> i1_list, LinkedList<Coords> i2_list) {
-        for (int i = 0; i < i2_list.size() - 1; i++) {
-            Coords first = i2_list.get(i);
-            double x1 = first.x;
-            double y1 = first.y;
-            Coords second = i2_list.get(i+1);
-            double x2 = second.x;
-            double y2 = second.y;
-
-            if (x1 == x2) {
-                continue;
-            }
-
-            for (Coords compared : i1_list) {
-                double x = compared.x;
-                if (x == x1) {
-                    continue;
-                }
-                boolean xIsBetweenLine = x >= x1 && x <= x2;
-                if (!xIsBetweenLine) {
-                    continue;
-                }
-                double y = compared.y;
-                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
-                if (y > func) {
-                    return GREAT;
-                } else {
-                    return LESS;
-                }
-            }
-        }
-        for (int i = 0; i < i1_list.size() - 1; i++) {
-            Coords first = i1_list.get(i);
-            double x1 = first.x;
-            double y1 = first.y;
-            Coords second = i1_list.get(i+1);
-            double x2 = second.x;
-            double y2 = second.y;
-
-            if (x1 == x2) {
-                continue;
-            }
-
-            for (Coords compared : i2_list) {
-                double x = compared.x;
-                if (x == x1) {
-                    continue;
-                }
-                boolean xIsBetweenLine = x >= x1 && x <= x2;
-                if (!xIsBetweenLine) {
-                    continue;
-                }
-                double y = compared.y;
-                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
-                if (y > func) {
-                    return LESS;
-                } else {
-                    return GREAT;
-                }
-            }
-        }
-        return INCOMPARABLE;
-    }
-
-    private void looseCoordsReference(List<Coords> from, List<Coords> to) {
-        for (Coords pos : from) {
-            Coords newPos = pos.clonePos();
-            to.add(newPos);
-        }
-    }
-
-    private void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
-        Coords first = linkedCoords.getFirst();
-        if (first.x != i2_posX) {
-            i2_left.x = i2_posX;
-            i2_left.y = first.y;
-            linkedCoords.addFirst(i2_left);
-        }
-
-        Coords last = linkedCoords.getLast();
-        double rightX = i2_posX + i2_imgWidth;
-        if (last.x != rightX) {
-            i2_right.x = rightX;
-            i2_right.y = last.y;
-            linkedCoords.addLast(i2_right);
-        }
-    }
-
-    private void translateCoords(List<Coords> list, double i2_posX, double i2_posY) {
-        list.forEach(c -> {
-                    c.x = i2_posX + c.x;
-                    c.y = i2_posY + c.y;
-                });
     }
 
     public PosItem lookForContent(Location location, Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
@@ -438,8 +274,8 @@ public class Board {
                 final List<List<Coords>> cp = pi.getCollisionPolygons();
                 for (List<Coords> polygon : cp) {
                     itemCoords.clear();
-                    looseCoordsReference(polygon, itemCoords);
-                    translateCoords(itemCoords, cX, cY);
+                    Coords.looseCoordsReference(polygon, itemCoords);
+                    Coords.translateCoords(itemCoords, cX, cY);
 
                     double maxObstacleX = itemCoords.stream()
                             .mapToDouble(p -> p.x)
