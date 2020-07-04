@@ -224,8 +224,11 @@ public class Creature extends PosItem<Creature> implements Containable {
         task.doTask();
     }
 
-    public double getCreatureLeft(double imgLeft, double imgWidth) {
+    @Override
+    public double getLeft() {
         double width = getSize().getWidth();
+        double imgWidth = getImageWidth();
+        double imgLeft = pos.x;
         if (imgWidth < width) {
             double halfDif = (width - imgWidth) / 2;
             imgLeft -= halfDif;
@@ -233,8 +236,11 @@ public class Creature extends PosItem<Creature> implements Containable {
         return imgLeft;
     }
 
-    public double getCreatureRight(double imgWidth, double imgRight) {
+    @Override
+    public double getRight() {
         double width = getSize().getWidth();
+        double imgWidth = getImageWidth();
+        double imgRight = pos.x + imgWidth;
         if (imgWidth < width) {
             double halfDif = (width - imgWidth) / 2;
             imgRight += halfDif;
@@ -242,17 +248,23 @@ public class Creature extends PosItem<Creature> implements Containable {
         return imgRight;
     }
 
-    public double getCreatureTop(double imgTop, double imgHeight) {
+    @Override
+    public double getTop() {
         double halfHeight = getCreatureHalfHeight();
-        double imgBottom = imgTop + imgHeight;
+        double imgHeight = getImageHeight();
+        double imgBottom = pos.y + imgHeight;
+        double imgTop = pos.y;
         if (imgHeight < halfHeight) {
             imgTop = imgBottom - halfHeight;
         }
         return imgTop;
     }
 
-    public double getCreatureBottom(double imgBottom) {
+    @Override
+    public double getBottom() {
         double halfHeight = getCreatureHalfHeight();
+        double imgHeight = getImageHeight();
+        double imgBottom = pos.y + imgHeight;
         imgBottom += halfHeight;
         return imgBottom;
     }

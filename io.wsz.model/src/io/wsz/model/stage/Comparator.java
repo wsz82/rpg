@@ -1,12 +1,10 @@
 package io.wsz.model.stage;
 
-import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.sizes.Sizes;
-import javafx.scene.image.Image;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,12 +12,16 @@ import static io.wsz.model.item.ItemType.*;
 import static io.wsz.model.stage.Comparator.Comparison.*;
 
 public class Comparator {
-    private static final LinkedList<Coords> i1_list = new LinkedList<>();
-    private static final LinkedList<Coords> i2_list = new LinkedList<>();
-    private static final Coords i1_left = new Coords();
-    private static final Coords i1_right = new Coords();
-    private static final Coords i2_left = new Coords();
-    private static final Coords i2_right = new Coords();
+    private static final LinkedList<Coords> oneList = new LinkedList<>();
+    private static final LinkedList<Coords> twoList = new LinkedList<>();
+    private static final List<Coords> oneLostReferences = new ArrayList<>(0);
+    private static final List<Coords> oneResultCoords = new ArrayList<>(0);
+    private static final List<Coords> twoLostReferences = new ArrayList<>(0);
+    private static final List<Coords> twoResultCoords = new ArrayList<>(0);
+    private static final Coords oneLeft = new Coords();
+    private static final Coords oneRight = new Coords();
+    private static final Coords twoLeft = new Coords();
+    private static final Coords twoRight = new Coords();
 
     public static Comparison compare(PosItem i1, Node n) {
         PosItem i2 = n.getItem();
@@ -27,37 +29,17 @@ public class Comparator {
         int o2level = i2.getLevel();
         ItemType t1 = i1.getType();
         ItemType t2 = i2.getType();
-        Coords pos1 = i1.getPos();
-        Coords pos2 = i2.getPos();
-        double o1y_top = pos1.y;
-        double o2y_top = pos2.y;
-        double o1x_left = pos1.x;
-        double o2x_left = pos2.x;
-        double i1_height = i1.getImage().getHeight() / Sizes.getMeter();
-        double o1y_bottom = o1y_top + i1_height;
-        double i2_height = i2.getImage().getHeight() / Sizes.getMeter();
-        double o2y_bottom = o2y_top + i2_height;
-        double i1_width = i1.getImage().getWidth() / Sizes.getMeter();
-        double o1x_right = o1x_left + i1_width;
-        double i2_width = i2.getImage().getWidth() / Sizes.getMeter();
-        double o2x_right = o2x_left + i2_width;
-        if (i1 instanceof Creature) {
-            Creature c1 = (Creature) i1;
-            o1y_bottom = c1.getCreatureBottom(o1y_bottom);
-            o1y_top = c1.getCreatureTop(o1y_top, i1_height);
-            o1x_right = c1.getCreatureRight(i1_width, o1x_right);
-            o1x_left = c1.getCreatureLeft(o1x_left, i1_width);
-        }
-        if (i2 instanceof Creature) {
-            Creature c2 = (Creature) i2;
-            o2y_bottom = c2.getCreatureBottom(o2y_bottom);
-            o2y_top = c2.getCreatureTop(o2y_top, i2_height);
-            o2x_right = c2.getCreatureRight(i2_width, o2x_right);
-            o2x_left = c2.getCreatureLeft(o2x_left, i2_width);
-        }
+        double i1_top = i1.getTop();
+        double i2_top = i2.getTop();
+        double i1_left = i1.getLeft();
+        double i2_left = i2.getLeft();
+        double i1_bottom = i1.getBottom();
+        double i2_bottom = i2.getBottom();
+        double i1_right = i1.getRight();
+        double i2_right = i2.getRight();
 
-        boolean doOverlap = doOverlap(o1x_left, o1y_top, o1x_right, o1y_bottom,
-                o2x_left, o2y_top, o2x_right, o2y_bottom);
+        boolean doOverlap = doOverlap(i1_left, i1_top, i1_right, i1_bottom,
+                i2_left, i2_top, i2_right, i2_bottom);
 
         if (!doOverlap) {
             return INCOMPARABLE;
@@ -75,9 +57,9 @@ public class Comparator {
 
                 if (t1.equals(LANDSCAPE)) {
 
-                    if (o1y_bottom > o2y_bottom) {
+                    if (i1_bottom > i2_bottom) {
                         return LESS;
-                    } else if (o1y_bottom < o2y_bottom) {
+                    } else if (i1_bottom < i2_bottom) {
                         return GREAT;
                     } else {
                         return INCOMPARABLE;
@@ -157,85 +139,47 @@ public class Comparator {
         return o1y_top <= o2y_bottom && o2y_top <= o1y_bottom;
     }
 
-    public static Comparison isCovered(PosItem i1, PosItem i2) {
-        final List<Coords> i1_cl = i1.getCoverLine();
-        final Coords i1_pos = i1.getPos();
-        final Image i1_img = i1.getImage();
-        final double i1_posX = i1_pos.x;
-        final double i1_posY = i1_pos.y;
-        final double i1_imgWidth = i1_img.getWidth() / Sizes.getMeter();
-        final double i1_imgHeight = i1_img.getHeight() / Sizes.getMeter();
-        i1_list.clear();
-        if (!i1_cl.isEmpty()) {
-            List<Coords> lostRef = Coords.looseCoordsReferences(i1_cl);
-            i1_list.addAll(lostRef);
-            Coords.translateCoords(i1_list, i1_posX, i1_posY);
-        } else {
-            i1_left.x = i1_posX;
-            double bottom = i1_posY + i1_imgHeight;
-            i1_right.x = i1_posX + i1_imgWidth;
-
-            if (i1 instanceof Creature) {
-                Creature c1 = (Creature) i1;
-                bottom = c1.getCreatureBottom(bottom);
-                i1_right.x = c1.getCreatureRight(i1_imgWidth, i1_right.x);
-                i1_left.x = c1.getCreatureLeft(i1_left.x, i1_imgWidth);
-            }
-
-            i1_left.y = i1_right.y = bottom;
-
-            i1_list.add(i1_left);
-            i1_list.add(i1_right);
-        }
-
-        final List<Coords> i2_cl = i2.getCoverLine();
-        final Coords i2_pos = i2.getPos();
-        final Image i2_img = i2.getImage();
-        final double i2_posX = i2_pos.x;
-        final double i2_posY = i2_pos.y;
-        final double i2_imgWidth = i2_img.getWidth() / Sizes.getMeter();
-        final double i2_imgHeight = i2_img.getHeight() / Sizes.getMeter();
-        i2_list.clear();
-        if (!i2_cl.isEmpty()) {
-            List<Coords> lostRef = Coords.looseCoordsReferences(i2_cl);
-            i2_list.addAll(lostRef);
-            Coords.translateCoords(i2_list, i2_posX, i2_posY);
-            addLeftAndRightPoints(i2_list, i2_posX, i2_imgWidth);
-        } else {
-            i2_left.x = i2_posX;
-            double bottom = i2_posY + i2_imgHeight;
-            i2_right.x = i2_posX + i2_imgWidth;
-
-            if (i2 instanceof Creature) {
-                Creature c2 = (Creature) i2;
-                bottom = c2.getCreatureBottom(bottom);
-                i2_right.x = c2.getCreatureRight(i2_imgWidth, i2_right.x);
-                i2_left.x = c2.getCreatureLeft(i2_left.x, i2_imgWidth);
-            }
-
-            i2_left.y = i2_right.y = bottom;
-
-            i2_list.add(i2_left);
-            i2_list.add(i2_right);
-        }
-
-        return isCoverLineAbove(i1_list, i2_list);
+    private static Comparison isCovered(PosItem i1, PosItem i2) {
+        addCoverCoordsToList(i1, oneList, oneLeft, oneRight, oneLostReferences, oneResultCoords);
+        addCoverCoordsToList(i2, twoList, twoLeft, twoRight, twoLostReferences, twoResultCoords);
+        return isCoverLineAbove(oneList, twoList);
     }
 
-    private static Comparison isCoverLineAbove(LinkedList<Coords> i1_list, LinkedList<Coords> i2_list) {
-        for (int i = 0; i < i2_list.size() - 1; i++) {
-            Coords first = i2_list.get(i);
+    private static void addCoverCoordsToList(PosItem pi, LinkedList<Coords> poss, Coords leftPos, Coords rightPos,
+                                             List<Coords> lostRef, List<Coords> resultCoords) {
+        final List<Coords> cl = pi.getCoverLine();
+        final double left = pi.getLeft();
+        final double top = pi.getTop();
+        final double right = pi.getRight();
+        final double bottom = pi.getBottom();
+        leftPos.x = left;
+        rightPos.x = right;
+        leftPos.y = rightPos.y = bottom;
+        poss.clear();
+        if (!cl.isEmpty()) {
+            Coords.looseCoordsReferences(cl, lostRef, resultCoords);
+            poss.addAll(lostRef);
+            Coords.translateCoords(poss, left, top);
+
+            addLeftAndRightCoords(poss, leftPos, rightPos);
+        } else {
+            poss.add(leftPos);
+            poss.add(rightPos);
+        }
+    }
+
+    private static Comparison isCoverLineAbove(LinkedList<Coords> oneList, LinkedList<Coords> twoList) {
+        for (int i = 0; i < twoList.size() - 1; i++) {
+            Coords first = twoList.get(i);
             double x1 = first.x;
-            double y1 = first.y;
-            Coords second = i2_list.get(i+1);
+            Coords second = twoList.get(i+1);
             double x2 = second.x;
-            double y2 = second.y;
 
             if (x1 == x2) {
                 continue;
             }
 
-            for (Coords compared : i1_list) {
+            for (Coords compared : oneList) {
                 double x = compared.x;
                 if (x == x1) {
                     continue;
@@ -245,7 +189,10 @@ public class Comparator {
                     continue;
                 }
                 double y = compared.y;
-                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
+                double y1 = first.y;
+                double y2 = second.y;
+
+                double func = (x*y1 - x*y2 + x1*y2 - x2*y1) / (x1 - x2);
                 if (y > func) {
                     return GREAT;
                 } else {
@@ -253,19 +200,17 @@ public class Comparator {
                 }
             }
         }
-        for (int i = 0; i < i1_list.size() - 1; i++) {
-            Coords first = i1_list.get(i);
+        for (int i = 0; i < oneList.size() - 1; i++) {
+            Coords first = oneList.get(i);
             double x1 = first.x;
-            double y1 = first.y;
-            Coords second = i1_list.get(i+1);
+            Coords second = oneList.get(i+1);
             double x2 = second.x;
-            double y2 = second.y;
 
             if (x1 == x2) {
                 continue;
             }
 
-            for (Coords compared : i2_list) {
+            for (Coords compared : twoList) {
                 double x = compared.x;
                 if (x == x1) {
                     continue;
@@ -275,7 +220,10 @@ public class Comparator {
                     continue;
                 }
                 double y = compared.y;
-                double func = (x * y1 - x * y2 + x1 * y2 - x2 * y1) / (x1 - x2);
+                double y1 = first.y;
+                double y2 = second.y;
+
+                double func = (x*y1 - x*y2 + x1*y2 - x2*y1) / (x1 - x2);
                 if (y > func) {
                     return LESS;
                 } else {
@@ -286,20 +234,17 @@ public class Comparator {
         return INCOMPARABLE;
     }
 
-    private static void addLeftAndRightPoints(LinkedList<Coords> linkedCoords, double i2_posX, double i2_imgWidth) {
-        Coords first = linkedCoords.getFirst();
-        if (first.x != i2_posX) {
-            i2_left.x = i2_posX;
-            i2_left.y = first.y;
-            linkedCoords.addFirst(i2_left);
+    private static void addLeftAndRightCoords(LinkedList<Coords> poss, Coords leftPos, Coords rightPos) {
+        Coords first = poss.getFirst();
+        if (first.x != leftPos.x) {
+            leftPos.y = first.y;
+            poss.addFirst(leftPos);
         }
 
-        Coords last = linkedCoords.getLast();
-        double rightX = i2_posX + i2_imgWidth;
-        if (last.x != rightX) {
-            i2_right.x = rightX;
-            i2_right.y = last.y;
-            linkedCoords.addLast(i2_right);
+        Coords last = poss.getLast();
+        if (last.x != rightPos.x) {
+            rightPos.y = last.y;
+            poss.addLast(rightPos);
         }
     }
 

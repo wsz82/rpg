@@ -43,17 +43,33 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Coords getCenter() {
-        center.x = pos.x + getImage().getWidth() / Sizes.getMeter();
-        center.y = pos.y + getImage().getHeight() / Sizes.getMeter();
+        center.x = pos.x + getImageWidth();
+        center.y = pos.y + getImageHeight();
         return center;
     }
 
-    public double[] getLeftTopRightBottomEdges() {
-        imgEdges[0] = pos.x;
-        imgEdges[1] = pos.y;
-        imgEdges[2] = pos.x + getImage().getWidth() / Sizes.getMeter();
-        imgEdges[3] = pos.y + getImage().getHeight() / Sizes.getMeter();
-        return imgEdges;
+    public double getLeft() {
+        return pos.x;
+    }
+
+    public double getTop() {
+        return pos.y;
+    }
+
+    public double getRight() {
+        return pos.x + getImageWidth();
+    }
+
+    public double getBottom() {
+        return pos.y + getImageHeight();
+    }
+
+    public double getImageHeight() {
+        return getImage().getHeight() / Sizes.getMeter();
+    }
+
+    public double getImageWidth() {
+        return getImage().getWidth() / Sizes.getMeter();
     }
 
     public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {

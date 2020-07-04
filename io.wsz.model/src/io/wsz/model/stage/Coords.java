@@ -17,6 +17,38 @@ public class Coords implements Externalizable {
     private static final List<Coords> lostReferences = new ArrayList<>(0);
     private static final List<Coords> resultCoords = new ArrayList<>(0);
 
+    public static List<Coords> looseCoordsReferences(List<Coords> from) {
+        return looseCoordsReferences(from, lostReferences, resultCoords);
+    }
+
+    public static List<Coords> looseCoordsReferences(List<Coords> from, List<Coords> to, List<Coords> result) {
+        int dif = from.size() - to.size();
+        if (dif > 0) {
+            for (int i = 0; i < dif; i++) {
+                to.add(new Coords());
+            }
+        }
+        for (int i = 0; i < from.size(); i++) {
+            Coords fromCoords = from.get(i);
+            Coords actual = to.get(i);
+            actual.x = fromCoords.x;
+            actual.y = fromCoords.y;
+            actual.setLocation(fromCoords.getLocation());
+        }
+        result.clear();
+        for (int i = 0; i < from.size(); i++) {
+            result.add(to.get(i));
+        }
+        return result;
+    }
+
+    public static void translateCoords(List<Coords> list, double x, double y) {
+        list.forEach(c -> {
+            c.x += x;
+            c.y += y;
+        });
+    }
+
     public double x;
     public double y;
 
@@ -28,34 +60,6 @@ public class Coords implements Externalizable {
         this.x = x;
         this.y = y;
         this.location = location;
-    }
-
-    public static List<Coords> looseCoordsReferences(List<Coords> from) {
-        int dif = from.size() - lostReferences.size();
-        if (dif > 0) {
-            for (int i = 0; i < dif; i++) {
-                lostReferences.add(new Coords());
-            }
-        }
-        for (int i = 0; i < from.size(); i++) {
-            Coords fromCoords = from.get(i);
-            Coords actual = lostReferences.get(i);
-            actual.x = fromCoords.x;
-            actual.y = fromCoords.y;
-            actual.setLocation(fromCoords.getLocation());
-        }
-        resultCoords.clear();
-        for (int i = 0; i < from.size(); i++) {
-            resultCoords.add(lostReferences.get(i));
-        }
-        return resultCoords;
-    }
-
-    public static void translateCoords(List<Coords> list, double x, double y) {
-        list.forEach(c -> {
-            c.x += x;
-            c.y += y;
-        });
     }
 
     public boolean is0() {
