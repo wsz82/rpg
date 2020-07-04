@@ -64,7 +64,6 @@ public class Comparator {
                     } else {
                         return INCOMPARABLE;
                     }
-
                 }
 
                 else if ((t1.equals(CREATURE))) {
@@ -84,43 +83,43 @@ public class Comparator {
                     return isCovered(i1, i2);
 
                 }
-
             }
 
-            else if ((t1.equals(CREATURE)) && !t2.equals(LANDSCAPE)) {
+            else if (!t1.equals(LANDSCAPE) && !t2.equals(LANDSCAPE)) {
 
-                if (i2 instanceof Equipment) {
+                if ((t1.equals(CREATURE))) {
 
-                    if (i2.getCoverLine().isEmpty()) {
+                    if (i2 instanceof Equipment) {
+
+                        if (i2.getCoverLine().isEmpty()) {
+                            return GREAT;
+                        }
+                    }
+
+                    return isCovered(i1, i2);
+
+                }
+
+                else if (t2.equals(CREATURE)) {
+
+                    if (i1 instanceof Equipment) {
+
+                        if (i1.getCoverLine().isEmpty()) {
+                            return LESS;
+                        }
+                    }
+
+                    Comparison isCovered = isCovered(i2, i1);
+
+                    if (isCovered.equals(LESS)) {
                         return GREAT;
-                    }
-
-                }
-
-                return isCovered(i1, i2);
-
-            }
-
-            else if ((!t1.equals(LANDSCAPE) && t2.equals(CREATURE))) {
-
-                if (i1 instanceof Equipment) {
-
-                    if (i1.getCoverLine().isEmpty()) {
+                    } else if (isCovered.equals(GREAT)) {
                         return LESS;
+                    } else {
+                        return INCOMPARABLE;
                     }
 
                 }
-
-                Comparison isCovered = isCovered(i2, i1);
-
-                if (isCovered.equals(LESS)) {
-                    return GREAT;
-                } else if (isCovered.equals(GREAT)) {
-                    return LESS;
-                } else {
-                    return INCOMPARABLE;
-                }
-
             }
 
             else {
