@@ -114,8 +114,8 @@ public class GameView extends Canvas {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
             translateCoordsToScreenCoords(pos);
-            final int x = (int) (modifiedCoords.x * Sizes.getMeter());
-            final int y = (int) (modifiedCoords.y * Sizes.getMeter());
+            final double x = (modifiedCoords.x * Sizes.getMeter());
+            final double y = (modifiedCoords.y * Sizes.getMeter());
 
             if (pi.getVisible()) {
                 switch (type) {
@@ -124,25 +124,32 @@ public class GameView extends Canvas {
                     }
                 }
                 Image img = pi.getImage();
-                int width = (int) img.getWidth();
-                int height = (int) img.getHeight();
+                double width = img.getWidth();
+                double height = img.getHeight();
 
-                int startX = 0;
+                double startX = 0;
                 if (x < 0) {
                     startX = -x;
                     width = x + width;
                 }
-                int startY = 0;
+                if (width > getWidth()) {
+                    width = getWidth();
+                }
+
+                double startY = 0;
                 if (y < 0) {
                     startY = -y;
                     height = y + height;
                 }
+                if (height > getHeight()) {
+                    height = getHeight();
+                }
 
-                int destX = 0;
+                double destX = 0;
                 if (x > 0) {
                     destX = x;
                 }
-                int destY = 0;
+                double destY = 0;
                 if (y > 0) {
                     destY = y;
                 }

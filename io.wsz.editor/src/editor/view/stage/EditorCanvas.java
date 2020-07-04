@@ -72,29 +72,36 @@ public class EditorCanvas extends Canvas {
             Coords pos = pi.getPos();
             Coords translated = pos.clonePos();
             translated.subtract(currentPos);
-            int x = (int) (translated.x * Sizes.getMeter());
-            int y = (int) (translated.y * Sizes.getMeter());
+            double x = (translated.x * Sizes.getMeter());
+            double y = (translated.y * Sizes.getMeter());
 
             Image img = pi.getImage();
             double width = img.getWidth();
             double height = img.getHeight();
 
-            int startX = 0;
+            double startX = 0;
             if (x < 0) {
                 startX = -x;
                 width = x + width;
             }
-            int startY = 0;
+            if (width > getWidth()) {
+                width = getWidth();
+            }
+
+            double startY = 0;
             if (y < 0) {
                 startY = -y;
                 height = y + height;
             }
+            if (height > getHeight()) {
+                height = getHeight();
+            }
 
-            int destX = 0;
+            double destX = 0;
             if (x > 0) {
                 destX = x;
             }
-            int destY = 0;
+            double destY = 0;
             if (y > 0) {
                 destY = y;
             }

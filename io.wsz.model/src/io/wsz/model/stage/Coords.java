@@ -179,7 +179,7 @@ public class Coords implements Externalizable {
         } else {
             locationName = null;
         }
-        return locationName + ": " + "X: " + x + ", Y: " + y;
+        return "Location:" + locationName + ": " + "X: " + x + ", Y: " + y;
     }
 
     @Override
