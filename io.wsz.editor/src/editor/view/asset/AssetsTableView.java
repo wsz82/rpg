@@ -137,12 +137,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         List<A> createdItems = createItems(pos, level);
         for (A item : createdItems) {
             Image img = item.getImage();
-            double width = img.getWidth();
-            double height = img.getHeight();
-            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-                alertTooBigImage(width, height, item.getName());
-                continue;
-            }
+            if (isImageTooBig(item, img)) continue;
             Controller.get().getCurrentLocation().getItems().add(item);
         }
     }
@@ -153,16 +148,21 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         for (A item : createdItems) {
             if (item instanceof Equipment) {
                 Image img = item.getImage();
-                double width = img.getWidth();
-                double height = img.getHeight();
-                if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-                    alertTooBigImage(width, height, item.getName());
-                    continue;
-                }
+                if (isImageTooBig(item, img)) continue;
                 Equipment e = (Equipment) item;
                 itemsStage.addEquipment(e);
             }
         }
+    }
+
+    private boolean isImageTooBig(A item, Image img) {
+        double width = img.getWidth();
+        double height = img.getHeight();
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+            alertTooBigImage(width, height, item.getName());
+            return true;
+        }
+        return false;
     }
 
     private void alertTooBigImage(double width, double height, String itemName) {

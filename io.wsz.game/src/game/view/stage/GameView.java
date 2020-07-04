@@ -119,9 +119,7 @@ public class GameView extends Canvas {
 
             if (pi.getVisible()) {
                 switch (type) {
-                    case CREATURE -> {
-                        drawCreatureSize((Creature) pi, gc);
-                    }
+                    case CREATURE -> drawCreatureSize((Creature) pi, gc);
                 }
                 Image img = pi.getImage();
                 double width = img.getWidth();
