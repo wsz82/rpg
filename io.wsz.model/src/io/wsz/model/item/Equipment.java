@@ -79,7 +79,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     }
 
     @Override
-    public void onDrop(Creature cr, double x, double y) {
+    public void onDrop(Creature cr, double x, double y) { //TODO check collision
         pos.x = x;
         pos.y = y;
         level = cr.getLevel();

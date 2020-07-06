@@ -53,9 +53,11 @@ public class Container extends Equipment<Container> implements Containable {
     }
 
     public void open(Creature cr) {
-        Controller.get().setCreatureToOpenInventory(cr);
-        Controller.get().setContainerToOpen(this);
-        Controller.get().setInventory(true);
+        if (cr.getControl() == CreatureControl.CONTROL) {
+            Controller.get().setCreatureToOpenInventory(cr);
+            Controller.get().setContainerToOpen(this);
+            Controller.get().setInventory(true);
+        }
     }
 
     public int getFilledSpace() {

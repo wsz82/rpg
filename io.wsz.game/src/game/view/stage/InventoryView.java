@@ -271,8 +271,12 @@ public class InventoryView {
     }
 
     private void drawContainer(double inventoryWidth) {
+        Creature cr = Controller.get().getCreatureToOpenInventory();
         Container c = Controller.get().getContainerToOpen();
         if (c == null) {
+            return;
+        }
+        if (!cr.withinRange(c)) {
             return;
         }
         double width = 0.3 * inventoryWidth / Sizes.getMeter();

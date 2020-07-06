@@ -34,9 +34,6 @@ public class BarView {
     public BarView(Canvas canvas) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
-        for (int i = 0; i < 6; i++) {
-            portraits.add(i, new Portrait(null, null, 0));
-        }
         hookupEvents();
     }
 
@@ -125,6 +122,9 @@ public class BarView {
         if (cr == null) {
             return;
         }
+
+        Controller.get().setCreatureToOpenInventory(cr);
+
         CreatureControl control = cr.getControl();
         if (control == CreatureControl.CONTROLLABLE) {
             Controller.get().getCreaturesToControl().add(cr);
@@ -226,14 +226,20 @@ public class BarView {
 
         creatures.clear();
         creatures.addAll(Controller.get().getHeroes());
+        int dif = creatures.size() - portraits.size();
+        if (dif > 0) {
+            for (int i = 0; i < dif; i++) {
+                portraits.add(i, new Portrait(null, null, 0));
+            }
+        }
         for (int i = 0; i < creatures.size(); i++) {
-            Portrait cl = portraits.get(i);
+            Portrait p = portraits.get(i);
             Creature cr = creatures.get(i);
 
-            cl.creature = cr;
-            cl.image = cr.getPortrait();
-            cl.y = y;
-            gc.drawImage(cl.image, portraitX, y);
+            p.creature = cr;
+            p.image = cr.getPortrait();
+            p.y = y;
+            gc.drawImage(p.image, portraitX, y);
 
             y += portraitSize + 2*padding;
         }
