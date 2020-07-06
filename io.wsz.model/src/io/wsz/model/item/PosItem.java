@@ -19,7 +19,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
-    protected final double[] imgEdges = new double[4];
 
     protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
@@ -43,8 +42,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Coords getCenter() {
-        center.x = pos.x + getImageWidth();
-        center.y = pos.y + getImageHeight();
+        center.x = pos.x + getImageWidth()/2;
+        center.y = pos.y + getImageHeight()/2;
         return center;
     }
 
@@ -103,6 +102,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.pos.x = pos.x;
         this.pos.y = pos.y;
         this.pos.setLocation(pos.getLocation());
+    }
+
+    public void setPos(double x, double y, Location location) {
+        this.pos.x = x;
+        this.pos.y = y;
+        this.pos.setLocation(location);
     }
 
     public Integer getLevel() {

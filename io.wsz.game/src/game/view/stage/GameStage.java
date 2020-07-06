@@ -4,8 +4,6 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
-import io.wsz.model.item.Container;
-import io.wsz.model.item.Creature;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
@@ -95,13 +93,6 @@ public class GameStage extends Stage {
         parentToReturn = root.getCenter();
         root.setCenter(settingsMenu);
         settingsMenu.open(root, parentToReturn);
-    }
-
-    public void setInventoryForCenter(Creature active, Container container) {
-        EquipmentView ev = new EquipmentView(active, container, this);
-        parentToReturn = gameView;
-        ev.initWindow();
-        root.setCenter(ev);
     }
 
     private void startNewGame() {

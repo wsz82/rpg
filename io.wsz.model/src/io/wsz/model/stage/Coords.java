@@ -17,6 +17,22 @@ public class Coords implements Externalizable {
     private static final List<Coords> lostReferences = new ArrayList<>(0);
     private static final List<Coords> resultCoords = new ArrayList<>(0);
 
+    public static List<Coords> cloneCoordsList(List<Coords> from) {
+        List<Coords> poss = new ArrayList<>(from.size());
+        for (Coords pos : from) {
+            poss.add(pos.clonePos());
+        }
+        return poss;
+    }
+
+    public static List<List<Coords>> cloneCoordsPolygons(List<List<Coords>> from) {
+        List<List<Coords>> polygons = new ArrayList<>(from.size());
+        for (List<Coords> poss : from) {
+            polygons.add(cloneCoordsList(poss));
+        }
+        return polygons;
+    }
+
     public static List<Coords> looseCoordsReferences(List<Coords> from) {
         return looseCoordsReferences(from, lostReferences, resultCoords);
     }

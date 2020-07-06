@@ -5,11 +5,20 @@ import io.wsz.model.stage.Coords;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class Equipment<E extends Equipment> extends PosItem<E> implements Equippable {
     private static final long serialVersionUID = 1L;
+
+    public static List<Equipment> cloneEquipmentList(List<Equipment> equipment) {
+        List<Equipment> clone = new ArrayList<>(equipment.size());
+        for (Equipment e : equipment) {
+            clone.add(e.cloneEquipment());
+        }
+        return clone;
+    }
 
     protected Double weight;
     protected Integer size;
@@ -59,23 +68,21 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         this.size = size;
     }
 
+    public abstract E cloneEquipment();
+
     @Override
-    public void onTake(Creature cr) {
-        visible.set(false);
-        Coords crPos = cr.pos;
-        this.pos.x = crPos.x;
-        this.pos.y = crPos.y;
-        level = cr.level;
-        crPos.getLocation().getItemsToRemove().add(this);
+    public void onTake(Creature cr, double x, double y) {
+        pos.x = x;
+        pos.y = y;
+        level = 0;
+        cr.pos.getLocation().getItemsToRemove().add(this);
     }
 
     @Override
-    public void onDrop(Creature cr) {
-        visible.set(true);
-        Coords centerBottomPos = cr.getCenterBottomPos();
-        this.pos.x = centerBottomPos.x;
-        this.pos.y = centerBottomPos.y;
-        this.level = cr.getLevel();
+    public void onDrop(Creature cr, double x, double y) {
+        pos.x = x;
+        pos.y = y;
+        level = cr.getLevel();
         cr.getPos().getLocation().getItemsToAdd().add(this);
     }
 

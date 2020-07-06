@@ -3,6 +3,7 @@ package game.model.setting;
 import io.wsz.model.sizes.Sizes;
 
 public class Settings {
+    private static double barPart = 0.08;
     private static double gameScrollSpeed = 0.2;
     private static double dialogScrollSpeed = 0.2;
     private static boolean centerOnPC = false;
@@ -10,6 +11,14 @@ public class Settings {
     private static int resolutionWidth = 1600;
     private static int resolutionHeight = 900;
     private static boolean showBar = true;
+
+    public static double getBarPart() {
+        return barPart;
+    }
+
+    public static void setBarPart(double barPart) {
+        Settings.barPart = barPart;
+    }
 
     public static double getGameScrollSpeed() {
         return gameScrollSpeed;

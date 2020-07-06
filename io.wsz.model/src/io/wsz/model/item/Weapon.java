@@ -24,6 +24,18 @@ public class Weapon extends Equipment<Weapon> {
                 coverLine, collisionPolygons);
     }
 
+    @Override
+    public Weapon cloneEquipment() {
+        Weapon clone = new Weapon(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level,
+                Coords.cloneCoordsList(prototype.coverLine), Coords.cloneCoordsPolygons(prototype.getCollisionPolygons()));
+        clone.setWeight(weight);
+        clone.setSize(size);
+        clone.setDamage(damage);
+        clone.setRange(range);
+        clone.setSpeed(speed);
+        return clone;
+    }
+
     public Double getIndividualDamage() {
         return damage;
     }

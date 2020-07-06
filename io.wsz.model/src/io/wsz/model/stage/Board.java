@@ -142,22 +142,26 @@ public class Board {
                 continue;
             }
             for (Coords pos : corners) {
-                double x = pos.x;
-                double y = pos.y;
-
                 Coords cPos = c.getCenterBottomPos();
-                double h = cPos.x;
-                double k = cPos.y;
-                double rx = c.getSize().getWidth()/2;
-                double ry = c.getSize().getHeight()/2;
+                double width = c.getSize().getWidth();
+                double height = c.getSize().getHeight();
 
-                double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
-                if (eq <= 1) {
-                    return c;
-                }
+                if (pointWithinEllipse(pos, cPos, width, height)) return c;
             }
         }
         return null;
+    }
+
+    public boolean pointWithinEllipse(Coords point, Coords center, double width, double height) {
+        double x = point.x;
+        double y = point.y;
+        double h = center.x;
+        double k = center.y;
+        double rx = width /2;
+        double ry = height /2;
+
+        double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
+        return eq <= 1;
     }
 
     public PosItem lookForObstacle(Coords[] poss, Location location) {
@@ -258,27 +262,17 @@ public class Board {
         sortItems(items);
         Collections.reverse(items);
 
-        Double range = cr.getRange();
+        double range = cr.getRange();
+        double width = cr.getSize().getWidth() + 2*range;
+        double height = cr.getSize().getHeight() + 2*range;
+        Coords point = cr.getCenterBottomPos();
         for (Equipment e : equipment) {
-            Coords eCenter = e.getCenter();
-            for (Coords pos : poss) {
-                if (pointWithinRange(pos, range, eCenter)) {
-                    if (!equipmentResult.contains(e)) {
-                        equipmentResult.add(e);
-                    }
-                }
+            Coords center = e.getCenter();
+            if (pointWithinEllipse(point, center, width, height)) {
+                equipmentResult.add(e);
             }
         }
         return equipmentResult;
-    }
-
-    private boolean pointWithinRange(Coords pos, Double range, Coords eCenter) {
-        double eX = eCenter.x;
-        double eY = eCenter.y;
-        double x = pos.x;
-        double y = pos.y;
-
-        return pow(eX - x, 2) + pow(eY - y, 2) < pow(range, 2);
     }
 
     public Coords getFreePosAround(Creature cr) {

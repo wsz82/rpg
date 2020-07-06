@@ -2,6 +2,7 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
+import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
@@ -26,7 +27,7 @@ public class GameRunner {
     public GameRunner() {}
 
     public void startGame(SaveMemento memento) {
-        gameController.setGame(true);
+        gameController.setGame(false);
 
         if (memento == null) {
             loadNewGame();
@@ -61,32 +62,7 @@ public class GameRunner {
                     continue;
                 }
                 synchronized (this) {
-                    Location currentLocation = controller.getCurrentLocation().getLocation();
-                    List<PosItem> items = currentLocation.getItems().get();
-
-                    for (PosItem pi : items) {
-                        pi.update();
-                    }
-                    for (Location l : controller.getLocationsList()) {
-                        addItems(l);
-                        removeItems(l);
-                    }
-
-                    heroesLocations.clear();
-                    controller.getHeroes().stream()
-                            .map(h -> h.getPos().getLocation())
-                            .collect(Collectors.toCollection(() -> heroesLocations));
-                    heroesLocations.remove(currentLocation);
-
-                    for (Location l : heroesLocations) {
-                        for (PosItem pi : l.getItems().get()) {
-                            pi.update();
-                        }
-                    }
-
-                    updateControls();
-                    updateLocation();
-                    tryToStartDialog();
+                    updateModel();
                 }
 
                 try {
@@ -97,12 +73,7 @@ public class GameRunner {
 
                 Platform.runLater(() -> {
                     synchronized (this) {
-                        if (Sizes.isReloadImages()) {
-                            clearImagesAndReload();
-                            Sizes.setReloadImages(false);
-                        }
-                        showGame();
-                        tryToOpenInventory();
+                        updateView();
                     }
                 });
 
@@ -110,6 +81,48 @@ public class GameRunner {
         });
         gameThread.setDaemon(true);
         gameThread.start();
+    }
+
+    private void updateModel() {
+        updateControls();
+        for (Location l : controller.getLocationsList()) {
+            addItems(l);
+            removeItems(l);
+        }
+
+        if (controller.isInventory() && Settings.isPauseOnInventory()) {
+            return;
+        }
+
+        Location currentLocation = controller.getCurrentLocation().getLocation();
+        List<PosItem> items = currentLocation.getItems().get();
+
+        for (PosItem pi : items) {
+            pi.update();
+        }
+
+        heroesLocations.clear();
+        controller.getHeroes().stream()
+                .map(h -> h.getPos().getLocation())
+                .collect(Collectors.toCollection(() -> heroesLocations));
+        heroesLocations.remove(currentLocation);
+
+        for (Location l : heroesLocations) {
+            for (PosItem pi : l.getItems().get()) {
+                pi.update();
+            }
+        }
+
+        updateLocation();
+        tryToStartDialog();
+    }
+
+    private void updateView() {
+        if (Sizes.isReloadImages()) {
+            clearImagesAndReload();
+            Sizes.setReloadImages(false);
+        }
+        showGame();
     }
 
     private void updateControls() {
@@ -162,16 +175,6 @@ public class GameRunner {
         gameController.setDialog(true);
     }
 
-    private void tryToOpenInventory() {
-        Creature creatureToOpenContainer = controller.getCreatureToOpenContainer();
-        Container containerToOpen = controller.getContainerToOpen();
-        if (creatureToOpenContainer != null && containerToOpen != null) {
-            gameController.openInventory(creatureToOpenContainer, containerToOpen);
-            controller.setCreatureToOpenContainer(null);
-            controller.setContainerToOpen(null);
-        }
-    }
-
     private void addItems(Location l) {
         List<PosItem> p = l.getItemsToAdd();
 
@@ -191,6 +194,9 @@ public class GameRunner {
             return;
         }
         l.getItems().get().removeAll(p);
+        for (PosItem pi : p) {
+            pi.getPos().setLocation(null);
+        }
         p.clear();
     }
 

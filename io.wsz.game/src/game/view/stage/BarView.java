@@ -1,6 +1,7 @@
 package game.view.stage;
 
 import game.model.GameController;
+import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
@@ -23,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BarView {
-    private static final double RIGHT_VIEW_PART = 0.08;
     private static final double PORTRAIT_PART = 0.9;
     private final Canvas canvas;
     private final GraphicsContext gc;
@@ -45,7 +45,7 @@ public class BarView {
         if (canvasWidth == 0) {
             return;
         }
-        double barWidth = canvasWidth*RIGHT_VIEW_PART;
+        double barWidth = canvasWidth * Settings.getBarPart();
         double leftX = canvasWidth - barWidth;
 
         drawBackground(leftX, barWidth);
@@ -122,6 +122,9 @@ public class BarView {
             return;
         }
         Creature cr = cl.creature;
+        if (cr == null) {
+            return;
+        }
         CreatureControl control = cr.getControl();
         if (control == CreatureControl.CONTROLLABLE) {
             Controller.get().getCreaturesToControl().add(cr);
@@ -251,7 +254,7 @@ public class BarView {
 
     public double getLeft() {
         double canvasWidth = canvas.getWidth();
-        double barWidth = canvasWidth*RIGHT_VIEW_PART;
+        double barWidth = canvasWidth * Settings.getBarPart();
         return canvasWidth - barWidth;
     }
 

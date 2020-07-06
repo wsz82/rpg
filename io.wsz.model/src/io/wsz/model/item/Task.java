@@ -61,7 +61,7 @@ public class Task implements Serializable {
             } else {
                 boolean taken = creature.getIndividualInventory().add(equipment);
                 if (taken) {
-                    equipment.onTake(creature);
+                    equipment.onTake(creature, 0, 0);
                 }
             }
             item = null;

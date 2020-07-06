@@ -24,6 +24,18 @@ public class Container extends Equipment<Container> implements Containable {
         super(prototype, name, type, path, visible, level, coverLine, collisionPolygons);
     }
 
+    @Override
+    public Container cloneEquipment() {
+        Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level,
+                Coords.cloneCoordsList(prototype.coverLine), Coords.cloneCoordsPolygons(prototype.getCollisionPolygons()));
+        clone.setWeight(weight);
+        clone.setSize(size);
+        clone.getItems().addAll(Equipment.cloneEquipmentList(getItems()));
+        clone.setNettoWeight(nettoWeight);
+        clone.setNettoSize(nettoSize);
+        return clone;
+    }
+
     public boolean add(Equipment e) {
         double size = e.getSize();
         if (getFilledSpace() + size > getSize() - getNettoSize()) {
@@ -39,8 +51,9 @@ public class Container extends Equipment<Container> implements Containable {
     }
 
     public void open(Creature cr) {
-        Controller.get().setCreatureToOpenContainer(cr);
+        Controller.get().setCreatureToOpenInventory(cr);
         Controller.get().setContainerToOpen(this);
+        Controller.get().setInventory(true);
     }
 
     public int getFilledSpace() {
@@ -114,7 +127,8 @@ public class Container extends Equipment<Container> implements Containable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
 
-        items.addAll((List<Equipment>) in.readObject());
+        List<Equipment> serItems = (List<Equipment>) in.readObject();
+        items.addAll(serItems);
 
         nettoWeight = (Double) in.readObject();
 

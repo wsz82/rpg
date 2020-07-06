@@ -12,8 +12,6 @@ import game.view.launcher.Main;
 import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Container;
-import io.wsz.model.item.Creature;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
@@ -27,7 +25,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public class GameController {
     private static GameController singleton;
@@ -61,13 +58,6 @@ public class GameController {
     public void resumeGame() {
         gameStage.setGameViewForCenter();
         gameRunner.resumeGame();
-    }
-
-    public void openInventory(Creature active, Container container) {
-        if (Settings.isPauseOnInventory()) {
-            isGame.set(false);
-        }
-        gameStage.setInventoryForCenter(active, container);
     }
 
     public void restoreLastPlugin() {
@@ -170,21 +160,7 @@ public class GameController {
         }
 
         controller.getLocationsList().clear();
-
-        List<Location> locations = m.getLocations();
-        controller.getLocationsList().setAll(locations);
-
-        List<Location> singleLocation = locations.stream()
-                .filter(l -> l.getName().equals(m.getCurrentLocationName()))
-                .collect(Collectors.toList());
-        Location currentLocation = singleLocation.get(0);
-        controller.getCurrentLocation().setLocation(currentLocation);
-
-        List<Layer> singleLayer = currentLocation.getLayers().get().stream()
-                .filter(l -> l.getLevel() == m.getCurrentLayer())
-                .collect(Collectors.toList());
-        Layer layer = singleLayer.get(0);
-        controller.getCurrentLayer().setLayer(layer);
+        fillLocationsList(m.getLocations(), true, m.getCurrentLocationName(), m.getCurrentLayer());
     }
 
     public void loadGameActivePluginToLists() {
@@ -195,30 +171,31 @@ public class GameController {
         controller.getAssetsList().clear();
 
         Plugin p = ActivePlugin.get().getPlugin();
+        controller.getAssetsList().addAll(p.getAssets());
+        fillLocationsList(p.getLocations(), p.isStartingLocation(), p.getStartLocation(), p.getStartLayer());
+    }
 
-        String startLocation = p.getStartLocation();
-        if (p.isStartingLocation()) {
-            Optional<Location> optLocation = p.getLocations().stream()
-                    .filter(l -> l.getName().equals(startLocation))
+    public void fillLocationsList(List<Location> serLocations, boolean isStartingLocation, String serStartLocation, int serStartLayer) {
+        controller.fillLocationsList(serLocations);
+
+        if (isStartingLocation) {
+            Optional<Location> optLocation = controller.getLocationsList().stream()
+                    .filter(l -> l.getName().equals(serStartLocation))
                     .findFirst();
             Location first = optLocation.orElse(null);
             if (first == null) {
-                throw new NullPointerException("Starting location \"" + startLocation + "\" does not exist in list");
+                throw new NullPointerException("Starting location \"" + serStartLocation + "\" does not exist in list");
             }
-            int serLayer = p.getStartLayer();
             controller.getCurrentLocation().setLocation(first);
             Optional<Layer> optLayer = first.getLayers().get().stream()
-                    .filter(l -> l.getLevel() == serLayer)
+                    .filter(l -> l.getLevel() == serStartLayer)
                     .findFirst();
             Layer startLayer = optLayer.orElse(null);
             if (startLayer == null) {
-                throw new NullPointerException("Start layer \"" + serLayer + "\" does not exist in start location");
+                throw new NullPointerException("Start layer \"" + serStartLayer + "\" does not exist in start location");
             }
             controller.getCurrentLayer().setLayer(startLayer);
         }
-
-        controller.getAssetsList().addAll(p.getAssets());
-        controller.fillLocationsList(p.getLocations());
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {

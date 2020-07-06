@@ -1,11 +1,14 @@
 package io.wsz.model.item;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Inventory implements Serializable {
+public class Inventory implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private List<Equipment> items = new ArrayList<>(1);
@@ -85,5 +88,24 @@ public class Inventory implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getItems(), getEquippedWeapon());
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(items);
+
+        out.writeObject(owner);
+
+        out.writeObject(equippedWeapon);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        List<Equipment> serItems = (List<Equipment>) in.readObject();
+        items.addAll(serItems);
+
+        owner = (Creature) in.readObject();
+
+        equippedWeapon = (Weapon) in.readObject();
     }
 }

@@ -48,19 +48,10 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            List<Coords> coverLine = new ArrayList<>();
-            if (p.getCoverLine() != null) {
-                coverLine.addAll(p.getCoverLine());
-            }
-            List<List<Coords>> collisionPolygons = new ArrayList<>();
-            if (p.getCollisionPolygons() != null) {
-                collisionPolygons.addAll(p.getCollisionPolygons());
-            }
-
             Landscape l = new Landscape(
                     p, name, type, path,
                     true, level,
-                    coverLine, collisionPolygons);
+                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
             l.setPos(pos);
             output.add(l);
         }

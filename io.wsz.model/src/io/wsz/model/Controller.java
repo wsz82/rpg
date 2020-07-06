@@ -21,16 +21,21 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
     private static Controller singleton;
     private static File programDir;
+
+    private final AtomicBoolean isInventory = new AtomicBoolean(false);
     private final LinkedList<Creature> heroes = new LinkedList<>();
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private final Coords posToCenter = new Coords();
+
+
     private Location locationToUpdate;
-    private Creature creatureToOpenContainer;
+    private Creature creatureToOpenInventory;
     private Container containerToOpen;
     private PosItem asking;
     private PosItem answering;
@@ -150,12 +155,12 @@ public class Controller {
         return Board.get().getBoardPos();
     }
 
-    public Creature getCreatureToOpenContainer() {
-        return creatureToOpenContainer;
+    public Creature getCreatureToOpenInventory() {
+        return creatureToOpenInventory;
     }
 
-    public void setCreatureToOpenContainer(Creature creatureToOpenContainer) {
-        this.creatureToOpenContainer = creatureToOpenContainer;
+    public void setCreatureToOpenInventory(Creature creatureToOpenContainer) {
+        this.creatureToOpenInventory = creatureToOpenContainer;
     }
 
     public void setContainerToOpen(Container container) {
@@ -213,5 +218,19 @@ public class Controller {
         for (Creature hero : Controller.get().getHeroes()) {
             hero.setPortrait(null);
         }
+    }
+
+    public boolean isInventory() {
+        return isInventory.get();
+    }
+
+    public void setInventory(boolean inventory) {
+        isInventory.set(inventory);
+    }
+
+    public void closeInventory() {
+        setInventory(false);
+        setContainerToOpen(null);
+        setCreatureToOpenInventory(null);
     }
 }

@@ -98,7 +98,8 @@ public class ItemsStage<A extends Containable> extends ChildStage {
         for (TableItem ti : items) {
             int count = ti.count;
             for (int i = 0; i < count; i++) {
-                output.add(ti.equipment);
+                Equipment e = ti.equipment;
+                output.add(e.cloneEquipment());
             }
         }
         return output;

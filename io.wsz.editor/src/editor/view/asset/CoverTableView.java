@@ -36,31 +36,22 @@ public class CoverTableView extends AssetsTableView<Cover> {
     protected List<Cover> createItems(Coords rawPos, int level) {
         List<Cover> selectedAssets = getSelectionModel().getSelectedItems();
         List<Cover> output = new ArrayList<>(1);
-        for (Cover c
+        for (Cover p
                 : selectedAssets) {
             Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
-                double height = c.getImage().getHeight() / Sizes.getMeter();
+                double height = p.getImage().getHeight() / Sizes.getMeter();
                 pos.y = pos.y - height;
             }
 
-            String name = c.getName();
-            ItemType type = c.getType();
-            String path = c.getRelativePath();
-
-            List<Coords> coverLine = new ArrayList<>();
-            if (c.getCoverLine() != null) {
-                coverLine.addAll(c.getCoverLine());
-            }
-            List<List<Coords>> collisionPolygons = new ArrayList<>();
-            if (c.getCollisionPolygons() != null) {
-                collisionPolygons.addAll(c.getCollisionPolygons());
-            }
+            String name = p.getName();
+            ItemType type = p.getType();
+            String path = p.getRelativePath();
 
             Cover cover = new Cover(
-                    c, name, type, path,
+                    p, name, type, path,
                     true, level,
-                    coverLine, collisionPolygons);
+                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
             cover.setPos(pos);
             output.add(cover);
         }

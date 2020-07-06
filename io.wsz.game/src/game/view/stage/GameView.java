@@ -35,22 +35,26 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends Canvas {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
+
     private final Stage parent;
     private final Controller controller = Controller.get();
     private final Board board = controller.getBoard();
+    private final GameController gameController = GameController.get();
     private final List<PosItem> items = new ArrayList<>(0);
     private final Coords currentPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
     private final Coords selFirst = new Coords(-1, -1, null);
     private final Coords selSecond = new Coords(-1, -1, null);
-    private final GameController gameController = GameController.get();
     private final BarView barView = new BarView(this);
+
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
     private DialogView dialogView;
+    private InventoryView inventoryView;
     private boolean dialogStarted = true;
+    private boolean inventoryStarted = true;
     private boolean constantWalk;
     private boolean selectionMode;
 
@@ -79,6 +83,23 @@ public class GameView extends Canvas {
             dialogStarted = true;
             hookUpRemovableEvents();
         }
+
+        if (controller.isInventory()) {
+            barView.refresh();
+            if (inventoryStarted) {
+                inventoryStarted = false;
+                removeEvents();
+                inventoryView = new InventoryView(this);
+            }
+            inventoryView.refresh();
+            return;
+        }
+        if (!inventoryStarted) {
+            constantWalk = false;
+            inventoryStarted = true;
+            hookUpRemovableEvents();
+        }
+
         setSize();
         if (getWidth() == 0) {
             return;
@@ -155,12 +176,12 @@ public class GameView extends Canvas {
             }
         }
 
-        if (Settings.isShowBar()) {
-            barView.refresh();
-        }
-
         if (selectionMode) {
             drawSelection(gc);
+        }
+
+        if (Settings.isShowBar()) {
+            barView.refresh();
         }
     }
 
@@ -186,13 +207,13 @@ public class GameView extends Canvas {
         gc.strokeRect(x, y, width, height);
     }
 
-    private void translateCoordsToScreenCoords(Coords first) {
-        modifiedCoords.x = first.x;
-        modifiedCoords.y = first.y;
+    private void translateCoordsToScreenCoords(Coords pos) {
+        modifiedCoords.x = pos.x;
+        modifiedCoords.y = pos.y;
         modifiedCoords.subtract(currentPos);
     }
 
-    private Coords getMouseCoords(double mouseX, double mouseY, double left, double top) {
+    private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
         mousePos.x = (mouseX - left) / Sizes.getMeter();
         mousePos.y = (mouseY - top) / Sizes.getMeter();
         return mousePos;
@@ -226,7 +247,7 @@ public class GameView extends Canvas {
         }
 
         if (selectionMode) {
-            Coords pos = getMouseCoords(x, y, left, top);
+            Coords pos = getMousePos(x, y, left, top);
             modifiedCoords.x = pos.x;
             modifiedCoords.y = pos.y;
             modifiedCoords.add(currentPos);
@@ -241,7 +262,7 @@ public class GameView extends Canvas {
         }
 
         if (constantWalk) {
-            Coords pos = getMouseCoords(x, y, left, top);
+            Coords pos = getMousePos(x, y, left, top);
             modifiedCoords.x = pos.x;
             modifiedCoords.y = pos.y;
             modifiedCoords.add(currentPos);
@@ -435,7 +456,6 @@ public class GameView extends Canvas {
                 }
                 case I -> {
                     e.consume();
-                    constantWalk = false;
                     synchronized (gameController.getGameRunner()) {
                         openInventory();
                     }
@@ -539,7 +559,8 @@ public class GameView extends Canvas {
             return;
         }
         Creature active = controlled.get(0);
-        gameController.openInventory(active, null);
+        controller.setCreatureToOpenInventory(active);
+        controller.setInventory(true);
     }
 
     private void centerScreenOn(Coords posToCenter) {
