@@ -28,6 +28,8 @@ public class Container extends Equipment<Container> implements Containable {
     public Container cloneEquipment() {
         Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level,
                 Coords.cloneCoordsList(prototype.coverLine), Coords.cloneCoordsPolygons(prototype.getCollisionPolygons()));
+        clone.getPos().x = this.pos.x;
+        clone.getPos().y = this.pos.y;
         clone.setWeight(weight);
         clone.setSize(size);
         clone.getItems().addAll(Equipment.cloneEquipmentList(getItems()));
