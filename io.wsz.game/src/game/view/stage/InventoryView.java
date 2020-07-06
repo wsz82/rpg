@@ -101,6 +101,8 @@ public class InventoryView {
         origin = ev;
         translateScreenCoordsToCoords(mousePos, ev.getCurrentPos(), ev.getViewPos());
         Equipment eq = lookForEquipment(modifiedCoords.x, modifiedCoords.y, ev);
+        Container con = Controller.get().getContainerToOpen();
+        if (eq == con) return;
         if (eq != null) {
             ev.remove(eq, Controller.get().getCreatureToOpenInventory());
             dragged[0] = eq.cloneEquipment();
@@ -110,6 +112,7 @@ public class InventoryView {
     private void stopDrag() {
         EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
         Equipment toAdd = dragged[0];
+        if (toAdd == null) return;
         Creature cr = Controller.get().getCreatureToOpenInventory();
         if (ev == null) {
             Coords extreme = origin.getExtremePos(mousePos, draggedEquipmentCoords, toAdd);
@@ -233,7 +236,6 @@ public class InventoryView {
 
     private void drawHold(double inventoryWidth, Creature cr) {
         Inventory inventory = cr.getInventory();
-        List<Equipment> hold = inventory.getItems();
 
         double holdWidth = 0.6 * inventoryWidth / Sizes.getMeter();
         double holdHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
@@ -242,7 +244,7 @@ public class InventoryView {
 
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
-        holdView.setItems(hold);
+        holdView.setInventory(inventory);
         holdView.refresh();
     }
 
@@ -254,16 +256,17 @@ public class InventoryView {
         double x = 0.6 * inventoryWidth / Sizes.getMeter();
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
 
-        dropView.setViewPos(x, y);
 //        dropView.setCreaturePos(cr.getCenterBottomPos());
         double range = cr.getRange();
         double width = cr.getSize().getWidth() + 2*range;
         if (width > maxDropWidth) width = maxDropWidth;
         double height = cr.getSize().getHeight() + 2*range;
         if (height > maxDropHeight) height = maxDropHeight;
+
+        dropView.setViewPos(x, y);
         dropView.setCurrentPos(cr.getCenterBottomPos().x - width/2, cr.getCenterBottomPos().y - height/2);
         dropView.setSize(width, height);
-        dropView.setItems(equipmentWithinRange);
+        dropView.setDroppedEquipment(equipmentWithinRange);
         dropView.refresh();
     }
 
@@ -272,7 +275,6 @@ public class InventoryView {
         if (c == null) {
             return;
         }
-        List<Equipment> items = c.getItems();
         double width = 0.3 * inventoryWidth / Sizes.getMeter();
         double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
         double x = 0.3 * inventoryWidth / Sizes.getMeter();
@@ -280,7 +282,7 @@ public class InventoryView {
 
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
-        containerView.setItems(items);
+        containerView.setContainer(c);
         containerView.refresh();
     }
 

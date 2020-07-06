@@ -3,7 +3,10 @@ package game.view.stage;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.stage.Coords;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 
 import java.util.List;
 
@@ -13,7 +16,6 @@ public abstract class EquipmentView {
     protected final Coords viewPos = new Coords();
     protected final Coords currentPos = new Coords();
 
-    protected List<Equipment> equipment;
     protected double viewWidth;
     protected double viewHeight;
 
@@ -55,14 +57,6 @@ public abstract class EquipmentView {
         this.viewHeight = height;
     }
 
-    public void setItems(List<Equipment> hold) {
-        equipment = hold;
-    }
-
-    public List<Equipment> getItems() {
-        return equipment;
-    }
-
     public double getViewWidth() {
         return viewWidth;
     }
@@ -89,9 +83,31 @@ public abstract class EquipmentView {
         return viewPos;
     }
 
+    protected void drawSize(int filledSpace, int maxSize, double x, double y) {
+        gc.setTextBaseline(VPos.TOP);
+        gc.setTextAlign(TextAlignment.CENTER);
+
+        Color filledSpaceTextColor;
+        if (filledSpace >= maxSize) {
+            filledSpaceTextColor = Color.RED;
+        } else {
+            filledSpaceTextColor = Color.BLACK;
+        }
+        gc.setStroke(filledSpaceTextColor);
+        String filled = String.valueOf(filledSpace);
+        gc.strokeText(filled, x, y);
+
+        gc.setStroke(Color.BLACK);
+        y += gc.getFont().getSize();
+        String max = String.valueOf(maxSize);
+        gc.strokeText(max, x, y);
+    }
+
     public abstract void remove(Equipment e, Creature cr);
 
     public abstract void add(Equipment e, Creature cr, double x, double y);
+
+    public abstract List<Equipment> getItems();
 
     public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
         if (mousePos.x < viewPos.x) {

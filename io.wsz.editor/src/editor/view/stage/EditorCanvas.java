@@ -65,7 +65,7 @@ public class EditorCanvas extends Canvas {
                 })
                 .collect(Collectors.toList());
 
-        Board.get().sortItems(items);
+        Board.get().sortPosItems(items);
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {

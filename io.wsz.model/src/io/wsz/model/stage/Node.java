@@ -5,28 +5,28 @@ import io.wsz.model.item.PosItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
-    private PosItem content;
-    private final List<Node> greater = new ArrayList<>(0);
-    private final List<Node> lesser = new ArrayList<>(0);
+public class Node<A extends PosItem> {
+    private A content;
+    private final List<Node<A>> greater = new ArrayList<>(0);
+    private final List<Node<A>> lesser = new ArrayList<>(0);
 
-    public Node(PosItem content) {
+    public Node(A content) {
         this.content = content;
     }
 
-    public PosItem getItem() {
+    public A getItem() {
         return content;
     }
 
-    public void setContent(PosItem content) {
+    public void setContent(A content) {
         this.content = content;
     }
 
-    public List<Node> getGreater() {
+    public List<Node<A>> getGreater() {
         return greater;
     }
 
-    public List<Node> getLesser() {
+    public List<Node<A>> getLesser() {
         return lesser;
     }
 

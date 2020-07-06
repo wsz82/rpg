@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
@@ -8,14 +9,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class ContainerView extends EquipmentView {
+    private Container container;
 
     public ContainerView(GraphicsContext gc) {
         super(gc);
     }
 
     protected final void drawEquipment() {
-        for (Equipment e : equipment) {
+        for (Equipment e : getItems()) {
             final Coords pos = e.getPos();
             Coords screenCoords = translateCoordsToScreenCoords(pos);
             final double x = (screenCoords.x * Sizes.getMeter());
@@ -53,6 +57,22 @@ public class ContainerView extends EquipmentView {
             }
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
         }
+
+        drawContainerSize();
+    }
+
+    private void drawContainerSize() {
+        double x = (viewPos.x + 4.0/5*viewWidth) * Sizes.getMeter();
+        double y = viewPos.y*Sizes.getMeter() - gc.getFont().getSize()*3;
+        drawSize(container.getFilledSpace(), container.getSize() - container.getNettoSize(), x, y);
+    }
+
+    public Container getContainer() {
+        return container;
+    }
+
+    public void setContainer(Container container) {
+        this.container = container;
     }
 
     @Override
@@ -70,6 +90,16 @@ public class ContainerView extends EquipmentView {
     @Override
     public void add(Equipment e, Creature cr, double x, double y) {
         e.setPos(x, y, null);
-        getItems().add(e);
+        if (!container.add(e)) {
+            Coords bottom = cr.getCenterBottomPos();
+            double dropX = bottom.x - e.getImageWidth()/2;
+            double dropY = bottom.y - e.getImageHeight()/2;
+            e.onDrop(cr, dropX, dropY);
+        }
+    }
+
+    @Override
+    public List<Equipment> getItems() {
+        return container.getItems();
     }
 }

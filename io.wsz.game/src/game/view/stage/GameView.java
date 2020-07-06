@@ -129,7 +129,7 @@ public class GameView extends Canvas {
                 .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
                 .collect(Collectors.toCollection(() -> items));
 
-        board.sortItems(items);
+        board.sortPosItems(items);
 
         for (PosItem pi : items) {
             final ItemType type = pi.getType();

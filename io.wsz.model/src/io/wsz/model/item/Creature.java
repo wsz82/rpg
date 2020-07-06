@@ -209,8 +209,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public List<Equipment> getEquipmentWithinRange() {
-        Coords[] poss = getCornersAndCenter();
-        return Controller.get().getBoard().getEquipmentWithinRange(poss, this);
+        return Controller.get().getBoard().getEquipmentWithinRange(this);
     }
 
     public double getDistance(double x1, double x2, double y1, double y2) {

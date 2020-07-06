@@ -8,15 +8,18 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class DropView extends EquipmentView{
     private final Coords creaturePos = new Coords();
+    private List<Equipment> droppedEquipment;
 
     public DropView(GraphicsContext gc) {
         super(gc);
     }
 
     protected final void drawEquipment() {
-        for (Equipment e : equipment) {
+        for (Equipment e : droppedEquipment) {
             final Coords pos = e.getPos();
             Coords screenCoords = translateCoordsToScreenCoords(pos);
             final double x = (screenCoords.x * Sizes.getMeter());
@@ -56,6 +59,10 @@ public class DropView extends EquipmentView{
         }
     }
 
+    public void setDroppedEquipment(List<Equipment> droppedEquipment) {
+        this.droppedEquipment = droppedEquipment;
+    }
+
     @Override
     protected void drawBackground() {
         gc.setFill(Color.BROWN);
@@ -70,12 +77,17 @@ public class DropView extends EquipmentView{
 
     @Override
     public void remove(Equipment e, Creature cr) {
-        e.onTake(cr, 0, 0);
-        getItems().remove(e);
+        e.onTake(cr, 0, 0); //TODO
+        droppedEquipment.remove(e);
     }
 
     @Override
     public void add(Equipment e, Creature cr, double x, double y) {
         e.onDrop(cr, x, y);
+    }
+
+    @Override
+    public List<Equipment> getItems() {
+        return droppedEquipment;
     }
 }

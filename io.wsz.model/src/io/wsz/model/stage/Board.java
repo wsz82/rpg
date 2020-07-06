@@ -16,7 +16,8 @@ import static java.lang.Math.*;
 
 public class Board {
     private static Board singleton;
-    private final GraphSorter graphSorter = new GraphSorter();
+    private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
+    private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
     private final Coords boardPos = new Coords(0, 0, null);
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
@@ -63,7 +64,7 @@ public class Board {
         if (items.isEmpty()) {
             return null;
         }
-        sortItems(items);
+        this.sortPosItems(items);
         Collections.reverse(items);
 
         for (PosItem pi : items) {
@@ -244,7 +245,7 @@ public class Board {
         return null;
     }
 
-    public List<Equipment> getEquipmentWithinRange(Coords[] poss, Creature cr) {
+    public List<Equipment> getEquipmentWithinRange(Creature cr) {
         equipmentResult.clear();
         items.clear();
         Location location = cr.getPos().getLocation();
@@ -259,8 +260,6 @@ public class Board {
         if (equipment.isEmpty()) {
             return equipmentResult;
         }
-        sortItems(items);
-        Collections.reverse(items);
 
         double range = cr.getRange();
         double width = cr.getSize().getWidth() + 2*range;
@@ -272,6 +271,7 @@ public class Board {
                 equipmentResult.add(e);
             }
         }
+        sortEquipment(equipmentResult);
         return equipmentResult;
     }
 
@@ -396,7 +396,11 @@ public class Board {
         return creatures;
     }
 
-    public void sortItems(List<PosItem> items) {
-        graphSorter.sortItems(items);
+    public void sortPosItems(List<PosItem> items) {
+        posItemGraphSorter.sortItems(items);
+    }
+
+    public void sortEquipment(List<Equipment> items) {
+        equipmentGraphSorter.sortItems(items);
     }
 }
