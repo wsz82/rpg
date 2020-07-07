@@ -82,7 +82,7 @@ public class Task implements Serializable {
             dest.x = -1;
             return;
         }
-        double dist = creature.getDistance(x1, x2, y1, y2);
+        double dist = Coords.getDistance(creature.pos, dest);
         double moveDist = creature.getSpeed();
         if (dist < creature.getSpeed()) {
             moveDist = dist;

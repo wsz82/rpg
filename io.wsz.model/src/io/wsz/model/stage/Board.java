@@ -131,24 +131,15 @@ public class Board {
         return creatures;
     }
 
-    public Creature getCornersCreature(Coords[] corners, Creature cr) {
+    public Creature getCornersCreature(Creature cr, Coords nextPos) {
         Location location = cr.getPos().getLocation();
         List<Creature> creatures = getCreatures(location);
-        if (creatures.isEmpty()) {
-            return null;
-        }
+        if (creatures.isEmpty()) return null;
 
         for (Creature c : creatures) {
-            if (cr == c) {
-                continue;
-            }
-            for (Coords pos : corners) {
-                Coords cPos = c.getCenterBottomPos();
-                double width = c.getSize().getWidth();
-                double height = c.getSize().getHeight();
-
-                if (pointWithinEllipse(pos, cPos, width, height)) return c;
-            }
+            if (cr == c) continue;
+            Coords cPos = c.getCenterBottomPos();
+            if (Coords.ovalsIntersect(nextPos, cr.getSize(), cPos, c.getSize())) return c;
         }
         return null;
     }

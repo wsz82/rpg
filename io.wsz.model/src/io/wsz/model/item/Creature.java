@@ -60,7 +60,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         Coords[] poss = getCornersAndCenter(nextPos);
         PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(poss, pos.getLocation());
         if (collidedObstacle == null) {
-            return Controller.get().getBoard().getCornersCreature(poss, this);
+            return Controller.get().getBoard().getCornersCreature(this, nextPos);
         }
         return collidedObstacle;
     }
@@ -188,7 +188,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         Coords ePos = cr.getCenterBottomPos();
         Coords[] poss = getCornersAndCenter();
         for (Coords corner : poss) {
-            double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
+            double dist = Coords.getDistance(corner, ePos);
             if (dist <= getRange()) {
                 return true;
             }
@@ -200,7 +200,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         Coords ePos = e.getCenter();
         Coords[] poss = getCornersAndCenter();
         for (Coords corner : poss) {
-            double dist = getDistance(corner.x, ePos.x, corner.y, ePos.y);
+            double dist = Coords.getDistance(corner, ePos);
             if (dist <= getRange()) {
                 return true;
             }
@@ -210,10 +210,6 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public List<Equipment> getEquipmentWithinRange() {
         return Controller.get().getBoard().getEquipmentWithinRange(this);
-    }
-
-    public double getDistance(double x1, double x2, double y1, double y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
     private void checkTask() {

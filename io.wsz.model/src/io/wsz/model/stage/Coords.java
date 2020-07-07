@@ -1,5 +1,6 @@
 package io.wsz.model.stage;
 
+import io.wsz.model.item.CreatureSize;
 import io.wsz.model.location.Location;
 
 import java.io.Externalizable;
@@ -9,6 +10,9 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 
 public class Coords implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -71,6 +75,22 @@ public class Coords implements Externalizable {
             return false;
         }
         return o1y_top <= o2y_bottom && o2y_top <= o1y_bottom;
+    }
+
+    public static boolean ovalsIntersect(Coords c1, CreatureSize s1, Coords c2, CreatureSize s2) {
+        double xDif = Math.abs(c1.x - c2.x);
+        double yDif = Math.abs(c1.y - c2.y);
+        double ratio = s1.getWidth() / s1.getHeight();
+        yDif *= ratio;
+        double r1 = s1.getWidth() / 2;
+        double r2 = s2.getWidth() / 2;
+        double dist = sqrt(pow(xDif, 2) + pow(yDif, 2));
+        double radiusSum = r1 + r2;
+        return dist <= radiusSum;
+    }
+
+    public static double getDistance(Coords c1, Coords c2) {
+        return sqrt(pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2));
     }
 
     public double x;
