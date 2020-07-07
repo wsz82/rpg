@@ -18,6 +18,14 @@ public class ContainerView extends EquipmentView {
         super(gc);
     }
 
+    @Override
+    public void refresh() {
+        super.refresh();
+
+        drawEquipment();
+    }
+
+    @Override
     protected final void drawEquipment() {
 
         selectItems();

@@ -155,9 +155,7 @@ public class InventoryView {
             double evBottom = evTop + ev.getViewHeight();
 
             if (x > evLeft && x < evRight
-                    && y > evTop && y < evBottom) {
-                return ev;
-            }
+                    && y > evTop && y < evBottom) return ev;
         }
         return null;
     }
@@ -176,9 +174,7 @@ public class InventoryView {
 
     public void refresh() {
         double width = canvas.getWidth();
-        if (width == 0) {
-            return;
-        }
+        if (width == 0) return;
         double right = (width - Settings.getBarPart()*width) / Sizes.getMeter();
 
         Creature cr = Controller.get().getCreatureToOpenInventory();
@@ -198,9 +194,7 @@ public class InventoryView {
 
     private void checkPos() {
         Bounds b = canvas.localToScreen(canvas.getBoundsInLocal());
-        if (b == null) {
-            return;
-        }
+        if (b == null) return;
         double left = b.getMinX();
         double top = b.getMinY();
         double right = b.getMaxX();
@@ -213,9 +207,7 @@ public class InventoryView {
         if (x < left
                 || x > right
                 || y < top
-                || y > bottom) {
-            return;
-        }
+                || y > bottom) return;
 
         Equipment drag = dragged[0];
         if (drag != null) {
@@ -275,7 +267,8 @@ public class InventoryView {
         }
 
         dropView.setViewPos(x, y);
-        dropView.setCurrentPos(cr.getCenterBottomPos().x - resultWidth/2, cr.getCenterBottomPos().y - resultHeight/2);
+        Coords bottom = cr.getCenterBottomPos();
+        dropView.setCurrentPos(bottom.x - resultWidth/2, bottom.y - resultHeight/2);
         dropView.setSize(resultWidth, resultHeight);
         dropView.setDroppedEquipment(equipmentWithinRange);
         dropView.refresh();
@@ -284,12 +277,8 @@ public class InventoryView {
     private void drawContainer(double inventoryWidth) {
         Creature cr = Controller.get().getCreatureToOpenInventory();
         Container c = Controller.get().getContainerToOpen();
-        if (c == null) {
-            return;
-        }
-        if (!cr.withinRange(c)) {
-            return;
-        }
+        if (c == null) return;
+        if (!cr.withinRange(c)) return;
         double width = 0.3 * inventoryWidth;
         double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
         double x = 0.3 * inventoryWidth;
@@ -317,12 +306,8 @@ public class InventoryView {
 
     public Equipment lookForEquipment(double x, double y, EquipmentView ev) {
         Coords currentPos = ev.getCurrentPos();
-        if (x < currentPos.x || x > currentPos.x + ev.getViewWidth()) {
-            return null;
-        }
-        if (y < currentPos.y || y > currentPos.y + ev.getViewHeight()) {
-            return null;
-        }
+        if (x < currentPos.x || x > currentPos.x + ev.getViewWidth()) return null;
+        if (y < currentPos.y || y > currentPos.y + ev.getViewHeight()) return null;
         lookedEquipment.clear();
         lookedEquipment.addAll(ev.getItems());
         Collections.reverse(lookedEquipment);
@@ -330,16 +315,12 @@ public class InventoryView {
             double cX = eq.getLeft();
             double cWidth = eq.getImageWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) {
-                continue;
-            }
+            if (!fitX) continue;
 
             double cY = eq.getTop();
             double cHeight = eq.getImageHeight();
             boolean fitY = y >= cY && y <= cY + cHeight;
-            if (!fitY) {
-                continue;
-            }
+            if (!fitY) continue;
 
             Image img = eq.getImage();
             int imgX = (int) ((x - cX) * Sizes.getMeter());
@@ -351,9 +332,7 @@ public class InventoryView {
                 continue;
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                continue;
-            }
+            if (isPixelTransparent) continue;
             draggedEquipmentCoords.x = (double) imgX / Sizes.getMeter();
             draggedEquipmentCoords.y = (double) imgY / Sizes.getMeter();
             return eq;

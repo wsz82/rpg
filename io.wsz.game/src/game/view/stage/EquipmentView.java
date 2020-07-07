@@ -26,13 +26,11 @@ public abstract class EquipmentView {
         this.gc = gc;
     }
 
-    public final void refresh() {
+    public void refresh() {
         if (viewWidth < 0 || viewHeight < 0) {
             return;
         }
         drawBackground();
-
-        drawEquipment();
     }
 
     protected abstract void drawEquipment();

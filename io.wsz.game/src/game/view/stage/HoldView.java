@@ -20,6 +20,14 @@ public class HoldView extends EquipmentView {
         super(gc);
     }
 
+    @Override
+    public void refresh() {
+        super.refresh();
+
+        drawEquipment();
+    }
+
+    @Override
     protected final void drawEquipment() {
 
         selectItems();

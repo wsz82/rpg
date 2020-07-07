@@ -18,6 +18,29 @@ public class DropView extends EquipmentView{
         super(gc);
     }
 
+    @Override
+    public void refresh() {
+        super.refresh();
+
+        gc.save();
+
+        gc.beginPath();
+        double centerX = (viewPos.x + viewWidth/2) * Sizes.getMeter();
+        double centerY = (viewPos.y + viewHeight/2) * Sizes.getMeter();
+        double radiusX = viewWidth / 2 * Sizes.getMeter();
+        double radiusY = viewHeight / 2 * Sizes.getMeter();
+        int startAngle = 0;
+        int length = 360;
+        gc.arc(centerX, centerY, radiusX, radiusY, startAngle, length);
+        gc.setFill(Color.BLACK);
+        gc.closePath();
+        gc.clip();
+
+        drawEquipment();
+        gc.restore();
+    }
+
+    @Override
     protected final void drawEquipment() {
 
         selectItems();
