@@ -184,6 +184,7 @@ public class GameRunner {
         l.getItems().get().addAll(p);
         for (PosItem pi : p) {
             pi.getPos().setLocation(l);
+            pi.setVisible(true);
         }
         p.clear();
     }
@@ -196,6 +197,7 @@ public class GameRunner {
         l.getItems().get().removeAll(p);
         for (PosItem pi : p) {
             pi.getPos().setLocation(null);
+            pi.setVisible(true);
         }
         p.clear();
     }

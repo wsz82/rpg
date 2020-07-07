@@ -80,7 +80,7 @@ public class DropView extends EquipmentView{
 
     @Override
     public void remove(Equipment e, Creature cr) {
-        e.onTake(cr, 0, 0); //TODO
+        e.onTake(cr, 0, 0);
         droppedEquipment.remove(e);
     }
 

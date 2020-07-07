@@ -75,6 +75,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         pos.x = x;
         pos.y = y;
         level = 0;
+        setVisible(false);
         cr.pos.getLocation().getItemsToRemove().add(this);
     }
 
