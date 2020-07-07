@@ -19,7 +19,10 @@ public class DropView extends EquipmentView{
     }
 
     protected final void drawEquipment() {
-        for (Equipment e : droppedEquipment) {
+
+        selectItems();
+
+        for (Equipment e : items) {
             final Coords pos = e.getPos();
             Coords screenCoords = translateCoordsToScreenCoords(pos);
             final double x = (screenCoords.x * Sizes.getMeter());

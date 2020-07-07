@@ -176,11 +176,10 @@ public class InventoryView {
 
     public void refresh() {
         double width = canvas.getWidth();
-        double canvasWidth = width;
-        if (canvasWidth == 0) {
+        if (width == 0) {
             return;
         }
-        double right = width - Settings.getBarPart()*width;
+        double right = (width - Settings.getBarPart()*width) / Sizes.getMeter();
 
         Creature cr = Controller.get().getCreatureToOpenInventory();
 
@@ -237,9 +236,9 @@ public class InventoryView {
     private void drawHold(double inventoryWidth, Creature cr) {
         Inventory inventory = cr.getInventory();
 
-        double holdWidth = 0.6 * inventoryWidth / Sizes.getMeter();
+        double holdWidth = 0.6 * inventoryWidth;
         double holdHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
-        double x = 0.3 * inventoryWidth / Sizes.getMeter();
+        double x = 0.3 * inventoryWidth;
         double y = 0.6 * canvas.getHeight() / Sizes.getMeter();
 
         holdView.setViewPos(x, y);
@@ -251,21 +250,33 @@ public class InventoryView {
     private void drawDrop(double inventoryWidth, Creature cr) {
         List<Equipment> equipmentWithinRange = cr.getEquipmentWithinRange();
 
-        double maxDropWidth = 0.3 * inventoryWidth / Sizes.getMeter();
-        double maxDropHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
-        double x = 0.6 * inventoryWidth / Sizes.getMeter();
+        double x = 0.6 * inventoryWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
-
 //        dropView.setCreaturePos(cr.getCenterBottomPos());
         double range = cr.getRange();
-        double width = cr.getSize().getWidth() + 2*range;
-        if (width > maxDropWidth) width = maxDropWidth;
+
         double height = cr.getSize().getHeight() + 2*range;
-        if (height > maxDropHeight) height = maxDropHeight;
+        double width = cr.getSize().getWidth() + 2*range;
+
+        double maxDropHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
+        double maxDropWidth = 0.3 * inventoryWidth;
+
+        double resultHeight = height;
+        double resultWidth = width;
+
+        if (height >= maxDropHeight) {
+            resultHeight = maxDropHeight;
+            double ratio = maxDropWidth/height;
+            resultWidth = width*ratio;
+        } else if (width >= maxDropWidth) {
+            resultWidth = maxDropWidth;
+            double ratio = maxDropHeight/width;
+            resultHeight = height*ratio;
+        }
 
         dropView.setViewPos(x, y);
-        dropView.setCurrentPos(cr.getCenterBottomPos().x - width/2, cr.getCenterBottomPos().y - height/2);
-        dropView.setSize(width, height);
+        dropView.setCurrentPos(cr.getCenterBottomPos().x - resultWidth/2, cr.getCenterBottomPos().y - resultHeight/2);
+        dropView.setSize(resultWidth, resultHeight);
         dropView.setDroppedEquipment(equipmentWithinRange);
         dropView.refresh();
     }
@@ -279,9 +290,9 @@ public class InventoryView {
         if (!cr.withinRange(c)) {
             return;
         }
-        double width = 0.3 * inventoryWidth / Sizes.getMeter();
+        double width = 0.3 * inventoryWidth;
         double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
-        double x = 0.3 * inventoryWidth / Sizes.getMeter();
+        double x = 0.3 * inventoryWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
 
         containerView.setViewPos(x, y);
@@ -293,7 +304,7 @@ public class InventoryView {
     private void drawCreature(double inventoryWidth, Creature cr) {
         Image img = cr.getImage();
 
-        double x = 0.1 * inventoryWidth;
+        double x = 0.1 * inventoryWidth * Sizes.getMeter();
         double y = 0.2 * canvas.getHeight();
 
         gc.drawImage(img, x, y);
@@ -301,7 +312,7 @@ public class InventoryView {
 
     private void drawBackground(double inventoryWidth) {
         gc.setFill(Color.DARKGRAY);
-        gc.fillRect(0, 0, inventoryWidth, canvas.getHeight());
+        gc.fillRect(0, 0, inventoryWidth * Sizes.getMeter(), canvas.getHeight());
     }
 
     public Equipment lookForEquipment(double x, double y, EquipmentView ev) {

@@ -8,13 +8,16 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class EquipmentView {
-    protected final GraphicsContext gc;
+    protected final List<Equipment> items = new ArrayList<>(0);
     protected final Coords modifiedCoords = new Coords();
     protected final Coords viewPos = new Coords();
     protected final Coords currentPos = new Coords();
+    protected final GraphicsContext gc;
 
     protected double viewWidth;
     protected double viewHeight;
@@ -33,6 +36,26 @@ public abstract class EquipmentView {
     }
 
     protected abstract void drawEquipment();
+
+    protected void selectItems() {
+        double left = currentPos.x;
+        double right = left + viewWidth;
+        double top = currentPos.y;
+        double bottom = top + viewHeight;
+
+        items.clear();
+        getItems().stream()
+                .filter(e -> {
+                    double eLeft = e.getLeft();
+                    double eRight = e.getRight();
+                    double eTop = e.getTop();
+                    double eBottom = e.getBottom();
+                    return Coords.doOverlap(
+                            left, top, right, bottom,
+                            eLeft, eTop, eRight, eBottom);
+                })
+                .collect(Collectors.toCollection(() -> items));
+    }
 
     protected abstract void drawBackground();
 
