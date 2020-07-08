@@ -135,8 +135,8 @@ public class GameView extends Canvas {
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
             translateCoordsToScreenCoords(pos);
-            final double x = (modifiedCoords.x * Sizes.getMeter());
-            final double y = (modifiedCoords.y * Sizes.getMeter());
+            final double x = modifiedCoords.x * Sizes.getMeter();
+            final double y = modifiedCoords.y * Sizes.getMeter();
 
             if (pi.getVisible()) {
                 switch (type) {

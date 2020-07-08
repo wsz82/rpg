@@ -238,7 +238,10 @@ public class InventoryView {
     }
 
     private void drawDrop(double inventoryWidth, Creature cr) {
-        List<Equipment> equipmentWithinRange = cr.getEquipmentWithinRange();
+        List<Equipment> equipmentWithinRange;
+        synchronized (GameController.get().getGameRunner()) {
+            equipmentWithinRange = cr.getEquipmentWithinRange();
+        }
 
         double x = 0.6 * inventoryWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
