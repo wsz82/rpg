@@ -30,6 +30,9 @@ public class Task implements Serializable {
     }
 
     public void doTask() {
+        if (isFinished()) {
+            return;
+        }
         if (dest.x != -1) {
             move();
             if (item != null) {
@@ -72,7 +75,15 @@ public class Task implements Serializable {
     }
 
     private void move() {
-        if (creature.getIndividualInventory().getActualWeight() > creature.getIndividualInventory().getMaxWeight()) {
+        Inventory inventory = creature.getIndividualInventory();
+        if (inventory.getActualWeight() > inventory.getMaxWeight()) {
+            System.out.println("Creature overloaded");
+            setFinished(true);
+            return;
+        }
+        if (inventory.getFilledSpace() > inventory.getMaxSize()) {
+            System.out.println("Creature carry too much");
+            setFinished(true);
             return;
         }
         double x1 = creature.pos.x;

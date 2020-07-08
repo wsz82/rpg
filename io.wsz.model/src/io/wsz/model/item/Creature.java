@@ -227,10 +227,12 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public void goTo(Coords pos) {
+        this.task.setFinished(false);
         this.task.setDest(reverseCenterBottomPos(pos));
     }
 
     private void setItemTask(PosItem e) {
+        this.task.setFinished(false);
         this.task.setItem(e);
     }
 
