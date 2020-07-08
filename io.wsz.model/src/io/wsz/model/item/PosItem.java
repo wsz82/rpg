@@ -41,6 +41,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.collisionPolygons = collisionPolygons;
     }
 
+    public Coords getImageCenter() {
+        center.x = pos.x + getImageWidth()/2;
+        center.y = pos.y + getImageHeight()/2;
+        return center;
+    }
+
     public Coords getCenter() {
         center.x = pos.x + getImageWidth()/2;
         center.y = pos.y + getImageHeight()/2;
@@ -80,6 +86,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         pos.x = targetX;
         pos.y = targetY;
         level = targetLayer.getLevel();
+    }
+
+    public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
+        return Coords.pointWithinOval(getCenter(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
     public Boolean getVisible() {

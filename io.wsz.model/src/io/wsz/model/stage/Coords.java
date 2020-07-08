@@ -88,12 +88,20 @@ public class Coords implements Externalizable {
     }
 
     public static boolean ovalsIntersect(Coords c1, CreatureSize s1, Coords c2, CreatureSize s2) {
+        return ovalsIntersect(c1, s1, c2, s2.getWidth());
+    }
+
+    public static boolean ovalsIntersect(Coords c1, CreatureSize s1, Coords c2, double w2) {
+        return ovalsIntersect(c1, s1.getWidth(), s1.getHeight(), c2, w2);
+    }
+
+    public static boolean ovalsIntersect(Coords c1, double w1, double h1, Coords c2, double w2) {
         double xDif = Math.abs(c1.x - c2.x);
         double yDif = Math.abs(c1.y - c2.y);
-        double ratio = s1.getWidth() / s1.getHeight();
+        double ratio = w1 / h1;
         yDif *= ratio;
-        double r1 = s1.getWidth() / 2;
-        double r2 = s2.getWidth() / 2;
+        double r1 = w1 / 2;
+        double r2 = w2 / 2;
         double dist = sqrt(pow(xDif, 2) + pow(yDif, 2));
         double radiusSum = r1 + r2;
         return dist <= radiusSum;
@@ -179,6 +187,18 @@ public class Coords implements Externalizable {
         return false;
     }
 
+    public static boolean pointWithinOval(Coords point, Coords ovalCenter, double width, double height) {
+        double x = point.x;
+        double y = point.y;
+        double h = ovalCenter.x;
+        double k = ovalCenter.y;
+        double rx = width /2;
+        double ry = height /2;
+
+        double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
+        return eq <= 1;
+    }
+
     public static double calcOvalLineIntersection(double radius, double x1, double x2, double y1, double y2) {
         return pow(radius, 2) * (pow(x2 - x1, 2) + pow(y2 - y1, 2)) - pow(x1*y2 - x2*y1, 2);
     }
@@ -190,12 +210,12 @@ public class Coords implements Externalizable {
     public static double getSquareDistance(Coords c1, Coords c2) {
         return pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2);
     }
-
     public static double getSquareDistance(double x1, double x2, double y1, double y2) {
         return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
 
     public double x;
+
     public double y;
 
     private Location location;

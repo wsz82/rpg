@@ -275,7 +275,7 @@ public class GameView extends Canvas {
             if (!controlledCreatures.isEmpty()) {
                 Creature cr = controlledCreatures.get(0);
                 if (cr != null) {
-                    centerScreenOn(cr.getCenterBottomPos());
+                    centerScreenOn(cr.getCenter());
                     return;
                 }
             }
@@ -351,7 +351,7 @@ public class GameView extends Canvas {
             return;
         }
         CreatureSize size = cr.getSize();
-        Coords centerBottomPos = cr.getCenterBottomPos();
+        Coords centerBottomPos = cr.getCenter();
         translateCoordsToScreenCoords(centerBottomPos);
         double x = modifiedCoords.x * Sizes.getMeter();
         double y = modifiedCoords.y * Sizes.getMeter();

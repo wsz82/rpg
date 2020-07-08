@@ -4,9 +4,7 @@ import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Container;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.Equipment;
-import io.wsz.model.item.Inventory;
+import io.wsz.model.item.*;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
@@ -267,7 +265,7 @@ public class InventoryView {
         }
 
         dropView.setViewPos(x, y);
-        Coords bottom = cr.getCenterBottomPos();
+        Coords bottom = cr.getCenter();
         dropView.setCurrentPos(bottom.x - resultWidth/2, bottom.y - resultHeight/2);
         dropView.setSize(resultWidth, resultHeight);
         dropView.setDroppedEquipment(equipmentWithinRange);
@@ -278,7 +276,8 @@ public class InventoryView {
         Creature cr = Controller.get().getCreatureToOpenInventory();
         Container c = Controller.get().getContainerToOpen();
         if (c == null) return;
-        if (!cr.withinRange(c)) return;
+        CreatureSize size = cr.getSize();
+        if (!c.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) return;
         double width = 0.3 * inventoryWidth;
         double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
         double x = 0.3 * inventoryWidth;

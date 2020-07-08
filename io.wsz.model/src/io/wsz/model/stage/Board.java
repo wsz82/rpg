@@ -12,7 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.*;
+import static java.lang.Math.tan;
+import static java.lang.Math.toRadians;
 
 public class Board {
     private static Board singleton;
@@ -141,91 +142,11 @@ public class Board {
 
         for (Creature c : creatures) {
             if (cr == c) continue;
-            Coords cPos = c.getCenterBottomPos();
+            Coords cPos = c.getCenter();
             if (Coords.ovalsIntersect(nextPos, cr.getSize(), cPos, c.getSize())) return c;
         }
         return null;
     }
-
-    public boolean pointWithinEllipse(Coords point, Coords center, double width, double height) {
-        double x = point.x;
-        double y = point.y;
-        double h = center.x;
-        double k = center.y;
-        double rx = width /2;
-        double ry = height /2;
-
-        double eq = pow(x - h, 2)/pow(rx, 2) + pow(y - k, 2)/pow(ry, 2);
-        return eq <= 1;
-    }
-
-//    public PosItem lookForObstacle(Coords[] poss, Location location) {
-//        if (location == null) return null;
-//        items.clear();
-//        location.getItems().get().stream()
-//                .filter(PosItem::getVisible)
-//                .filter(pi -> pi.getCollisionPolygons() != null)
-//                .filter(pi -> {
-//                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
-//                    return pi.getLevel().equals(level);
-//                })
-//                .collect(Collectors.toCollection(() -> items));
-//        if (items.isEmpty()) return null;
-//
-//        for (PosItem pi : items) {
-//            final Image img = pi.getImage();
-//            final Coords cPos = pi.getPos();
-//
-//            for (Coords pos : poss) {
-//                double x = pos.x;
-//                double y = pos.y;
-//
-//                double cX = cPos.x;
-//                double cWidth = img.getWidth() / Sizes.getMeter();
-//                boolean fitX = x >= cX && x <= cX + cWidth;
-//                if (!fitX) continue;
-//
-//                double cY = cPos.y;
-//                double cHeight = img.getHeight() / Sizes.getMeter();
-//                boolean fitY = y >= cY && y <= cY + cHeight;
-//                if (!fitY) continue;
-//
-//                final List<List<Coords>> cp = pi.getCollisionPolygons();
-//                for (List<Coords> polygon : cp) {
-//                    List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
-//                    Coords.translateCoords(lostRef, cX, cY);
-//
-//                    double maxObstacleX = lostRef.stream()
-//                            .mapToDouble(p -> p.x)
-//                            .max()
-//                            .getAsDouble();
-//                    double minObstacleX = lostRef.stream()
-//                            .mapToDouble(p -> p.x)
-//                            .min()
-//                            .getAsDouble();
-//                    boolean fitObstacleX = x >= minObstacleX && x <= maxObstacleX;
-//                    if (!fitObstacleX) continue;
-//
-//                    double maxObstacleY = lostRef.stream()
-//                            .mapToDouble(p -> p.y)
-//                            .max()
-//                            .getAsDouble();
-//                    double minObstacleY = lostRef.stream()
-//                            .mapToDouble(p -> p.y)
-//                            .min()
-//                            .getAsDouble();
-//                    boolean fitObstacleY = y >= minObstacleY && y <= maxObstacleY;
-//                    if (!fitObstacleY) continue;
-//
-//                    boolean isInsidePolygon = pos.isInsidePolygon(lostRef, maxObstacleX);
-//                    if (isInsidePolygon) {
-//                        return pi;
-//                    }
-//                }
-//            }
-//        }
-//        return null;
-//    }
 
     public PosItem lookForObstacle(Coords pos, Creature cr, Location location) {
         if (location == null) return null;
@@ -313,10 +234,10 @@ public class Board {
         double range = cr.getRange();
         double width = cr.getSize().getWidth() + 2*range;
         double height = cr.getSize().getHeight() + 2*range;
-        Coords point = cr.getCenterBottomPos();
+        Coords point = cr.getCenter();
         for (Equipment e : equipment) {
-            Coords center = e.getCenter();
-            if (pointWithinEllipse(point, center, width, height)) {
+            Coords center = e.getImageCenter();
+            if (Coords.pointWithinOval(point, center, width, height)) {
                 equipmentResult.add(e);
             }
         }
@@ -325,7 +246,7 @@ public class Board {
     }
 
     public Coords getFreePosAround(Creature cr) {
-        Coords pos = cr.getCenterBottomPos();
+        Coords pos = cr.getCenter();
 
         CreatureSize size = cr.getSize();
         double height = size.getHeight();
@@ -429,7 +350,7 @@ public class Board {
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
                         || c.getControl().equals(CreatureControl.CONTROL))
                 .filter(c -> {
-                    Coords centerBottom = c.getCenterBottomPos();
+                    Coords centerBottom = c.getCenter();
                     double x = centerBottom.x;
                     double y = centerBottom.y;
                     return x > left && x < right

@@ -102,7 +102,7 @@ public class ContainerView extends EquipmentView {
     public void add(Equipment e, Creature cr, double x, double y) {
         e.setPos(x, y, null);
         if (!container.add(e)) {
-            Coords bottom = cr.getCenterBottomPos();
+            Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
             e.onDrop(cr, dropX, dropY);

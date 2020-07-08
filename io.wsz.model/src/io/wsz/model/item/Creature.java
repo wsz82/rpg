@@ -21,7 +21,6 @@ import java.util.Objects;
 import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.TELEPORT;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
-import static java.lang.Math.pow;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
@@ -77,7 +76,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
         if (enteredToFlag != null && enteredToFlag == pos.getLocation()) {
             enteredToFlag = null;
-            PosItem collided = getCollision(getCenterBottomPos());
+            PosItem collided = getCollision(getCenter());
             if (collided != null) {
                 Coords freePos = Board.get().getFreePosAround(this);
                 Coords reversed = reverseCenterBottomPos(freePos);
@@ -92,11 +91,12 @@ public class Creature extends PosItem<Creature> implements Containable {
         return Controller.get().getBoard().lookForContent(this.pos.getLocation(), poss, types, false);
     }
 
-    public Coords getCenterBottomPos() {
-        return getCenterBottomPos(pos);
+    @Override
+    public Coords getCenter() {
+        return getCenter(pos);
     }
 
-    public Coords getCenterBottomPos(Coords pos) {
+    public Coords getCenter(Coords pos) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
         centerBottom.x = pos.x + width/2;
@@ -116,7 +116,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public Coords[] getCorners8AndCenter() {
-        return get8CornersAndCenter(getCenterBottomPos());
+        return get8CornersAndCenter(getCenter());
     }
 
     public Coords[] get8CornersAndCenter(Coords pos) {
@@ -147,7 +147,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public Coords[] get4Corners() {
-        return get4Corners(getCenterBottomPos());
+        return get4Corners(getCenter());
     }
 
     public Coords[] get4Corners(Coords pos) {
@@ -205,28 +205,13 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.task.setItem(e);
     }
 
-    public boolean creatureWithinRange(Creature cr) {
-        Coords ePos = cr.getCenterBottomPos();
-        Coords[] poss = getCorners8AndCenter();
-        for (Coords corner : poss) {
-            double powDist = Coords.getSquareDistance(corner, ePos);
-            if (powDist <= pow(getRange(), 2)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    @Override
+    public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
+        Coords thisCenter = getCenter();
 
-    public boolean withinRange(PosItem e) {
-        Coords ePos = e.getCenter();
-        Coords[] poss = getCorners8AndCenter();
-        for (Coords corner : poss) {
-            double dist = Coords.getDistance(corner, ePos);
-            if (dist <= getRange()) {
-                return true;
-            }
-        }
-        return false;
+        CreatureSize thisSize = getSize();
+        double width = sizeWidth + 2*range;
+        return Coords.ovalsIntersect(thisCenter, thisSize, pos, width);
     }
 
     public List<Equipment> getEquipmentWithinRange() {

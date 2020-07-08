@@ -136,7 +136,7 @@ public class BarView {
         if (current != heroLocation) {
             Controller.get().setLocationToUpdate(heroLocation);
         }
-        Controller.get().setPosToCenter(cr.getCenter());
+        Controller.get().setPosToCenter(cr.getImageCenter());
     }
 
     private void updateActivePortrait(double leftX, double padding, double portraitSize) {

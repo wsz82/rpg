@@ -46,7 +46,8 @@ public class Task implements Serializable {
     }
 
     private void interactWithCreature(Creature cr) {
-        if (creature.creatureWithinRange(cr)) {
+        CreatureSize size = creature.getSize();
+        if (cr.withinRange(creature.getCenter(), creature.getRange(), size.getWidth(), size.getHeight())) {
             Controller.get().setAsking(creature);
             Controller.get().setAnswering(cr);
             item = null;
@@ -55,7 +56,8 @@ public class Task implements Serializable {
     }
 
     private void interactWithEquipment(Equipment equipment) {
-        if (creature.withinRange(equipment)) {
+        CreatureSize size = creature.getSize();
+        if (equipment.withinRange(creature.getCenter(), creature.getRange(), size.getWidth(), size.getHeight())) {
             if (equipment instanceof Container) {
                 ((Container) equipment).open(creature);
             } else {
@@ -91,7 +93,7 @@ public class Task implements Serializable {
         double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
         nextPos.x = x3;
         nextPos.y = y3;
-        PosItem pi = creature.getCollision(creature.getCenterBottomPos(nextPos));
+        PosItem pi = creature.getCollision(creature.getCenter(nextPos));
         if (pi != null) {
             return;
         }
@@ -119,7 +121,7 @@ public class Task implements Serializable {
             return;
         }
         if (item instanceof Creature) {
-            Coords dest = creature.reverseCenterBottomPos(((Creature) item).getCenterBottomPos());
+            Coords dest = creature.reverseCenterBottomPos(item.getCenter());
             this.dest.x = dest.x;
             this.dest.y = dest.y;
         } else {
