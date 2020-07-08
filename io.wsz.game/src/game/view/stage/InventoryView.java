@@ -74,7 +74,9 @@ public class InventoryView {
                 e.consume();
                 mousePos.x = e.getX() / Sizes.getMeter();
                 mousePos.y = e.getY() / Sizes.getMeter();
-                startDrag();
+                synchronized (GameController.get().getGameRunner()) {
+                    startDrag();
+                }
             }
         };
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, equipmentLook);
@@ -86,7 +88,9 @@ public class InventoryView {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
                     mousePos.y = e.getY() / Sizes.getMeter();
-                    stopDrag();
+                    synchronized (GameController.get().getGameRunner()) {
+                        stopDrag();
+                    }
                 }
             }
         };
@@ -161,7 +165,8 @@ public class InventoryView {
     private void closeInventory() {
         Equipment drag = dragged[0];
         if (drag != null) {
-            origin.getItems().add(drag);
+            Creature cr = Controller.get().getCreatureToOpenInventory();
+            holdView.add(drag, cr, 0, 0);
             dragged[0] = null;
         }
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, equipmentLook);

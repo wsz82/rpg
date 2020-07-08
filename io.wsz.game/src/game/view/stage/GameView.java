@@ -69,6 +69,7 @@ public class GameView extends Canvas {
         if (parent.isIconified()) {
             return;
         }
+
         if (gameController.isDialog()) {
             if (dialogStarted) {
                 dialogStarted = false;
@@ -109,27 +110,7 @@ public class GameView extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        double left = currentPos.x;
-        double right = left + getWidth()/Sizes.getMeter();
-        double top = currentPos.y;
-        double bottom = top + getHeight()/Sizes.getMeter();
-
-        items.clear();
-        controller.getCurrentLocation().getItems().stream()
-                .filter(PosItem::getVisible)
-                .filter(pi -> {
-                    double piLeft = pi.getLeft();
-                    double piRight = pi.getRight();
-                    double piTop = pi.getTop();
-                    double piBottom = pi.getBottom();
-                    return Coords.doOverlap(
-                            left, top, right, bottom,
-                            piLeft, piTop, piRight, piBottom);
-                })
-                .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
-                .collect(Collectors.toCollection(() -> items));
-
-        board.sortPosItems(items);
+        selectItems();
 
         for (PosItem pi : items) {
             final ItemType type = pi.getType();
@@ -183,6 +164,30 @@ public class GameView extends Canvas {
         if (Settings.isShowBar()) {
             barView.refresh();
         }
+    }
+
+    public void selectItems() {
+        double left = currentPos.x;
+        double right = left + getWidth()/ Sizes.getMeter();
+        double top = currentPos.y;
+        double bottom = top + getHeight()/Sizes.getMeter();
+
+        items.clear();
+        controller.getCurrentLocation().getItems().stream()
+                .filter(PosItem::getVisible)
+                .filter(pi -> {
+                    double piLeft = pi.getLeft();
+                    double piRight = pi.getRight();
+                    double piTop = pi.getTop();
+                    double piBottom = pi.getBottom();
+                    return Coords.doOverlap(
+                            left, top, right, bottom,
+                            piLeft, piTop, piRight, piBottom);
+                })
+                .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
+                .collect(Collectors.toCollection(() -> items));
+
+        board.sortPosItems(items);
     }
 
     private void drawSelection(GraphicsContext gc) {

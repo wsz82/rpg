@@ -84,7 +84,12 @@ public class GameRunner {
     }
 
     private void updateModel() {
+        if (gameController.isDialog()) {
+            return;
+        }
+
         updateControls();
+
         for (Location l : controller.getLocationsList()) {
             addItems(l);
             removeItems(l);

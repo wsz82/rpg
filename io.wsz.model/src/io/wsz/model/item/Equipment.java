@@ -79,25 +79,28 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         level = 0;
         setVisible(false);
         cr.pos.getLocation().getItemsToRemove().add(this);
+        System.out.println(this.getName() + " taken");
     }
 
     @Override
     public boolean onDrop(Creature cr, double x, double y) {
         double tempX = pos.x;
         double tempY = pos.y;
+        Integer tempLevel = this.getLevel();
         pos.x = x;
         pos.y = y;
+        setLevel(cr.getLevel());
         Location location = cr.getPos().getLocation();
         PosItem obstacle = Controller.get().getBoard().getObstacle(pos, this, location);
         if (obstacle != null) {
             pos.x = tempX;
             pos.y = tempY;
+            setLevel(tempLevel);
+            System.out.println(this.getName() + " cannot be dropped here");
             return false;
         } else {
-            pos.x = x;
-            pos.y = y;
-            level = cr.getLevel();
             location.getItemsToAdd().add(this);
+            System.out.println(this.getName() + " dropped");
             return true;
         }
     }

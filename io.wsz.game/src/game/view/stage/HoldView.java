@@ -127,11 +127,11 @@ public class HoldView extends EquipmentView {
     @Override
     public void remove(Equipment e, Creature cr) {
         inventory.remove(e);
+        System.out.println(e.getName() + " removed from " + cr.getName() + " inventory");
     }
 
     @Override
-    public boolean add(Equipment e, Creature cr, double x, double y) {
-        e.setPos(x, y, null);
+    public void add(Equipment e, Creature cr, double x, double y) {
         if (!inventory.add(e)) {
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
@@ -139,9 +139,10 @@ public class HoldView extends EquipmentView {
             if (!e.onDrop(cr, dropX, dropY)) {
                 cr.getItems().add(e);
             }
-            return false;
+            System.out.println(e.getName() + " does not fit " + cr.getName() + " inventory");
         } else {
-            return true;
+            e.setPos(x, y, null);
+            System.out.println(e.getName() + " added to " + cr.getName() + " inventory");
         }
     }
 

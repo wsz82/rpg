@@ -96,21 +96,22 @@ public class ContainerView extends EquipmentView {
     @Override
     public void remove(Equipment e, Creature cr) {
         getItems().remove(e);
+        System.out.println(e.getName() + " removed from " + container.getName());
     }
 
     @Override
-    public boolean add(Equipment e, Creature cr, double x, double y) {
-        e.setPos(x, y, null);
+    public void add(Equipment e, Creature cr, double x, double y) {
         if (!container.add(e)) {
+            System.out.println(e.getName() + " does not fit " + container.getName());
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
             if (!e.onDrop(cr, dropX, dropY)) {
                 cr.getItems().add(e);
             }
-            return false;
         } else {
-            return true;
+            e.setPos(x, y, null);
+            System.out.println(e.getName() + " added to " + container.getName());
         }
     }
 

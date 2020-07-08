@@ -175,12 +175,9 @@ public class DropView extends EquipmentView{
     }
 
     @Override
-    public boolean add(Equipment e, Creature cr, double x, double y) {
+    public void add(Equipment e, Creature cr, double x, double y) {
         if (!e.onDrop(cr, x, y)) {
             cr.getItems().add(e);
-            return false;
-        } else {
-            return true;
         }
     }
 

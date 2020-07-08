@@ -126,7 +126,7 @@ public abstract class EquipmentView {
 
     public abstract void remove(Equipment e, Creature cr);
 
-    public abstract boolean add(Equipment e, Creature cr, double x, double y); //TODO make void?
+    public abstract void add(Equipment e, Creature cr, double x, double y);
 
     public abstract List<Equipment> getItems();
 
