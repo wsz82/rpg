@@ -16,14 +16,17 @@ import static java.lang.Math.*;
 
 public class Board {
     private static Board singleton;
+
     private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
     private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
     private final Coords boardPos = new Coords(0, 0, null);
+
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
     private final List<Equipment> equipment = new ArrayList<>(0);
     private final List<Equipment> equipmentResult = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
+    private final Coords modifiedCoords = new Coords();
     private final Coords resultCoords = new Coords();
 
     public static Board get() {
@@ -156,10 +159,76 @@ public class Board {
         return eq <= 1;
     }
 
-    public PosItem lookForObstacle(Coords[] poss, Location location) {
-        if (location == null) {
-            return null;
-        }
+//    public PosItem lookForObstacle(Coords[] poss, Location location) {
+//        if (location == null) return null;
+//        items.clear();
+//        location.getItems().get().stream()
+//                .filter(PosItem::getVisible)
+//                .filter(pi -> pi.getCollisionPolygons() != null)
+//                .filter(pi -> {
+//                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
+//                    return pi.getLevel().equals(level);
+//                })
+//                .collect(Collectors.toCollection(() -> items));
+//        if (items.isEmpty()) return null;
+//
+//        for (PosItem pi : items) {
+//            final Image img = pi.getImage();
+//            final Coords cPos = pi.getPos();
+//
+//            for (Coords pos : poss) {
+//                double x = pos.x;
+//                double y = pos.y;
+//
+//                double cX = cPos.x;
+//                double cWidth = img.getWidth() / Sizes.getMeter();
+//                boolean fitX = x >= cX && x <= cX + cWidth;
+//                if (!fitX) continue;
+//
+//                double cY = cPos.y;
+//                double cHeight = img.getHeight() / Sizes.getMeter();
+//                boolean fitY = y >= cY && y <= cY + cHeight;
+//                if (!fitY) continue;
+//
+//                final List<List<Coords>> cp = pi.getCollisionPolygons();
+//                for (List<Coords> polygon : cp) {
+//                    List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
+//                    Coords.translateCoords(lostRef, cX, cY);
+//
+//                    double maxObstacleX = lostRef.stream()
+//                            .mapToDouble(p -> p.x)
+//                            .max()
+//                            .getAsDouble();
+//                    double minObstacleX = lostRef.stream()
+//                            .mapToDouble(p -> p.x)
+//                            .min()
+//                            .getAsDouble();
+//                    boolean fitObstacleX = x >= minObstacleX && x <= maxObstacleX;
+//                    if (!fitObstacleX) continue;
+//
+//                    double maxObstacleY = lostRef.stream()
+//                            .mapToDouble(p -> p.y)
+//                            .max()
+//                            .getAsDouble();
+//                    double minObstacleY = lostRef.stream()
+//                            .mapToDouble(p -> p.y)
+//                            .min()
+//                            .getAsDouble();
+//                    boolean fitObstacleY = y >= minObstacleY && y <= maxObstacleY;
+//                    if (!fitObstacleY) continue;
+//
+//                    boolean isInsidePolygon = pos.isInsidePolygon(lostRef, maxObstacleX);
+//                    if (isInsidePolygon) {
+//                        return pi;
+//                    }
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
+    public PosItem lookForObstacle(Coords pos, Creature cr, Location location) {
+        if (location == null) return null;
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
@@ -169,67 +238,58 @@ public class Board {
                     return pi.getLevel().equals(level);
                 })
                 .collect(Collectors.toCollection(() -> items));
-        if (items.isEmpty()) {
-            return null;
-        }
+        if (items.isEmpty()) return null;
+
+        CreatureSize s = cr.getSize();
+        double halfWidth = s.getWidth() / 2;
+        double halfHeight = s.getHeight() / 2;
+
+        double left = pos.x - halfWidth;
+        double right = pos.x + halfWidth;
+        double top = pos.y - halfHeight;
+        double bottom = pos.y + halfHeight;
 
         for (PosItem pi : items) {
-            final Image img = pi.getImage();
-            final Coords cPos = pi.getPos();
+            Coords piPos = pi.getPos();
 
-            for (Coords pos : poss) {
-                double x = pos.x;
-                double y = pos.y;
+            double piLeft = pi.getLeft();
+            double piRight = pi.getRight();
+            if (right < piLeft || left > piRight) continue;
 
-                double cX = cPos.x;
-                double cWidth = img.getWidth() / Sizes.getMeter();
-                boolean fitX = x >= cX && x <= cX + cWidth;
-                if (!fitX) {
-                    continue;
-                }
+            double piTop = pi.getTop();
+            double piBottom = pi.getBottom();
+            if (bottom < piTop || top > piBottom) continue;
 
-                double cY = cPos.y;
-                double cHeight = img.getHeight() / Sizes.getMeter();
-                boolean fitY = y >= cY && y <= cY + cHeight;
-                if (!fitY) {
-                    continue;
-                }
+            List<List<Coords>> cp = pi.getCollisionPolygons();
+            for (List<Coords> polygon : cp) {
+                List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
+                Coords.translateCoords(lostRef, piPos.x, piPos.y);
 
-                final List<List<Coords>> cp = pi.getCollisionPolygons();
-                for (List<Coords> polygon : cp) {
-                    List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
-                    Coords.translateCoords(lostRef, cX, cY);
+                double maxObstacleX = lostRef.stream()
+                        .mapToDouble(p -> p.x)
+                        .max()
+                        .getAsDouble();
+                double minObstacleX = lostRef.stream()
+                        .mapToDouble(p -> p.x)
+                        .min()
+                        .getAsDouble();
+                if (right < minObstacleX || left > maxObstacleX) continue;
 
-                    double maxObstacleX = lostRef.stream()
-                            .mapToDouble(p -> p.x)
-                            .max()
-                            .getAsDouble();
-                    double minObstacleX = lostRef.stream()
-                            .mapToDouble(p -> p.x)
-                            .min()
-                            .getAsDouble();
-                    boolean fitObstacleX = x >= minObstacleX && x <= maxObstacleX;
-                    if (!fitObstacleX) {
-                        continue;
-                    }
+                double maxObstacleY = lostRef.stream()
+                        .mapToDouble(p -> p.y)
+                        .max()
+                        .getAsDouble();
+                double minObstacleY = lostRef.stream()
+                        .mapToDouble(p -> p.y)
+                        .min()
+                        .getAsDouble();
+                if (bottom < minObstacleY || top > maxObstacleY) continue;
 
-                    double maxObstacleY = lostRef.stream()
-                            .mapToDouble(p -> p.y)
-                            .max()
-                            .getAsDouble();
-                    double minObstacleY = lostRef.stream()
-                            .mapToDouble(p -> p.y)
-                            .min()
-                            .getAsDouble();
-                    boolean fitObstacleY = y >= minObstacleY && y <= maxObstacleY;
-                    if (!fitObstacleY) {
-                        continue;
-                    }
-
-                    boolean isInsidePolygon = pos.isInsidePolygon(lostRef, maxObstacleX);
-                    if (isInsidePolygon) {
-                        return pi;
-                    }
+                CreatureSize size = cr.getSize();
+                boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(pos, size, lostRef);
+                if (ovalIntersectsPolygon) {
+                    System.out.println("Creature inside polygon");
+                    return pi;
                 }
             }
         }
@@ -248,9 +308,7 @@ public class Board {
                 .filter(pi -> pi instanceof Equipment)
                 .map(pi -> (Equipment) pi)
                 .collect(Collectors.toCollection(() -> equipment));
-        if (equipment.isEmpty()) {
-            return equipmentResult;
-        }
+        if (equipment.isEmpty()) return equipmentResult;
 
         double range = cr.getRange();
         double width = cr.getSize().getWidth() + 2*range;
@@ -313,20 +371,14 @@ public class Board {
                 }
 
                 Location location = cr.getPos().getLocation();
-                if (x < 0 || x > location.getWidth()) {
-                    continue;
-                }
-                if (y < 0 || y > location.getHeight()) {
-                    continue;
-                }
+                if (x < 0 || x > location.getWidth()) continue;
+                if (y < 0 || y > location.getHeight()) continue;
 
                 resultCoords.x = x;
                 resultCoords.y = y;
                 PosItem pi = cr.getCollision(resultCoords);
 
-                if (pi == null) {
-                    return resultCoords;
-                }
+                if (pi == null) return resultCoords;
                 angle = (int) (angleScope * j);
             }
         }

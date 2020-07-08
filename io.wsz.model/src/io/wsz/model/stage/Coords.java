@@ -11,13 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public class Coords implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private static final Coords EXTREME = new Coords();
+    private static final Coords temp1 = new Coords();
+    private static final Coords temp2 = new Coords();
+    private static final Coords temp3 = new Coords();
+    private static final Coords temp4 = new Coords();
     private static final List<Coords> lostReferences = new ArrayList<>(0);
     private static final List<Coords> resultCoords = new ArrayList<>(0);
 
@@ -69,6 +72,13 @@ public class Coords implements Externalizable {
         });
     }
 
+    private static void extendCoords(List<Coords> list, int xRatio, double yRatio) {
+        list.forEach(c -> {
+            c.x *= xRatio;
+            c.y *= yRatio;
+        });
+    }
+
     public static boolean doOverlap(double o1x_left, double o1y_top, double o1x_right, double o1y_bottom,
                                     double o2x_left, double o2y_top, double o2x_right, double o2y_bottom) {
         if (o1x_left > o2x_right || o2x_left > o1x_right) {
@@ -89,8 +99,100 @@ public class Coords implements Externalizable {
         return dist <= radiusSum;
     }
 
+    public static boolean ovalIntersectsPolygon(Coords c, CreatureSize s, List<Coords> polygon) {
+        double ratio = s.getWidth() / s.getHeight();
+        double radius = s.getWidth() / 2;
+
+        double x = c.x;
+        double y = c.y * ratio;
+
+        double halfWidth = s.getWidth() / 2;
+        double halfHeight = s.getHeight() / 2;
+        double left = c.x - halfWidth;
+        double right = c.x + halfWidth;
+        double top = c.y - halfHeight;
+        double bottom = c.y + halfHeight;
+
+        for (int i = 0; i < polygon.size(); i++) {
+            Coords first = polygon.get(i);
+            if (polygon.size() == 2 && i == 1) continue;
+            Coords second;
+            if (i+1 == polygon.size()) {
+                second = polygon.get(0);
+            } else {
+                second = polygon.get(i+1);
+            }
+
+            double x1 = first.x;
+            double x2 = second.x;
+            double y1 = first.y;
+            double y2 = second.y;
+
+            double leftPointX = min(x1, x2);
+            double rightPointX = max(x1, x2);
+            double topPointY = min(y1, y2);
+            double bottomPointY = max(y1, y2);
+
+            if (right < leftPointX || left > rightPointX) continue;
+
+            if (bottom < topPointY || top > bottomPointY) continue;
+
+            y1 *= ratio;
+            y2 *= ratio;
+
+            double powDist = pow((y2 - y1)*x - (x2 - x1)*y + x2*y1 - y2*x1, 2) / (pow(y2 - y1, 2) + pow(x2 - x1, 2));
+            double powRadius = pow(radius, 2);
+
+            double p1dist = getSquareDistance(x1, x, y1, y);
+            if (p1dist < powRadius) return true;
+            double p2dist = getSquareDistance(x2, x, y2, y);
+            if (p2dist < powRadius) return true;
+
+            if (powDist < powRadius) {
+                double dist = sqrt(powDist);
+                temp1.x = x1;
+                temp1.y = y1;
+                temp2.x = x2;
+                temp2.y = y2;
+
+                temp3.x = x - dist;
+                temp3.y = y - dist;
+
+                temp4.x = x + dist;
+                temp4.y = y + dist;
+
+                boolean intersectNW_SE = doIntersect(temp1, temp2, temp3, temp4);
+
+                temp3.x = x + dist;
+                temp3.y = y - dist;
+
+                temp4.x = x - dist;
+                temp4.y = y + dist;
+
+                boolean intersectNE_SW = doIntersect(temp1, temp2, temp3, temp4);
+
+                if (intersectNW_SE || intersectNE_SW) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static double calcOvalLineIntersection(double radius, double x1, double x2, double y1, double y2) {
+        return pow(radius, 2) * (pow(x2 - x1, 2) + pow(y2 - y1, 2)) - pow(x1*y2 - x2*y1, 2);
+    }
+
     public static double getDistance(Coords c1, Coords c2) {
         return sqrt(pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2));
+    }
+
+    public static double getSquareDistance(Coords c1, Coords c2) {
+        return pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2);
+    }
+
+    public static double getSquareDistance(double x1, double x2, double y1, double y2) {
+        return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
 
     public double x;
@@ -99,6 +201,11 @@ public class Coords implements Externalizable {
     private Location location;
 
     public Coords() {}
+
+    public Coords(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
 
     public Coords(double x, double y, Location location) {
         this.x = x;
@@ -160,14 +267,14 @@ public class Coords implements Externalizable {
         return (count % 2 == 1);
     }
 
-    private boolean onSegment(Coords p, Coords q, Coords r) {
+    private static boolean onSegment(Coords p, Coords q, Coords r) {
         return q.x <= Math.max(p.x, r.x)
                 && q.x >= Math.min(p.x, r.x)
                 && q.y <= Math.max(p.y, r.y)
                 && q.y >= Math.min(p.y, r.y);
     }
 
-    private int orientation(Coords p, Coords q, Coords r) {
+    private static int orientation(Coords p, Coords q, Coords r) {
         double val = (q.y - p.y) * (r.x - q.x)
                 - (q.x - p.x) * (r.y - q.y);
 
@@ -177,7 +284,7 @@ public class Coords implements Externalizable {
         return (val > 0) ? 1 : 2;
     }
 
-    private boolean doIntersect(Coords p1, Coords q1,
+    public static boolean doIntersect(Coords p1, Coords q1,
                                        Coords p2, Coords q2) {
         int o1 = orientation(p1, q1, p2);
         int o2 = orientation(p1, q1, q2);
