@@ -57,12 +57,41 @@ public class Creature extends PosItem<Creature> implements Containable {
                 coverLine, collisionPolygons);
     }
 
-    public PosItem getCollision(Coords nextPos) {
-        PosItem collidedObstacle = Controller.get().getBoard().lookForObstacle(nextPos, this, pos.getLocation());
-        if (collidedObstacle == null) {
-            return Controller.get().getBoard().getCornersCreature(this, nextPos);
-        }
-        return collidedObstacle;
+    @Override
+    public Double getCollisionLeft() {
+        return getCollisionLeft(getCenter());
+    }
+
+    public Double getCollisionLeft(Coords nextPos) {
+        double halfWidth = getSize().getWidth() / 2;
+        return nextPos.x - halfWidth;
+    }
+
+    public Double getCollisionRight() {
+        return getCollisionRight(getCenter());
+    }
+
+    public Double getCollisionRight(Coords nextPos) {
+        double halfWidth = getSize().getWidth() / 2;
+        return nextPos.x + halfWidth;
+    }
+
+    public Double getCollisionTop() {
+        return getCollisionTop(getCenter());
+    }
+
+    public Double getCollisionTop(Coords nextPos) {
+        double halfHeight = getSize().getHeight() / 2;
+        return nextPos.y - halfHeight;
+    }
+
+    public Double getCollisionBottom() {
+        return getCollisionBottom(getCenter());
+    }
+
+    public Double getCollisionBottom(Coords nextPos) {
+        double halfHeight = getSize().getHeight() / 2;
+        return nextPos.y + halfHeight;
     }
 
     private void checkSurrounding() {

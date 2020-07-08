@@ -1,5 +1,7 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
+import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
@@ -80,11 +82,24 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     }
 
     @Override
-    public void onDrop(Creature cr, double x, double y) { //TODO check collision
+    public boolean onDrop(Creature cr, double x, double y) {
+        double tempX = pos.x;
+        double tempY = pos.y;
         pos.x = x;
         pos.y = y;
-        level = cr.getLevel();
-        cr.getPos().getLocation().getItemsToAdd().add(this);
+        Location location = cr.getPos().getLocation();
+        PosItem obstacle = Controller.get().getBoard().getObstacle(pos, this, location);
+        if (obstacle != null) {
+            pos.x = tempX;
+            pos.y = tempY;
+            return false;
+        } else {
+            pos.x = x;
+            pos.y = y;
+            level = cr.getLevel();
+            location.getItemsToAdd().add(this);
+            return true;
+        }
     }
 
     @Override

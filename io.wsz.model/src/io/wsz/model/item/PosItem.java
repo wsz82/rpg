@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.layer.Layer;
@@ -90,6 +91,78 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
         return Coords.pointWithinOval(getCenter(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
+    }
+
+    public PosItem getCollision(Coords nextPos) {
+        return Controller.get().getBoard().getObstacle(nextPos, this, pos.getLocation());
+    }
+
+    public Double getCollisionLeft() {
+        return getCollisionLeft(pos);
+    }
+
+    public Double getCollisionLeft(Coords nextPos) {
+        List<List<Coords>> cp = getCollisionPolygons();
+        if (cp.isEmpty()) return null;
+        double left =  cp.stream()
+                .mapToDouble(l -> l.stream()
+                        .mapToDouble(p -> p.x)
+                        .min()
+                        .getAsDouble())
+                .min()
+                .getAsDouble();
+        return nextPos.x + left;
+    }
+
+    public Double getCollisionRight() {
+        return getCollisionRight(pos);
+    }
+
+    public Double getCollisionRight(Coords nextPos) {
+        List<List<Coords>> cp = getCollisionPolygons();
+        if (cp.isEmpty()) return null;
+        double right =  cp.stream()
+                .mapToDouble(l -> l.stream()
+                        .mapToDouble(p -> p.x)
+                        .max()
+                        .getAsDouble())
+                .max()
+                .getAsDouble();
+        return nextPos.x + right;
+    }
+
+    public Double getCollisionTop() {
+        return getCollisionTop(pos);
+    }
+
+    public Double getCollisionTop(Coords nextPos) {
+        List<List<Coords>> cp = getCollisionPolygons();
+        if (cp.isEmpty()) return null;
+        double top =  cp.stream()
+                .mapToDouble(l -> l.stream()
+                        .mapToDouble(p -> p.y)
+                        .min()
+                        .getAsDouble())
+                .min()
+                .getAsDouble();
+        return nextPos.y + top;
+    }
+
+    public Double getCollisionBottom() {
+        return getCollisionBottom(pos);
+    }
+
+    public Double getCollisionBottom(Coords nextPos) {
+        List<List<Coords>> cp = getCollisionPolygons();
+        if (cp.isEmpty()) return null;
+        double bottom = cp.stream()
+                .mapToDouble(l -> l.stream()
+                        .mapToDouble(p -> p.y)
+                        .max()
+                        .getAsDouble())
+                .max()
+                .getAsDouble();
+        return nextPos.y + bottom;
     }
 
     public Boolean getVisible() {

@@ -130,13 +130,18 @@ public class HoldView extends EquipmentView {
     }
 
     @Override
-    public void add(Equipment e, Creature cr, double x, double y) {
+    public boolean add(Equipment e, Creature cr, double x, double y) {
         e.setPos(x, y, null);
         if (!inventory.add(e)) {
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
-            e.onDrop(cr, dropX, dropY);
+            if (!e.onDrop(cr, dropX, dropY)) {
+                cr.getItems().add(e);
+            }
+            return false;
+        } else {
+            return true;
         }
     }
 

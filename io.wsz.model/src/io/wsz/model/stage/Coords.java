@@ -1,6 +1,7 @@
 package io.wsz.model.stage;
 
 import io.wsz.model.item.CreatureSize;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 
 import java.io.Externalizable;
@@ -21,10 +22,13 @@ public class Coords implements Externalizable {
     private static final Coords temp2 = new Coords();
     private static final Coords temp3 = new Coords();
     private static final Coords temp4 = new Coords();
-    private static final List<Coords> lostReferences = new ArrayList<>(0);
-    private static final List<Coords> resultCoords = new ArrayList<>(0);
+    private static final List<Coords> lostReferences1 = new ArrayList<>(0);
+    private static final List<Coords> lostReferences2 = new ArrayList<>(0);
+    private static final List<Coords> resultCoords1 = new ArrayList<>(0);
+    private static final List<Coords> resultCoords2 = new ArrayList<>(0);
 
     public static List<Coords> cloneCoordsList(List<Coords> from) {
+        if (from == null) return null;
         List<Coords> poss = new ArrayList<>(from.size());
         for (Coords pos : from) {
             poss.add(pos.clonePos());
@@ -33,6 +37,7 @@ public class Coords implements Externalizable {
     }
 
     public static List<List<Coords>> cloneCoordsPolygons(List<List<Coords>> from) {
+        if (from == null) return null;
         List<List<Coords>> polygons = new ArrayList<>(from.size());
         for (List<Coords> poss : from) {
             polygons.add(cloneCoordsList(poss));
@@ -40,8 +45,12 @@ public class Coords implements Externalizable {
         return polygons;
     }
 
-    public static List<Coords> looseCoordsReferences(List<Coords> from) {
-        return looseCoordsReferences(from, lostReferences, resultCoords);
+    public static List<Coords> looseCoordsReferences1(List<Coords> from) {
+        return looseCoordsReferences(from, lostReferences1, resultCoords1);
+    }
+
+    public static List<Coords> looseCoordsReferences2(List<Coords> from) {
+        return looseCoordsReferences(from, lostReferences2, resultCoords2);
     }
 
     public static List<Coords> looseCoordsReferences(List<Coords> from, List<Coords> to, List<Coords> result) {
@@ -121,11 +130,13 @@ public class Coords implements Externalizable {
         double top = c.y - halfHeight;
         double bottom = c.y + halfHeight;
 
-        for (int i = 0; i < polygon.size(); i++) {
+        int pSize = polygon.size();
+        for (int i = 0; i < pSize; i++) {
             Coords first = polygon.get(i);
-            if (polygon.size() == 2 && i == 1) continue;
+            if (pSize == 1) return first.isInsidePolygon(polygon);
+            if (pSize == 2 && i == 1) continue;
             Coords second;
-            if (i+1 == polygon.size()) {
+            if (i+1 == pSize) {
                 second = polygon.get(0);
             } else {
                 second = polygon.get(i+1);
@@ -214,8 +225,97 @@ public class Coords implements Externalizable {
         return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
 
-    public double x;
+    public static boolean polygonsIntersect(Coords nextPos, PosItem item, PosItem obstacle) {
+        if (item.getCollisionPolygons().isEmpty()) return false;
+        if (obstacle.getCollisionPolygons().isEmpty()) return false;
 
+        List<List<Coords>> iPolygons = item.getCollisionPolygons();
+        List<List<Coords>> oPolygons = obstacle.getCollisionPolygons();
+
+        for (List<Coords> rawIPolygon : iPolygons) {
+
+            List<Coords> iPolygon = looseCoordsReferences1(rawIPolygon);
+            translateCoords(iPolygon, nextPos.x, nextPos.y);
+
+            for (List<Coords> rawOPolygon : oPolygons) {
+
+                List<Coords> oPolygon = looseCoordsReferences2(rawOPolygon);
+                Coords oPos = item.getPos();
+                translateCoords(oPolygon, oPos.x, oPos.y);
+
+                if (!polygonsRectanglesOverlap(iPolygon, oPolygon)) continue;
+
+                int iSize = iPolygon.size();
+                for (int ic = 0; ic < iSize; ic++) {
+                    Coords i1 = iPolygon.get(ic);
+                    if (iSize == 1) return i1.isInsidePolygon(oPolygon);
+                    if (iSize == 2 && ic == 1) continue;
+                    Coords i2;
+                    if (ic + 1 == iSize) {
+                        i2 = iPolygon.get(0);
+                    } else {
+                        i2 = iPolygon.get(ic + 1);
+                    }
+
+                    int oSize = oPolygon.size();
+                    for (int oc = 0; oc < oSize; oc++) {
+                        Coords o1 = oPolygon.get(oc);
+                        if (oSize == 1) return o1.isInsidePolygon(iPolygon);
+                        if (oSize == 2 && oc == 1) continue;
+                        Coords o2;
+                        if (oc + 1 == oSize) {
+                            o2 = oPolygon.get(0);
+                        } else {
+                            o2 = oPolygon.get(oc + 1);
+                        }
+
+                        if (doIntersect(i1, i2, o1, o2)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean polygonsRectanglesOverlap(List<Coords> polygon1, List<Coords> polygon2) {
+        double p1Left = polygon1.stream()
+                .mapToDouble(c -> c.x)
+                .min()
+                .getAsDouble();
+        double p1Top = polygon1.stream()
+                .mapToDouble(c -> c.y)
+                .min()
+                .getAsDouble();
+        double p1Right = polygon1.stream()
+                .mapToDouble(c -> c.x)
+                .max()
+                .getAsDouble();
+        double p1Bottom = polygon1.stream()
+                .mapToDouble(c -> c.y)
+                .max()
+                .getAsDouble();
+
+        double p2Left = polygon2.stream()
+                .mapToDouble(c -> c.x)
+                .min()
+                .getAsDouble();
+        double p2Top = polygon2.stream()
+                .mapToDouble(c -> c.y)
+                .min()
+                .getAsDouble();
+        double p2Right = polygon2.stream()
+                .mapToDouble(c -> c.x)
+                .max()
+                .getAsDouble();
+        double p2Bottom = polygon2.stream()
+                .mapToDouble(c -> c.y)
+                .max()
+                .getAsDouble();
+
+        return doOverlap(p1Left, p1Top, p1Right, p1Bottom, p2Left, p2Top, p2Right, p2Bottom);
+    }
+
+    public double x;
     public double y;
 
     private Location location;
@@ -251,11 +351,16 @@ public class Coords implements Externalizable {
         this.y -= pos2.y;
     }
 
-    public boolean isInsidePolygon(List<Coords> polygon, double maxX) {
+    public boolean isInsidePolygon(List<Coords> polygon) {
         int n = polygon.size();
         if (n < 3) {
             return false;
         }
+
+        double maxX = polygon.stream()
+                .mapToDouble(c -> c.x)
+                .max()
+                .getAsDouble();
 
         EXTREME.x = maxX;
         EXTREME.y = this.y;

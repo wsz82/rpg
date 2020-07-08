@@ -148,73 +148,106 @@ public class Board {
         return null;
     }
 
-    public PosItem lookForObstacle(Coords pos, Creature cr, Location location) {
+    public PosItem getObstacle(Coords nextPos, PosItem item, Location location) {
         if (location == null) return null;
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> pi.getCollisionPolygons() != null)
+                .filter(pi -> pi.getCollisionPolygons() != null || pi instanceof Creature)
                 .filter(pi -> {
-                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
+                    int level = item.getLevel();
                     return pi.getLevel().equals(level);
                 })
                 .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) return null;
+        if (item.getCollisionPolygons().isEmpty() && !(item instanceof Creature)) return null;
 
-        CreatureSize s = cr.getSize();
-        double halfWidth = s.getWidth() / 2;
-        double halfHeight = s.getHeight() / 2;
+        double left = item.getCollisionLeft(nextPos);
+        double right = item.getCollisionRight(nextPos);
+        double top = item.getCollisionTop(nextPos);
+        double bottom = item.getCollisionBottom(nextPos);
 
-        double left = pos.x - halfWidth;
-        double right = pos.x + halfWidth;
-        double top = pos.y - halfHeight;
-        double bottom = pos.y + halfHeight;
+        for (PosItem obstacle : items) {
+            if (obstacle == item) continue;
+            if (obstacle.getCollisionPolygons().isEmpty() && !(obstacle instanceof Creature)) continue;
+            double oLeft = obstacle.getCollisionLeft();
+            double oRight = obstacle.getCollisionRight();
+            if (right < oLeft || left > oRight) continue;
 
-        for (PosItem pi : items) {
-            Coords piPos = pi.getPos();
+            double oTop = obstacle.getCollisionTop();
+            double oBottom = obstacle.getCollisionBottom();
+            if (bottom < oTop || top > oBottom) continue;
 
-            double piLeft = pi.getLeft();
-            double piRight = pi.getRight();
-            if (right < piLeft || left > piRight) continue;
+            if (item instanceof Creature && !(obstacle instanceof Creature)) {
 
-            double piTop = pi.getTop();
-            double piBottom = pi.getBottom();
-            if (bottom < piTop || top > piBottom) continue;
+                Creature cr = (Creature) item;
+                if (getCreatureObstacleCollision(nextPos, cr.getSize(), obstacle)) return obstacle;
 
-            List<List<Coords>> cp = pi.getCollisionPolygons();
-            for (List<Coords> polygon : cp) {
-                List<Coords> lostRef = Coords.looseCoordsReferences(polygon);
-                Coords.translateCoords(lostRef, piPos.x, piPos.y);
+            } else if (obstacle instanceof Creature && !(item instanceof Creature)) {
 
-                double maxObstacleX = lostRef.stream()
-                        .mapToDouble(p -> p.x)
-                        .max()
-                        .getAsDouble();
-                double minObstacleX = lostRef.stream()
-                        .mapToDouble(p -> p.x)
-                        .min()
-                        .getAsDouble();
-                if (right < minObstacleX || left > maxObstacleX) continue;
+                Creature crO = (Creature) obstacle;
+                if (getObstacleCreatureCollision(nextPos, crO, item)) return obstacle;
 
-                double maxObstacleY = lostRef.stream()
-                        .mapToDouble(p -> p.y)
-                        .max()
-                        .getAsDouble();
-                double minObstacleY = lostRef.stream()
-                        .mapToDouble(p -> p.y)
-                        .min()
-                        .getAsDouble();
-                if (bottom < minObstacleY || top > maxObstacleY) continue;
+            } else if (obstacle instanceof Creature) {
 
-                CreatureSize size = cr.getSize();
-                boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(pos, size, lostRef);
-                if (ovalIntersectsPolygon) {
-                    System.out.println("Creature inside polygon");
-                    return pi;
-                }
+                Creature cr = (Creature) item;
+                Creature crO = (Creature) obstacle;
+                if (getCreatureCreatureCollision(nextPos, cr, crO)) return obstacle;
+
+            } else {
+
+                if (getObstacleObstacleCollision(nextPos, item, obstacle)) return obstacle;
+
             }
         }
         return null;
+    }
+
+    private boolean getObstacleObstacleCollision(Coords nextPos, PosItem item, PosItem obstacle) {
+        boolean collides = Coords.polygonsIntersect(nextPos, item, obstacle);
+        if (collides) {
+            System.out.println("Obstacle collides obstacle");
+        }
+        return collides;
+    }
+
+    private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
+        boolean collides = Coords.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
+        if (collides) {
+            System.out.println("Creature collides creature");
+        }
+        return collides;
+    }
+
+    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, PosItem pi) {
+        List<List<Coords>> cp = pi.getCollisionPolygons();
+        for (List<Coords> polygon : cp) {
+            List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
+            Coords.translateCoords(lostRef, nextPos.x, nextPos.y);
+
+            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
+            if (ovalIntersectsPolygon) {
+                System.out.println("Obstacle collides creature");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean getCreatureObstacleCollision(Coords nextPos, CreatureSize s, PosItem pi) {
+        List<List<Coords>> cp = pi.getCollisionPolygons();
+        for (List<Coords> polygon : cp) {
+            List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
+            Coords piPos = pi.getPos();
+            Coords.translateCoords(lostRef, piPos.x, piPos.y);
+
+            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(nextPos, s, lostRef);
+            if (ovalIntersectsPolygon) {
+                System.out.println("Creature collides obstacle");
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Equipment> getEquipmentWithinRange(Creature cr) {
