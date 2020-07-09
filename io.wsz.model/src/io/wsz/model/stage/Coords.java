@@ -467,6 +467,8 @@ public class Coords implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeDouble(x);
 
         out.writeDouble(y);
@@ -480,6 +482,8 @@ public class Coords implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         x = in.readDouble();
 
         y = in.readDouble();

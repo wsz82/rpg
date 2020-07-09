@@ -289,6 +289,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(prototype);
 
@@ -308,6 +309,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         prototype = (A) in.readObject();
 

@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Answer;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.Question;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
@@ -82,9 +83,12 @@ public class DialogView {
         PosItem asker = controller.getAsking();
         addDialogItem(asker, activeQuestion.getText());
 
-        if (activeQuestion.getAnswer() != null) {
-            PosItem speaker = controller.getAnswering();
-            Answer answer = activeQuestion.getAnswer();
+        PosItem speaker = controller.getAnswering();
+        Dialog dialog = controller.getAnswering().getDialog();
+        int answerIndex = activeQuestion.getAnswerIndex();
+        Answer answer = dialog.getAnswers().get(answerIndex);
+
+        if (answer != null) {
             addDialogItem(speaker, answer.getText());
 
             lastAnswer = answer;

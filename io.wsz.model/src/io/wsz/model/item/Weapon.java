@@ -103,6 +103,7 @@ public class Weapon extends Equipment<Weapon> {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(damage);
 
@@ -114,6 +115,7 @@ public class Weapon extends Equipment<Weapon> {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         damage = (Double) in.readObject();
 

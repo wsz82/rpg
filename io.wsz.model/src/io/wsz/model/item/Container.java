@@ -119,6 +119,7 @@ public class Container extends Equipment<Container> implements Containable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(items);
 
@@ -130,6 +131,7 @@ public class Container extends Equipment<Container> implements Containable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         List<Equipment> serItems = (List<Equipment>) in.readObject();
         items.addAll(serItems);

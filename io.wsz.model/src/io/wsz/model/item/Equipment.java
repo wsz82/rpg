@@ -133,6 +133,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(weight);
 
@@ -142,6 +143,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         weight = (Double) in.readObject();
 

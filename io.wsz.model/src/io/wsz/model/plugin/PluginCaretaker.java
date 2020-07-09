@@ -11,8 +11,7 @@ import java.util.stream.Collectors;
 
 public class PluginCaretaker {
 
-    public PluginCaretaker() {
-    }
+    public PluginCaretaker() {}
 
     public void save(Plugin plugin) {
         serializePlugin(plugin);

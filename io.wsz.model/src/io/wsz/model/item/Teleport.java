@@ -132,6 +132,7 @@ public class Teleport extends PosItem<Teleport> {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(locationName);
 
@@ -143,6 +144,7 @@ public class Teleport extends PosItem<Teleport> {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         locationName = (String) in.readObject();
 

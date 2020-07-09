@@ -47,12 +47,16 @@ public class ItemList implements LevelValueListener, VisibleValueListener, Exter
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         List<PosItem> ser = new ArrayList<>(contents);
         out.writeObject(ser);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         contents.addAll((List<PosItem>) in.readObject());
     }
 }

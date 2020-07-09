@@ -14,13 +14,13 @@ public class Plugin implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private List<Location> locations;
-    private List<Asset> assets;
     private boolean active;
     private boolean isStartingLocation;
     private String startLocation;
     private Coords startPos;
     private int startLayer;
+    private List<Location> locations;
+    private List<Asset> assets;
 
     public Plugin() {}
 
@@ -108,11 +108,9 @@ public class Plugin implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeUTF(name);
-
-        out.writeObject(locations);
-
-        out.writeObject(assets);
 
         out.writeBoolean(active);
 
@@ -123,15 +121,17 @@ public class Plugin implements Externalizable {
         out.writeObject(startPos);
 
         out.writeInt(startLayer);
+
+        out.writeObject(locations);
+
+        out.writeObject(assets);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         name = in.readUTF();
-
-        locations = (List<Location>) in.readObject();
-
-        assets = (List<Asset>) in.readObject();
 
         active = in.readBoolean();
 
@@ -142,5 +142,9 @@ public class Plugin implements Externalizable {
         startPos = (Coords) in.readObject();
 
         startLayer = in.readInt();
+
+        locations = (List<Location>) in.readObject();
+
+        assets = (List<Asset>) in.readObject();
     }
 }

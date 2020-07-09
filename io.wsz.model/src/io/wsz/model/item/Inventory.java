@@ -92,6 +92,8 @@ public class Inventory implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeObject(items);
 
         out.writeObject(owner);
@@ -101,6 +103,8 @@ public class Inventory implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         List<Equipment> serItems = (List<Equipment>) in.readObject();
         items.addAll(serItems);
 

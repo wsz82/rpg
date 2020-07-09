@@ -21,7 +21,7 @@ class CreatureTest {
         List<Answer> answers = new ArrayList<>(1);
         Answer sample = new Answer("sample", new ArrayList<>(0));
         answers.add(sample);
-        Dialog dialog = new Dialog(answers, sample);
+        Dialog dialog = new Dialog(answers, 0);
         p.setDialog(dialog);
 
         Integer level = 0;

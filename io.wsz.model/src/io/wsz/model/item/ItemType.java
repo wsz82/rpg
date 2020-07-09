@@ -8,8 +8,5 @@ public enum ItemType {
     CONTAINER,
     WEAPON,
     TELEPORT,
-    LANDSCAPE;
-
-    private static final long serialVersionUID = 1L;
-
+    LANDSCAPE
 }

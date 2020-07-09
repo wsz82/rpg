@@ -76,6 +76,8 @@ public class Layer implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeInt(level.get());
 
         out.writeUTF(name.get());
@@ -85,6 +87,8 @@ public class Layer implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         level.set(in.readInt());
 
         name.set(in.readUTF());

@@ -38,7 +38,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private Image portrait;
     private String portraitPath;
-    private final Task task = new Task(this);
+    private final Task task = new Task();
     private Inventory inventory;
 
     private CreatureSize size;
@@ -233,7 +233,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private void setItemTask(PosItem e) {
         this.task.setFinished(false);
-        this.task.setItem(e);
+        this.task.setItem(this, e);
     }
 
     @Override
@@ -253,7 +253,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         if (task.getDest() == null && task.getItem() == null) {
             return;
         }
-        task.doTask();
+        task.doTask(this);
     }
 
     @Override
@@ -532,6 +532,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
+        out.writeLong(serialVersionUID);
 
         out.writeObject(task);
 
@@ -553,10 +554,11 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        long ver = in.readLong();
 
         Task readTask = (Task) in.readObject();
         task.setDest(readTask.getDest());
-        task.setItem(readTask.getItem());
+        task.setItem(this, readTask.getItem());
 
         inventory = (Inventory) in.readObject();
 

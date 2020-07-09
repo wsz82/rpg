@@ -190,6 +190,8 @@ public abstract class Asset implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeUTF(name.get());
 
         out.writeObject(type.get());
@@ -199,6 +201,8 @@ public abstract class Asset implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         name.set(in.readUTF());
 
         type.set((ItemType) in.readObject());

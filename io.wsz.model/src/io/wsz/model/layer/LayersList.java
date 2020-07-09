@@ -25,12 +25,16 @@ public class LayersList implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         List<Layer> ser = new ArrayList<>(layers);
         out.writeObject(new ArrayList<>(ser));
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         layers.addAll((List<Layer>) in.readObject());
     }
 }

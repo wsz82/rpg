@@ -1,10 +1,13 @@
 package io.wsz.model.dialog;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Answer implements Serializable {
+public class Answer implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String text;
@@ -32,5 +35,24 @@ public class Answer implements Serializable {
     @Override
     public String toString() {
         return text;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
+        out.writeUTF(text);
+
+        out.writeObject(questions);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
+        text = in.readUTF();
+
+        List<Question> input = (List<Question>) in.readObject();
+        questions.addAll(input);
     }
 }

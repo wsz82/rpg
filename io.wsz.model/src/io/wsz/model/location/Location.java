@@ -94,6 +94,8 @@ public class Location implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
         out.writeUTF(name.get());
 
         out.writeDouble(width.get());
@@ -111,6 +113,8 @@ public class Location implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
         name.set(in.readUTF());
 
         width.set(in.readDouble());
