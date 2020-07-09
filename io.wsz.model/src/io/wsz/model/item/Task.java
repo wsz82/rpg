@@ -76,13 +76,14 @@ public class Task implements Serializable {
 
     private void move() {
         Inventory inventory = creature.getIndividualInventory();
+        String name = creature.getName();
         if (inventory.getActualWeight() > inventory.getMaxWeight()) {
-            System.out.println("Creature overloaded");
+            System.out.println(name + " overloaded");
             setFinished(true);
             return;
         }
         if (inventory.getFilledSpace() > inventory.getMaxSize()) {
-            System.out.println("Creature carry too much");
+            System.out.println(name + " carry too much");
             setFinished(true);
             return;
         }

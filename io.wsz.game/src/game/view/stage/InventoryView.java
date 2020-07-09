@@ -75,7 +75,7 @@ public class InventoryView {
                 mousePos.x = e.getX() / Sizes.getMeter();
                 mousePos.y = e.getY() / Sizes.getMeter();
                 synchronized (GameController.get().getGameRunner()) {
-                    startDrag();
+                    startDrag(mousePos.x, mousePos.y);
                 }
             }
         };
@@ -89,7 +89,7 @@ public class InventoryView {
                     mousePos.x = e.getX() / Sizes.getMeter();
                     mousePos.y = e.getY() / Sizes.getMeter();
                     synchronized (GameController.get().getGameRunner()) {
-                        stopDrag();
+                        stopDrag(mousePos.x, mousePos.y);
                     }
                 }
             }
@@ -97,8 +97,8 @@ public class InventoryView {
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
     }
 
-    private void startDrag() {
-        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+    private void startDrag(double mouseX, double mouseY) {
+        EquipmentView ev = getEquipmentView(mouseX, mouseY);
         if (ev == null) return;
         origin = ev;
         translateScreenCoordsToCoords(mousePos, ev.getCurrentPos(), ev.getViewPos());
@@ -111,8 +111,8 @@ public class InventoryView {
         }
     }
 
-    private void stopDrag() {
-        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+    private void stopDrag(double mouseX, double mouseY) {
+        EquipmentView ev = getEquipmentView(mouseX, mouseY);
         Equipment toAdd = dragged[0];
         if (toAdd == null) return;
         Creature cr = Controller.get().getCreatureToOpenInventory();
@@ -213,9 +213,9 @@ public class InventoryView {
                 || y > bottom) return;
 
         Equipment drag = dragged[0];
+        Coords mousePos = getMousePos(x, y, left, top);
         if (drag != null) {
             Image img = drag.getImage();
-            Coords mousePos = getMousePos(x, y, left, top);
             gc.drawImage(img,
                     mousePos.x*Sizes.getMeter() - img.getWidth()/2,
                     mousePos.y*Sizes.getMeter() - img.getHeight());
