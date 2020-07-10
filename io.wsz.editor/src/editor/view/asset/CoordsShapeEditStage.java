@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -33,7 +34,8 @@ public abstract class CoordsShapeEditStage extends ChildStage {
     protected final PosItem item;
     protected final ScrollPane scrollPane = new ScrollPane();
     protected final Pane pointsPane = new Pane();
-    protected final HBox controls = new HBox(5);
+    protected final HBox hControls = new HBox(5);
+    protected final VBox vControls = new VBox(5);
     protected final ContextMenu contextMenu = new ContextMenu();
 
     protected ChoiceBox<Coords> coordsCB = new ChoiceBox<>(coordsList);
@@ -100,19 +102,30 @@ public abstract class CoordsShapeEditStage extends ChildStage {
                 bounds.getHeight() - bounds.getHeight()/5);
         scrollPane.setContent(pointsPane);
 
+        final VBox coords = new VBox(5);
         final HBox xBox = new HBox(5);
         final Label xLabel = new Label("X:");
+        xLabel.setAlignment(Pos.CENTER);
         xBox.getChildren().addAll(xLabel, xPosField);
         xPosField.setPrefWidth(50);
         final HBox yBox = new HBox(5);
         final Label yLabel = new Label("Y:");
+        yLabel.setAlignment(Pos.CENTER);
         yBox.getChildren().addAll(yLabel, yPosField);
+        coords.getChildren().addAll(xBox, yBox);
         yPosField.setPrefWidth(50);
-        coordsCBBox.setPrefWidth(Sizes.getMeter());
 
-        controls.getChildren().addAll(cancel, save, coordsCBBox, xBox, yBox, deletePoint);
+        final VBox coordsCBVBox = new VBox(5);
+        final Label coordsCBLabel = new Label("Point");
+        coordsCBLabel.setAlignment(Pos.CENTER);
+        coordsCBVBox.getChildren().addAll(coordsCBLabel, coordsCBBox);
+        coordsCBBox.setSpacing(5);
+        coordsCBBox.setPrefWidth(100);
 
-        c.getChildren().addAll(scrollPane, controls);
+        vControls.getChildren().add(deletePoint);
+        hControls.getChildren().addAll(cancel, save, coordsCBVBox, coords, vControls);
+
+        c.getChildren().addAll(scrollPane, hControls);
         r.getChildren().add(c);
 
         final Scene scene = new Scene(r);

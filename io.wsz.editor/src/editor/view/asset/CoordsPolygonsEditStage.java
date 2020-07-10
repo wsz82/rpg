@@ -5,10 +5,10 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
@@ -24,8 +24,7 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
     private final ChoiceBox<List<Coords>> polygonsCB = new ChoiceBox<>(polygons);
     private final List<List<Coords>> itemPolygons;
     private final MenuItem addPolygon = new MenuItem("Add polygon");
-
-    private List<Coords> actualList;
+    private final Button deletePolygon = new Button("Delete polygon");
 
     public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, PosItem item) {
         super(parent, item);
@@ -36,13 +35,24 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
     public void initWindow(boolean isContent, String title) {
         super.initWindow(isContent, title);
 
-        controls.getChildren().add(2, polygonsCB);
+        final VBox polygonsCBVBox = new VBox(5);
+        final Label polygonsCBLabel = new Label("Polygon");
+        polygonsCBLabel.setAlignment(Pos.CENTER);
+        polygonsCB.setPrefWidth(100);
+        polygonsCBVBox.getChildren().addAll(polygonsCBLabel, polygonsCB);
+        hControls.getChildren().add(2, polygonsCBVBox);
+        vControls.getChildren().add(deletePolygon);
 
         setUpPolygonsCB();
+        hookUpEvents();
 
         if (isContent) {
             polygonsCB.setDisable(true);
         }
+    }
+
+    private void hookUpEvents() {
+        deletePolygon.setOnAction(e -> removePolygon());
     }
 
     @Override
@@ -159,9 +169,11 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
         if (c == null) return;
         List<Coords> list = polygonsCB.getValue();
         if (list == null) return;
+        coordsList.remove(c);
         list.remove(c);
         if (list.isEmpty()) {
             polygons.remove(list);
+            polygonsCB.setValue(null);
         }
         super.deletePoint();
     }
@@ -173,7 +185,6 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
         polygonsCB.setValue(newPolygon);
         coordsList.clear();
         coordsList.add(first);
-        actualList = newPolygon;
         coordsCB.setValue(first);
     }
 
@@ -184,6 +195,7 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
 
     private void removePolygon() {
         polygons.remove(polygonsCB.getValue());
+        polygonsCB.setValue(null);
         coordsList.clear();
         refreshShape();
     }
