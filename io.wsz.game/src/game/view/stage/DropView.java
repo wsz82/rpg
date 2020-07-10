@@ -20,6 +20,7 @@ public class DropView extends EquipmentView{
     private final Coords creaturePos = new Coords();
     private final List<PosItem> allItmes = new ArrayList<>(0);
     private final Controller controller = Controller.get();
+
     private List<Equipment> droppedEquipment;
 
     public DropView(GraphicsContext gc) {

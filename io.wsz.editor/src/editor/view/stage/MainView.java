@@ -143,7 +143,7 @@ class MainView {
     private ToolBar getToolBar() {
         pointer.setEditorCanvas(editorCanvas);
         contentsWindow.setPointer(pointer);
-        return new EditorToolBar(pointer);
+        return new EditorToolBar(editorCanvas, pointer);
     }
 
     private void setBottomContent(VBox bottom) {

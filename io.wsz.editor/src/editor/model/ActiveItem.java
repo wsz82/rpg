@@ -5,7 +5,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class ActiveItem {
-    private final ObjectProperty<PosItem> items = new SimpleObjectProperty<>();
+    private final ObjectProperty<PosItem> item = new SimpleObjectProperty<>();
     private static ActiveItem singleton;
 
     public static ActiveItem get() {
@@ -17,11 +17,11 @@ public class ActiveItem {
 
     private ActiveItem(){}
 
-    public PosItem getItems() {
-        return items.get();
+    public PosItem getItem() {
+        return item.get();
     }
 
-    public void setItems(PosItem items) {
-        this.items.set(items);
+    public void setItem(PosItem items) {
+        this.item.set(items);
     }
 }

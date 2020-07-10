@@ -2,21 +2,32 @@ package editor.view.stage;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.Objects;
 
 class EditorToolBar extends ToolBar {
+    private static double itemsOpacity = 1;
+    private static boolean layerOpacity;
+
+    private final EditorCanvas editorCanvas;
     private final ToggleButton pointerButton = new ToggleButton();
     private final Slider opacitySlider = new Slider(0.1, 1, 1);
 
-    EditorToolBar(Pointer pointer) {
+    EditorToolBar(EditorCanvas editorCanvas, Pointer pointer) {
+        this.editorCanvas = editorCanvas;
+        initToolBar(pointer);
+    }
+
+    private void initToolBar(Pointer pointer) {
         createPointerTool(pointer);
         VBox opacityBox = createOpacityTool();
 
@@ -47,9 +58,18 @@ class EditorToolBar extends ToolBar {
     }
 
     private void hookupOpacityEvents(String itemOpacity, ChoiceBox<String> cb) {
-        opacitySlider.pressedProperty().addListener((observable, oldValue, newValue) -> {
-           //TODO changing opacity
+        cb.setOnAction(e -> {
+            String val = cb.getValue();
+            layerOpacity = !val.equals(itemOpacity);
+            editorCanvas.refresh();
         });
+
+        EventHandler<MouseEvent> setOpacity = e -> {
+            itemsOpacity = opacitySlider.getValue();
+            editorCanvas.refresh();
+
+        };
+        opacitySlider.addEventHandler(MouseEvent.MOUSE_RELEASED, setOpacity);
     }
 
     private void createPointerTool(Pointer pointer) {
@@ -64,8 +84,14 @@ class EditorToolBar extends ToolBar {
     }
 
     private Image getPointerIcon() {
-        return new Image(
-                Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("pointer.png"))
-        );
+        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("pointer.png")));
+    }
+
+    public static double getItemsOpacity() {
+        return itemsOpacity;
+    }
+
+    public static boolean isLayerOpacity() {
+        return layerOpacity;
     }
 }

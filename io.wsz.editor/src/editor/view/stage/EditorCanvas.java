@@ -69,6 +69,21 @@ public class EditorCanvas extends Canvas {
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
+
+            double itemsOpacity = EditorToolBar.getItemsOpacity();
+            if (itemsOpacity != 1) {
+                if (EditorToolBar.isLayerOpacity()) {
+                    int level = Controller.get().getCurrentLayer().getLevel();
+                    if (pi.getLevel() == level) {
+                        gc.setGlobalAlpha(itemsOpacity);
+                    }
+                } else {
+                    if (pi == EditorController.get().getActiveContent().getItem()) {
+                        gc.setGlobalAlpha(itemsOpacity);
+                    }
+                }
+            }
+
             Coords pos = pi.getPos();
             Coords translated = pos.clonePos();
             translated.subtract(currentPos);
@@ -108,10 +123,12 @@ public class EditorCanvas extends Canvas {
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
             if (!activeContentMarked
-                    && pi.equals(EditorController.get().getActiveContent().getItems())) {
+                    && pi.equals(EditorController.get().getActiveContent().getItem())) {
                 activeContentMarked = true;
                 drawActiveContentRectangle(gc, pi);
             }
+
+            gc.setGlobalAlpha(1);
         }
 
         if (pointer.isActive()) {
@@ -239,15 +256,15 @@ public class EditorCanvas extends Canvas {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         attachArrowsEventToContent(pi);
                     } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                        EditorController.get().getActiveContent().setItems(pi);
+                        EditorController.get().getActiveContent().setItem(pi);
                         openContextMenu(pi, e);
                     }
                 } else {
-                    ac.setItems(null);
+                    ac.setItem(null);
                 }
             } finally {
                 if (((e.getButton().equals(MouseButton.SECONDARY)
-                        || (ac.getItems()) == null) && !pointer.isActive())) {
+                        || (ac.getItem()) == null) && !pointer.isActive())) {
                     removeArrowsEvent();
                 }
                 refresh();
@@ -302,7 +319,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void attachArrowsEventToContent(PosItem pi) {
-        EditorController.get().getActiveContent().setItems(pi);
+        EditorController.get().getActiveContent().setItem(pi);
         removeArrowsEvent();
         arrowsEvent = e -> {
             if (pointer.isActive()) {
@@ -313,7 +330,7 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.UP
                     || e.getCode() == KeyCode.RIGHT
                     || e.getCode() == KeyCode.LEFT) {
-                PosItem active = EditorController.get().getActiveContent().getItems();
+                PosItem active = EditorController.get().getActiveContent().getItem();
                 moveContent(e.getCode(), active);
                 contentTableView.refresh();
                 refresh();
