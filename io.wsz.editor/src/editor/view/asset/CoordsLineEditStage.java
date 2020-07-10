@@ -13,24 +13,22 @@ public class CoordsLineEditStage extends CoordsShapeEditStage {
     private final Polyline polyline = new Polyline();
     private final List<Coords> line;
 
-    public CoordsLineEditStage(Stage parent, PosItem item, List<Coords> line, boolean isContent) {
-        super(parent, item, isContent);
+    public CoordsLineEditStage(Stage parent, PosItem item, List<Coords> line) {
+        super(parent, item);
         this.line = line;
     }
 
     @Override
-    public void initWindow(boolean isContent) {
-        super.initWindow(isContent);
-        setTitle("Cover edit");
+    public void initWindow(boolean isContent, String title) {
+        super.initWindow(isContent, title);
 
-        scrollPane.setContent(pointsPane);
         polyline.setStroke(Color.RED);
         polyline.setStrokeWidth(1);
         pointsPane.getChildren().add(polyline);
     }
 
     @Override
-    protected void fillList(PosItem item) {
+    protected void fillList() {
         List<Coords> clone = Coords.cloneCoordsList(line);
         coordsList.addAll(clone);
     }

@@ -169,8 +169,13 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (item.getImage() == null) {
             return;
         }
-        Stage coverEdit = new CollisionEditStage(this, item, isContent);
-        coverEdit.show();
+        List<List<Coords>> collisionPolygons = item.getCollisionPolygons();
+        if (collisionPolygons == null) {
+            collisionPolygons = new ArrayList<>(0);
+        }
+        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item);
+        collisionEdit.initWindow(isContent, "Collision edit");
+        collisionEdit.show();
     }
 
     private void openCoverEdit() {
@@ -181,8 +186,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (coverLine == null) {
             coverLine = new ArrayList<>(0);
         }
-        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine, isContent);
-        coverEdit.initWindow(isContent);
+        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine);
+        coverEdit.initWindow(isContent, "Cover edit");
         coverEdit.show();
     }
 

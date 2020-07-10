@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -33,6 +34,9 @@ public abstract class CoordsShapeEditStage extends ChildStage {
     protected final ScrollPane scrollPane = new ScrollPane();
     protected final Pane pointsPane = new Pane();
     protected final HBox controls = new HBox(5);
+    protected final ContextMenu contextMenu = new ContextMenu();
+
+    protected ChoiceBox<Coords> coordsCB = new ChoiceBox<>(coordsList);
 
     private final ImageView iv = new ImageView();
     private final TextField xPosField = new DoubleField(0.0, false);
@@ -41,14 +45,22 @@ public abstract class CoordsShapeEditStage extends ChildStage {
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
     private final HBox coordsCBBox = new HBox(5);
-
-    private ChoiceBox<Coords> coordsCB = new ChoiceBox<>(coordsList);
+    private final MenuItem addPoint = new MenuItem("Add point");
 
     private final EventHandler<ActionEvent> coordsChosen = e -> {
+        e.consume();
         Coords c = coordsCB.getValue();
-        if (c == null) return;
-        xPosField.setText(String.valueOf(c.x));
-        yPosField.setText(String.valueOf(c.y));
+        String xVal;
+        String yVal;
+        if (c != null) {
+            xVal = String.valueOf(c.x);
+            yVal = String.valueOf(c.y);
+        } else {
+            xVal = "0.0";
+            yVal = "0.0";
+        }
+        xPosField.setText(xVal);
+        yPosField.setText(yVal);
     };
     private final ChangeListener<String> xValueListener = (observable, oldValue, newValue) -> {
         Coords c = coordsCB.getValue();
@@ -67,13 +79,16 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         refreshShape();
     };
 
-    public CoordsShapeEditStage(Stage parent, PosItem item, boolean isContent) {
+    public CoordsShapeEditStage(Stage parent, PosItem item) {
         super(parent);
         this.item = item;
     }
 
-    public void initWindow(boolean isContent) {
+    public void initWindow(boolean isContent, String title) {
+        setTitle(title);
+
         final StackPane r = new StackPane();
+        r.setPadding(new Insets(10));
 
         final VBox c = new VBox(5);
         final Image img = item.getImage();
@@ -104,7 +119,7 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         setScene(scene);
 
         hookupEvents();
-        fillList(item);
+        fillList();
         restoreShape();
 
         if (isContent) {
@@ -125,7 +140,7 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         return doubles;
     }
 
-    protected abstract void fillList(PosItem item);
+    protected abstract void fillList();
 
     protected abstract void restoreShape();
 
@@ -133,36 +148,54 @@ public abstract class CoordsShapeEditStage extends ChildStage {
 
     protected abstract void refreshShape();
 
+    protected abstract void saveShape();
+
+    protected void setUpContextMenu() {
+        final MenuItem clear = new MenuItem("Clear");
+        contextMenu.getItems().addAll(addPoint, clear);
+        clear.setOnAction(e -> clearShape());
+        EventHandler<ContextMenuEvent> onContextMenuRequested = e -> openContextMenu(contextMenu, e);
+        pointsPane.setOnContextMenuRequested(onContextMenuRequested);
+    }
+
+    protected void openContextMenu(ContextMenu cm, ContextMenuEvent e) {
+        cm.show(iv, e.getScreenX(), e.getScreenY());
+        addPoint.setOnAction(ev -> {
+            Coords point = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+            addPoint(point);
+        });
+    }
+
     private void hookupEvents() {
         cancel.setCancelButton(true);
         cancel.setOnAction(e -> close());
         save.setDefaultButton(true);
         save.setOnAction(e -> saveShape());
         deletePoint.setOnAction(e -> deletePoint());
-        final ContextMenu cm = new ContextMenu();
-        final MenuItem addPoint = new MenuItem("Add point");
-        final MenuItem clear = new MenuItem("Clear");
-        clear.setOnAction(ev -> clearShape());
-        cm.getItems().addAll(addPoint, clear);
-        pointsPane.setOnContextMenuRequested(e -> openContextMenu(cm, addPoint, e));
         pointsPane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                     && e.getClickCount() == 2) {
-                addPoint(e.getX(), e.getY());
+                Coords point = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+                addPoint(point);
             }
         });
         refreshCoordsCB();
         xPosField.textProperty().addListener(xValueListener);
         yPosField.textProperty().addListener(yValueListener);
+
+        setUpContextMenu();
     }
 
-    private void deletePoint() {
+    protected void deletePoint() {
         Coords c = coordsCB.getValue();
         coordsList.remove(c);
+        if (!coordsList.isEmpty()) {
+            coordsCB.setValue(coordsList.get(0));
+        }
         refreshShape();
     }
 
-    private void refreshCoordsCB() {
+    protected void refreshCoordsCB() {
         coordsCBBox.getChildren().remove(coordsCB);
         coordsCB = new ChoiceBox<>(coordsList);
         coordsCB.setMaxWidth(100);
@@ -172,32 +205,9 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         coordsCB.setOnAction(coordsChosen);
     }
 
-    private void openContextMenu(ContextMenu cm, MenuItem addPoint, ContextMenuEvent e) {
-        cm.show(iv, e.getScreenX(), e.getScreenY());
-        addPoint.setOnAction(ev -> {
-            double x = e.getX();
-            double y = e.getY();
-            addPoint(x, y);
-        });
-    }
-
-    private void addPoint(double x, double y) {
-        x /= Sizes.getMeter();
-        y /= Sizes.getMeter();
-        Coords point = new Coords(x, y);
+    protected void addPoint(Coords point) {
         coordsList.add(point);
-
         coordsCB.setValue(point);
-
         refreshShape();
     }
-
-    private boolean xAlreadyExists(double x) {
-        return coordsList.stream()
-                .anyMatch(c ->
-                        x > c.x - 0.01
-                                && x < c.x + 0.01);
-    }
-
-    protected abstract void saveShape();
 }
