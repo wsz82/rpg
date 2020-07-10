@@ -1,8 +1,11 @@
 package editor.model.settings;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class SettingsMemento implements Serializable {
+public class SettingsMemento implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private double stageX;
@@ -137,5 +140,65 @@ public class SettingsMemento implements Serializable {
 
     public double getLocationsHeight() {
         return locationsHeight;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
+        out.writeDouble(stageX);
+        out.writeDouble(stageY);
+        out.writeDouble(stageWidth);
+        out.writeDouble(stageHeight);
+
+        out.writeDouble(layersX);
+        out.writeDouble(layersY);
+        out.writeDouble(layersWidth);
+        out.writeDouble(layersHeight);
+
+        out.writeDouble(assetsX);
+        out.writeDouble(assetsY);
+        out.writeDouble(assetsWidth);
+        out.writeDouble(assetsHeight);
+
+        out.writeDouble(contentsX);
+        out.writeDouble(contentsY);
+        out.writeDouble(contentsWidth);
+        out.writeDouble(contentsHeight);
+
+        out.writeDouble(locationsX);
+        out.writeDouble(locationsY);
+        out.writeDouble(locationsWidth);
+        out.writeDouble(locationsHeight);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
+        stageX = in.readDouble();
+        stageY = in.readDouble();
+        stageWidth = in.readDouble();
+        stageHeight = in.readDouble();
+
+        layersX = in.readDouble();
+        layersY = in.readDouble();
+        layersWidth = in.readDouble();
+        layersHeight = in.readDouble();
+
+        assetsX = in.readDouble();
+        assetsY = in.readDouble();
+        assetsWidth = in.readDouble();
+        assetsHeight = in.readDouble();
+
+        contentsX = in.readDouble();
+        contentsY = in.readDouble();
+        contentsWidth = in.readDouble();
+        contentsHeight = in.readDouble();
+
+        locationsX = in.readDouble();
+        locationsY = in.readDouble();
+        locationsWidth = in.readDouble();
+        locationsHeight = in.readDouble();
     }
 }

@@ -4,19 +4,22 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SaveMemento implements Serializable {
+public class SaveMemento implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String name;
     private Coords lastPos;
-    private List<Location> locations;
     private String currentLocationName;
     private int currentLayer;
     private LinkedList<Creature> heroes;
+    private List<Location> locations;
 
     public SaveMemento() {}
 
@@ -75,5 +78,39 @@ public class SaveMemento implements Serializable {
 
     public void setHeroes(LinkedList<Creature> heroes) {
         this.heroes = heroes;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
+        out.writeUTF(name);
+
+        out.writeObject(lastPos);
+
+        out.writeUTF(currentLocationName);
+
+        out.writeInt(currentLayer);
+
+        out.writeObject(heroes);
+
+        out.writeObject(locations);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
+        name = in.readUTF();
+
+        lastPos = (Coords) in.readObject();
+
+        currentLocationName = in.readUTF();
+
+        currentLayer = in.readInt();
+
+        heroes = (LinkedList<Creature>) in.readObject();
+
+        locations = (List<Location>) in.readObject();
     }
 }

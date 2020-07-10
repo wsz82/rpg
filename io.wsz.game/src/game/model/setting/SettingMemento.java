@@ -2,9 +2,12 @@ package game.model.setting;
 
 import io.wsz.model.sizes.FontSize;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class SettingMemento implements Serializable {
+public class SettingMemento implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private boolean isFullScreen;
@@ -103,5 +106,35 @@ public class SettingMemento implements Serializable {
 
     public void setResizeWithResolution(boolean resizeWithResolution) {
         this.resizeWithResolution = resizeWithResolution;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(serialVersionUID);
+
+        out.writeBoolean(isFullScreen);
+        out.writeObject(fontSize);
+        out.writeDouble(gameScrollSpeed);
+        out.writeDouble(dialogScrollSpeed);
+        out.writeBoolean(centerOnPc);
+        out.writeBoolean(pauseOnInventory);
+        out.writeInt(resolutionWidth);
+        out.writeInt(resolutionHeight);
+        out.writeBoolean(resizeWithResolution);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
+        isFullScreen = in.readBoolean();
+        fontSize = (FontSize) in.readObject();
+        gameScrollSpeed = in.readDouble();
+        dialogScrollSpeed = in.readDouble();
+        centerOnPc = in.readBoolean();
+        pauseOnInventory = in.readBoolean();
+        resolutionWidth = in.readInt();
+        resolutionHeight = in.readInt();
+        resizeWithResolution = in.readBoolean();
     }
 }
