@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class CoordsShapeEditStage extends ChildStage {
     protected final ObservableList<Coords> coordsList = FXCollections.observableArrayList();
@@ -41,8 +42,8 @@ public abstract class CoordsShapeEditStage extends ChildStage {
     protected ChoiceBox<Coords> coordsCB = new ChoiceBox<>(coordsList);
 
     private final ImageView iv = new ImageView();
-    private final TextField xPosField = new DoubleField(0.0, false);
-    private final TextField yPosField = new DoubleField(0.0, false);
+    private final TextField xPosField = new DoubleField(0.00, false);
+    private final TextField yPosField = new DoubleField(0.00, false);
     private final Button deletePoint = new Button("Delete point");
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
@@ -80,6 +81,10 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         coordsCB.setValue(c);
         refreshShape();
     };
+    private Button xLeftArrow;
+    private Button xRightArrow;
+    private Button yLeftArrow;
+    private Button yRightArrow;
 
     public CoordsShapeEditStage(Stage parent, PosItem item) {
         super(parent);
@@ -103,16 +108,30 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         scrollPane.setContent(pointsPane);
 
         final VBox coords = new VBox(5);
+
+        final VBox xVBox = new VBox(5);
+        final HBox xButtons = new HBox(5);
+        xLeftArrow = new Button("", new ImageView(getLeftArrow()));
+        xRightArrow = new Button("", new ImageView(getRightArrow()));
+        xButtons.getChildren().addAll(xLeftArrow, xRightArrow);
         final HBox xBox = new HBox(5);
         final Label xLabel = new Label("X:");
         xLabel.setAlignment(Pos.CENTER);
+        xVBox.getChildren().addAll(xBox, xButtons);
         xBox.getChildren().addAll(xLabel, xPosField);
         xPosField.setPrefWidth(50);
+
+        final VBox yVBox = new VBox(5);
+        final HBox yButtons = new HBox(5);
+        yLeftArrow = new Button("", new ImageView(getLeftArrow()));
+        yRightArrow = new Button("", new ImageView(getRightArrow()));
+        yButtons.getChildren().addAll(yLeftArrow, yRightArrow);
         final HBox yBox = new HBox(5);
         final Label yLabel = new Label("Y:");
         yLabel.setAlignment(Pos.CENTER);
+        yVBox.getChildren().addAll(yBox, yButtons);
         yBox.getChildren().addAll(yLabel, yPosField);
-        coords.getChildren().addAll(xBox, yBox);
+        coords.getChildren().addAll(xVBox, yVBox);
         yPosField.setPrefWidth(50);
 
         final VBox coordsCBVBox = new VBox(5);
@@ -197,6 +216,47 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         yPosField.textProperty().addListener(yValueListener);
 
         setUpContextMenu();
+
+        xLeftArrow.setOnAction(e -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            double val = getRounded2DecVal(c.x - 0.01);
+            setNewPosXVal(c, val);
+        });
+        xRightArrow.setOnAction(e -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            double val = getRounded2DecVal(c.x + 0.01);
+            setNewPosXVal(c, val);
+        });
+        yLeftArrow.setOnAction(e -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            double val = getRounded2DecVal(c.y - 0.01);
+            setNewPosYVal(c, val);
+        });
+        yRightArrow.setOnAction(e -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            double val = getRounded2DecVal(c.y + 0.01);
+            setNewPosYVal(c, val);
+        });
+    }
+
+    private double getRounded2DecVal(double rawVal) {
+        return (int) (Math.round(rawVal * 100)) / 100.0;
+    }
+
+    private void setNewPosXVal(Coords c, double v) {
+        c.x = v;
+        coordsCB.setValue(null);
+        coordsCB.setValue(c);
+    }
+
+    private void setNewPosYVal(Coords c, double v) {
+        c.y = v;
+        coordsCB.setValue(null);
+        coordsCB.setValue(c);
     }
 
     protected void deletePoint() {
@@ -222,5 +282,13 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         coordsList.add(point);
         coordsCB.setValue(point);
         refreshShape();
+    }
+
+    private Image getRightArrow() {
+        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("arrow_right.png")));
+    }
+
+    private Image getLeftArrow() {
+        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("arrow_left.png")));
     }
 }
