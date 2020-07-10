@@ -444,10 +444,11 @@ public class Coords implements Externalizable {
         String locationName;
         if (location != null) {
             locationName = location.getName();
+            return "Location: " + locationName + ": " + "X: " + x + ", Y: " + y;
         } else {
-            locationName = null;
+            return "X: " + x + ", Y: " + y;
         }
-        return "Location:" + locationName + ": " + "X: " + x + ", Y: " + y;
+
     }
 
     @Override

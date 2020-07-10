@@ -6,6 +6,7 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.stage.Coords;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
@@ -175,7 +177,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (item.getImage() == null) {
             return;
         }
-        Stage coverEdit = new CoverEditStage(this, item, isContent);
+        List<Coords> coverLine= item.getCoverLine();
+        if (coverLine == null) {
+            coverLine = new ArrayList<>(0);
+        }
+        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine, isContent);
+        coverEdit.initWindow(isContent);
         coverEdit.show();
     }
 
