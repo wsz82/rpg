@@ -90,16 +90,18 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         pos.x = x;
         pos.y = y;
         setLevel(cr.getLevel());
-        Location location = cr.getPos().getLocation();
-        PosItem obstacle = Controller.get().getBoard().getObstacle(pos, this, location);
-        if (obstacle != null) {
+        Location l = cr.getPos().getLocation();
+        PosItem obstacle = Controller.get().getBoard().getObstacle(pos, this, l);
+        boolean outOfLocation = x < 0 || y < 0
+                || x > l.getWidth() || y > l.getHeight();
+        if (obstacle != null || outOfLocation) {
             pos.x = tempX;
             pos.y = tempY;
             setLevel(tempLevel);
             System.out.println(this.getName() + " cannot be dropped here");
             return false;
         } else {
-            location.getItemsToAdd().add(this);
+            l.getItemsToAdd().add(this);
             System.out.println(this.getName() + " dropped");
             return true;
         }

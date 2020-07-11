@@ -14,7 +14,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -158,7 +157,7 @@ public class GameView extends CanvasView {
         }
 
         if (selectionMode) {
-            drawSelection(gc);
+            drawSelection();
         }
 
         if (Settings.isShowBar()) {
@@ -175,8 +174,8 @@ public class GameView extends CanvasView {
                 items, level);
     }
 
-    private void drawSelection(GraphicsContext gc) {
-        if (selFirst.x == -1 | selSecond.x == -1) {
+    private void drawSelection() {
+        if (selFirst.x == -1 || selSecond.x == -1) {
             return;
         }
         final Coords first = selFirst;
