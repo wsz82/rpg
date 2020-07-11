@@ -81,6 +81,7 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
 
     @Override
     protected void refreshShape() {
+        super.refreshShape();
         List<Polygon> polygonsShapes = new ArrayList<>(0);
         for (List<Coords> poss : polygons) {
             Polygon p = new Polygon();

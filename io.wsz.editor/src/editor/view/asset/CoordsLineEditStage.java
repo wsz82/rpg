@@ -52,6 +52,7 @@ public class CoordsLineEditStage extends CoordsShapeEditStage {
 
     @Override
     protected void refreshShape() {
+        super.refreshShape();
         coordsList.sort(Comparator.comparingDouble(c -> c.x));
         List<Double> doubles = coordsToPoints(coordsList);
         List<Double> points = polyline.getPoints();

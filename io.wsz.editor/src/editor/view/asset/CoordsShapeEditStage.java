@@ -23,6 +23,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -41,6 +43,7 @@ public abstract class CoordsShapeEditStage extends ChildStage {
 
     protected ChoiceBox<Coords> coordsCB = new ChoiceBox<>(coordsList);
 
+    private final Circle circle = new Circle(5, Color.TRANSPARENT);
     private final ImageView iv = new ImageView();
     private final TextField xPosField = new DoubleField(0.00, false);
     private final TextField yPosField = new DoubleField(0.00, false);
@@ -147,6 +150,11 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         c.getChildren().addAll(scrollPane, hControls);
         r.getChildren().add(c);
 
+        circle.setVisible(false);
+        circle.setStroke(Color.GREEN);
+        circle.setStrokeWidth(2);
+        pointsPane.getChildren().add(circle);
+
         final Scene scene = new Scene(r);
         setScene(scene);
 
@@ -178,7 +186,16 @@ public abstract class CoordsShapeEditStage extends ChildStage {
 
     protected abstract void clearShape();
 
-    protected abstract void refreshShape();
+    protected void refreshShape() {
+        Coords c = coordsCB.getValue();
+        if (c == null) {
+            circle.setVisible(false);
+        } else {
+            circle.setCenterX(c.x * Sizes.getMeter());
+            circle.setCenterY(c.y * Sizes.getMeter());
+            circle.setVisible(true);
+        }
+    }
 
     protected abstract void saveShape();
 
