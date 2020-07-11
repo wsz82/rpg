@@ -47,7 +47,7 @@ public class GameStage extends Stage {
                 gameController.setGame(false);
                 setGameMenuForCenter();
             } else
-            if (parentToReturn == gameView) {
+            if (parentToReturn == gameView.getCanvas()) {
                 gameController.resumeGame();
             }
         }
@@ -104,7 +104,7 @@ public class GameStage extends Stage {
         if (gameMenu == null) {
             createGameMenu();
         }
-        parentToReturn = gameView;
+        parentToReturn = gameView.getCanvas();
         root.setCenter(gameMenu);
     }
 
@@ -303,8 +303,8 @@ public class GameStage extends Stage {
             createGameMenu();
         }
         parentToReturn = gameMenu;
-        if (root.getCenter() != gameView) {
-            root.setCenter(gameView);
+        if (root.getCenter() != gameView.getCanvas()) {
+            root.setCenter(gameView.getCanvas());
         }
     }
 
