@@ -46,11 +46,11 @@ public class InventoryView {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
 
-        this.holdView = new HoldView(gc);
+        this.holdView = new HoldView(canvas);
         equipmentViews.add(holdView);
-        this.dropView = new DropView(gc);
+        this.dropView = new DropView(canvas);
         equipmentViews.add(dropView);
-        this.containerView = new ContainerView(gc);
+        this.containerView = new ContainerView(canvas);
         equipmentViews.add(containerView);
 
         hookupEvents();

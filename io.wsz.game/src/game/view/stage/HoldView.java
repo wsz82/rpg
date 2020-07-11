@@ -6,7 +6,7 @@ import io.wsz.model.item.Inventory;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -16,8 +16,8 @@ import java.util.List;
 public class HoldView extends EquipmentView {
     private Inventory inventory;
 
-    public HoldView(GraphicsContext gc) {
-        super(gc);
+    public HoldView(Canvas canvas) {
+        super(canvas);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class HoldView extends EquipmentView {
     @Override
     protected final void drawEquipment() {
 
-        selectItems();
+        selectEquipment();
 
         for (Equipment e : items) {
             final Coords pos = e.getPos();

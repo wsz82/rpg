@@ -11,7 +11,7 @@ public class Sizes {
     public static final int CONSTANT_METER = 100;
     public static final int TURN_DURATION_MILLIS = 16;
     public static final double SECOND = 1000.0/TURN_DURATION_MILLIS;
-    public static final double COVER_OPACITY = 0.5;
+    public static final double COVER_OPACITY = 0.4;
 
     private static int meter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;

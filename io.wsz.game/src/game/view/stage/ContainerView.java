@@ -5,7 +5,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -14,8 +14,8 @@ import java.util.List;
 public class ContainerView extends EquipmentView {
     private Container container;
 
-    public ContainerView(GraphicsContext gc) {
-        super(gc);
+    public ContainerView(Canvas canvas) {
+        super(canvas);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ContainerView extends EquipmentView {
     @Override
     protected final void drawEquipment() {
 
-        selectItems();
+        selectEquipment();
 
         for (Equipment e : items) {
             final Coords pos = e.getPos();

@@ -4,7 +4,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.stage.Coords;
 import javafx.geometry.VPos;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
@@ -12,18 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class EquipmentView {
+public abstract class EquipmentView extends CanvasView {
     protected final List<Equipment> items = new ArrayList<>(0);
     protected final Coords modifiedCoords = new Coords();
     protected final Coords viewPos = new Coords();
     protected final Coords currentPos = new Coords();
-    protected final GraphicsContext gc;
 
     protected double viewWidth;
     protected double viewHeight;
 
-    public EquipmentView(GraphicsContext gc) {
-        this.gc = gc;
+    public EquipmentView(Canvas canvas) {
+        super(canvas);
     }
 
     public void refresh() {
@@ -35,7 +34,7 @@ public abstract class EquipmentView {
 
     protected abstract void drawEquipment();
 
-    protected void selectItems() {
+    protected void selectEquipment() {
         double left = currentPos.x;
         double right = left + viewWidth;
         double top = currentPos.y;

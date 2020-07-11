@@ -1,6 +1,5 @@
 package game.view.stage;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureSize;
 import io.wsz.model.item.Equipment;
@@ -8,23 +7,21 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class DropView extends EquipmentView{
+public class DropView extends EquipmentView {
     private final Coords creaturePos = new Coords();
     private final List<PosItem> allItmes = new ArrayList<>(0);
-    private final Controller controller = Controller.get();
 
     private List<Equipment> droppedEquipment;
 
-    public DropView(GraphicsContext gc) {
-        super(gc);
+    public DropView(Canvas canvas) {
+        super(canvas);
     }
 
     @Override
@@ -56,6 +53,9 @@ public class DropView extends EquipmentView{
 
         for (PosItem pi : allItmes) {
             Creature cr = controller.getCreatureToOpenInventory();
+
+            adjustCoverOpacity(cr, pi);
+
             if (pi == cr) {
                 drawCreatureSize();
             }
@@ -101,6 +101,7 @@ public class DropView extends EquipmentView{
                 destY = y;
             }
             gc.drawImage(img, startX, startY, width, height, destX + viewX, destY + viewY, width, height);
+            gc.setGlobalAlpha(1.0);
         }
     }
 
@@ -130,27 +131,7 @@ public class DropView extends EquipmentView{
         Creature cr = controller.getCreatureToOpenInventory();
         Location loc = cr.getPos().getLocation();
 
-        double left = currentPos.x;
-        double right = left + viewWidth;
-        double top = currentPos.y;
-        double bottom = top + viewHeight;
-
-        allItmes.clear();
-        loc.getItems().get().stream()
-                .filter(PosItem::getVisible)
-                .filter(pi -> {
-                    double piLeft = pi.getLeft();
-                    double piRight = pi.getRight();
-                    double piTop = pi.getTop();
-                    double piBottom = pi.getBottom();
-                    return Coords.doOverlap(
-                            left, top, right, bottom,
-                            piLeft, piTop, piRight, piBottom);
-                })
-                .filter(pi -> pi.getLevel().equals(cr.getLevel()))
-                .collect(Collectors.toCollection(() -> allItmes));
-
-        controller.getBoard().sortPosItems(allItmes);
+        sortItems(loc, currentPos, viewWidth, viewHeight, allItmes, cr.getLevel());
     }
 
     public void setDroppedEquipment(List<Equipment> droppedEquipment) {

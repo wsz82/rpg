@@ -10,7 +10,6 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.ItemsComparator;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
@@ -34,16 +33,12 @@ import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 import static javafx.scene.input.KeyCode.*;
 
-public class GameView {
+public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
 
-    private final Canvas canvas = new Canvas();
     private final Stage parent;
-    private final Controller controller = Controller.get();
-    private final Board board = controller.getBoard();
     private final GameController gameController = GameController.get();
     private final List<PosItem> items = new ArrayList<>(0);
-    private final List<Creature> visibleControllables = new ArrayList<>(0);
     private final Coords currentPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
@@ -62,6 +57,7 @@ public class GameView {
     private boolean selectionMode;
 
     public GameView(Stage parent) {
+        super(new Canvas());
         this.parent = parent;
         hookUpEvents();
         defineRemovableEvents();
@@ -109,24 +105,14 @@ public class GameView {
             return;
         }
         updatePos();
+        clear();
+        sortItems();
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        clear(gc);
-
-        selectItems();
-
-        items.stream()
-                .filter(p -> p instanceof Creature)
-                .map(p -> (Creature) p)
-                .filter(c -> {
-                    CreatureControl control = c.getControl();
-                    return control.equals(CONTROLLABLE) || control.equals(CONTROL);
-                })
-                .collect(Collectors.toCollection(() -> visibleControllables));
+        List<Creature> visibleControllables = getVisibleControllables(items);
 
         for (PosItem pi : items) {
 
-            adjustCoverOpacity(gc, pi);
+            adjustCoverOpacity(visibleControllables, pi);
 
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
@@ -135,7 +121,7 @@ public class GameView {
             final double y = modifiedCoords.y * Sizes.getMeter();
 
             switch (type) {
-                case CREATURE -> drawCreatureSize((Creature) pi, gc);
+                case CREATURE -> drawCreatureSize((Creature) pi);
             }
             Image img = pi.getImage();
             double width = img.getWidth();
@@ -180,53 +166,13 @@ public class GameView {
         }
     }
 
-    private void adjustCoverOpacity(GraphicsContext gc, PosItem pi) {
-        if (!pi.getCollisionPolygons().isEmpty()) {
-            for (Creature cr : visibleControllables) {
-                double crLeft = cr.getLeft();
-                double crRight = cr.getRight();
-                double crTop = cr.getTop();
-                double crBottom = cr.getBottom();
-
-                double piLeft = pi.getLeft();
-                double piRight = pi.getRight();
-                double piTop = pi.getTop();
-                double piBottom = pi.getBottom();
-                boolean overlap = Coords.doOverlap(
-                        crLeft, crTop, crRight, crBottom,
-                        piLeft, piTop, piRight, piBottom);
-                if (!overlap) continue;
-                ItemsComparator.Comparison comparison = ItemsComparator.isCovered(cr, pi);
-                if (comparison == ItemsComparator.Comparison.LESS) {
-                    gc.setGlobalAlpha(Sizes.COVER_OPACITY);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void selectItems() {
-        double left = currentPos.x;
-        double right = left + canvas.getWidth() / Sizes.getMeter();
-        double top = currentPos.y;
-        double bottom = top + canvas.getHeight() / Sizes.getMeter();
-
-        items.clear();
-        controller.getCurrentLocation().getItems().stream()
-                .filter(PosItem::getVisible)
-                .filter(pi -> {
-                    double piLeft = pi.getLeft();
-                    double piRight = pi.getRight();
-                    double piTop = pi.getTop();
-                    double piBottom = pi.getBottom();
-                    return Coords.doOverlap(
-                            left, top, right, bottom,
-                            piLeft, piTop, piRight, piBottom);
-                })
-                .filter(pi -> pi.getLevel() <= controller.getCurrentLayer().getLevel())    //TODO
-                .collect(Collectors.toCollection(() -> items));
-
-        board.sortPosItems(items);
+    private void sortItems() {
+        Location location = controller.getCurrentLocation().getLocation();
+        int level = controller.getCurrentLayer().getLevel();
+        double canvasWidth = canvas.getWidth() / Sizes.getMeter();
+        double canvasHeight = canvas.getHeight() / Sizes.getMeter();
+        sortItems(location, currentPos, canvasWidth, canvasHeight,
+                items, level);
     }
 
     private void drawSelection(GraphicsContext gc) {
@@ -388,7 +334,7 @@ public class GameView {
         currentPos.x = Math.max(newX, 0);
     }
 
-    private void drawCreatureSize(Creature cr, GraphicsContext gc) {
+    private void drawCreatureSize(Creature cr) {
         CreatureControl control = cr.getControl();
         if (control != CreatureControl.CONTROL
                 && control != CreatureControl.ENEMY) {
@@ -677,7 +623,7 @@ public class GameView {
         }
     }
 
-    private void clear(GraphicsContext gc) {
+    private void clear() {
         gc.setFill(Color.LIGHTGREY);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
