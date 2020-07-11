@@ -5,9 +5,9 @@ import io.wsz.model.item.PosItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.wsz.model.stage.Comparator.Comparison.GREAT;
-import static io.wsz.model.stage.Comparator.Comparison.LESS;
-import static io.wsz.model.stage.Comparator.compare;
+import static io.wsz.model.stage.ItemsComparator.Comparison.GREAT;
+import static io.wsz.model.stage.ItemsComparator.Comparison.LESS;
+import static io.wsz.model.stage.ItemsComparator.compare;
 
 public class GraphSorter<A extends PosItem> {
     private final Graph<A> graph = new Graph<A>(new ArrayList<>(0));
@@ -26,7 +26,7 @@ public class GraphSorter<A extends PosItem> {
             Node<A> newNode = new Node<A>(pi);
 
             for (Node<A> n : nodes) {
-                Comparator.Comparison result = compare(pi, n);
+                ItemsComparator.Comparison result = compare(pi, n);
 
                 if (result.equals(GREAT)) {
                     n.getGreater().add(newNode);

@@ -27,7 +27,6 @@ public class Board {
     private final List<Equipment> equipment = new ArrayList<>(0);
     private final List<Equipment> equipmentResult = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
-    private final Coords modifiedCoords = new Coords();
     private final Coords resultCoords = new Coords();
 
     public static Board get() {

@@ -10,9 +10,9 @@ import java.util.List;
 
 import static io.wsz.model.item.ItemType.CREATURE;
 import static io.wsz.model.item.ItemType.LANDSCAPE;
-import static io.wsz.model.stage.Comparator.Comparison.*;
+import static io.wsz.model.stage.ItemsComparator.Comparison.*;
 
-public class Comparator {
+public class ItemsComparator {
     private static final LinkedList<Coords> oneList = new LinkedList<>();
     private static final LinkedList<Coords> twoList = new LinkedList<>();
     private static final List<Coords> oneLostReferences = new ArrayList<>(0);
@@ -129,7 +129,7 @@ public class Comparator {
         return INCOMPARABLE;
     }
 
-    private static Comparison isCovered(PosItem i1, PosItem i2) {
+    public static Comparison isCovered(PosItem i1, PosItem i2) {
         addCoverCoordsToList(i1, oneList, oneLeft, oneRight, oneLostReferences, oneResultCoords);
         addCoverCoordsToList(i2, twoList, twoLeft, twoRight, twoLostReferences, twoResultCoords);
         return isCoverLineAbove(oneList, twoList);

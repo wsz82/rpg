@@ -10,6 +10,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ItemsComparator;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
@@ -41,6 +42,7 @@ public class GameView extends Canvas {
     private final Board board = controller.getBoard();
     private final GameController gameController = GameController.get();
     private final List<PosItem> items = new ArrayList<>(0);
+    private final List<Creature> visibleControllables = new ArrayList<>(0);
     private final Coords currentPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
@@ -112,49 +114,60 @@ public class GameView extends Canvas {
 
         selectItems();
 
+        items.stream()
+                .filter(p -> p instanceof Creature)
+                .map(p -> (Creature) p)
+                .filter(c -> {
+                    CreatureControl control = c.getControl();
+                    return control.equals(CONTROLLABLE) || control.equals(CONTROL);
+                })
+                .collect(Collectors.toCollection(() -> visibleControllables));
+
         for (PosItem pi : items) {
+
+            adjustCoverOpacity(gc, pi);
+
             final ItemType type = pi.getType();
             final Coords pos = pi.getPos();
             translateCoordsToScreenCoords(pos);
             final double x = modifiedCoords.x * Sizes.getMeter();
             final double y = modifiedCoords.y * Sizes.getMeter();
 
-            if (pi.getVisible()) {
-                switch (type) {
-                    case CREATURE -> drawCreatureSize((Creature) pi, gc);
-                }
-                Image img = pi.getImage();
-                double width = img.getWidth();
-                double height = img.getHeight();
-
-                double startX = 0;
-                if (x < 0) {
-                    startX = -x;
-                    width = x + width;
-                }
-                if (width > getWidth()) {
-                    width = getWidth();
-                }
-
-                double startY = 0;
-                if (y < 0) {
-                    startY = -y;
-                    height = y + height;
-                }
-                if (height > getHeight()) {
-                    height = getHeight();
-                }
-
-                double destX = 0;
-                if (x > 0) {
-                    destX = x;
-                }
-                double destY = 0;
-                if (y > 0) {
-                    destY = y;
-                }
-                gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
+            switch (type) {
+                case CREATURE -> drawCreatureSize((Creature) pi, gc);
             }
+            Image img = pi.getImage();
+            double width = img.getWidth();
+            double height = img.getHeight();
+
+            double startX = 0;
+            if (x < 0) {
+                startX = -x;
+                width = x + width;
+            }
+            if (width > getWidth()) {
+                width = getWidth();
+            }
+
+            double startY = 0;
+            if (y < 0) {
+                startY = -y;
+                height = y + height;
+            }
+            if (height > getHeight()) {
+                height = getHeight();
+            }
+
+            double destX = 0;
+            if (x > 0) {
+                destX = x;
+            }
+            double destY = 0;
+            if (y > 0) {
+                destY = y;
+            }
+            gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
+            gc.setGlobalAlpha(1);
         }
 
         if (selectionMode) {
@@ -166,11 +179,36 @@ public class GameView extends Canvas {
         }
     }
 
-    public void selectItems() {
+    private void adjustCoverOpacity(GraphicsContext gc, PosItem pi) {
+        if (!pi.getCollisionPolygons().isEmpty()) {
+            for (Creature cr : visibleControllables) {
+                double crLeft = cr.getLeft();
+                double crRight = cr.getRight();
+                double crTop = cr.getTop();
+                double crBottom = cr.getBottom();
+
+                double piLeft = pi.getLeft();
+                double piRight = pi.getRight();
+                double piTop = pi.getTop();
+                double piBottom = pi.getBottom();
+                boolean overlap = Coords.doOverlap(
+                        crLeft, crTop, crRight, crBottom,
+                        piLeft, piTop, piRight, piBottom);
+                if (!overlap) continue;
+                ItemsComparator.Comparison comparison = ItemsComparator.isCovered(cr, pi);
+                if (comparison == ItemsComparator.Comparison.LESS) {
+                    gc.setGlobalAlpha(0.5);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void selectItems() {
         double left = currentPos.x;
-        double right = left + getWidth()/ Sizes.getMeter();
+        double right = left + getWidth() / Sizes.getMeter();
         double top = currentPos.y;
-        double bottom = top + getHeight()/Sizes.getMeter();
+        double bottom = top + getHeight() / Sizes.getMeter();
 
         items.clear();
         controller.getCurrentLocation().getItems().stream()
