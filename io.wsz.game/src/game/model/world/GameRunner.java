@@ -113,6 +113,7 @@ public class GameRunner {
         heroesLocations.remove(currentLocation);
 
         for (Location l : heroesLocations) {
+            if (l == null) continue;
             for (PosItem pi : l.getItems().get()) {
                 pi.update();
             }
@@ -201,7 +202,6 @@ public class GameRunner {
         }
         l.getItems().get().removeAll(p);
         for (PosItem pi : p) {
-            pi.getPos().setLocation(null);
             pi.setVisible(true);
         }
         p.clear();

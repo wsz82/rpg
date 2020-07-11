@@ -45,6 +45,7 @@ public class Board {
 
     public PosItem lookForContent(Location location, Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
+        if (location == null) return null;
         allItems.addAll(location.getItems().get());
         items.clear();
         allItems.stream()
@@ -149,7 +150,6 @@ public class Board {
     }
 
     public PosItem getObstacle(Coords nextPos, PosItem item, Location location) {
-        if (location == null) return null;
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
