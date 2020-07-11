@@ -65,7 +65,7 @@ public class PluginCaretaker {
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             plugin = (Plugin) oos.readObject();
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -80,7 +80,7 @@ public class PluginCaretaker {
                 ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             p = (Plugin) oos.readObject();
-        } catch (ClassNotFoundException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

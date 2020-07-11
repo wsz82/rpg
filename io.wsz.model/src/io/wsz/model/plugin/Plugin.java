@@ -24,24 +24,6 @@ public class Plugin implements Externalizable {
 
     public Plugin() {}
 
-    public Plugin(String name, List<Location> locations, List<Asset> assets) {
-        this.name = name;
-        this.locations = locations;
-        this.assets = assets;
-    }
-
-    public Plugin(String name, List<Location> locations, List<Asset> assets, boolean active,
-                  boolean isStartingLocation, String startLocation, Coords startPos, int startLayer) {
-        this.name = name;
-        this.locations = locations;
-        this.assets = assets;
-        this.active = active;
-        this.isStartingLocation = isStartingLocation;
-        this.startLocation = startLocation;
-        this.startPos = startPos;
-        this.startLayer = startLayer;
-    }
-
     public String getName() {
         return name;
     }
