@@ -127,6 +127,11 @@ public class Creature extends PosItem<Creature> implements Containable {
         return getCenter(pos);
     }
 
+    @Override
+    protected Coords getCoordsForCollisionCheck() {
+        return getCenter();
+    }
+
     public Coords getCenter(Coords pos) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();

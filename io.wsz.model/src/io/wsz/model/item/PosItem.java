@@ -93,6 +93,14 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return Coords.pointWithinOval(getCenter(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
+    public PosItem getCollision() {
+        return getCollision(getCoordsForCollisionCheck());
+    }
+
+    protected Coords getCoordsForCollisionCheck() {
+        return pos;
+    }
+
     public PosItem getCollision(Coords nextPos) {
         return Controller.get().getBoard().getObstacle(nextPos, this, pos.getLocation());
     }

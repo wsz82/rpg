@@ -119,11 +119,21 @@ public class InDoor extends PosItem<InDoor> implements Externalizable, Openable 
     @Override
     public void open() {
         open = true;
+        PosItem collision = getCollision();
+        if (collision != null) {
+            open = false;
+            System.out.println(getName() + " cannot be open: collides with " + collision.getName());
+        }
     }
 
     @Override
     public void close() {
         open = false;
+        PosItem collision = getCollision();
+        if (collision != null) {
+            open = true;
+            System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
+        }
     }
 
     @Override
