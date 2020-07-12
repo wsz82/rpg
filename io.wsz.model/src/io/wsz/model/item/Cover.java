@@ -23,11 +23,6 @@ public class Cover extends PosItem<Cover> implements Externalizable {
     }
 
     @Override
-    public void update() {
-
-    }
-
-    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

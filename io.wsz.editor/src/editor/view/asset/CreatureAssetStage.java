@@ -91,10 +91,10 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         }
 
         fillInputs();
-        hookUpEvents();
+        hookUpCreatureEvents();
     }
 
-    private void hookUpEvents() {
+    private void hookUpCreatureEvents() {
         portraitButton.setOnAction(e -> {
             String title = "Choose image for creature portrait";
             setUpImageChooser(title, portraitLabel);

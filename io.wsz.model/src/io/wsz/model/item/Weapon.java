@@ -97,11 +97,6 @@ public class Weapon extends Equipment<Weapon> {
     }
 
     @Override
-    public void onEquip() {
-
-    }
-
-    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

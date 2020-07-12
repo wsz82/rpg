@@ -114,11 +114,6 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     }
 
     @Override
-    public void update() {
-
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Equipment)) return false;

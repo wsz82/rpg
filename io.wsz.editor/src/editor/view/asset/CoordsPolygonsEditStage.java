@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -26,8 +27,8 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
     private final MenuItem addPolygon = new MenuItem("Add polygon");
     private final Button deletePolygon = new Button("Delete polygon");
 
-    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, PosItem item) {
-        super(parent, item);
+    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, PosItem item, Image background) {
+        super(parent, item, background);
         this.itemPolygons = itemPolygons;
     }
 

@@ -81,6 +81,10 @@ public abstract class Asset implements Externalizable {
         this.relativePath.set(relativePath);
     }
 
+    public final Image getInitialImage() {
+        return getImage();
+    }
+
     public Image getImage() {
         if (this.image.get() == null) {
             setImage(loadImageFromPath(getRelativePath()));
@@ -88,7 +92,7 @@ public abstract class Asset implements Externalizable {
         return image.get();
     }
 
-    private Image loadImageFromPath(String fileName) {
+    protected Image loadImageFromPath(String fileName) {
         String path = getRelativeTypePath(getType()) + File.separator + fileName;
         if (path.isEmpty()) {
             throw new NoSuchElementException();

@@ -226,11 +226,10 @@ public class Coords implements Externalizable {
     }
 
     public static boolean polygonsIntersect(Coords nextPos, PosItem item, PosItem obstacle) {
-        if (item.getCollisionPolygons().isEmpty()) return false;
-        if (obstacle.getCollisionPolygons().isEmpty()) return false;
-
-        List<List<Coords>> iPolygons = item.getCollisionPolygons();
-        List<List<Coords>> oPolygons = obstacle.getCollisionPolygons();
+        List<List<Coords>> iPolygons = item.getActualCollisionPolygons();
+        if (iPolygons.isEmpty()) return false;
+        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
+        if (oPolygons.isEmpty()) return false;
 
         for (List<Coords> rawIPolygon : iPolygons) {
 

@@ -152,14 +152,14 @@ public class Board {
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> pi.getCollisionPolygons() != null || pi instanceof Creature)
+                .filter(pi -> pi.getActualCollisionPolygons() != null || pi instanceof Creature)
                 .filter(pi -> {
                     int level = item.getLevel();
                     return pi.getLevel().equals(level);
                 })
                 .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) return null;
-        if (item.getCollisionPolygons().isEmpty() && !(item instanceof Creature)) return null;
+        if (item.getActualCollisionPolygons().isEmpty() && !(item instanceof Creature)) return null;
 
         double left = item.getCollisionLeft(nextPos);
         double right = item.getCollisionRight(nextPos);
@@ -168,7 +168,7 @@ public class Board {
 
         for (PosItem obstacle : items) {
             if (obstacle == item) continue;
-            if (obstacle.getCollisionPolygons().isEmpty() && !(obstacle instanceof Creature)) continue;
+            if (obstacle.getActualCollisionPolygons().isEmpty() && !(obstacle instanceof Creature)) continue;
             double oLeft = obstacle.getCollisionLeft();
             double oRight = obstacle.getCollisionRight();
             if (right < oLeft || left > oRight) continue;
@@ -219,7 +219,7 @@ public class Board {
     }
 
     public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, PosItem pi) {
-        List<List<Coords>> cp = pi.getCollisionPolygons();
+        List<List<Coords>> cp = pi.getActualCollisionPolygons();
         for (List<Coords> polygon : cp) {
             List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
             Coords.translateCoords(lostRef, nextPos.x, nextPos.y);
@@ -234,7 +234,7 @@ public class Board {
     }
 
     public boolean getCreatureObstacleCollision(Coords nextPos, CreatureSize s, PosItem pi) {
-        List<List<Coords>> cp = pi.getCollisionPolygons();
+        List<List<Coords>> cp = pi.getActualCollisionPolygons();
         for (List<Coords> polygon : cp) {
             List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
             Coords piPos = pi.getPos();

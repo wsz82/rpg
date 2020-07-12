@@ -80,7 +80,7 @@ public class ItemsComparator {
 
                     if (i2 instanceof Equipment) {
 
-                        if (i2.getCoverLine().isEmpty()) {
+                        if (i2.getActualCoverLine().isEmpty()) {
                             return GREAT;
                         }
                     }
@@ -93,7 +93,7 @@ public class ItemsComparator {
 
                     if (i1 instanceof Equipment) {
 
-                        if (i1.getCoverLine().isEmpty()) {
+                        if (i1.getActualCoverLine().isEmpty()) {
                             return LESS;
                         }
                     }
@@ -137,7 +137,7 @@ public class ItemsComparator {
 
     private static void addCoverCoordsToList(PosItem pi, LinkedList<Coords> poss, Coords leftPos, Coords rightPos,
                                              List<Coords> lostRef, List<Coords> resultCoords) {
-        final List<Coords> cl = pi.getCoverLine();
+        final List<Coords> cl = pi.getActualCoverLine();
         final double left = pi.getLeft();
         final double top = pi.getTop();
         final double right = pi.getRight();

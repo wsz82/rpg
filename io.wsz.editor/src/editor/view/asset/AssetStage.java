@@ -10,6 +10,7 @@ import io.wsz.model.stage.Coords;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -22,11 +23,13 @@ import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final VBox container = new VBox(5);
-    protected A item;
-    protected boolean isContent;
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
     protected final Button dialogButton = new Button("Dialog");
+
+    protected A item;
+    protected boolean isContent;
+
     private final TextField nameInput = new TextField();
     private final Button imageButton = new Button("Image");
     private final Label imageLabel = new Label();
@@ -166,27 +169,29 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void openCollisionEdit() {
-        if (item.getImage() == null) {
+        Image background = item.getInitialImage();
+        if (background == null) {
             return;
         }
         List<List<Coords>> collisionPolygons = item.getCollisionPolygons();
         if (collisionPolygons == null) {
             collisionPolygons = new ArrayList<>(0);
         }
-        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item);
+        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item, background);
         collisionEdit.initWindow(isContent, "Collision edit");
         collisionEdit.show();
     }
 
     private void openCoverEdit() {
-        if (item.getImage() == null) {
+        Image background = item.getInitialImage();
+        if (background == null) {
             return;
         }
-        List<Coords> coverLine= item.getCoverLine();
+        List<Coords> coverLine = item.getCoverLine();
         if (coverLine == null) {
             coverLine = new ArrayList<>(0);
         }
-        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine);
+        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine, background);
         coverEdit.initWindow(isContent, "Cover edit");
         coverEdit.show();
     }

@@ -102,7 +102,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Double getCollisionLeft(Coords nextPos) {
-        List<List<Coords>> cp = getCollisionPolygons();
+        List<List<Coords>> cp = getActualCollisionPolygons();
         if (cp.isEmpty()) return null;
         double left =  cp.stream()
                 .mapToDouble(l -> l.stream()
@@ -119,7 +119,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Double getCollisionRight(Coords nextPos) {
-        List<List<Coords>> cp = getCollisionPolygons();
+        List<List<Coords>> cp = getActualCollisionPolygons();
         if (cp.isEmpty()) return null;
         double right =  cp.stream()
                 .mapToDouble(l -> l.stream()
@@ -136,7 +136,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Double getCollisionTop(Coords nextPos) {
-        List<List<Coords>> cp = getCollisionPolygons();
+        List<List<Coords>> cp = getActualCollisionPolygons();
         if (cp.isEmpty()) return null;
         double top =  cp.stream()
                 .mapToDouble(l -> l.stream()
@@ -153,7 +153,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public Double getCollisionBottom(Coords nextPos) {
-        List<List<Coords>> cp = getCollisionPolygons();
+        List<List<Coords>> cp = getActualCollisionPolygons();
         if (cp.isEmpty()) return null;
         double bottom = cp.stream()
                 .mapToDouble(l -> l.stream()
@@ -209,6 +209,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         }
     }
 
+    public List<Coords> getActualCoverLine() {
+        return getCoverLine();
+    }
+
     public void setCoverLine(List<Coords> coverLine) {
         this.coverLine = coverLine;
     }
@@ -219,6 +223,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         } else {
             return collisionPolygons;
         }
+    }
+
+    public List<List<Coords>> getActualCollisionPolygons() {
+        return getCollisionPolygons();
     }
 
     public void setCollisionPolygons(List<List<Coords>> collisionPolygons) {
@@ -259,6 +267,9 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         }
         return super.getName();
     }
+
+    @Override
+    public void update() {}
 
     @Override
     public boolean equals(Object o) {

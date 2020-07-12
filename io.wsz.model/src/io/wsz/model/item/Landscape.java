@@ -22,11 +22,6 @@ public class Landscape extends PosItem<Landscape> {
     }
 
     @Override
-    public void update() {
-
-    }
-
-    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

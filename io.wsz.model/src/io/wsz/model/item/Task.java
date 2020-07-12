@@ -42,11 +42,28 @@ public class Task implements Externalizable {
                 } else
                 if (item instanceof Creature) {
                     interactWithCreature(cr, (Creature) item);
+                } else
+                if (item instanceof InDoor) {
+                    interactWithDoor(cr, (InDoor) item);
                 }
             }
             return;
         }
         finished = true;
+    }
+
+    private void interactWithDoor(Creature cr, InDoor id) {
+        CreatureSize size = cr.getSize();
+        if (id.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            boolean open = id.isOpen();
+            if (open) {
+                id.close();
+            } else {
+                id.open();
+            }
+            item = null;
+            dest.x = -1;
+        }
     }
 
     private void interactWithCreature(Creature acting, Creature cr) {

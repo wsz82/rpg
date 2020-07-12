@@ -84,14 +84,16 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         coordsCB.setValue(c);
         refreshShape();
     };
+    private final Image background;
     private Button xLeftArrow;
     private Button xRightArrow;
     private Button yLeftArrow;
     private Button yRightArrow;
 
-    public CoordsShapeEditStage(Stage parent, PosItem item) {
+    public CoordsShapeEditStage(Stage parent, PosItem item, Image background) {
         super(parent);
         this.item = item;
+        this.background = background;
     }
 
     public void initWindow(boolean isContent, String title) {
@@ -101,8 +103,8 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         r.setPadding(new Insets(10));
 
         final VBox c = new VBox(5);
-        final Image img = item.getImage();
-        iv.setImage(img);
+//        final Image img = item.getImage();
+        iv.setImage(background);
         pointsPane.getChildren().add(iv);
 
         Rectangle2D bounds = Screen.getPrimary().getBounds();

@@ -19,6 +19,7 @@ public class ObservableAssets {
     private final ObservableList<Teleport> teleports = FXCollections.observableArrayList();
     private final ObservableList<Weapon> weapons = FXCollections.observableArrayList();
     private final ObservableList<Container> containers = FXCollections.observableArrayList();
+    private final ObservableList<InDoor> inDoors = FXCollections.observableArrayList();
 
     public static ObservableAssets get() {
         if (singleton == null) {
@@ -38,6 +39,7 @@ public class ObservableAssets {
         assets.addAll(teleports);
         assets.addAll(weapons);
         assets.addAll(containers);
+        assets.addAll(inDoors);
         return assets;
     }
 
@@ -48,6 +50,7 @@ public class ObservableAssets {
         teleports.clear();
         weapons.clear();
         containers.clear();
+        inDoors.clear();
     }
 
     public void fillLists(List<Asset> assets) {
@@ -81,6 +84,11 @@ public class ObservableAssets {
                 .map(a -> (Container) a)
                 .collect(Collectors.toList());
         containers.addAll(tempCon);
+        List<InDoor> tempInDoor = assets.stream()
+                .filter(a -> a.getType().equals(INDOOR))
+                .map(a -> (InDoor) a)
+                .collect(Collectors.toList());
+        inDoors.addAll(tempInDoor);
     }
 
     public ObservableList<Creature> getCreatures() {
@@ -105,5 +113,9 @@ public class ObservableAssets {
 
     public ObservableList<Container> getContainers() {
         return containers;
+    }
+
+    public ObservableList<InDoor> getInDoors() {
+        return inDoors;
     }
 }

@@ -26,7 +26,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
     private static final ItemType[] CHECK_SURROUNDING_TYPES = new ItemType[] {TELEPORT};
-    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT};
+    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR};
 
     private final Coords[] corners8AndCenter = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
             new Coords(), new Coords(), new Coords(), new Coords(), new Coords()};
@@ -211,7 +211,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         switch (type) {
             case CREATURE ->
                     resolveInteractionWithCreature((Creature) pi);
-            case WEAPON, CONTAINER ->
+            case WEAPON, CONTAINER, INDOOR ->
                     setItemTask(pi);
             default ->
                     goTo(pos);
@@ -296,10 +296,10 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     @Override
     public double getBottom() {
-        double halfHeight = getCreatureHalfHeight();
+//        double halfHeight = getCreatureHalfHeight();
         double imgHeight = getImageHeight();
         double imgBottom = pos.y + imgHeight;
-        imgBottom += halfHeight;
+//        imgBottom += halfHeight;
         return imgBottom;
     }
 

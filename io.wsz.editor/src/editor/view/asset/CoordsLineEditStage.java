@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
 import javafx.stage.Stage;
@@ -13,8 +14,8 @@ public class CoordsLineEditStage extends CoordsShapeEditStage {
     private final Polyline polyline = new Polyline();
     private final List<Coords> line;
 
-    public CoordsLineEditStage(Stage parent, PosItem item, List<Coords> line) {
-        super(parent, item);
+    public CoordsLineEditStage(Stage parent, PosItem item, List<Coords> line, Image background) {
+        super(parent, item, background);
         this.line = line;
     }
 
