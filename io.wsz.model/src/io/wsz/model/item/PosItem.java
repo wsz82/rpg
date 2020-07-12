@@ -289,7 +289,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeObject(prototype);
 

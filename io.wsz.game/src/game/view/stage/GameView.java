@@ -107,10 +107,39 @@ public class GameView extends CanvasView {
         clear();
         sortItems();
 
+        gc.save();
+        gc.beginPath();
+        Location location = Controller.get().getCurrentLocation().getLocation();
+        for (Creature cr : board.getControlledAndControllableCreatures(location)) {
+            Double visionRange = cr.getVisionRange();
+            translateCoordsToScreenCoords(cr.getCenter());
+            double centerX = modifiedCoords.x * Sizes.getMeter();
+            double centerY = modifiedCoords.y * Sizes.getMeter();
+            double radiusX = visionRange * Sizes.getMeter();
+            double radiusY = visionRange * 2.0/3 * Sizes.getMeter();
+            int startAngle = 0;
+            int length = 360;
+            gc.arc(centerX, centerY, radiusX, radiusY, startAngle, length);
+            gc.setFill(Color.BLACK);
+        }
+        gc.closePath();
+        gc.clip();
+
+        drawItems();
+        gc.restore();
+
+        if (selectionMode) {
+            drawSelection();
+        }
+
+        if (Settings.isShowBar()) {
+            barView.refresh();
+        }
+    }
+
+    private void drawItems() {
         List<Creature> visibleControllables = getVisibleControllables(items);
-
         for (PosItem pi : items) {
-
             adjustCoverOpacity(visibleControllables, pi);
 
             final ItemType type = pi.getType();
@@ -154,14 +183,6 @@ public class GameView extends CanvasView {
             }
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
             gc.setGlobalAlpha(1);
-        }
-
-        if (selectionMode) {
-            drawSelection();
-        }
-
-        if (Settings.isShowBar()) {
-            barView.refresh();
         }
     }
 

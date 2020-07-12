@@ -44,6 +44,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     private CreatureSize size;
     private CreatureControl control;
     private Double speed;
+    private Double visionRange;
     private Double range;
     private Integer strength;
 
@@ -367,6 +368,25 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.range = range;
     }
 
+    public Double getIndividualVisionRange() {
+        return visionRange;
+    }
+
+    public Double getVisionRange() {
+        if (visionRange == null) {
+            if (prototype == null) {
+                return 1.0;
+            }
+            return prototype.visionRange;
+        } else {
+            return visionRange;
+        }
+    }
+
+    public void setVisionRange(Double visionRange) {
+        this.visionRange = visionRange;
+    }
+
     public CreatureSize getIndividualSize() {
         return size;
     }
@@ -532,7 +552,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeObject(task);
 
@@ -543,6 +563,8 @@ public class Creature extends PosItem<Creature> implements Containable {
         out.writeObject(control);
 
         out.writeObject(speed);
+
+        out.writeObject(visionRange);
 
         out.writeObject(range);
 
@@ -567,6 +589,10 @@ public class Creature extends PosItem<Creature> implements Containable {
         control = (CreatureControl) in.readObject();
 
         speed = (Double) in.readObject();
+
+        if (ver > 1L) {
+            visionRange = (Double) in.readObject();
+        }
 
         range = (Double) in.readObject();
 

@@ -341,12 +341,23 @@ public class Board {
     public List<Creature> getControllableCreatures(Location location) {
         creatures.clear();
         location.getItems().get().stream()
-                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .filter(pi -> pi instanceof Creature)
+                .map(pi -> (Creature) pi)
                 .filter(pi -> {
-                    Creature cr = (Creature) pi;
+                    Creature cr = pi;
                     return cr.getControl().equals(CreatureControl.CONTROLLABLE);
                 })
+                .collect(Collectors.toCollection(() -> creatures));
+        return creatures;
+    }
+
+    public List<Creature> getControlledAndControllableCreatures(Location location) {
+        creatures.clear();
+        location.getItems().get().stream()
+                .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
+                .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
+                            || c.getControl().equals(CreatureControl.CONTROL))
                 .collect(Collectors.toCollection(() -> creatures));
         return creatures;
     }
@@ -377,7 +388,7 @@ public class Board {
         }
         creatures.clear();
         location.getItems().get().stream()
-                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
                         || c.getControl().equals(CreatureControl.CONTROL))

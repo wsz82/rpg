@@ -190,7 +190,7 @@ public abstract class Asset implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeUTF(name.get());
 

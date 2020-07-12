@@ -22,6 +22,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final DoubleField speedInput = new DoubleField(isContent);
     private final DoubleField rangeInput = new DoubleField(isContent);
+    private final DoubleField visionRangeInput = new DoubleField(isContent);
     private final IntegerField strengthInput = new IntegerField(isContent);
     private final Button itemsButton = new Button("Items");
 
@@ -58,6 +59,10 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label speedLabel = new Label("Speed");
         speedBox.getChildren().addAll(speedLabel, speedInput);
 
+        final HBox visionRangeBox = new HBox(10);
+        final Label visionRangeLabel = new Label("Vision range");
+        visionRangeBox.getChildren().addAll(visionRangeLabel, visionRangeInput);
+
         final HBox rangeBox = new HBox(10);
         final Label rangeLabel = new Label("Range");
         rangeBox.getChildren().addAll(rangeLabel, rangeInput);
@@ -66,7 +71,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label strengthLabel = new Label("Strength");
         strengthBox.getChildren().addAll(strengthLabel, strengthInput);
 
-        container.getChildren().addAll(portraitBox, sizeBox, controlBox, speedBox, rangeBox, strengthBox);
+        container.getChildren().addAll(portraitBox, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
 
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
@@ -130,6 +135,13 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             speedInput.setText(String.valueOf(speed));
         }
 
+        Double visionRange = item.getIndividualVisionRange();
+        if (visionRange == null) {
+            visionRangeInput.setText("");
+        } else {
+            visionRangeInput.setText(String.valueOf(visionRange));
+        }
+
         Double range = item.getIndividualRange();
         if (range == null) {
             rangeInput.setText("");
@@ -177,6 +189,17 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             }
         } else {
             item.setSpeed(Double.parseDouble(speed));
+        }
+
+        String visionRange = visionRangeInput.getText();
+        if (visionRange.isEmpty()) {
+            if (isContent) {
+                item.setVisionRange(null);
+            } else {
+                item.setVisionRange(1.0);
+            }
+        } else {
+            item.setVisionRange(Double.parseDouble(visionRange));
         }
 
         String range = rangeInput.getText();

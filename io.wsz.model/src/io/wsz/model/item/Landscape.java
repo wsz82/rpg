@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class Landscape extends PosItem<Landscape> {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
     }
 
     @Override

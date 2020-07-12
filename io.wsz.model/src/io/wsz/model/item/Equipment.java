@@ -2,6 +2,7 @@ package io.wsz.model.item;
 
 import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
@@ -135,7 +136,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeObject(weight);
 

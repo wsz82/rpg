@@ -183,7 +183,7 @@ public class Task implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeObject(dest);
 

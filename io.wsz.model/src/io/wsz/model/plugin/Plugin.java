@@ -2,6 +2,7 @@ package io.wsz.model.plugin;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
@@ -90,7 +91,7 @@ public class Plugin implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeUTF(name);
 

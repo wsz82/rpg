@@ -2,6 +2,7 @@ package io.wsz.model.content;
 
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.sizes.Sizes;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -47,7 +48,7 @@ public class ItemList implements LevelValueListener, VisibleValueListener, Exter
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         List<PosItem> ser = new ArrayList<>(contents);
         out.writeObject(ser);

@@ -1,5 +1,6 @@
 package io.wsz.model.layer;
 
+import io.wsz.model.sizes.Sizes;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -25,7 +26,7 @@ public class LayersList implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         List<Layer> ser = new ArrayList<>(layers);
         out.writeObject(new ArrayList<>(ser));

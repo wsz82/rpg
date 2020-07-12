@@ -5,6 +5,7 @@ import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 public class Sizes {
+    public static final long VERSION = 2L;
     public static final int MIN_RESOLUTION_WIDTH = 100;
     public static final int MIN_RESOLUTION_HEIGHT = 100;
     public static final int ORIGIN_RESOLUTION_WIDTH = 1600;

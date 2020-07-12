@@ -3,6 +3,7 @@ package io.wsz.model.location;
 import io.wsz.model.content.ItemList;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.LayersList;
+import io.wsz.model.sizes.Sizes;
 import javafx.beans.property.*;
 
 import java.io.Externalizable;
@@ -94,7 +95,7 @@ public class Location implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeUTF(name.get());
 

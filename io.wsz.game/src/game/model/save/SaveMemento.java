@@ -2,6 +2,7 @@ package game.model.save;
 
 import io.wsz.model.item.Creature;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
@@ -82,7 +83,7 @@ public class SaveMemento implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeUTF(name);
 

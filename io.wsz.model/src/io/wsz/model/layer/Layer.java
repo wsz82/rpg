@@ -1,5 +1,6 @@
 package io.wsz.model.layer;
 
+import io.wsz.model.sizes.Sizes;
 import javafx.beans.property.*;
 
 import java.io.Externalizable;
@@ -76,7 +77,7 @@ public class Layer implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeInt(level.get());
 

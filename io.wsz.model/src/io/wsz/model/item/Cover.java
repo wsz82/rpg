@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
@@ -29,7 +30,7 @@ public class Cover extends PosItem<Cover> implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
     }
 
     @Override

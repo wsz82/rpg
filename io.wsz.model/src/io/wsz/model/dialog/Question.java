@@ -1,5 +1,7 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.sizes.Sizes;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -45,7 +47,7 @@ public class Question implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(serialVersionUID);
+        out.writeLong(Sizes.VERSION);
 
         out.writeUTF(text);
 
