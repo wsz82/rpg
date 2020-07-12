@@ -38,7 +38,6 @@ public class DropView extends EquipmentView {
         int startAngle = 0;
         int length = 360;
         gc.arc(centerX, centerY, radiusX, radiusY, startAngle, length);
-        gc.setFill(Color.BLACK);
         gc.closePath();
         gc.clip();
 

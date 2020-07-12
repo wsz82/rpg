@@ -19,13 +19,14 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static io.wsz.model.item.CreatureControl.*;
-import static io.wsz.model.item.ItemType.TELEPORT;
+import static io.wsz.model.item.ItemType.*;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
     private static final ItemType[] CHECK_SURROUNDING_TYPES = new ItemType[] {TELEPORT};
+    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT};
 
     private final Coords[] corners8AndCenter = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
             new Coords(), new Coords(), new Coords(), new Coords(), new Coords()};
@@ -200,8 +201,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     public void onInteractWith(Coords pos) {
         interactionCoords[0].x = pos.x;
         interactionCoords[0].y = pos.y;
-        ItemType[] types = ItemType.values();
-        PosItem pi = Controller.get().getBoard().lookForContent(this.pos.getLocation(), interactionCoords, types, true);
+        Location location = this.pos.getLocation();
+        PosItem pi = Controller.get().getBoard().lookForContent(location, interactionCoords, INTERACTION_TYPES, true);
         if (pi == null) {
             return;
         }
@@ -590,9 +591,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
         speed = (Double) in.readObject();
 
-        if (ver > 1L) {
-            visionRange = (Double) in.readObject();
-        }
+        visionRange = (Double) in.readObject();
 
         range = (Double) in.readObject();
 
