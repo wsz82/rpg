@@ -80,7 +80,7 @@ public class Task implements Externalizable {
         CreatureSize size = cr.getSize();
         if (equipment.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (equipment instanceof Container) {
-                ((Container) equipment).open(cr);
+                ((Container) equipment).searchContainer(cr);
             } else {
                 boolean taken = cr.getIndividualInventory().add(equipment);
                 if (taken) {

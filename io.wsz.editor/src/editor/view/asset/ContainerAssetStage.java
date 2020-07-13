@@ -4,14 +4,17 @@ import editor.view.DoubleField;
 import editor.view.IntegerField;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.stage.Coords;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ContainerAssetStage extends EquipmentAssetStage<Container>{
+public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
     private static final String TITLE = "Container asset";
     private final DoubleField inputNettoWeight = new DoubleField(0.0, isContent);
     private final IntegerField inputNettoSize = new IntegerField(0, isContent);
@@ -50,6 +53,21 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
         }
 
         fillInputs();
+    }
+
+    @Override
+    protected Image getOpenImage() {
+        return item.getOpenImage();
+    }
+
+    @Override
+    protected List<Coords> getOpenCoverLine() {
+        return item.getOpenContainerCoverLine();
+    }
+
+    @Override
+    protected List<List<Coords>> getOpenCollisionPolygons() {
+        return item.getOpenContainerCollisionPolygons();
     }
 
     private void hookupContainerEvents() {
@@ -108,16 +126,39 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     }
 
     @Override
+    protected void setOpen(boolean open) {
+        item.setOpen(open);
+    }
+
+    @Override
+    protected void setOpenImagePath(String openImagePath) {
+        item.setOpenImagePath(openImagePath);
+    }
+
+    @Override
+    protected boolean isOpen() {
+        return item.isOpen();
+    }
+
+    @Override
+    protected String getOpenImagePath() {
+        return item.getOpenImagePath();
+    }
+
+    @Override
     protected void addAssetToList(Container asset) {
         ObservableAssets.get().getContainers().add(asset);
     }
 
     @Override
     protected Container createNewAsset(String name, String relativePath) {
-        return new Container(
+        Container c = new Container(
                 null, name, getType(), relativePath,
                 true, null,
                 new ArrayList<>(0), new ArrayList<>(0));
+        c.setOpenContainerCoverLine(new ArrayList<>(0));
+        c.setOpenContainerCollisionPolygons(new ArrayList<>(0));
+        return c;
     }
 
     @Override

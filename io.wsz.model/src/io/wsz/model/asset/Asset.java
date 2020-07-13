@@ -82,7 +82,10 @@ public abstract class Asset implements Externalizable {
     }
 
     public final Image getInitialImage() {
-        return getImage();
+        if (this.image.get() == null) {
+            setImage(loadImageFromPath(getRelativePath()));
+        }
+        return image.get();
     }
 
     public Image getImage() {

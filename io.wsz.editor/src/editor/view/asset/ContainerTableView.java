@@ -71,10 +71,10 @@ public class ContainerTableView extends AssetsTableView<Container> {
                     true, level,
                     Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
             c.setPos(pos);
-            output.add(c);
-
             c.getItems().addAll(p.getItems());
+            c.setOpen(p.isOpen());
 
+            output.add(c);
         }
         return output;
     }
