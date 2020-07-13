@@ -92,6 +92,8 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
                     true, level,
                     Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
             t.setPos(pos);
+            t.getTeleportCollisionPolygons().addAll(Coords.cloneCoordsPolygons(p.getTeleportCollisionPolygons()));
+
             output.add(t);
         }
         return output;

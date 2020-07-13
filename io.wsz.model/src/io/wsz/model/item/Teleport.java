@@ -9,6 +9,7 @@ import io.wsz.model.stage.Coords;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ public class Teleport extends PosItem<Teleport> {
     private String locationName;
     private Coords exit;
     private Integer exitLevel;
+    private final List<List<Coords>> teleportCollisionPolygons = new ArrayList<>(0);
 
     public Teleport() {}
 
@@ -125,6 +127,14 @@ public class Teleport extends PosItem<Teleport> {
         this.exitLevel = exitLevel;
     }
 
+    public List<List<Coords>> getTeleportCollisionPolygons() {
+        if (prototype != null) {
+            return prototype.teleportCollisionPolygons;
+        } else {
+            return teleportCollisionPolygons;
+        }
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
@@ -135,6 +145,8 @@ public class Teleport extends PosItem<Teleport> {
         out.writeObject(exit);
 
         out.writeObject(exitLevel);
+
+        out.writeObject(teleportCollisionPolygons);
     }
 
     @Override
@@ -147,5 +159,8 @@ public class Teleport extends PosItem<Teleport> {
         exit = (Coords) in.readObject();
 
         exitLevel = (Integer) in.readObject();
+
+        List<List<Coords>> input = (List<List<Coords>>) in.readObject();
+        teleportCollisionPolygons.addAll(input);
     }
 }

@@ -25,21 +25,17 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
-    private static final ItemType[] CHECK_SURROUNDING_TYPES = new ItemType[] {TELEPORT};
     private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR};
 
-    private final Coords[] corners8AndCenter = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords(),
-            new Coords(), new Coords(), new Coords(), new Coords(), new Coords()};
-    private final Coords[] corners4 = new Coords[]{new Coords(), new Coords(), new Coords(), new Coords()};
     private final Coords[] interactionCoords = new Coords[]{new Coords()};
     private final Coords centerBottom = new Coords();
     private final Coords reversCenterBottom = new Coords();
 
     private Location enteredToFlag;
 
+    private final Task task = new Task();
     private Image portrait;
     private String portraitPath;
-    private final Task task = new Task();
     private Inventory inventory;
 
     private CreatureSize size;
@@ -60,50 +56,52 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     @Override
-    public Double getCollisionLeft() {
-        return getCollisionLeft(getCenter());
+    public double getCollisionLeft(List<List<Coords>> cp) {
+        return getCollisionLeft(cp, getCenter());
     }
 
-    public Double getCollisionLeft(Coords nextPos) {
+    @Override
+    public double getCollisionLeft(List<List<Coords>> cp, Coords nextPos) {
         double halfWidth = getSize().getWidth() / 2;
         return nextPos.x - halfWidth;
     }
 
-    public Double getCollisionRight() {
-        return getCollisionRight(getCenter());
+    @Override
+    public double getCollisionRight(List<List<Coords>> cp) {
+        return getCollisionRight(cp, getCenter());
     }
 
-    public Double getCollisionRight(Coords nextPos) {
+    @Override
+    public double getCollisionRight(List<List<Coords>> cp, Coords nextPos) {
         double halfWidth = getSize().getWidth() / 2;
         return nextPos.x + halfWidth;
     }
 
-    public Double getCollisionTop() {
-        return getCollisionTop(getCenter());
+    @Override
+    public double getCollisionTop(List<List<Coords>> cp) {
+        return getCollisionTop(cp, getCenter());
     }
 
-    public Double getCollisionTop(Coords nextPos) {
+    @Override
+    public double getCollisionTop(List<List<Coords>> cp, Coords nextPos) {
         double halfHeight = getSize().getHeight() / 2;
         return nextPos.y - halfHeight;
     }
 
-    public Double getCollisionBottom() {
-        return getCollisionBottom(getCenter());
+    @Override
+    public double getCollisionBottom(List<List<Coords>> cp) {
+        return getCollisionBottom(cp, getCenter());
     }
 
-    public Double getCollisionBottom(Coords nextPos) {
+    @Override
+    public double getCollisionBottom(List<List<Coords>> cp, Coords nextPos) {
         double halfHeight = getSize().getHeight() / 2;
         return nextPos.y + halfHeight;
     }
 
     private void checkSurrounding() {
-        PosItem pi = getCornersContent(CHECK_SURROUNDING_TYPES);
-        if (pi != null) {
-            ItemType type = pi.getType();
-            switch (type) {
-                case TELEPORT -> ((Teleport) pi).enter(this);
-            }
-        }
+        Teleport t = Controller.get().getBoard().getTeleport(getCenter(), this, this.pos.getLocation());
+        if (t != null) t.enter(this);
 
         if (enteredToFlag != null && enteredToFlag == pos.getLocation()) {
             enteredToFlag = null;
@@ -115,11 +113,6 @@ public class Creature extends PosItem<Creature> implements Containable {
                 pos.y = reversed.y;
             }
         }
-    }
-
-    private PosItem getCornersContent(ItemType[] types) {
-        Coords[] poss = getCorners8AndCenter();
-        return Controller.get().getBoard().lookForContent(this.pos.getLocation(), poss, types, false);
     }
 
     @Override
@@ -149,58 +142,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         reversCenterBottom.x = difPos.x - width/2;
         reversCenterBottom.y = difPos.y - height;
         return reversCenterBottom;
-    }
-
-    public Coords[] getCorners8AndCenter() {
-        return get8CornersAndCenter(getCenter());
-    }
-
-    public Coords[] get8CornersAndCenter(Coords pos) {
-        double halfWidth = getSize().getWidth()/2;
-        double halfHeight = getSize().getHeight()/2;
-        double centerX = pos.x;
-        double centerY = pos.y;
-
-        corners8AndCenter[0].x = centerX;
-        corners8AndCenter[0].y = centerY - halfHeight;
-        corners8AndCenter[1].x = centerX - halfWidth;
-        corners8AndCenter[1].y = centerY;
-        corners8AndCenter[2].x = centerX;
-        corners8AndCenter[2].y = centerY + halfHeight;
-        corners8AndCenter[3].x = centerX + halfWidth;
-        corners8AndCenter[3].y = centerY;
-        corners8AndCenter[4].x = centerX + 3/5.0*halfWidth;
-        corners8AndCenter[4].y = centerY - 2/3.0*halfHeight;
-        corners8AndCenter[5].x = centerX - 3/5.0*halfWidth;
-        corners8AndCenter[5].y = centerY - 2/3.0*halfHeight;
-        corners8AndCenter[6].x = centerX + 3/5.0*halfWidth;
-        corners8AndCenter[6].y = centerY + 2/3.0*halfHeight;
-        corners8AndCenter[7].x = centerX - 3/5.0*halfWidth;
-        corners8AndCenter[7].y = centerY + 2/3.0*halfHeight;
-        corners8AndCenter[8].x = centerX;
-        corners8AndCenter[8].y = centerY;
-        return corners8AndCenter;
-    }
-
-    public Coords[] get4Corners() {
-        return get4Corners(getCenter());
-    }
-
-    public Coords[] get4Corners(Coords pos) {
-        double halfWidth = getSize().getWidth()/2;
-        double halfHeight = getSize().getHeight()/2;
-        double centerX = pos.x;
-        double centerY = pos.y;
-
-        corners4[0].x = centerX;
-        corners4[0].y = centerY - halfHeight;
-        corners4[1].x = centerX - halfWidth;
-        corners4[1].y = centerY;
-        corners4[2].x = centerX;
-        corners4[2].y = centerY + halfHeight;
-        corners4[3].x = centerX + halfWidth;
-        corners4[3].y = centerY;
-        return corners4;
     }
 
     public void onInteractWith(Coords pos) {

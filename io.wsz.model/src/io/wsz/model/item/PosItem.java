@@ -105,13 +105,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return Controller.get().getBoard().getObstacle(nextPos, this, pos.getLocation());
     }
 
-    public Double getCollisionLeft() {
-        return getCollisionLeft(pos);
+    public double getCollisionLeft(List<List<Coords>> cp) {
+        return getCollisionLeft(cp, pos);
     }
 
-    public Double getCollisionLeft(Coords nextPos) {
-        List<List<Coords>> cp = getActualCollisionPolygons();
-        if (cp.isEmpty()) return null;
+    public double getCollisionLeft(List<List<Coords>> cp, Coords nextPos) {
+        if (cp.isEmpty()) return nextPos.x;
         double left =  cp.stream()
                 .mapToDouble(l -> l.stream()
                         .mapToDouble(p -> p.x)
@@ -122,13 +121,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return nextPos.x + left;
     }
 
-    public Double getCollisionRight() {
-        return getCollisionRight(pos);
+    public double getCollisionRight(List<List<Coords>> cp) {
+        return getCollisionRight(cp, pos);
     }
 
-    public Double getCollisionRight(Coords nextPos) {
-        List<List<Coords>> cp = getActualCollisionPolygons();
-        if (cp.isEmpty()) return null;
+    public double getCollisionRight(List<List<Coords>> cp, Coords nextPos) {
+        if (cp.isEmpty()) return nextPos.x;
         double right =  cp.stream()
                 .mapToDouble(l -> l.stream()
                         .mapToDouble(p -> p.x)
@@ -139,13 +137,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return nextPos.x + right;
     }
 
-    public Double getCollisionTop() {
-        return getCollisionTop(pos);
+    public double getCollisionTop(List<List<Coords>> cp) {
+        return getCollisionTop(cp, pos);
     }
 
-    public Double getCollisionTop(Coords nextPos) {
-        List<List<Coords>> cp = getActualCollisionPolygons();
-        if (cp.isEmpty()) return null;
+    public double getCollisionTop(List<List<Coords>> cp, Coords nextPos) {
+        if (cp.isEmpty()) return nextPos.y;
         double top =  cp.stream()
                 .mapToDouble(l -> l.stream()
                         .mapToDouble(p -> p.y)
@@ -156,13 +153,12 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return nextPos.y + top;
     }
 
-    public Double getCollisionBottom() {
-        return getCollisionBottom(pos);
+    public double getCollisionBottom(List<List<Coords>> cp) {
+        return getCollisionBottom(cp, pos);
     }
 
-    public Double getCollisionBottom(Coords nextPos) {
-        List<List<Coords>> cp = getActualCollisionPolygons();
-        if (cp.isEmpty()) return null;
+    public double getCollisionBottom(List<List<Coords>> cp, Coords nextPos) {
+        if (cp.isEmpty()) return nextPos.y;
         double bottom = cp.stream()
                 .mapToDouble(l -> l.stream()
                         .mapToDouble(p -> p.y)

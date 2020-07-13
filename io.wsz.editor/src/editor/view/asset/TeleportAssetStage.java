@@ -10,15 +10,17 @@ import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class TeleportAssetStage extends AssetStage<Teleport> {
     private static final String TITLE = "Teleport asset";
@@ -26,6 +28,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     private final DoubleField inputX = new DoubleField(0.0, isContent);
     private final DoubleField inputY = new DoubleField(0.0, isContent);
     private final IntegerField inputLayer = new IntegerField(isContent);
+    private final Button teleportCollisionButton = new Button("Teleport area");
 
     public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent) {
         super(parent, asset, isContent);
@@ -58,10 +61,26 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         inputLayer.setPrefWidth(50);
         pos.getChildren().addAll(xLabel, inputX, yLabel, inputY, layerLabel, inputLayer);
 
-        container.getChildren().addAll(location, pos);
+        container.getChildren().addAll(location, pos, teleportCollisionButton);
 
         setUpLocationChoice(locationChoice);
         fillInputs();
+        hookUpInDoorEvents();
+    }
+
+    private void hookUpInDoorEvents() {
+        teleportCollisionButton.setOnAction(e -> openTeleportAreaEdit());
+    }
+
+    private void openTeleportAreaEdit() {
+        Image background = item.getImage();
+        if (background == null) {
+            return;
+        }
+        List<List<Coords>> teleportAreaPolygons = item.getTeleportCollisionPolygons();
+        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, teleportAreaPolygons, item, background);
+        collisionEdit.initWindow(isContent, "Teleport area edit");
+        collisionEdit.show();
     }
 
     private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {
@@ -93,13 +112,10 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     private Location getLocation(String s) {
-        List<Location> singleLocation = Controller.get().getLocationsList().stream()
+        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
                 .filter(l -> l.getName().equals(s))
-                .collect(Collectors.toList());
-        if (singleLocation.isEmpty()) {
-            return null;
-        }
-        return singleLocation.get(0);
+                .findFirst();
+        return optLocation.orElse(null);
     }
 
     @Override

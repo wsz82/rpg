@@ -1,7 +1,6 @@
 package io.wsz.model.stage;
 
 import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 
 import java.io.Externalizable;
@@ -225,10 +224,9 @@ public class Coords implements Externalizable {
         return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
 
-    public static boolean polygonsIntersect(Coords nextPos, PosItem item, PosItem obstacle) {
-        List<List<Coords>> iPolygons = item.getActualCollisionPolygons();
+    public static boolean polygonsIntersect(Coords nextPos,
+                                            List<List<Coords>> iPolygons, Coords oPos, List<List<Coords>> oPolygons) {
         if (iPolygons.isEmpty()) return false;
-        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
         if (oPolygons.isEmpty()) return false;
 
         for (List<Coords> rawIPolygon : iPolygons) {
@@ -239,7 +237,6 @@ public class Coords implements Externalizable {
             for (List<Coords> rawOPolygon : oPolygons) {
 
                 List<Coords> oPolygon = looseCoordsReferences2(rawOPolygon);
-                Coords oPos = item.getPos();
                 translateCoords(oPolygon, oPos.x, oPos.y);
 
                 if (!polygonsRectanglesOverlap(iPolygon, oPolygon)) continue;
