@@ -139,6 +139,15 @@ public class InDoor extends PosItem<InDoor> implements Externalizable, Openable 
     }
 
     @Override
+    public void interact() {
+        if (open) {
+            close();
+        } else {
+            open();
+        }
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

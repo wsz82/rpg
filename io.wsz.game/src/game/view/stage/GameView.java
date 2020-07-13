@@ -30,10 +30,14 @@ import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
+import static io.wsz.model.item.ItemType.*;
 import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
+    private static final Coords[] POSS = new Coords[]{new Coords()};
+    private static final ItemType[] PRIMARY_ITEM_TYPES = new ItemType[]{CREATURE};
+    private static final ItemType[] SECONDARY_ITEM_TYPES = new ItemType[]{INDOOR, CONTAINER};
 
     private final Stage parent;
     private final GameController gameController = GameController.get();
@@ -447,8 +451,7 @@ public class GameView extends CanvasView {
             } else if (button.equals(MouseButton.SECONDARY)) {
                 e.consume();
                 synchronized (gameController.getGameRunner()) {
-                    Location location = controller.getCurrentLocation().getLocation();
-                    board.looseCreaturesControl(location);
+                    onMapSecondaryButtonClick(e.getX(), e.getY());
                 }
             }
         };
@@ -505,16 +508,34 @@ public class GameView extends CanvasView {
         };
     }
 
-    private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
-        Coords pos = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter(),
-                Controller.get().getCurrentLocation().getLocation());
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
+    private void onMapSecondaryButtonClick(double x, double y) {
+        Location location = controller.getCurrentLocation().getLocation();
+        modifiedCoords.x = x / Sizes.getMeter();
+        modifiedCoords.y = y / Sizes.getMeter();
         modifiedCoords.add(currentPos);
-        Coords[] poss = new Coords[]{modifiedCoords};
-        ItemType[] types = new ItemType[]{ItemType.CREATURE};
-        Location location = Controller.get().getCurrentLocation().getLocation();
-        PosItem pi = controller.getBoard().lookForContent(location, poss, types, true);
+        POSS[0].x = modifiedCoords.x;
+        POSS[0].y = modifiedCoords.y;
+        PosItem pi = board.lookForContent(location, POSS, SECONDARY_ITEM_TYPES, true);
+        if (pi == null) {
+            board.looseCreaturesControl(location);
+        } else {
+            if (pi instanceof Openable) {
+                Openable o = (Openable) pi;
+                o.interact();
+            } else {
+                board.looseCreaturesControl(location);
+            }
+        }
+    }
+
+    private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
+        Location location = controller.getCurrentLocation().getLocation();
+        modifiedCoords.x = x / Sizes.getMeter();
+        modifiedCoords.y = y / Sizes.getMeter();
+        modifiedCoords.add(currentPos);
+        POSS[0].x = modifiedCoords.x;
+        POSS[0].y = modifiedCoords.y;
+        PosItem pi = board.lookForContent(location, POSS, PRIMARY_ITEM_TYPES, true);
         if (pi != null) {
             ItemType type = pi.getType();
             boolean success = switch (type) {

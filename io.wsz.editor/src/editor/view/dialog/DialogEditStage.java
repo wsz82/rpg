@@ -1,4 +1,4 @@
-package editor.view.asset;
+package editor.view.dialog;
 
 import editor.view.stage.ChildStage;
 import io.wsz.model.dialog.Answer;

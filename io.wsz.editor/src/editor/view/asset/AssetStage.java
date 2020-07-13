@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;

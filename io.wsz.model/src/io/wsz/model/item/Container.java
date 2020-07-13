@@ -238,6 +238,15 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
+    public void interact() {
+        if (open) {
+            close();
+        } else {
+            open();
+        }
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

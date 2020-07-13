@@ -55,12 +55,7 @@ public class Task implements Externalizable {
     private void interactWithDoor(Creature cr, InDoor id) {
         CreatureSize size = cr.getSize();
         if (id.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            boolean open = id.isOpen();
-            if (open) {
-                id.close();
-            } else {
-                id.open();
-            }
+            id.interact();
             item = null;
             dest.x = -1;
         }

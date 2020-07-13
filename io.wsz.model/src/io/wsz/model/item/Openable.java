@@ -5,4 +5,6 @@ public interface Openable {
     void open();
 
     void close();
+
+    void interact();
 }
