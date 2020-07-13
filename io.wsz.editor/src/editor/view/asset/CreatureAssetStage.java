@@ -16,6 +16,7 @@ import java.util.Arrays;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
+
     private final Button portraitButton = new Button("Portrait");
     private final Label portraitLabel = new Label();
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();

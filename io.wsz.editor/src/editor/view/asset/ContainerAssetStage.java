@@ -4,21 +4,20 @@ import editor.view.DoubleField;
 import editor.view.IntegerField;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.stage.Coords;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
+public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     private static final String TITLE = "Container asset";
+
     private final DoubleField inputNettoWeight = new DoubleField(0.0, isContent);
     private final IntegerField inputNettoSize = new IntegerField(0, isContent);
     private final Button itemsButton = new Button("Items");
+    private final OpenableContainer openable = new OpenableContainer(this, item, isContent);
 
     public ContainerAssetStage(Stage parent, Container item, boolean isContent) {
         super(parent, item, isContent);
@@ -35,6 +34,7 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
         super.initWindow();
         setTitle(TITLE);
 
+        openable.initOpenable(container);
         container.getChildren().remove(weightBox);
 
         final HBox weightBox = new HBox(10);
@@ -55,21 +55,6 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
         fillInputs();
     }
 
-    @Override
-    protected Image getOpenImage() {
-        return item.getOpenImage();
-    }
-
-    @Override
-    protected List<Coords> getOpenCoverLine() {
-        return item.getOpenContainerCoverLine();
-    }
-
-    @Override
-    protected List<List<Coords>> getOpenCollisionPolygons() {
-        return item.getOpenContainerCollisionPolygons();
-    }
-
     private void hookupContainerEvents() {
         itemsButton.setOnAction(e -> {
             ItemsStage<Container> itemsStage = new ItemsStage<>(parent, item);
@@ -80,6 +65,7 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
     @Override
     protected void fillInputs() {
         super.fillInputs();
+        openable.fillOpenableInputs();
         if (item == null) {
             return;
         }
@@ -102,6 +88,7 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
     @Override
     protected void defineAsset() {
         super.defineAsset();
+        openable.defineOpenable();
         String nettoWeight = inputNettoWeight.getText();
         if (nettoWeight.isEmpty()) {
             if (isContent) {
@@ -123,26 +110,6 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
         } else {
             item.setNettoSize(Integer.parseInt(nettoSize));
         }
-    }
-
-    @Override
-    protected void setOpen(boolean open) {
-        item.setOpen(open);
-    }
-
-    @Override
-    protected void setOpenImagePath(String openImagePath) {
-        item.setOpenImagePath(openImagePath);
-    }
-
-    @Override
-    protected boolean isOpen() {
-        return item.isOpen();
-    }
-
-    @Override
-    protected String getOpenImagePath() {
-        return item.getOpenImagePath();
     }
 
     @Override

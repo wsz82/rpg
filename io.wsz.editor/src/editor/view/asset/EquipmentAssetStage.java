@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStage<A> {
     protected final DoubleField inputWeight = new DoubleField(0.0, isContent);
     protected final IntegerField inputSize = new IntegerField(0, isContent);
+
     protected HBox weightBox;
 
     public EquipmentAssetStage(Stage parent, A item, boolean isContent) {
