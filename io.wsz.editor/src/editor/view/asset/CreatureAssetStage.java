@@ -71,8 +71,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         final Label strengthLabel = new Label("Strength");
         strengthBox.getChildren().addAll(strengthLabel, strengthInput);
 
-        container.getChildren().addAll(portraitBox, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
-
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
         sizeCB.setItems(sizes);
@@ -88,7 +86,12 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         if (item != null) {
             container.getChildren().add(itemsButton);
             hookUpEditEvents();
+            if (!isContent) {
+                container.getChildren().add(portraitBox);
+            }
         }
+
+        container.getChildren().addAll(sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
 
         fillInputs();
         hookUpCreatureEvents();
@@ -234,8 +237,9 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected Creature createNewAsset(String name, String relativePath) {
         Creature cr = new Creature(
                 null, name, getType(), relativePath,
-                true, null,
-                new ArrayList<>(0), new ArrayList<>(0));
+                true, null);
+        cr.setCoverLine(new ArrayList<>(0));
+        cr.setCollisionPolygons(new ArrayList<>(0));
         cr.setInventory(new Inventory(cr));
         return cr;
     }

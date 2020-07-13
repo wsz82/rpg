@@ -152,10 +152,9 @@ public class ContainerAssetStage extends OpenableEquipmentAssetStage<Container>{
 
     @Override
     protected Container createNewAsset(String name, String relativePath) {
-        Container c = new Container(
-                null, name, getType(), relativePath,
-                true, null,
-                new ArrayList<>(0), new ArrayList<>(0));
+        Container c = new Container(null, name, getType(), relativePath, true, null);
+        c.setCoverLine(new ArrayList<>(0));
+        c.setCollisionPolygons(new ArrayList<>(0));
         c.setOpenContainerCoverLine(new ArrayList<>(0));
         c.setOpenContainerCollisionPolygons(new ArrayList<>(0));
         return c;

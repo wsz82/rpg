@@ -90,8 +90,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
 
             Weapon w = new Weapon(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             w.setPos(pos);
             output.add(w);
         }

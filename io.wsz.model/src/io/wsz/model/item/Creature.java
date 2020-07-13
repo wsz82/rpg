@@ -47,12 +47,8 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public Creature() {}
 
-    public Creature(Creature prototype, String name, ItemType type, String path,
-                    Boolean visible, Integer level,
-                    List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path,
-                visible, level,
-                coverLine, collisionPolygons);
+    public Creature(Creature prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+        super(prototype, name, type, path, visible, level);
     }
 
     @Override

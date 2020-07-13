@@ -40,11 +40,13 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
         final HBox openDoorBox = new HBox(10);
         openDoorBox.getChildren().addAll(openDoorButton, openDoorLabel);
 
-        container.getChildren().addAll(openDoorBox, openCB);
-
         if (item != null) {
-            container.getChildren().addAll(openDoorCoverButton, openDoorCollisionButton);
+            if (!isContent) {
+                container.getChildren().addAll(openDoorBox, openDoorCoverButton, openDoorCollisionButton);
+            }
         }
+
+        container.getChildren().addAll(openCB);
 
         fillInputs();
         hookUpInDoorEvents();
@@ -127,8 +129,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
     protected InDoor createNewAsset(String name, String relativePath) {
         InDoor i = new InDoor(
                 null, name, getType(), relativePath,
-                true, null,
-                new ArrayList<>(0), new ArrayList<>(0));
+                true, null);
         i.setOpenDoorCoverLine(new ArrayList<>(0));
         i.setOpenDoorCollisionPolygons(new ArrayList<>(0));
         return i;

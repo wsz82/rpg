@@ -61,7 +61,13 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         inputLayer.setPrefWidth(50);
         pos.getChildren().addAll(xLabel, inputX, yLabel, inputY, layerLabel, inputLayer);
 
-        container.getChildren().addAll(location, pos, teleportCollisionButton);
+        container.getChildren().addAll(location, pos);
+
+        if (item != null) {
+            if (!isContent) {
+                container.getChildren().addAll(teleportCollisionButton);
+            }
+        }
 
         setUpLocationChoice(locationChoice);
         fillInputs();
@@ -192,10 +198,12 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected Teleport createNewAsset(String name, String relativePath) {
-        return new Teleport(
+        Teleport t = new Teleport(
                 null, name, getType(), relativePath,
-                true, null,
-                new ArrayList<>(0), new ArrayList<>(0));
+                true, null);
+        t.setCoverLine(new ArrayList<>(0));
+        t.setCollisionPolygons(new ArrayList<>(0));
+        return t;
     }
 
     @Override

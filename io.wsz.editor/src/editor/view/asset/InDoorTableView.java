@@ -67,13 +67,10 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
 
             InDoor id = new InDoor(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             id.setPos(pos);
             id.setOpenImagePath(p.getOpenImagePath());
             id.setOpen(p.isOpen());
-            id.setOpenDoorCoverLine(Coords.cloneCoordsList(p.getOpenDoorCoverLine()));
-            id.setOpenDoorCollisionPolygons(Coords.cloneCoordsPolygons(p.getOpenDoorCollisionPolygons()));
 
             output.add(id);
         }

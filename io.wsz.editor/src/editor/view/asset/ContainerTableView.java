@@ -68,8 +68,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
 
             Container c = new Container(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             c.setPos(pos);
             c.getItems().addAll(p.getItems());
             c.setOpen(p.isOpen());

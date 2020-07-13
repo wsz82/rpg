@@ -18,7 +18,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
@@ -76,12 +75,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
 
-        container.getChildren().addAll(nameInput, imageBox);
+        container.getChildren().addAll(nameInput);
 
         if (item != null) {
-            container.getChildren().addAll(coverButton, collisionButton);
             if (!isContent) {
-                container.getChildren().add(dialogButton);
+                container.getChildren().addAll(imageBox, dialogButton, coverButton, collisionButton);
             }
         }
 
@@ -89,7 +87,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         root.getChildren().add(containerWithButtons);
         if (isContent) {
             nameInput.setDisable(true);
-            imageButton.setDisable(true);
         }
         hookupEvents();
     }
@@ -168,32 +165,26 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         dialogEditStage.show();
     }
 
-    private void openCollisionEdit() {
-        Image background = item.getInitialImage();
-        if (background == null) {
-            return;
-        }
-        List<List<Coords>> collisionPolygons = item.getCollisionPolygons();
-        if (collisionPolygons == null) {
-            collisionPolygons = new ArrayList<>(0);
-        }
-        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item, background);
-        collisionEdit.initWindow(isContent, "Collision edit");
-        collisionEdit.show();
-    }
-
     private void openCoverEdit() {
         Image background = item.getInitialImage();
         if (background == null) {
             return;
         }
         List<Coords> coverLine = item.getCoverLine();
-        if (coverLine == null) {
-            coverLine = new ArrayList<>(0);
-        }
         CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine, background);
         coverEdit.initWindow(isContent, "Cover edit");
         coverEdit.show();
+    }
+
+    private void openCollisionEdit() {
+        Image background = item.getInitialImage();
+        if (background == null) {
+            return;
+        }
+        List<List<Coords>> collisionPolygons = item.getCollisionPolygons();
+        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item, background);
+        collisionEdit.initWindow(isContent, "Collision edit");
+        collisionEdit.show();
     }
 
     private void editAsset() {

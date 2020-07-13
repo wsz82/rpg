@@ -25,16 +25,15 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     public Container() {}
 
-    public Container(Container prototype, String name, ItemType type, String path,
-                     Boolean visible, Integer level,
-                     List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path, visible, level, coverLine, collisionPolygons);
+    public Container(Container prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+        super(prototype, name, type, path, visible, level);
     }
 
     @Override
     public Container cloneEquipment() {
-        Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level,
-                Coords.cloneCoordsList(prototype.coverLine), Coords.cloneCoordsPolygons(prototype.getCollisionPolygons()));
+        Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level);
+        clone.setCoverLine(Coords.cloneCoordsList(coverLine));
+        clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
         clone.getPos().x = this.pos.x;
         clone.getPos().y = this.pos.y;
         clone.setWeight(weight);
@@ -121,17 +120,13 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     public List<Coords> getOpenContainerCoverLine() {
-        if (openContainerCoverLine != null) {
-            return openContainerCoverLine;
-        } else {
-            List<Coords> prototypeCL = prototype.openContainerCoverLine;
-            if (prototypeCL != null) {
-                return prototypeCL;
-            } else {
-                List<Coords> newCL = new ArrayList<>(0);
-                prototype.setOpenContainerCoverLine(newCL);
-                return newCL;
+        if (openContainerCoverLine == null) {
+            if (prototype == null) {
+                return new ArrayList<>(0);
             }
+            return prototype.openContainerCoverLine;
+        } else {
+            return openContainerCoverLine;
         }
     }
 
@@ -140,22 +135,27 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     public List<List<Coords>> getOpenContainerCollisionPolygons() {
-        if (openContainerCollisionPolygons != null) {
-            return openContainerCollisionPolygons;
-        } else {
-            List<List<Coords>> prototypeCP = prototype.openContainerCollisionPolygons;
-            if (prototypeCP != null) {
-                return prototypeCP;
-            } else {
-                List<List<Coords>> newCP = new ArrayList<>(0);
-                prototype.setOpenContainerCollisionPolygons(newCP);
-                return newCP;
+        if (openContainerCollisionPolygons == null) {
+            if (prototype == null) {
+                return new ArrayList<>(0);
             }
+            return prototype.openContainerCollisionPolygons;
+        } else {
+            return openContainerCollisionPolygons;
         }
     }
 
     public void setOpenContainerCollisionPolygons(List<List<Coords>> openContainerCollisionPolygons) {
         this.openContainerCollisionPolygons = openContainerCollisionPolygons;
+    }
+
+    @Override
+    public List<List<Coords>> getActualCollisionPolygons() {
+        if (open) {
+            return getOpenContainerCollisionPolygons();
+        } else {
+            return super.getActualCollisionPolygons();
+        }
     }
 
     public String getOpenImagePath() {

@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,15 +32,11 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
     public PosItem() {}
 
-    public PosItem(A prototype, String name, ItemType type, String path,
-                   Boolean visible, Integer level,
-                   List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
+    public PosItem(A prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
         super(name, type, path);
         this.prototype = prototype;
         this.visible.set(visible);
         this.level = level;
-        this.coverLine = coverLine;
-        this.collisionPolygons = collisionPolygons;
     }
 
     public Coords getImageCenter() {
@@ -206,7 +203,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public List<Coords> getCoverLine() {
-        if (prototype != null) {
+        if (coverLine == null) {
+            if (prototype == null) {
+                return new ArrayList<>(0);
+            }
             return prototype.coverLine;
         } else {
             return coverLine;
@@ -222,7 +222,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public List<List<Coords>> getCollisionPolygons() {
-        if (prototype != null) {
+        if (collisionPolygons == null) {
+            if (prototype == null) {
+                return new ArrayList<>(0);
+            }
             return prototype.collisionPolygons;
         } else {
             return collisionPolygons;

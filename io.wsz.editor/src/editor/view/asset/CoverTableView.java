@@ -50,8 +50,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
 
             Cover cover = new Cover(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             cover.setPos(pos);
             output.add(cover);
         }

@@ -34,11 +34,13 @@ public abstract class OpenableEquipmentAssetStage<A extends Equipment> extends E
         final HBox openDoorBox = new HBox(10);
         openDoorBox.getChildren().addAll(openButton, openLabel);
 
-        container.getChildren().addAll(openDoorBox, openCB);
-
         if (item != null) {
-            container.getChildren().addAll(openCoverButton, openCollisionButton);
+            if (!isContent) {
+                container.getChildren().addAll(openDoorBox, openCoverButton, openCollisionButton);
+            }
         }
+
+        container.getChildren().addAll(openCB);
 
         hookUpOpenableEvents();
     }

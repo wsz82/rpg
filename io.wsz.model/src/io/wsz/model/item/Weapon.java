@@ -6,7 +6,6 @@ import io.wsz.model.stage.Coords;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 
 public class Weapon extends Equipment<Weapon> {
     private static final long serialVersionUID = 1L;
@@ -17,18 +16,15 @@ public class Weapon extends Equipment<Weapon> {
 
     public Weapon() {}
 
-    public Weapon(Weapon prototype, String name, ItemType type, String path,
-                  Boolean visible, Integer level,
-                  List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path,
-                visible, level,
-                coverLine, collisionPolygons);
+    public Weapon(Weapon prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+        super(prototype, name, type, path, visible, level);
     }
 
     @Override
     public Weapon cloneEquipment() {
-        Weapon clone = new Weapon(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level,
-                Coords.cloneCoordsList(prototype.coverLine), Coords.cloneCoordsPolygons(prototype.getCollisionPolygons()));
+        Weapon clone = new Weapon(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level);
+        clone.setCoverLine(Coords.cloneCoordsList(coverLine));
+        clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
         clone.getPos().x = this.pos.x;
         clone.getPos().y = this.pos.y;
         clone.setWeight(weight);

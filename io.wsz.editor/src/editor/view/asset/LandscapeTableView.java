@@ -50,8 +50,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
 
             Landscape l = new Landscape(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             l.setPos(pos);
             output.add(l);
         }

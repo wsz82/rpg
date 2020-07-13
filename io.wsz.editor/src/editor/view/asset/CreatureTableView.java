@@ -80,8 +80,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
 
             Creature cr = new Creature(
                     p, name, type, path,
-                    true, level,
-                    Coords.cloneCoordsList(p.getCoverLine()), Coords.cloneCoordsPolygons(p.getCollisionPolygons()));
+                    true, level);
             cr.setPos(pos);
 
             Task pTasks = p.getTask();

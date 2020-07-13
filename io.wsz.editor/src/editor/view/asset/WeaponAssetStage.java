@@ -126,10 +126,10 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
 
     @Override
     protected Weapon createNewAsset(String name, String relativePath) {
-        return new Weapon(
-                null, name, getType(), relativePath,
-                true, null,
-                new ArrayList<>(0), new ArrayList<>(0));
+        Weapon w = new Weapon(null, name, getType(), relativePath, true, null);
+        w.setCoverLine(new ArrayList<>(0));
+        w.setCollisionPolygons(new ArrayList<>(0));
+        return w;
     }
 
     @Override

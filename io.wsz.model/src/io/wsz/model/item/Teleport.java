@@ -21,16 +21,12 @@ public class Teleport extends PosItem<Teleport> {
     private String locationName;
     private Coords exit;
     private Integer exitLevel;
-    private final List<List<Coords>> teleportCollisionPolygons = new ArrayList<>(0);
+    private List<List<Coords>> teleportCollisionPolygons;
 
     public Teleport() {}
 
-    public Teleport(Teleport prototype, String name, ItemType type, String path,
-                    Boolean visible, Integer level,
-                    List<Coords> coverLine, List<List<Coords>> collisionPolygons) {
-        super(prototype, name, type, path,
-                visible, level,
-                coverLine, collisionPolygons);
+    public Teleport(Teleport prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+        super(prototype, name, type, path, visible, level);
     }
 
     public void enter(Creature cr) {
@@ -128,11 +124,18 @@ public class Teleport extends PosItem<Teleport> {
     }
 
     public List<List<Coords>> getTeleportCollisionPolygons() {
-        if (prototype != null) {
+        if (teleportCollisionPolygons == null) {
+            if (prototype == null) {
+                return new ArrayList<>(0);
+            }
             return prototype.teleportCollisionPolygons;
         } else {
             return teleportCollisionPolygons;
         }
+    }
+
+    public void setTeleportCollisionPolygons(List<List<Coords>> teleportCollisionPolygons) {
+        this.teleportCollisionPolygons = teleportCollisionPolygons;
     }
 
     @Override
@@ -160,7 +163,6 @@ public class Teleport extends PosItem<Teleport> {
 
         exitLevel = (Integer) in.readObject();
 
-        List<List<Coords>> input = (List<List<Coords>>) in.readObject();
-        teleportCollisionPolygons.addAll(input);
+        teleportCollisionPolygons = (List<List<Coords>>) in.readObject();
     }
 }
