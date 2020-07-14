@@ -44,7 +44,7 @@ public class Task implements Externalizable {
                     interactWithCreature(cr, (Creature) item);
                 } else
                 if (item instanceof InDoor) {
-                    interactWithDoor(cr, (InDoor) item);
+                    interactWithInDoor(cr, (InDoor) item);
                 }
             }
             return;
@@ -52,7 +52,7 @@ public class Task implements Externalizable {
         finished = true;
     }
 
-    private void interactWithDoor(Creature cr, InDoor id) {
+    private void interactWithInDoor(Creature cr, InDoor id) {
         CreatureSize size = cr.getSize();
         if (id.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             id.interact();
@@ -141,15 +141,13 @@ public class Task implements Externalizable {
         if (item == null) {
             return;
         }
+        Coords dest;
         if (item instanceof Creature) {
-            Coords dest = cr.reverseCenterBottomPos(item.getCenter());
-            this.dest.x = dest.x;
-            this.dest.y = dest.y;
+            dest = cr.reverseCenterBottomPos(item.getCenter());
         } else {
-            Coords dest = cr.reverseCenterBottomPos(item.getPos());
-            this.dest.x = dest.x;
-            this.dest.y = dest.y;
+            dest = cr.reverseCenterBottomPos(item.getPos());
         }
+        setDest(dest);
     }
 
     public Coords getDest() {
@@ -159,6 +157,7 @@ public class Task implements Externalizable {
     public void setDest(Coords dest) {
         this.dest.x = dest.x;
         this.dest.y = dest.y;
+        this.dest.level = dest.level;
     }
 
     public boolean isFinished() {

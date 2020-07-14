@@ -25,13 +25,13 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     public Container() {}
 
-    public Container(Container prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+    public Container(Container prototype, String name, ItemType type, String path, Boolean visible) {
+        super(prototype, name, type, path, visible);
     }
 
     @Override
     public Container cloneEquipment() {
-        Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level);
+        Container clone = new Container(prototype, name.get(), type.get(), relativePath.get(), visible.get());
         clone.setCoverLine(Coords.cloneCoordsList(coverLine));
         clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
         clone.getPos().x = this.pos.x;

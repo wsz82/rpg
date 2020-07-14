@@ -20,7 +20,7 @@ public class Board {
 
     private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
     private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
-    private final Coords boardPos = new Coords(0, 0, null);
+    private final Coords boardPos = new Coords(0, 0);
 
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
@@ -58,7 +58,7 @@ public class Board {
                     return false;
                 })
                 .filter(pi -> {
-                    int level = pi.getLevel();
+                    int level = pi.getPos().level;
                     int actualLevel = Controller.get().getCurrentLayer().getLevel(); //TODO checked location
                     if (includeLevelsBelow) {
                         return level <= actualLevel;
@@ -116,7 +116,7 @@ public class Board {
         location.getItems().get().stream()
                 .filter(pi -> {
                     int level = Controller.get().getCurrentLayer().getLevel(); // TODO
-                    return pi.getLevel().equals(level);
+                    return pi.getPos().level == level;
                 })
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .map(pi -> (Creature) pi)
@@ -155,8 +155,8 @@ public class Board {
                 })
                 .filter(pi -> pi.getActualCollisionPolygons() != null || pi instanceof Creature)
                 .filter(pi -> {
-                    int level = item.getLevel();
-                    return pi.getLevel().equals(level);
+                    int level = item.getPos().level;
+                    return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) return null;
@@ -185,8 +185,8 @@ public class Board {
                 .map(pi -> (Teleport) pi)
                 .filter(pi -> pi.getActualCollisionPolygons() != null)
                 .filter(pi -> {
-                    int level = item.getLevel();
-                    return pi.getLevel().equals(level);
+                    int level = item.getPos().level;
+                    return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> teleports));
         if (teleports.isEmpty()) return null;
@@ -294,7 +294,7 @@ public class Board {
         equipment.clear();
         items.stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> pi.getLevel().equals(cr.getLevel()))
+                .filter(pi -> pi.getPos().level == cr.getPos().level)
                 .filter(pi -> pi instanceof Equipment)
                 .map(pi -> (Equipment) pi)
                 .collect(Collectors.toCollection(() -> equipment));

@@ -130,7 +130,7 @@ public class DropView extends EquipmentView {
         Creature cr = controller.getCreatureToOpenInventory();
         Location loc = cr.getPos().getLocation();
 
-        sortItems(loc, currentPos, viewWidth, viewHeight, allItmes, cr.getLevel());
+        sortItems(loc, currentPos, viewWidth, viewHeight, allItmes, cr.getPos().level);
     }
 
     public void setDroppedEquipment(List<Equipment> droppedEquipment) {

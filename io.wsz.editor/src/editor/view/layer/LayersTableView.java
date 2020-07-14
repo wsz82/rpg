@@ -132,7 +132,7 @@ class LayersTableView extends TableView<Layer> implements LevelValueObservable, 
                 .map(l -> l.getLevel())
                 .collect(Collectors.toList());
         List<PosItem> itemsToRemove = Controller.get().getCurrentLocation().getItems().stream()
-                .filter(pi -> levelsToRemove.contains(pi.getLevel()))
+                .filter(pi -> levelsToRemove.contains(pi.getPos().level))
                 .collect(Collectors.toList());
         Controller.get().getCurrentLocation().getItems().removeAll(itemsToRemove);
     }

@@ -3,6 +3,7 @@ package io.wsz.model.content;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -30,8 +31,9 @@ public class ItemList implements LevelValueListener, VisibleValueListener, Exter
     public void onLevelValueChanged(int oldValue, int newValue) {
         for (PosItem pi:
                 CurrentLocation.get().getItems()) {
-            if (pi.getLevel() == oldValue) {
-                pi.setLevel(newValue);
+            Coords pos = pi.getPos();
+            if (pos.level == oldValue) {
+                pos.level = newValue;
             }
         }
     }
@@ -40,7 +42,7 @@ public class ItemList implements LevelValueListener, VisibleValueListener, Exter
     public void onVisibleValueChanged(int level, boolean newValue) {
         for (PosItem pi:
                 CurrentLocation.get().getItems()) {
-            if (pi.getLevel() == level) {
+            if (pi.getPos().level == level) {
                 pi.setVisible(newValue);
             }
         }

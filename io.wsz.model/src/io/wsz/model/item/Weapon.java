@@ -16,13 +16,13 @@ public class Weapon extends Equipment<Weapon> {
 
     public Weapon() {}
 
-    public Weapon(Weapon prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+    public Weapon(Weapon prototype, String name, ItemType type, String path, Boolean visible) {
+        super(prototype, name, type, path, visible);
     }
 
     @Override
     public Weapon cloneEquipment() {
-        Weapon clone = new Weapon(prototype, name.get(), type.get(), relativePath.get(), visible.get(), level);
+        Weapon clone = new Weapon(prototype, name.get(), type.get(), relativePath.get(), visible.get());
         clone.setCoverLine(Coords.cloneCoordsList(coverLine));
         clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
         clone.getPos().x = this.pos.x;

@@ -90,7 +90,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
 
             Weapon w = new Weapon(
                     p, name, type, path,
-                    true, level);
+                    true);
             w.setPos(pos);
             output.add(w);
         }

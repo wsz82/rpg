@@ -45,8 +45,8 @@ public class GameView extends CanvasView {
     private final Coords currentPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
-    private final Coords selFirst = new Coords(-1, -1, null);
-    private final Coords selSecond = new Coords(-1, -1, null);
+    private final Coords selFirst = new Coords(-1, -1);
+    private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView = new BarView(canvas);
 
     private List<Layer> layers;

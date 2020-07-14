@@ -59,7 +59,7 @@ public class ContentTableView extends TableView<PosItem> {
         levelCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
-                return param.getValue().getLevel();
+                return param.getValue().getPos().level;
             }
         });
         levelCol.setEditable(true);
@@ -73,9 +73,9 @@ public class ContentTableView extends TableView<PosItem> {
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {
                 alertLayerNotExisting(level);
-                pi.setLevel(t.getOldValue());
+                pi.getPos().level = t.getOldValue();
             } else {
-                pi.setLevel(level);
+                pi.getPos().level = level;
                 editorCanvas.refresh();
             }
             refresh();

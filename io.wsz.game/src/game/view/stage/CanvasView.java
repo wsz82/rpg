@@ -49,7 +49,7 @@ public abstract class CanvasView {
                             left, top, right, bottom,
                             piLeft, piTop, piRight, piBottom);
                 })
-                .filter(pi -> pi.getLevel().equals(level))
+                .filter(pi -> pi.getPos().level == level)
                 .collect(Collectors.toCollection(() -> items));
 
         board.sortPosItems(items);

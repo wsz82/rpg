@@ -27,8 +27,8 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
 
     public Equipment() {}
 
-    public Equipment(E prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+    public Equipment(E prototype, String name, ItemType type, String path, Boolean visible) {
+        super(prototype, name, type, path, visible);
     }
     public Double getIndividualWeight() {
         return weight;
@@ -72,7 +72,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public void onTake(Creature cr, double x, double y) {
         pos.x = x;
         pos.y = y;
-        level = 0;
+        pos.level = 0;
         setVisible(false);
         cr.pos.getLocation().getItemsToRemove().add(this);
         System.out.println(this.getName() + " taken");
@@ -82,10 +82,10 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public boolean onDrop(Creature cr, double x, double y) {
         double tempX = pos.x;
         double tempY = pos.y;
-        Integer tempLevel = this.getLevel();
+        int tempLevel = pos.level;
         pos.x = x;
         pos.y = y;
-        setLevel(cr.getLevel());
+        pos.level = cr.getPos().level;
         Location l = cr.getPos().getLocation();
         PosItem obstacle = Controller.get().getBoard().getObstacle(pos, this, l);
         boolean outOfLocation = x < 0 || y < 0
@@ -93,7 +93,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         if (obstacle != null || outOfLocation) {
             pos.x = tempX;
             pos.y = tempY;
-            setLevel(tempLevel);
+            pos.level = tempLevel;
             System.out.println(this.getName() + " cannot be dropped here");
             return false;
         } else {

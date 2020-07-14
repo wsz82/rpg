@@ -1,7 +1,6 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
-import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -48,7 +47,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     public Creature() {}
 
     public Creature(Creature prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+        super(prototype, name, type, path, visible);
     }
 
     @Override
@@ -126,6 +125,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         double height = getImage().getHeight() / Sizes.getMeter();
         centerBottom.x = pos.x + width/2;
         centerBottom.y = pos.y + height;
+        centerBottom.level = pos.level;
         return centerBottom;
     }
 
@@ -137,6 +137,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         double height = getImage().getHeight() / Sizes.getMeter();
         reversCenterBottom.x = difPos.x - width/2;
         reversCenterBottom.y = difPos.y - height;
+        reversCenterBottom.level = difPos.level;
         return reversCenterBottom;
     }
 
@@ -451,14 +452,14 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     @Override
-    public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
-        super.changeLocation(from, target, targetLayer, targetX, targetY);
-        Coords rawPos = new Coords(targetX, targetY, null);
-        Coords reversed = reverseCenterBottomPos(rawPos);
+    public void changeLocation(Location from, Coords exit) {
+        super.changeLocation(from, exit);
+        Coords reversed = reverseCenterBottomPos(exit);
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;
+        this.pos.level = reversed.level;
         task.clear();
-        enteredToFlag = target;
+        enteredToFlag = exit.getLocation();
     }
 
     @Override

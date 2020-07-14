@@ -119,7 +119,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     @Override
     protected Container createNewAsset(String name, String relativePath) {
-        Container c = new Container(null, name, getType(), relativePath, true, null);
+        Container c = new Container(null, name, getType(), relativePath, true);
         c.setCoverLine(new ArrayList<>(0));
         c.setCollisionPolygons(new ArrayList<>(0));
         c.setOpenContainerCoverLine(new ArrayList<>(0));

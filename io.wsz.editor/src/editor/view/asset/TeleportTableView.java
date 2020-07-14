@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -25,7 +26,12 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         toCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().getLocationName();
+                Location l = p.getValue().getExit().getLocation();
+                if (l == null) {
+                    return null;
+                } else {
+                    return l.getName();
+                }
             }
         });
         toCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -47,7 +53,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         levCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().getExitLevel().toString();
+                return String.valueOf(p.getValue().getExit().level);
             }
         });
         levCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -89,7 +95,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
 
             Teleport t = new Teleport(
                     p, name, type, path,
-                    true, level);
+                    true);
             t.setPos(pos);
 
             output.add(t);

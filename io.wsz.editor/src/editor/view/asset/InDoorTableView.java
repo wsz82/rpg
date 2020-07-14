@@ -67,7 +67,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
 
             InDoor id = new InDoor(
                     p, name, type, path,
-                    true, level);
+                    true);
             id.setPos(pos);
             id.setOpenImagePath(p.getOpenImagePath());
             id.setOpen(p.isOpen());

@@ -3,7 +3,6 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
-import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -25,18 +24,16 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
     protected final Coords pos = new Coords();
-    protected Integer level;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
 
     public PosItem() {}
 
-    public PosItem(A prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+    public PosItem(A prototype, String name, ItemType type, String path, Boolean visible) {
         super(name, type, path);
         this.prototype = prototype;
         this.visible.set(visible);
-        this.level = level;
     }
 
     public Coords getImageCenter() {
@@ -75,15 +72,16 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return getImage().getWidth() / Sizes.getMeter();
     }
 
-    public void changeLocation(Location from, Location target, Layer targetLayer, double targetX, double targetY) {
+    public void changeLocation(Location from, Coords exit) {
+        Location target = exit.getLocation();
         if (!from.equals(target)) {
             from.getItemsToRemove().add(this);
             target.getItemsToAdd().add(this);
         }
 
-        pos.x = targetX;
-        pos.y = targetY;
-        level = targetLayer.getLevel();
+        pos.x = exit.x;
+        pos.y = exit.y;
+        pos.level = exit.level;
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
@@ -194,14 +192,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.pos.setLocation(location);
     }
 
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
     public List<Coords> getCoverLine() {
         if (coverLine == null) {
             if (prototype == null) {
@@ -287,7 +277,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return Objects.equals(getPrototype(), item.getPrototype()) &&
                 Objects.equals(getVisible(), item.getVisible()) &&
                 Objects.equals(getPos(), item.getPos()) &&
-                Objects.equals(getLevel(), item.getLevel()) &&
                 Objects.equals(getCoverLine(), item.getCoverLine()) &&
                 Objects.equals(getCollisionPolygons(), item.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), item.getDialog());
@@ -295,7 +284,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getPrototype(), getVisible(), getPos(), getLevel(),
+        return Objects.hash(super.hashCode(), getPrototype(), getVisible(), getPos(),
                 getCoverLine(), getCollisionPolygons(), getDialog());
     }
 
@@ -314,8 +303,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         out.writeBoolean(visible.get());
 
         out.writeObject(pos);
-
-        out.writeObject(level);
 
         out.writeObject(coverLine);
 
@@ -336,9 +323,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         Coords pos = (Coords) in.readObject();
         this.pos.x = pos.x;
         this.pos.y = pos.y;
+        this.pos.level = pos.level;
         this.pos.setLocation(pos.getLocation());
-
-        level = (Integer) in.readObject();
 
         coverLine = (List<Coords>) in.readObject();
 

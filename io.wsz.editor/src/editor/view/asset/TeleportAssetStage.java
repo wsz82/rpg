@@ -130,25 +130,17 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         if (item == null) {
             return;
         }
-        String locationName = item.getIndividualLocationName();
-        if (locationName == null) {
+        Coords exit = item.getExit();
+        if (exit == null) {
             locationChoice.setValue(null);
-        } else {
-            locationChoice.setValue(getLocation(locationName));
-        }
-        Integer exitLevel = item.getIndividualExitLevel();
-        if (exitLevel == null) {
             inputLayer.setText("");
-        } else {
-            inputLayer.setText(String.valueOf(exitLevel));
-        }
-        Coords exitPos = item.getIndividualExit();
-        if (exitPos == null) {
             inputX.setText("");
             inputY.setText("");
         } else {
-            double x = exitPos.x;
-            double y = exitPos.y;
+            locationChoice.setValue(exit.getLocation());
+            inputLayer.setText(String.valueOf(exit.level));
+            double x = exit.x;
+            double y = exit.y;
             inputX.setText(String.valueOf(x));
             inputY.setText(String.valueOf(y));
         }
@@ -157,37 +149,42 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     @Override
     protected void defineAsset() {
         Location l = locationChoice.getValue();
-        if (l == null) {
-            item.setLocationName(null);
-        } else {
-            item.setLocationName(l.getName());
-        }
-
         String exitLevel = inputLayer.getText();
-        if (exitLevel.isEmpty()) {
-            if (isContent) {
-                item.setExitLevel(null);
-            } else {
-                item.setExitLevel(0);
-            }
-        } else {
-            item.setExitLevel(Integer.parseInt(exitLevel));
-        }
-
         String exitX = inputX.getText();
         String exitY = inputY.getText();
+
+        Coords exit = item.getIndividualExit();
+        if (exit == null && (l != null || !exitLevel.isEmpty() || !exitX.isEmpty() || !exitY.isEmpty())) {
+            exit = new Coords();
+        }
+
+        if (l == null) {
+            if (exit != null) {
+                exit.setLocation(null);
+            }
+        } else {
+            exit.setLocation(l);
+        }
+
+        if (exitLevel.isEmpty()) {
+            if (exit != null) {
+                exit.level = 0;
+            }
+        } else {
+            exit.level = Integer.parseInt(exitLevel);
+        }
+
         boolean posIsEmpty = exitX.isEmpty() || exitY.isEmpty();
         if (posIsEmpty) {
-            if (isContent) {
-                item.setExit(null);
-            } else {
-                item.setExit(new Coords(0, 0, null));
+            if (exit != null) {
+                exit.x = 0;
+                exit.y = 0;
             }
         } else {
             double x = Double.parseDouble(exitX);
             double y = Double.parseDouble(exitY);
-            Coords exitPos = new Coords(x, y, null);
-            item.setExit(exitPos);
+            exit.x = x;
+            exit.y = y;
         }
     }
 
@@ -200,7 +197,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     protected Teleport createNewAsset(String name, String relativePath) {
         Teleport t = new Teleport(
                 null, name, getType(), relativePath,
-                true, null);
+                true);
         t.setCoverLine(new ArrayList<>(0));
         t.setCollisionPolygons(new ArrayList<>(0));
         return t;

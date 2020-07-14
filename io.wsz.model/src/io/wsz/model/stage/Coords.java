@@ -313,6 +313,7 @@ public class Coords implements Externalizable {
 
     public double x;
     public double y;
+    public int level;
 
     private Location location;
 
@@ -323,9 +324,16 @@ public class Coords implements Externalizable {
         this.y = y;
     }
 
-    public Coords(double x, double y, Location location) {
+    public Coords(double x, double y, int level) {
         this.x = x;
         this.y = y;
+        this.level = level;
+    }
+
+    public Coords(double x, double y, int level, Location location) {
+        this.x = x;
+        this.y = y;
+        this.level = level;
         this.location = location;
     }
 
@@ -334,7 +342,7 @@ public class Coords implements Externalizable {
     }
 
     public Coords clonePos() {
-        return new Coords(this.x, this.y, this.location);
+        return new Coords(this.x, this.y, this.level, this.location);
     }
 
     public void add(Coords pos2) {
@@ -440,9 +448,9 @@ public class Coords implements Externalizable {
         String locationName;
         if (location != null) {
             locationName = location.getName();
-            return "Location: " + locationName + ": " + "X: " + x + ", Y: " + y;
+            return "Location: " + locationName + ": " + "X: " + x + ", Y: " + y + ", level: " + level;
         } else {
-            return "X: " + x + ", Y: " + y;
+            return "X: " + x + ", Y: " + y + ", level: " + level;
         }
 
     }
@@ -450,16 +458,17 @@ public class Coords implements Externalizable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Coords)) return false;
         Coords coords = (Coords) o;
         return Double.compare(coords.x, x) == 0 &&
                 Double.compare(coords.y, y) == 0 &&
-                Objects.equals(coords.location, location);
+                level == coords.level &&
+                Objects.equals(getLocation(), coords.getLocation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, location);
+        return Objects.hash(x, y, level, location);
     }
 
     @Override
@@ -469,6 +478,8 @@ public class Coords implements Externalizable {
         out.writeDouble(x);
 
         out.writeDouble(y);
+
+        out.writeInt(level);
 
         if (location != null) {
             out.writeUTF(location.getName());
@@ -484,6 +495,8 @@ public class Coords implements Externalizable {
         x = in.readDouble();
 
         y = in.readDouble();
+
+        level = in.readInt();
 
         String locationName = in.readUTF();
         if (!locationName.isEmpty()) {

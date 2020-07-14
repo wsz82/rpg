@@ -12,8 +12,8 @@ public class Cover extends PosItem<Cover> implements Externalizable {
 
     public Cover() {}
 
-    public Cover(Cover prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+    public Cover(Cover prototype, String name, ItemType type, String path, Boolean visible) {
+        super(prototype, name, type, path, visible);
     }
 
     @Override

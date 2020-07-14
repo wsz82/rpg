@@ -34,7 +34,7 @@ class CreatureTest {
         Inventory inventoryA = new Inventory(a);
         a.setInventory(inventoryA);
 
-        a.getTask().setDest(new Coords(12, 7, null));
+        a.getTask().setDest(new Coords(12, 7));
 
         Creature b = new Creature(p, p.getName(), p.getType(), p.getRelativePath(),
                 true, level);

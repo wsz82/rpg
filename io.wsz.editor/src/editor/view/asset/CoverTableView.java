@@ -50,7 +50,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
 
             Cover cover = new Cover(
                     p, name, type, path,
-                    true, level);
+                    true);
             cover.setPos(pos);
             output.add(cover);
         }

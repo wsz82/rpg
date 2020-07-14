@@ -26,8 +26,8 @@ public class ItemsComparator {
 
     public static Comparison compare(PosItem i1, Node n) {
         PosItem i2 = n.getItem();
-        int o1level = i1.getLevel();
-        int o2level = i2.getLevel();
+        int o1level = i1.getPos().level;
+        int o2level = i2.getPos().level;
         ItemType t1 = i1.getType();
         ItemType t2 = i2.getType();
         double i1_top = i1.getTop();

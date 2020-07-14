@@ -5,6 +5,7 @@ import io.wsz.model.asset.AssetsList;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.Teleport;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -101,18 +102,29 @@ public class Controller {
         List<Location> locations = getLocationsList();
         for (Location l : locations) {
             for (PosItem pi : l.getItems().get()) {
-                Location serLoc = pi.getPos().getLocation();
-                if (serLoc != null) {
-                    Optional<Location> optionalLocation = getLocationsList().stream()
-                            .filter(refLoc -> refLoc.getName().equals(serLoc.getName()))
-                            .findFirst();
-                    Location foundLoc = optionalLocation.orElse(null);
-                    if (foundLoc == null) {
-                        throw new NullPointerException("Location \"" + serLoc.getName() + "\" should be in locations list");
-                    }
-                    pi.getPos().setLocation(foundLoc);
+                Coords pos = pi.getPos();
+                restoreCoords(pos);
+
+                if (pi instanceof Teleport) {
+                    Teleport t = (Teleport) pi;
+                    Coords exit = t.getExit();
+                    restoreCoords(exit);
                 }
             }
+        }
+    }
+
+    private void restoreCoords(Coords exit) {
+        Location serExitLoc = exit.getLocation();
+        if (serExitLoc != null) {
+            Optional<Location> optionalLocation = getLocationsList().stream()
+                    .filter(refLoc -> refLoc.getName().equals(serExitLoc.getName()))
+                    .findFirst();
+            Location foundLoc = optionalLocation.orElse(null);
+            if (foundLoc == null) {
+                throw new NullPointerException("Location \"" + serExitLoc.getName() + "\" should be in locations list");
+            }
+            exit.setLocation(foundLoc);
         }
     }
 

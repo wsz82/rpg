@@ -21,8 +21,8 @@ public class InDoor extends PosItem<InDoor> implements Externalizable, Openable 
 
     public InDoor() {}
 
-    public InDoor(InDoor prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
-        super(prototype, name, type, path, visible, level);
+    public InDoor(InDoor prototype, String name, ItemType type, String path, Boolean visible) {
+        super(prototype, name, type, path, visible);
     }
 
     public String getIndividualOpenImagePath() {

@@ -92,7 +92,7 @@ public class EditorController {
         p.setStartLocation(startLocation);
         double startX = pss.getStartX();
         double startY = pss.getStartY();
-        p.setStartPos(new Coords(startX, startY, null));
+        p.setStartPos(new Coords(startX, startY));
         int startLayer = pss.getStartLayer();
         p.setStartLayer(startLayer);
     }

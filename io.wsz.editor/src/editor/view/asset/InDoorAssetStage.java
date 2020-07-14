@@ -50,7 +50,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
     protected InDoor createNewAsset(String name, String relativePath) {
         InDoor i = new InDoor(
                 null, name, getType(), relativePath,
-                true, null);
+                true);
         i.setOpenDoorCoverLine(new ArrayList<>(0));
         i.setOpenDoorCollisionPolygons(new ArrayList<>(0));
         return i;

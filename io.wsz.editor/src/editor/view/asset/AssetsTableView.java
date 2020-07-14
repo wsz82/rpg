@@ -143,7 +143,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private void addItemsToContainable(ItemsStage itemsStage) {
-        Coords pos = new Coords(0, 0, null);
+        Coords pos = new Coords(0, 0);
         List<A> createdItems = createItems(pos, 0);
         for (A item : createdItems) {
             if (item instanceof Equipment) {

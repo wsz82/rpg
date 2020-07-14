@@ -68,7 +68,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
 
             Container c = new Container(
                     p, name, type, path,
-                    true, level);
+                    true);
             c.setPos(pos);
             c.getItems().addAll(p.getItems());
             c.setOpen(p.isOpen());
