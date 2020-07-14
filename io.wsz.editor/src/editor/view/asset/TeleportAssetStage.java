@@ -130,7 +130,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         if (item == null) {
             return;
         }
-        Coords exit = item.getExit();
+        Coords exit = item.getIndividualExit();
         if (exit == null) {
             locationChoice.setValue(null);
             inputLayer.setText("");

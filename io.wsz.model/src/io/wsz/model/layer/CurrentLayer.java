@@ -17,8 +17,7 @@ public class CurrentLayer {
         return singleton;
     }
 
-    private CurrentLayer() {
-    }
+    private CurrentLayer() {}
 
     public ObjectProperty<Layer> layerProperty() {
         return layer;

@@ -19,6 +19,7 @@ public class Pointer {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
                 mark.x = event.getX() / Sizes.getMeter();
                 mark.y = event.getY() / Sizes.getMeter();
+                mark.level = Controller.get().getCurrentLayer().getLevel();
                 mark.add(Controller.get().getBoardPos());
                 if (markerImage == null) {
                     loadMarkerImage();
@@ -57,7 +58,7 @@ public class Pointer {
         if (mark.x != -1 && active) {
             return mark;
         } else {
-            return new Coords(0, 0);
+            return new Coords();
         }
     }
 

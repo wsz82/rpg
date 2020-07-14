@@ -1,22 +1,22 @@
 package editor.view.asset;
 
-import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.OutDoor;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
-public class InDoorAssetStage extends AssetStage<InDoor> {
-    private static final String TITLE = "InDoor asset";
+public class OutDoorAssetStage extends AssetStage<OutDoor> {
+    private static final String TITLE = "OutDoor asset";
 
-    private final OpenableInDoor openable = new OpenableInDoor(this, item, isContent);
+    private final OpenableOutDoor openable = new OpenableOutDoor(this, item, isContent);
 
-    public InDoorAssetStage(Stage parent, InDoor item, boolean isContent) {
+    public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent) {
         super(parent, item, isContent);
         initWindow();
     }
 
-    public InDoorAssetStage(Stage parent) {
+    public OutDoorAssetStage(Stage parent) {
         super(parent);
         initWindow();
     }
@@ -42,13 +42,13 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
     }
 
     @Override
-    protected void addAssetToList(InDoor asset) {
-        ObservableAssets.get().getInDoors().add(asset);
+    protected void addAssetToList(OutDoor asset) {
+        ObservableAssets.get().getOutDoors().add(asset);
     }
 
     @Override
-    protected InDoor createNewAsset(String name, String relativePath) {
-        InDoor i = new InDoor(null, name, getType(), relativePath, true);
+    protected OutDoor createNewAsset(String name, String relativePath) {
+        OutDoor i = new OutDoor(null, name, getType(), relativePath, true);
         i.setOpenDoorCoverLine(new ArrayList<>(0));
         i.setOpenDoorCollisionPolygons(new ArrayList<>(0));
         return i;
@@ -56,6 +56,6 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected ItemType getType() {
-        return ItemType.INDOOR;
+        return ItemType.OUTDOOR;
     }
 }

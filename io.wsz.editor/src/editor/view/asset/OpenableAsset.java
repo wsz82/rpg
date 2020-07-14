@@ -32,9 +32,13 @@ public abstract class OpenableAsset<A extends PosItem> {
         final HBox openDoorBox = new HBox(10);
         openDoorBox.getChildren().addAll(openButton, openLabel);
 
+        if (!isContent) {
+            container.getChildren().add(openDoorBox);
+        }
+
         if (item != null) {
             if (!isContent) {
-                container.getChildren().addAll(openDoorBox, openCoverButton, openCollisionButton);
+                container.getChildren().addAll(openCoverButton, openCollisionButton);
             }
         }
 
@@ -86,7 +90,7 @@ public abstract class OpenableAsset<A extends PosItem> {
         }
 
         String openImagePath = getOpenImagePath();
-        if (openImagePath == null) {
+        if (openImagePath.isEmpty()) {
             openLabel.setText("");
         } else {
             openLabel.setText(openImagePath);
@@ -98,7 +102,7 @@ public abstract class OpenableAsset<A extends PosItem> {
 
     public void defineOpenable() {
         String openDoorPath = openLabel.getText();
-        if (!isContent && openDoorPath == null) {
+        if (!isContent && openDoorPath.isEmpty()) {
             setOpenImagePath("");
         } else {
             setOpenImagePath(openDoorPath);

@@ -143,6 +143,7 @@ public class EditorController {
     public void setDragPos(Coords pos) {
         this.dragPos.x = pos.x;
         this.dragPos.y = pos.y;
+        this.dragPos.level = pos.level;
         this.dragPos.setLocation(pos.getLocation());
     }
 

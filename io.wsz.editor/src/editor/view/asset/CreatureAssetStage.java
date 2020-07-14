@@ -238,7 +238,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     protected Creature createNewAsset(String name, String relativePath) {
         Creature cr = new Creature(
                 null, name, getType(), relativePath,
-                true, null);
+                true);
         cr.setCoverLine(new ArrayList<>(0));
         cr.setCollisionPolygons(new ArrayList<>(0));
         cr.setInventory(new Inventory(cr));

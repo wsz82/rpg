@@ -193,6 +193,8 @@ public class ContentTableView extends TableView<PosItem> {
                     parent, (Container) pi, true);
             case INDOOR -> new InDoorAssetStage(
                     parent, (InDoor) pi, true);
+            case OUTDOOR -> new OutDoorAssetStage(
+                    parent, (OutDoor) pi, true);
         };
         itemStage.show();
     }

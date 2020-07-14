@@ -46,7 +46,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public Creature() {}
 
-    public Creature(Creature prototype, String name, ItemType type, String path, Boolean visible, Integer level) {
+    public Creature(Creature prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }
 

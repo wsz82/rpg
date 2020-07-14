@@ -4,6 +4,7 @@ package io.wsz.model.item;
 
 public enum ItemType {
     COVER,
+    OUTDOOR,
     INDOOR,
     CREATURE,
     CONTAINER,

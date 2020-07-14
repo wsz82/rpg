@@ -75,12 +75,15 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         nameInput.setPromptText("Name");
         final HBox imageBox = new HBox(10);
         imageBox.getChildren().addAll(imageButton, imageLabel);
-
         container.getChildren().addAll(nameInput);
+
+        if (!isContent) {
+            container.getChildren().add(imageBox);
+        }
 
         if (item != null) {
             if (!isContent) {
-                container.getChildren().addAll(imageBox, dialogButton, coverButton, collisionButton);
+                container.getChildren().addAll(dialogButton, coverButton, collisionButton);
             }
         }
 

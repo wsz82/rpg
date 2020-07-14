@@ -133,8 +133,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private void addItemsToStage(Coords pos) {
-        int level = Controller.get().getCurrentLayer().getLevel();
-        List<A> createdItems = createItems(pos, level);
+        List<A> createdItems = createItems(pos);
         for (A item : createdItems) {
             Image img = item.getImage();
             if (isImageTooBig(item, img)) continue;
@@ -144,7 +143,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     private void addItemsToContainable(ItemsStage itemsStage) {
         Coords pos = new Coords(0, 0);
-        List<A> createdItems = createItems(pos, 0);
+        List<A> createdItems = createItems(pos);
         for (A item : createdItems) {
             if (item instanceof Equipment) {
                 Image img = item.getImage();
@@ -178,7 +177,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                 .ifPresent(r -> alert.close());
     }
 
-    protected abstract List<A> createItems(Coords pos, int level);
+    protected abstract List<A> createItems(Coords pos);
 
     private void removeAssets() {
         List<A> assetsToRemove = getSelectionModel().getSelectedItems();

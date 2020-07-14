@@ -40,8 +40,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected Landscape createNewAsset(String name, String relativePath) {
-        Landscape l = new Landscape(null, name, getType(), relativePath,
-                true, null);
+        Landscape l = new Landscape(null, name, getType(), relativePath, true);
         l.setCoverLine(new ArrayList<>(0));
         l.setCollisionPolygons(new ArrayList<>(0));
         return l;

@@ -63,7 +63,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
     }
 
     @Override
-    protected List<Creature> createItems(Coords rawPos, int level) {
+    protected List<Creature> createItems(Coords rawPos) {
         List<Creature> selectedAssets = getSelectionModel().getSelectedItems();
         List<Creature> output = new ArrayList<>(1);
         for (Creature p
@@ -80,7 +80,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
 
             Creature cr = new Creature(
                     p, name, type, path,
-                    true, level);
+                    true);
             cr.setPos(pos);
 
             Task pTasks = p.getTask();

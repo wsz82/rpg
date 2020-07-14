@@ -33,7 +33,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
     }
 
     @Override
-    protected List<Cover> createItems(Coords rawPos, int level) {
+    protected List<Cover> createItems(Coords rawPos) {
         List<Cover> selectedAssets = getSelectionModel().getSelectedItems();
         List<Cover> output = new ArrayList<>(1);
         for (Cover p

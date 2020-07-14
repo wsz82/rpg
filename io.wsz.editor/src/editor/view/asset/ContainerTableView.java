@@ -51,7 +51,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
     }
 
     @Override
-    protected List<Container> createItems(Coords rawPos, int level) {
+    protected List<Container> createItems(Coords rawPos) {
         List<Container> selectedAssets = getSelectionModel().getSelectedItems();
         List<Container> output = new ArrayList<>(1);
         for (Container p

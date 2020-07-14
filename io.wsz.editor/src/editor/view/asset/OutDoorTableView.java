@@ -1,7 +1,7 @@
 package editor.view.asset;
 
-import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.OutDoor;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -13,15 +13,15 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InDoorTableView extends AssetsTableView<InDoor> {
+public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
-    InDoorTableView(Stage parent, ObservableList<InDoor> assets) {
+    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets) {
         super(parent, assets);
-        initInDoorTable();
+        initOutDoorTable();
     }
 
-    private void initInDoorTable() {
-        TableColumn<InDoor, String> openDoorPathCol = new TableColumn<>("Open door path");
+    private void initOutDoorTable() {
+        TableColumn<OutDoor, String> openDoorPathCol = new TableColumn<>("Open door path");
         openDoorPathCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
@@ -31,29 +31,40 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         openDoorPathCol.setCellFactory(TextFieldTableCell.forTableColumn());
         openDoorPathCol.setEditable(false);
         getColumns().add(openDoorPathCol);
+
+        TableColumn<OutDoor, String> exitCol = new TableColumn<>("Exit");
+        exitCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getExit().toString();
+            }
+        });
+        exitCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        exitCol.setEditable(false);
+        getColumns().add(exitCol);
     }
 
     @Override
     protected void editAsset() {
-        InDoor id = getSelectionModel().getSelectedItem();
+        OutDoor id = getSelectionModel().getSelectedItem();
         if (id == null) {
             return;
         }
-        InDoorAssetStage as = new InDoorAssetStage(parent, id, false);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        InDoorAssetStage as = new InDoorAssetStage(parent);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent);
         as.show();
     }
 
     @Override
-    protected List<InDoor> createItems(Coords rawPos) {
-        List<InDoor> selectedAssets = getSelectionModel().getSelectedItems();
-        List<InDoor> output = new ArrayList<>(1);
-        for (InDoor p
+    protected List<OutDoor> createItems(Coords rawPos) {
+        List<OutDoor> selectedAssets = getSelectionModel().getSelectedItems();
+        List<OutDoor> output = new ArrayList<>(1);
+        for (OutDoor p
                 : selectedAssets) {
             Coords pos = rawPos.clonePos();
             if (!pos.is0()) {
@@ -65,7 +76,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            InDoor id = new InDoor(
+            OutDoor id = new OutDoor(
                     p, name, type, path,
                     true);
             id.setPos(pos);
@@ -78,12 +89,12 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
     }
 
     @Override
-    protected void removeAssetFromList(List<InDoor> assetsToRemove) {
-        ObservableAssets.get().getInDoors().removeAll(assetsToRemove);
+    protected void removeAssetFromList(List<OutDoor> assetsToRemove) {
+        ObservableAssets.get().getOutDoors().removeAll(assetsToRemove);
     }
 
     @Override
     protected ItemType getType() {
-        return ItemType.INDOOR;
+        return ItemType.OUTDOOR;
     }
 }

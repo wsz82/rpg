@@ -78,7 +78,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
     }
 
     @Override
-    protected List<Teleport> createItems(Coords rawPos, int level) {
+    protected List<Teleport> createItems(Coords rawPos) {
         List<Teleport> selectedAssets = getSelectionModel().getSelectedItems();
         List<Teleport> output = new ArrayList<>(1);
         for (Teleport p

@@ -33,7 +33,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
     }
 
     @Override
-    protected List<Landscape> createItems(Coords rawPos, int level) {
+    protected List<Landscape> createItems(Coords rawPos) {
         List<Landscape> selectedAssets = getSelectionModel().getSelectedItems();
         List<Landscape> output = new ArrayList<>(1);
         for (Landscape p
@@ -48,9 +48,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            Landscape l = new Landscape(
-                    p, name, type, path,
-                    true, level);
+            Landscape l = new Landscape(p, name, type, path, true);
             l.setPos(pos);
             output.add(l);
         }

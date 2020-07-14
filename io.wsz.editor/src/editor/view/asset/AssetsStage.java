@@ -69,6 +69,10 @@ public class AssetsStage extends ChildStage {
                     ObservableList<InDoor> inDoors = ObservableAssets.get().getInDoors();
                     table = new InDoorTableView(this, inDoors);
                 }
+                case OUTDOOR -> {
+                    ObservableList<OutDoor> outDoors = ObservableAssets.get().getOutDoors();
+                    table = new OutDoorTableView(this, outDoors);
+                }
             }
             table.setPointer(pointer);
             table.setContentTableView(contentTableView);

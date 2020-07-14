@@ -73,7 +73,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
     }
 
     @Override
-    protected List<Weapon> createItems(Coords rawPos, int level) {
+    protected List<Weapon> createItems(Coords rawPos) {
         List<Weapon> selectedAssets = getSelectionModel().getSelectedItems();
         List<Weapon> output = new ArrayList<>(1);
         for (Weapon p
