@@ -24,7 +24,7 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
-    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR};
+    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
 
     private final Coords[] interactionCoords = new Coords[]{new Coords()};
     private final Coords centerBottom = new Coords();
@@ -154,7 +154,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         switch (type) {
             case CREATURE ->
                     resolveInteractionWithCreature((Creature) pi);
-            case WEAPON, CONTAINER, INDOOR ->
+            case WEAPON, CONTAINER, INDOOR, OUTDOOR ->
                     setItemTask(pi);
             default ->
                     goTo(pos);
@@ -449,6 +449,17 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public void setPortraitPath(String portraitPath) {
         this.portraitPath = portraitPath;
+    }
+
+    @Override
+    public boolean creatureInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            Controller.get().setAsking(cr);
+            Controller.get().setAnswering(cr);
+            return true;
+        }
+        return false;
     }
 
     @Override

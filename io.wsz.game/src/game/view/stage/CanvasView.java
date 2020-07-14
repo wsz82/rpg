@@ -75,7 +75,7 @@ public abstract class CanvasView {
     }
 
     protected void adjustCoverOpacity(List<Creature> visibleControllables, PosItem pi) {
-        if (!pi.getActualCollisionPolygons().isEmpty()) {
+        if (!pi.getActualCoverLine().isEmpty()) {
             for (Creature cr : visibleControllables) {
                 double crLeft = cr.getLeft();
                 double crRight = cr.getRight();

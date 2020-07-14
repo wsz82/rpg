@@ -193,6 +193,16 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
+    public boolean creatureInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            searchContainer(cr);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public Image getImage() {
         if (open) {
             return getOpenImage();

@@ -2,10 +2,7 @@ package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
-import io.wsz.model.item.Container;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.PosItem;
-import io.wsz.model.item.Teleport;
+import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -33,7 +30,6 @@ public class Controller {
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private final Coords posToCenter = new Coords();
-
 
     private Location locationToUpdate;
     private Creature creatureToOpenInventory;
@@ -108,6 +104,12 @@ public class Controller {
                 if (pi instanceof Teleport) {
                     Teleport t = (Teleport) pi;
                     Coords exit = t.getExit();
+                    restoreCoordsLocation(exit);
+                }
+
+                if (pi instanceof OutDoor) {
+                    OutDoor od = (OutDoor) pi;
+                    Coords exit = od.getExit();
                     restoreCoordsLocation(exit);
                 }
             }

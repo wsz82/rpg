@@ -32,7 +32,12 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected void fillInputs() {
+        if (item == null) {
+            item = createNewAsset("", "");
+        }
+
         super.fillInputs();
+
         openable.fillOpenableInputs();
     }
 
@@ -49,6 +54,8 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
     @Override
     protected InDoor createNewAsset(String name, String relativePath) {
         InDoor i = new InDoor(null, name, getType(), relativePath, true);
+        i.setCoverLine(new ArrayList<>(0));
+        i.setCollisionPolygons(new ArrayList<>(0));
         i.setOpenDoorCoverLine(new ArrayList<>(0));
         i.setOpenDoorCollisionPolygons(new ArrayList<>(0));
         return i;

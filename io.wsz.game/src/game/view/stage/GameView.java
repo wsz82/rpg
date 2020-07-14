@@ -37,7 +37,7 @@ public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
     private static final Coords[] POSS = new Coords[]{new Coords()};
     private static final ItemType[] PRIMARY_ITEM_TYPES = new ItemType[]{CREATURE};
-    private static final ItemType[] SECONDARY_ITEM_TYPES = new ItemType[]{INDOOR, CONTAINER};
+    private static final ItemType[] SECONDARY_ITEM_TYPES = new ItemType[]{INDOOR, OUTDOOR, CONTAINER};
 
     private final Stage parent;
     private final GameController gameController = GameController.get();

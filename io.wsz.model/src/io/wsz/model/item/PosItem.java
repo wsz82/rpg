@@ -84,6 +84,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         pos.level = exit.level;
     }
 
+    public boolean creatureInteract(Creature cr) {
+        return false;
+    }
+
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
         return Coords.pointWithinOval(getCenter(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }

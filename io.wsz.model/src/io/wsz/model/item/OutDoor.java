@@ -42,6 +42,20 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     @Override
+    public boolean creatureInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (isOpen()) {
+                enter(cr);
+            } else {
+                open();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

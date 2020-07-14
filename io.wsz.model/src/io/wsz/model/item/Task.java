@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
@@ -37,56 +36,16 @@ public class Task implements Externalizable {
         if (dest.x != -1) {
             move(cr);
             if (item != null) {
-                if (item instanceof Equipment) {
-                    interactWithEquipment(cr, (Equipment) item);
-                } else
-                if (item instanceof Creature) {
-                    interactWithCreature(cr, (Creature) item);
-                } else
-                if (item instanceof InDoor) {
-                    interactWithInDoor(cr, (InDoor) item);
+                if (item.creatureInteract(cr)) {
+                    item = null;
+                    dest.x = -1;
                 }
             }
             return;
         }
         finished = true;
     }
-
-    private void interactWithInDoor(Creature cr, InDoor id) {
-        CreatureSize size = cr.getSize();
-        if (id.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            id.interact();
-            item = null;
-            dest.x = -1;
-        }
-    }
-
-    private void interactWithCreature(Creature acting, Creature cr) {
-        CreatureSize size = acting.getSize();
-        if (cr.withinRange(acting.getCenter(), acting.getRange(), size.getWidth(), size.getHeight())) {
-            Controller.get().setAsking(acting);
-            Controller.get().setAnswering(cr);
-            item = null;
-            dest.x = -1;
-        }
-    }
-
-    private void interactWithEquipment(Creature cr, Equipment equipment) {
-        CreatureSize size = cr.getSize();
-        if (equipment.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (equipment instanceof Container) {
-                ((Container) equipment).searchContainer(cr);
-            } else {
-                boolean taken = cr.getIndividualInventory().add(equipment);
-                if (taken) {
-                    equipment.onTake(cr, 0, 0);
-                }
-            }
-            item = null;
-            dest.x = -1;
-        }
-    }
-
+    
     private void move(Creature cr) {
         Inventory inventory = cr.getIndividualInventory();
         String name = cr.getName();

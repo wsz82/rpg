@@ -98,6 +98,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     protected void fillInputs() {
+        if (item == null) {
+            return;
+        }
         nameInput.setText(item.getName());
         imageLabel.setText(item.getRelativePath());
     }

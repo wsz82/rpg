@@ -59,10 +59,12 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     @Override
     protected OutDoor createNewAsset(String name, String relativePath) {
-        OutDoor i = new OutDoor(null, name, getType(), relativePath, true);
-        i.setOpenDoorCoverLine(new ArrayList<>(0));
-        i.setOpenDoorCollisionPolygons(new ArrayList<>(0));
-        return i;
+        OutDoor o = new OutDoor(null, name, getType(), relativePath, true);
+        o.setCoverLine(new ArrayList<>(0));
+        o.setCollisionPolygons(new ArrayList<>(0));
+        o.setOpenDoorCoverLine(new ArrayList<>(0));
+        o.setOpenDoorCollisionPolygons(new ArrayList<>(0));
+        return o;
     }
 
     @Override
