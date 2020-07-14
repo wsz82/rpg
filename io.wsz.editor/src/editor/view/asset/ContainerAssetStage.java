@@ -17,7 +17,8 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     private final DoubleField inputNettoWeight = new DoubleField(0.0, isContent);
     private final IntegerField inputNettoSize = new IntegerField(0, isContent);
     private final Button itemsButton = new Button("Items");
-    private final OpenableContainer openable = new OpenableContainer(this, item, isContent);
+
+    private OpenableContainer openable;
 
     public ContainerAssetStage(Stage parent, Container item, boolean isContent) {
         super(parent, item, isContent);
@@ -34,7 +35,6 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
         super.initWindow();
         setTitle(TITLE);
 
-        openable.initOpenable(container);
         container.getChildren().remove(weightBox);
 
         final HBox weightBox = new HBox(10);
@@ -64,11 +64,14 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     @Override
     protected void fillInputs() {
+        if (item == null) {
+            item = createNewAsset("", "");
+        }
+        openable = new OpenableContainer(this, item, isContent);
+        openable.initOpenable(container);
+
         super.fillInputs();
         openable.fillOpenableInputs();
-        if (item == null) {
-            return;
-        }
 
         Double nettoWeight = item.getIndividualNettoWeight();
         if (nettoWeight == null) {

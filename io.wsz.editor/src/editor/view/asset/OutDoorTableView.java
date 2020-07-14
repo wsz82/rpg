@@ -76,9 +76,7 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
             ItemType type = p.getType();
             String path = p.getRelativePath();
 
-            OutDoor id = new OutDoor(
-                    p, name, type, path,
-                    true);
+            OutDoor id = new OutDoor(p, name, type, path, true);
             id.setPos(pos);
             id.setOpenImagePath(p.getOpenImagePath());
             id.setOpen(p.isOpen());

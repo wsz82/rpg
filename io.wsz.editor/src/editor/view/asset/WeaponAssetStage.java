@@ -53,11 +53,11 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
 
     @Override
     protected void fillInputs() {
-        super.fillInputs();
-
         if (item == null) {
-            return;
+            item = createNewAsset("", "");
         }
+
+        super.fillInputs();
 
         Double damage = item.getIndividualDamage();
         if (damage == null) {

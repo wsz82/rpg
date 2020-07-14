@@ -83,9 +83,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         if (item != null) {
             if (!isContent) {
-                container.getChildren().addAll(dialogButton, coverButton, collisionButton);
+                container.getChildren().addAll(coverButton, collisionButton);
             }
         }
+
+        container.getChildren().add(dialogButton);
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
@@ -96,9 +98,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     protected void fillInputs() {
-        if (item == null) {
-            return;
-        }
         nameInput.setText(item.getName());
         imageLabel.setText(item.getRelativePath());
     }
@@ -224,7 +223,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         String name = nameInput.getText();
         String path = imageLabel.getText();
         String relativePath = Asset.convertToRelativePath(path);
-        item = createNewAsset(name, relativePath);
+        item.setName(name);
+        item.setRelativePath(relativePath);
         item.setDialog(new Dialog());
         addAssetToList(item);
     }

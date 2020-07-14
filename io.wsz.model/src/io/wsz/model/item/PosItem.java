@@ -237,7 +237,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     public Dialog getDialog() {
         if (dialog == null) {
             if (prototype == null) {
-                return null;
+                setDialog(new Dialog());
+                return dialog;
             }
             return prototype.dialog;
         } else {

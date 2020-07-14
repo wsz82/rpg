@@ -26,6 +26,9 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected void fillInputs() {
+        if (item == null) {
+            item = createNewAsset("", "");
+        }
         super.fillInputs();
     }
 

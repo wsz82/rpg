@@ -103,7 +103,6 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         r.setPadding(new Insets(10));
 
         final VBox c = new VBox(5);
-//        final Image img = item.getImage();
         iv.setImage(background);
         pointsPane.getChildren().add(iv);
 

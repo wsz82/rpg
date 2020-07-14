@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private static final String TITLE = "OutDoor asset";
 
-    private final OpenableOutDoor openable = new OpenableOutDoor(this, item, isContent);
+    private OpenableOutDoor openable;
 
     public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent) {
         super(parent, item, isContent);
@@ -26,12 +26,17 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         super.initWindow();
         setTitle(TITLE);
 
-        openable.initOpenable(container);
         fillInputs();
     }
 
     @Override
     protected void fillInputs() {
+        if (item == null) {
+            item = createNewAsset("", "");
+        }
+        openable = new OpenableOutDoor(this, item, isContent);
+        openable.initOpenable(container);
+
         super.fillInputs();
         openable.fillOpenableInputs();
     }

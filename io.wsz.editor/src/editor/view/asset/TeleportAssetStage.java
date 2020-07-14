@@ -126,10 +126,12 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected void fillInputs() {
-        super.fillInputs();
         if (item == null) {
-            return;
+            item = createNewAsset("", "");
         }
+
+        super.fillInputs();
+
         Coords exit = item.getIndividualExit();
         if (exit == null) {
             locationChoice.setValue(null);

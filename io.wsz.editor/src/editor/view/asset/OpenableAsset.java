@@ -36,7 +36,7 @@ public abstract class OpenableAsset<A extends PosItem> {
             container.getChildren().add(openDoorBox);
         }
 
-        if (item != null) {
+        if (!item.getRelativePath().isEmpty()) {
             if (!isContent) {
                 container.getChildren().addAll(openCoverButton, openCollisionButton);
             }

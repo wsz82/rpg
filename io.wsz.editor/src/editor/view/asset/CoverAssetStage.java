@@ -27,6 +27,9 @@ public class CoverAssetStage extends AssetStage<Cover> {
 
     @Override
     protected void fillInputs() {
+        if (item == null) {
+            item = createNewAsset("", "");
+        }
         super.fillInputs();
     }
 
