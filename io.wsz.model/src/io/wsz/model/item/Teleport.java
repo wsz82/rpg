@@ -40,6 +40,10 @@ public class Teleport extends PosItem<Teleport> {
         }
     }
 
+    public void setExit(Coords exit) {
+        this.exit = exit;
+    }
+
     public List<List<Coords>> getTeleportCollisionPolygons() {
         if (teleportCollisionPolygons == null) {
             if (prototype == null) {

@@ -37,6 +37,10 @@ public class OutDoor extends Door<OutDoor> {
         }
     }
 
+    public void setExit(Coords exit) {
+        this.exit = exit;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);

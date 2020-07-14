@@ -1,7 +1,5 @@
 package editor.view.asset;
 
-import editor.view.DoubleField;
-import editor.view.IntegerField;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
@@ -9,12 +7,9 @@ import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -24,11 +19,10 @@ import java.util.Optional;
 
 public class TeleportAssetStage extends AssetStage<Teleport> {
     private static final String TITLE = "Teleport asset";
-    private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
-    private final DoubleField inputX = new DoubleField(0.0, isContent);
-    private final DoubleField inputY = new DoubleField(0.0, isContent);
-    private final IntegerField inputLayer = new IntegerField(isContent);
+
     private final Button teleportCollisionButton = new Button("Teleport area");
+
+    private CoordsEdit coordsEdit;
 
     public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent) {
         super(parent, asset, isContent);
@@ -45,36 +39,17 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         super.initWindow();
         setTitle(TITLE);
 
-        final HBox location = new HBox(10);
-        location.setAlignment(Pos.CENTER_LEFT);
-        final Label locationLabel = new Label("To location");
-        location.getChildren().addAll(locationLabel, locationChoice);
-
-        final HBox pos = new HBox(10);
-        pos.setAlignment(Pos.CENTER_LEFT);
-        final Label xLabel = new Label("X:");
-        final Label yLabel = new Label("Y:");
-        final Label layerLabel = new Label("Layer:");
-        inputX.setPrefWidth(50);
-        inputY.setPrefWidth(50);
-        inputLayer.setText("0");
-        inputLayer.setPrefWidth(50);
-        pos.getChildren().addAll(xLabel, inputX, yLabel, inputY, layerLabel, inputLayer);
-
-        container.getChildren().addAll(location, pos);
-
         if (item != null) {
             if (!isContent) {
                 container.getChildren().addAll(teleportCollisionButton);
             }
         }
 
-        setUpLocationChoice(locationChoice);
         fillInputs();
-        hookUpInDoorEvents();
+        hookUpTeleportEvents();
     }
 
-    private void hookUpInDoorEvents() {
+    private void hookUpTeleportEvents() {
         teleportCollisionButton.setOnAction(e -> openTeleportAreaEdit());
     }
 
@@ -129,65 +104,16 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         if (item == null) {
             item = createNewAsset("", "");
         }
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent);
+        coordsEdit.initCoords(container);
 
         super.fillInputs();
-
-        Coords exit = item.getIndividualExit();
-        if (exit == null) {
-            locationChoice.setValue(null);
-            inputLayer.setText("");
-            inputX.setText("");
-            inputY.setText("");
-        } else {
-            locationChoice.setValue(exit.getLocation());
-            inputLayer.setText(String.valueOf(exit.level));
-            double x = exit.x;
-            double y = exit.y;
-            inputX.setText(String.valueOf(x));
-            inputY.setText(String.valueOf(y));
-        }
     }
 
     @Override
     protected void defineAsset() {
-        Location l = locationChoice.getValue();
-        String exitLevel = inputLayer.getText();
-        String exitX = inputX.getText();
-        String exitY = inputY.getText();
-
         Coords exit = item.getIndividualExit();
-        if (exit == null && (l != null || !exitLevel.isEmpty() || !exitX.isEmpty() || !exitY.isEmpty())) {
-            exit = new Coords();
-        }
-
-        if (l == null) {
-            if (exit != null) {
-                exit.setLocation(null);
-            }
-        } else {
-            exit.setLocation(l);
-        }
-
-        if (exitLevel.isEmpty()) {
-            if (exit != null) {
-                exit.level = 0;
-            }
-        } else {
-            exit.level = Integer.parseInt(exitLevel);
-        }
-
-        boolean posIsEmpty = exitX.isEmpty() || exitY.isEmpty();
-        if (posIsEmpty) {
-            if (exit != null) {
-                exit.x = 0;
-                exit.y = 0;
-            }
-        } else {
-            double x = Double.parseDouble(exitX);
-            double y = Double.parseDouble(exitY);
-            exit.x = x;
-            exit.y = y;
-        }
+        item.setExit(coordsEdit.defineCoords(exit));
     }
 
     @Override

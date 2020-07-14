@@ -28,7 +28,7 @@ public abstract class OpenableAsset<A extends PosItem> {
         this.assetStage = assetStage;
     }
 
-    protected void initOpenable(VBox container) {
+    public void initOpenable(VBox container) {
         final HBox openDoorBox = new HBox(10);
         openDoorBox.getChildren().addAll(openButton, openLabel);
 
