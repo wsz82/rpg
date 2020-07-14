@@ -103,28 +103,28 @@ public class Controller {
         for (Location l : locations) {
             for (PosItem pi : l.getItems().get()) {
                 Coords pos = pi.getPos();
-                restoreCoords(pos);
+                restoreCoordsLocation(pos);
 
                 if (pi instanceof Teleport) {
                     Teleport t = (Teleport) pi;
                     Coords exit = t.getExit();
-                    restoreCoords(exit);
+                    restoreCoordsLocation(exit);
                 }
             }
         }
     }
 
-    private void restoreCoords(Coords exit) {
-        Location serExitLoc = exit.getLocation();
-        if (serExitLoc != null) {
+    public void restoreCoordsLocation(Coords pos) {
+        Location serLoc = pos.getLocation();
+        if (serLoc != null) {
             Optional<Location> optionalLocation = getLocationsList().stream()
-                    .filter(refLoc -> refLoc.getName().equals(serExitLoc.getName()))
+                    .filter(refLoc -> refLoc.getName().equals(serLoc.getName()))
                     .findFirst();
             Location foundLoc = optionalLocation.orElse(null);
             if (foundLoc == null) {
-                throw new NullPointerException("Location \"" + serExitLoc.getName() + "\" should be in locations list");
+                throw new NullPointerException("Location \"" + serLoc.getName() + "\" should be in locations list");
             }
-            exit.setLocation(foundLoc);
+            pos.setLocation(foundLoc);
         }
     }
 

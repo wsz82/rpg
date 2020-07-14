@@ -19,16 +19,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class PluginSettingsStage extends ChildStage {
     private final String TITLE = "Plugin settings";
     private final BooleanProperty startingLocation = new SimpleBooleanProperty();
-    private final ObjectProperty<String> startLocationName = new SimpleObjectProperty<>();
+    private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
     private final DoubleProperty startX = new SimpleDoubleProperty();
     private final DoubleProperty startY = new SimpleDoubleProperty();
-    private final IntegerProperty startLayer = new SimpleIntegerProperty();
+    private final IntegerProperty startLevel = new SimpleIntegerProperty();
     private final StackPane root = new StackPane();
 
     public PluginSettingsStage(Stage parent){
@@ -51,7 +50,6 @@ public class PluginSettingsStage extends ChildStage {
         final HBox location = new HBox(10);
         location.setAlignment(Pos.CENTER_LEFT);
         final Label locationLabel = new Label("Starting location");
-        final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
         location.getChildren().addAll(locationLabel, locationChoice);
 
         final HBox pos = new HBox(10);
@@ -82,13 +80,13 @@ public class PluginSettingsStage extends ChildStage {
 
             @Override
             public Location fromString(String s) {
+                if (s == null) {
+                    return null;
+                }
                 if (s.isEmpty()) {
                     return null;
                 }
-                List<Location> singleLocation = Controller.get().getLocationsList().stream()
-                        .filter(l -> l.getName().equals(s))
-                        .collect(Collectors.toList());
-                return singleLocation.get(0);
+                return getLocation(s);
             }
         });
         locationChoice.setItems(Controller.get().getLocationsList());
@@ -98,26 +96,6 @@ public class PluginSettingsStage extends ChildStage {
         inputY.disableProperty().bind(ifStartingLocation.selectedProperty().not());
         inputLayer.disableProperty().bind(ifStartingLocation.selectedProperty().not());
 
-        StringConverter<Location> locationConverter = new StringConverter<>() {
-            @Override
-            public String toString(Location l) {
-                if (l == null) {
-                    return "";
-                }
-                return l.getName();
-            }
-
-            @Override
-            public Location fromString(String s) {
-                if (s.isEmpty()) {
-                    return null;
-                }
-                List<Location> singleLocation = Controller.get().getLocationsList().stream()
-                        .filter(l -> l.getName().equals(s))
-                        .collect(Collectors.toList());
-                return singleLocation.get(0);
-            }
-        };
         StringConverter<Number> stringDoubleConverter = new StringConverter<>() {
             @Override
             public String toString(Number n) {
@@ -130,7 +108,6 @@ public class PluginSettingsStage extends ChildStage {
             }
         };
         startingLocation.bindBidirectional(ifStartingLocation.selectedProperty());
-        Bindings.bindBidirectional(startLocationName, locationChoice.valueProperty(), locationConverter);
         Bindings.bindBidirectional(inputX.textProperty(), startX, stringDoubleConverter);
         Bindings.bindBidirectional(inputY.textProperty(), startY, stringDoubleConverter);
         StringConverter<Number> stringIntegerConverter = new StringConverter<>() {
@@ -149,7 +126,14 @@ public class PluginSettingsStage extends ChildStage {
                 return Integer.parseInt(s);
             }
         };
-        Bindings.bindBidirectional(inputLayer.textProperty(), startLayer, stringIntegerConverter);
+        Bindings.bindBidirectional(inputLayer.textProperty(), startLevel, stringIntegerConverter);
+    }
+
+    private Location getLocation(String s) {
+        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
+                .filter(l -> l.getName().equals(s))
+                .findFirst();
+        return optLocation.orElse(null);
     }
 
     public void open(){
@@ -164,12 +148,12 @@ public class PluginSettingsStage extends ChildStage {
         this.startingLocation.set(startingLocation);
     }
 
-    public String getStartLocationName() {
-        return startLocationName.get();
+    public Location getStartLocation() {
+        return locationChoice.getValue();
     }
 
-    public void setStartLocationName(String startLocationName) {
-        this.startLocationName.set(startLocationName);
+    public void setStartLocation(Location startLocation) {
+        locationChoice.setValue(startLocation);
     }
 
     public double getStartX() {
@@ -188,11 +172,11 @@ public class PluginSettingsStage extends ChildStage {
         this.startY.set(startY);
     }
 
-    public int getStartLayer() {
-        return startLayer.get();
+    public int getStartLevel() {
+        return startLevel.get();
     }
 
-    public void setStartLayer(int startLayer) {
-        this.startLayer.set(startLayer);
+    public void setStartLevel(int startLayer) {
+        this.startLevel.set(startLayer);
     }
 }

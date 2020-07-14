@@ -160,9 +160,7 @@ public class GameController {
         }
 
         controller.getLocationsList().clear();
-        String startLocation = m.getLastPos().getLocation().getName();
-        int level = m.getLastPos().level;
-        fillLocationsList(m.getLocations(), true, startLocation, level);
+        fillLocationsList(m.getLocations(), true, m.getLastPos());
     }
 
     public void loadGameActivePluginToLists() {
@@ -174,27 +172,25 @@ public class GameController {
 
         Plugin p = ActivePlugin.get().getPlugin();
         controller.getAssetsList().addAll(p.getAssets());
-        fillLocationsList(p.getLocations(), p.isStartingLocation(), p.getStartLocation(), p.getStartLayer());
+        Coords startPos = p.getStartPos();
+        fillLocationsList(p.getLocations(), p.isStartingLocation(), startPos);
     }
 
-    public void fillLocationsList(List<Location> serLocations, boolean isStartingLocation, String serStartLocation, int serStartLayer) {
+    public void fillLocationsList(List<Location> serLocations, boolean isStartingLocation, Coords startPos) {
         controller.fillLocationsList(serLocations);
 
         if (isStartingLocation) {
-            Optional<Location> optLocation = controller.getLocationsList().stream()
-                    .filter(l -> l.getName().equals(serStartLocation))
-                    .findFirst();
-            Location first = optLocation.orElse(null);
-            if (first == null) {
-                throw new NullPointerException("Starting location \"" + serStartLocation + "\" does not exist in list");
-            }
+            controller.restoreCoordsLocation(startPos);
+            Location first = startPos.getLocation();
             controller.getCurrentLocation().setLocation(first);
+
+            int serLevel = startPos.level;
             Optional<Layer> optLayer = first.getLayers().get().stream()
-                    .filter(l -> l.getLevel() == serStartLayer)
+                    .filter(l -> l.getLevel() == serLevel)
                     .findFirst();
             Layer startLayer = optLayer.orElse(null);
             if (startLayer == null) {
-                throw new NullPointerException("Start layer \"" + serStartLayer + "\" does not exist in start location");
+                throw new NullPointerException("Start layer \"" + serLevel + "\" does not exist in start location");
             }
             controller.getCurrentLayer().setLayer(startLayer);
         }

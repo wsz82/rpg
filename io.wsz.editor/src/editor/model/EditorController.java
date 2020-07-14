@@ -88,13 +88,12 @@ public class EditorController {
         p.setLocations(new ArrayList<>(LocationsList.get()));
         boolean isStartingLocation = pss.isStartingLocation();
         p.setStartingLocation(isStartingLocation);
-        String startLocation = pss.getStartLocationName();
-        p.setStartLocation(startLocation);
-        double startX = pss.getStartX();
-        double startY = pss.getStartY();
-        p.setStartPos(new Coords(startX, startY));
-        int startLayer = pss.getStartLayer();
-        p.setStartLayer(startLayer);
+        Coords startPos = new Coords();
+        startPos.setLocation(pss.getStartLocation());
+        startPos.x = pss.getStartX();
+        startPos.y = pss.getStartY();
+        startPos.level = pss.getStartLevel();
+        p.setStartPos(startPos);
     }
 
     public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
@@ -102,11 +101,17 @@ public class EditorController {
         Plugin p = pc.load(pluginName);
         controller.setActivePlugin(p);
         loadEditorActivePluginToLists();
+        restorePluginSettingsStage(pss, p);
+    }
+
+    private void restorePluginSettingsStage(PluginSettingsStage pss, Plugin p) {
         pss.setStartingLocation(p.isStartingLocation());
-        pss.setStartLocationName(p.getStartLocation());
-        pss.setStartX(p.getStartPos().x);
-        pss.setStartY(p.getStartPos().y);
-        pss.setStartLayer(p.getStartLayer());
+        Coords startPos = p.getStartPos();
+        controller.restoreCoordsLocation(startPos);
+        pss.setStartLocation(startPos.getLocation());
+        pss.setStartX(startPos.x);
+        pss.setStartY(startPos.y);
+        pss.setStartLevel(startPos.level);
     }
 
     public void loadEditorActivePluginToLists() {

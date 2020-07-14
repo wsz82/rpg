@@ -17,9 +17,7 @@ public class Plugin implements Externalizable {
     private String name;
     private boolean active;
     private boolean isStartingLocation;
-    private String startLocation;
     private Coords startPos;
-    private int startLayer;
     private List<Location> locations;
     private List<Asset> assets;
 
@@ -65,28 +63,12 @@ public class Plugin implements Externalizable {
         isStartingLocation = startingLocation;
     }
 
-    public String getStartLocation() {
-        return startLocation;
-    }
-
-    public void setStartLocation(String startLocation) {
-        this.startLocation = startLocation;
-    }
-
     public Coords getStartPos() {
         return startPos;
     }
 
     public void setStartPos(Coords startPos) {
         this.startPos = startPos;
-    }
-
-    public int getStartLayer() {
-        return startLayer;
-    }
-
-    public void setStartLayer(int startLayer) {
-        this.startLayer = startLayer;
     }
 
     @Override
@@ -99,11 +81,7 @@ public class Plugin implements Externalizable {
 
         out.writeBoolean(isStartingLocation);
 
-        out.writeObject(startLocation);
-
         out.writeObject(startPos);
-
-        out.writeInt(startLayer);
 
         out.writeObject(locations);
 
@@ -120,11 +98,7 @@ public class Plugin implements Externalizable {
 
         isStartingLocation = in.readBoolean();
 
-        startLocation = (String) in.readObject();
-
         startPos = (Coords) in.readObject();
-
-        startLayer = in.readInt();
 
         locations = (List<Location>) in.readObject();
 
