@@ -102,9 +102,9 @@ public class GameController {
             name = createUniqueName(name);
             getSavesList().add(name);
         }
-        String currentLocationName = controller.getCurrentLocation().getName();
-        int currentLayer = controller.getCurrentLayer().getLevel();
-        SaveMemento memento = new SaveMemento(name, savedPos, currentLocationName, currentLayer, controller.getHeroes());
+        savedPos.setLocation(controller.getCurrentLocation().getLocation());
+        savedPos.level = controller.getCurrentLayer().getLevel();
+        SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes());
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.createSave(memento);
     }
@@ -160,7 +160,9 @@ public class GameController {
         }
 
         controller.getLocationsList().clear();
-        fillLocationsList(m.getLocations(), true, m.getCurrentLocationName(), m.getCurrentLayer());
+        String startLocation = m.getLastPos().getLocation().getName();
+        int level = m.getLastPos().level;
+        fillLocationsList(m.getLocations(), true, startLocation, level);
     }
 
     public void loadGameActivePluginToLists() {

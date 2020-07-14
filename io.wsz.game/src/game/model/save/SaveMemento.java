@@ -17,19 +17,14 @@ public class SaveMemento implements Externalizable {
 
     private String name;
     private Coords lastPos;
-    private String currentLocationName;
-    private int currentLayer;
     private LinkedList<Creature> heroes;
     private List<Location> locations;
 
     public SaveMemento() {}
 
-    public SaveMemento(String name, Coords lastPos, String currentLocationName, int currentLayer,
-                       LinkedList<Creature> heroes) {
+    public SaveMemento(String name, Coords lastPos, LinkedList<Creature> heroes) {
         this.name = name;
         this.lastPos = lastPos;
-        this.currentLocationName = currentLocationName;
-        this.currentLayer = currentLayer;
         this.heroes = heroes;
     }
 
@@ -57,22 +52,6 @@ public class SaveMemento implements Externalizable {
         this.locations = locations;
     }
 
-    public String getCurrentLocationName() {
-        return currentLocationName;
-    }
-
-    public void setCurrentLocationName(String currentLocationName) {
-        this.currentLocationName = currentLocationName;
-    }
-
-    public int getCurrentLayer() {
-        return currentLayer;
-    }
-
-    public void setCurrentLayer(int currentLayer) {
-        this.currentLayer = currentLayer;
-    }
-
     public LinkedList<Creature> getHeroes() {
         return heroes;
     }
@@ -89,10 +68,6 @@ public class SaveMemento implements Externalizable {
 
         out.writeObject(lastPos);
 
-        out.writeUTF(currentLocationName);
-
-        out.writeInt(currentLayer);
-
         out.writeObject(heroes);
 
         out.writeObject(locations);
@@ -105,10 +80,6 @@ public class SaveMemento implements Externalizable {
         name = in.readUTF();
 
         lastPos = (Coords) in.readObject();
-
-        currentLocationName = in.readUTF();
-
-        currentLayer = in.readInt();
 
         heroes = (LinkedList<Creature>) in.readObject();
 
