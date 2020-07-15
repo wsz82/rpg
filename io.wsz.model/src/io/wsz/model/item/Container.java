@@ -179,6 +179,7 @@ public class Container extends Equipment<Container> implements Containable, Open
         this.openImagePath = openImagePath;
     }
 
+    @Override
     public Image getOpenImage() {
         if (this.openImage == null) {
             setOpenImage(loadImageFromPath(getOpenImagePath()));
@@ -186,6 +187,7 @@ public class Container extends Equipment<Container> implements Containable, Open
         return openImage;
     }
 
+    @Override
     public void setOpenImage(Image openImage) {
         this.openImage = openImage;
     }
@@ -197,6 +199,8 @@ public class Container extends Equipment<Container> implements Containable, Open
     public void setOpen(boolean open) {
         this.open = open;
     }
+
+
 
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {

@@ -50,6 +50,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         this.openImagePath = openImagePath;
     }
 
+    @Override
     public Image getOpenImage() {
         if (this.openImage == null) {
             setOpenImage(loadImageFromPath(getOpenImagePath()));
@@ -57,6 +58,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         return openImage;
     }
 
+    @Override
     public void setOpenImage(Image openImage) {
         this.openImage = openImage;
     }

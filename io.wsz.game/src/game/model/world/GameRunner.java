@@ -151,22 +151,26 @@ public class GameRunner {
 
     private void clearImagesAndReload() {
         gameController.setGame(false);
-        List<Location> locations = Controller.get().getLocationsList();
-        for (Location l : locations) {
-            List<PosItem> items = l.getItems().get();
-            for (PosItem pi : items) {
-                pi.setImage(null);
-                if (pi instanceof Containable) {
-                    Containable c = (Containable) pi;
-                    List<Equipment> equipment = c.getItems();
-                    if (!equipment.isEmpty()) {
-                        for (Equipment e : equipment) {
-                            e.setImage(null);
-                        }
-                    }
-                }
-            }
-        }
+//        List<Location> locations = Controller.get().getLocationsList();
+//        for (Location l : locations) {
+//            List<PosItem> items = l.getItems().get();
+//            for (PosItem pi : items) {
+//                pi.setImage(null);
+//                if (pi instanceof Containable) {
+//                    Containable c = (Containable) pi;
+//                    List<Equipment> equipment = c.getItems();
+//                    if (!equipment.isEmpty()) {
+//                        for (Equipment e : equipment) {
+//                            e.setImage(null);
+//                        }
+//                    }
+//                }
+//                if (pi instanceof Openable) {
+//                    Openable o = (Openable) pi;
+//                    o.setOpenImage(null);
+//                }
+//            }
+//        }
         loadImages();
     }
 
@@ -248,15 +252,27 @@ public class GameRunner {
 
             for (int i = 0; i <= total; i++) {
                 PosItem item = items.get(i);
+                item.setImage(null);
                 item.getImage();
                 if (item instanceof Containable) {
                     Containable c = (Containable) item;
                     List<Equipment> equipment = c.getItems();
                     if (!equipment.isEmpty()) {
                         for (Equipment e : equipment) {
+                            e.setImage(null);
                             e.getImage();
+                            if (e instanceof Openable) {
+                                Openable o = (Openable) e;
+                                o.setOpenImage(null);
+                                o.getOpenImage();
+                            }
                         }
                     }
+                }
+                if (item instanceof Openable) {
+                    Openable o = (Openable) item;
+                    o.setOpenImage(null);
+                    o.getOpenImage();
                 }
                 updateProgress(i, total);
             }
