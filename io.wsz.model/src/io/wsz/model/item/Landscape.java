@@ -11,6 +11,10 @@ public class Landscape extends PosItem<Landscape> {
 
     public Landscape() {}
 
+    public Landscape(ItemType type) {
+        super(type);
+    }
+
     public Landscape(Landscape prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }

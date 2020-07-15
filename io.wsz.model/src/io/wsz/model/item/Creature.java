@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static io.wsz.model.item.CreatureControl.*;
 import static io.wsz.model.item.ItemType.*;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
@@ -45,6 +44,11 @@ public class Creature extends PosItem<Creature> implements Containable {
     private Integer strength;
 
     public Creature() {}
+
+    public Creature(ItemType type) {
+        super(type);
+        this.inventory = new Inventory(this);
+    }
 
     public Creature(Creature prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
@@ -141,34 +145,11 @@ public class Creature extends PosItem<Creature> implements Containable {
         return reversCenterBottom;
     }
 
-    public void onInteractWith(Coords pos) {
-        interactionCoords[0].x = pos.x;
-        interactionCoords[0].y = pos.y;
-        Location location = this.pos.getLocation();
-        PosItem pi = Controller.get().getBoard().lookForContent(location, interactionCoords, INTERACTION_TYPES, true);
+    public void onFirstAction(PosItem pi) {
         if (pi == null) {
             return;
         }
-        ItemType type = pi.getType();
-
-        switch (type) {
-            case CREATURE ->
-                    resolveInteractionWithCreature((Creature) pi);
-            case WEAPON, CONTAINER, INDOOR, OUTDOOR ->
-                    setItemTask(pi);
-            default ->
-                    goTo(pos);
-        }
-    }
-
-    private void resolveInteractionWithCreature(Creature cr) {
-        CreatureControl control = cr.getControl();
-        if (control.equals(CONTROLLABLE)) {
-            cr.setControl(CONTROL);
-            this.setControl(CONTROLLABLE);
-        } else if (control.equals(NEUTRAL)) {
-            setItemTask(cr);
-        }
+        setItemTask(pi);
     }
 
     public void goTo(Coords pos) {
@@ -239,10 +220,8 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     @Override
     public double getBottom() {
-//        double halfHeight = getCreatureHalfHeight();
         double imgHeight = getImageHeight();
         double imgBottom = pos.y + imgHeight;
-//        imgBottom += halfHeight;
         return imgBottom;
     }
 
@@ -451,12 +430,16 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.portraitPath = portraitPath;
     }
 
+    public void onSecondAction(PosItem pi) {
+        pi.creatureSecondaryInteract(this);
+    }
+
     @Override
-    public boolean creatureInteract(Creature cr) {
+    public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             Controller.get().setAsking(cr);
-            Controller.get().setAnswering(cr);
+            Controller.get().setAnswering(this);
             return true;
         }
         return false;

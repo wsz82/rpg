@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater {
+public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater, Interactable {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
@@ -29,6 +29,14 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     protected Dialog dialog;
 
     public PosItem() {}
+
+    public PosItem(ItemType type) {
+        super(type);
+        this.visible.set(true);
+        this.coverLine = new ArrayList<>(0);
+        this.collisionPolygons = new ArrayList<>(0);
+        this.dialog = new Dialog();
+    }
 
     public PosItem(A prototype, String name, ItemType type, String path, Boolean visible) {
         super(name, type, path);
@@ -82,10 +90,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         pos.x = exit.x;
         pos.y = exit.y;
         pos.level = exit.level;
-    }
-
-    public boolean creatureInteract(Creature cr) {
-        return false;
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
@@ -241,8 +245,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     public Dialog getDialog() {
         if (dialog == null) {
             if (prototype == null) {
-                setDialog(new Dialog());
-                return dialog;
+                return null;
             }
             return prototype.dialog;
         } else {
@@ -268,6 +271,16 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
             return prototype.getName();
         }
         return super.getName();
+    }
+
+    @Override
+    public boolean creaturePrimaryInteract(Creature cr) {
+        return false;
+    }
+
+    @Override
+    public boolean creatureSecondaryInteract(Creature cr) {
+        return false;
     }
 
     @Override

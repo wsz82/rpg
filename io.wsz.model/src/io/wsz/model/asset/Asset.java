@@ -34,6 +34,10 @@ public abstract class Asset implements Externalizable {
 
     public Asset() {}
 
+    public Asset(ItemType type) {
+        this.type.set(type);
+    }
+
     public Asset(String name, ItemType type, String relativePath) {
         this.name.set(name);
         this.type.set(type);

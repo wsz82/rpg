@@ -17,6 +17,12 @@ public class Teleport extends PosItem<Teleport> {
 
     public Teleport() {}
 
+    public Teleport(ItemType type) {
+        super(type);
+        this.exit = new Coords();
+        this.teleportCollisionPolygons = new ArrayList<>(0);
+    }
+
     public Teleport(Teleport prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }

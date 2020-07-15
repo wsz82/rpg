@@ -4,7 +4,6 @@ import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
@@ -87,7 +86,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             }
         }
 
-        container.getChildren().add(dialogButton);
+        if (!isContent) {
+            container.getChildren().add(dialogButton);
+        }
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
@@ -167,7 +168,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void openDialogEdit() {
-        Stage dialogEditStage = new DialogEditStage(this, item.getDialog());
+        Stage dialogEditStage = new DialogEditStage(this, item.getIndividualDialog());
         dialogEditStage.show();
     }
 
@@ -228,13 +229,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         String relativePath = Asset.convertToRelativePath(path);
         item.setName(name);
         item.setRelativePath(relativePath);
-        item.setDialog(new Dialog());
         addAssetToList(item);
     }
 
     protected abstract void addAssetToList(A asset);
 
-    protected abstract A createNewAsset(String name, String relativePath);
+    protected abstract A createNewAsset();
 
     protected abstract ItemType getType();
 

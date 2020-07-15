@@ -4,8 +4,6 @@ import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class CoverAssetStage extends AssetStage<Cover> {
 
     public CoverAssetStage(Stage parent, Cover asset, boolean isContent) {
@@ -28,7 +26,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
         super.fillInputs();
     }
@@ -43,11 +41,8 @@ public class CoverAssetStage extends AssetStage<Cover> {
     }
 
     @Override
-    protected Cover createNewAsset(String name, String relativePath) {
-        Cover c = new Cover(null, name, getType(), relativePath, true);
-        c.setCoverLine(new ArrayList<>(0));
-        c.setCollisionPolygons(new ArrayList<>(0));
-        return c;
+    protected Cover createNewAsset() {
+        return new Cover(getType());
     }
 
     @Override

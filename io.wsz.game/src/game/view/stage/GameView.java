@@ -36,8 +36,10 @@ import static javafx.scene.input.KeyCode.*;
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
     private static final Coords[] POSS = new Coords[]{new Coords()};
-    private static final ItemType[] PRIMARY_ITEM_TYPES = new ItemType[]{CREATURE};
-    private static final ItemType[] SECONDARY_ITEM_TYPES = new ItemType[]{INDOOR, OUTDOOR, CONTAINER};
+    private static final ItemType[] PRIMARY_ITEM_TYPES =
+            new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
+    private static final ItemType[] SECONDARY_ITEM_TYPES =
+            new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
 
     private final Stage parent;
     private final GameController gameController = GameController.get();
@@ -515,17 +517,17 @@ public class GameView extends CanvasView {
         modifiedCoords.add(currentPos);
         POSS[0].x = modifiedCoords.x;
         POSS[0].y = modifiedCoords.y;
-        PosItem pi = board.lookForContent(location, POSS, SECONDARY_ITEM_TYPES, true);
+        PosItem pi = board.lookForContent(location, POSS, SECONDARY_ITEM_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
         } else {
-            if (pi instanceof Openable) {
-                Openable o = (Openable) pi;
-                o.interact();
-            } else {
-                board.looseCreaturesControl(location);
-            }
+            commandControllablesSecondAction(location, pi);
         }
+    }
+
+    private void commandControllablesSecondAction(Location location, PosItem pi) {
+        board.getControlledCreatures(location)
+                .forEach(c -> c.onSecondAction(pi));
     }
 
     private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
@@ -535,20 +537,20 @@ public class GameView extends CanvasView {
         modifiedCoords.add(currentPos);
         POSS[0].x = modifiedCoords.x;
         POSS[0].y = modifiedCoords.y;
-        PosItem pi = board.lookForContent(location, POSS, PRIMARY_ITEM_TYPES, true);
-        if (pi != null) {
-            ItemType type = pi.getType();
-            boolean success = switch (type) {
-                case CREATURE -> interact((Creature) pi, multiple);
-                default -> false;
-            };
-            if (!success) {
-                commandControllable(modifiedCoords);
+        PosItem pi = board.lookForContent(location, POSS, PRIMARY_ITEM_TYPES, false);
+        if (pi == null) {
+            commandControllableGoTo(modifiedCoords);
+            constantWalk = true;
+        } else {
+            boolean creatureSelected = false;
+            if (pi instanceof Creature) {
+                Creature selected = (Creature) pi;
+                creatureSelected = chooseCreatures(selected, multiple);
+            }
+            if (!creatureSelected) {
+                commandControllableFirstAction(pi);
                 constantWalk = true;
             }
-        } else {
-            commandControllable(modifiedCoords);
-            constantWalk = true;
         }
     }
 
@@ -562,7 +564,7 @@ public class GameView extends CanvasView {
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
-    private boolean interact(Creature cr, boolean multiple) {
+    private boolean chooseCreatures(Creature cr, boolean multiple) {
         CreatureControl control = cr.getControl();
         if (control == CONTROL) {
             cr.setControl(CONTROLLABLE);
@@ -612,10 +614,10 @@ public class GameView extends CanvasView {
         }
     }
 
-    private void commandControllable(Coords pos) {
+    private void commandControllableFirstAction(PosItem pi) {
         Location location = controller.getCurrentLocation().getLocation();
         board.getControlledCreatures(location)
-                .forEach(c -> c.onInteractWith(pos));
+                .forEach(c -> c.onFirstAction(pi));
     }
 
     private void commandControllableGoTo(Coords pos) {

@@ -127,7 +127,18 @@ public class DialogView {
 
         if (dialogs.isEmpty()) {
             PosItem speaker = controller.getAnswering();
-            Answer answer = speaker.getDialog().getStartAnswer();
+            Dialog dialog = speaker.getDialog();
+            if (dialog == null) {
+                System.out.println(speaker.getName() + " does not speak");
+                endDialog();
+                return;
+            }
+            Answer answer = dialog.getGreeting();
+            if (answer == null) {
+                System.out.println(speaker.getName() + " does not greet");
+                endDialog();
+                return;
+            }
             addDialogItem(speaker, answer.getText());
             lastAnswer = answer;
         }

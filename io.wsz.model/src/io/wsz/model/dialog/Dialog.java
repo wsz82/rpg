@@ -14,38 +14,42 @@ public class Dialog implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private final List<Answer> answers = new ArrayList<>(0);
-    private int startAnswerIndex;
+    private int greetingIndex;
 
     public Dialog() {}
 
-    public Dialog(List<Answer> answers, int startAnswerIndex) {
+    public Dialog(List<Answer> answers, int greetingIndex) {
         this.answers.addAll(answers);
-        this.startAnswerIndex = startAnswerIndex;
+        this.greetingIndex = greetingIndex;
     }
 
     public List<Answer> getAnswers() {
         return answers;
     }
 
-    public int getStartAnswerIndex() {
-        return startAnswerIndex;
+    public int getGreetingIndex() {
+        return greetingIndex;
     }
 
-    public void setStartAnswerIndex(int startAnswerIndex) {
-        this.startAnswerIndex = startAnswerIndex;
+    public void setGreetingIndex(int greetingIndex) {
+        this.greetingIndex = greetingIndex;
     }
 
-    public Answer getStartAnswer() {
-        if (startAnswerIndex < 0 || startAnswerIndex >= answers.size()) {
+    public Answer getGreeting() {
+        if (greetingIndex < 0 || greetingIndex >= answers.size()) {
             return null;
         } else {
-            return answers.get(startAnswerIndex);
+            return answers.get(greetingIndex);
         }
     }
 
     @Override
     public String toString() {
-        return answers.get(startAnswerIndex).toString();
+        if (answers.isEmpty()) {
+            return "Empty dialog";
+        } else {
+            return getGreeting().toString();
+        }
     }
 
     @Override
@@ -53,13 +57,13 @@ public class Dialog implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Dialog)) return false;
         Dialog dialog = (Dialog) o;
-        return getStartAnswerIndex() == dialog.getStartAnswerIndex() &&
+        return getGreetingIndex() == dialog.getGreetingIndex() &&
                 Objects.equals(getAnswers(), dialog.getAnswers());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAnswers(), getStartAnswerIndex());
+        return Objects.hash(getAnswers(), getGreetingIndex());
     }
 
     @Override
@@ -68,7 +72,7 @@ public class Dialog implements Externalizable {
 
         out.writeObject(answers);
 
-        out.writeInt(startAnswerIndex);
+        out.writeInt(greetingIndex);
     }
 
     @Override
@@ -78,6 +82,6 @@ public class Dialog implements Externalizable {
         List<Answer> input = (List<Answer>) in.readObject();
         answers.addAll(input);
 
-        startAnswerIndex = in.readInt();
+        greetingIndex = in.readInt();
     }
 }

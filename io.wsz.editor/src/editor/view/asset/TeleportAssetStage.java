@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +101,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
         coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent);
         coordsEdit.initCoords(container);
@@ -122,13 +121,8 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     @Override
-    protected Teleport createNewAsset(String name, String relativePath) {
-        Teleport t = new Teleport(
-                null, name, getType(), relativePath,
-                true);
-        t.setCoverLine(new ArrayList<>(0));
-        t.setCollisionPolygons(new ArrayList<>(0));
-        return t;
+    protected Teleport createNewAsset() {
+        return new Teleport(getType());
     }
 
     @Override

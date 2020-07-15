@@ -16,6 +16,10 @@ public class Weapon extends Equipment<Weapon> {
 
     public Weapon() {}
 
+    public Weapon(ItemType type) {
+        super(type);
+    }
+
     public Weapon(Weapon prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }
@@ -93,7 +97,7 @@ public class Weapon extends Equipment<Weapon> {
     }
 
     @Override
-    public boolean creatureInteract(Creature cr) {
+    public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             boolean taken = cr.getIndividualInventory().add(this);

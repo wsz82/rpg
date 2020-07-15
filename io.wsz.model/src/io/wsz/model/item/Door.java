@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Door<I extends Door> extends PosItem<I> implements Openable {
@@ -19,6 +20,12 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
     protected List<List<Coords>> openDoorCollisionPolygons;
 
     public Door() {}
+
+    public Door(ItemType type) {
+        super(type);
+        this.openDoorCoverLine = new ArrayList<>(0);
+        this.openDoorCollisionPolygons = new ArrayList<>(0);
+    }
 
     public Door(I prototype, String name, ItemType type, String path, Boolean visible) {
             super(prototype, name, type, path, visible);
@@ -138,12 +145,17 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
     }
 
     @Override
-    public void interact() {
-        if (open) {
-            close();
-        } else {
-            open();
+    public boolean creatureSecondaryInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (open) {
+                close();
+            } else {
+                open();
+            }
+            return true;
         }
+        return false;
     }
 
     @Override

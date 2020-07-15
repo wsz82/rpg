@@ -2,7 +2,10 @@ package editor.view.asset;
 
 import editor.view.DoubleField;
 import editor.view.IntegerField;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.CreatureSize;
+import io.wsz.model.item.ItemType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -11,7 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
@@ -84,15 +86,16 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             controls.add(null);
         }
 
-        if (item != null) {
-            container.getChildren().add(itemsButton);
-            hookUpEditEvents();
-            if (!isContent) {
-                container.getChildren().add(portraitBox);
-            }
+        if (!isContent) {
+            container.getChildren().add(portraitBox);
         }
 
         container.getChildren().addAll(sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
+
+        if (item != null) {
+            container.getChildren().add(itemsButton);
+            hookUpEditEvents();
+        }
 
         fillInputs();
         hookUpCreatureEvents();
@@ -114,10 +117,11 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void fillInputs() {
-        super.fillInputs();
         if (item == null) {
-            return;
+            item = createNewAsset();
         }
+
+        super.fillInputs();
 
         String portraitPath = item.getIndividualPortraitPath();
         if (portraitPath == null) {
@@ -235,12 +239,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     }
 
     @Override
-    protected Creature createNewAsset(String name, String relativePath) {
-        Creature cr = new Creature(null, name, getType(), relativePath, true);
-        cr.setCoverLine(new ArrayList<>(0));
-        cr.setCollisionPolygons(new ArrayList<>(0));
-        cr.setInventory(new Inventory(cr));
-        return cr;
+    protected Creature createNewAsset() {
+        return new Creature(getType());
     }
 
     @Override

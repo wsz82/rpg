@@ -4,8 +4,6 @@ import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     public LandscapeAssetStage(Stage parent, Landscape asset, boolean isContent) {
@@ -27,7 +25,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
         super.fillInputs();
     }
@@ -42,11 +40,8 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     }
 
     @Override
-    protected Landscape createNewAsset(String name, String relativePath) {
-        Landscape l = new Landscape(null, name, getType(), relativePath, true);
-        l.setCoverLine(new ArrayList<>(0));
-        l.setCollisionPolygons(new ArrayList<>(0));
-        return l;
+    protected Landscape createNewAsset() {
+        return new Landscape(getType());
     }
 
     @Override

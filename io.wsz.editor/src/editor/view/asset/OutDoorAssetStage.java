@@ -5,8 +5,6 @@ import io.wsz.model.item.OutDoor;
 import io.wsz.model.stage.Coords;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private static final String TITLE = "OutDoor asset";
 
@@ -34,7 +32,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
         openable = new OpenableOutDoor(this, item, isContent);
         openable.initOpenable(container);
@@ -58,13 +56,8 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     }
 
     @Override
-    protected OutDoor createNewAsset(String name, String relativePath) {
-        OutDoor o = new OutDoor(null, name, getType(), relativePath, true);
-        o.setCoverLine(new ArrayList<>(0));
-        o.setCollisionPolygons(new ArrayList<>(0));
-        o.setOpenDoorCoverLine(new ArrayList<>(0));
-        o.setOpenDoorCollisionPolygons(new ArrayList<>(0));
-        return o;
+    protected OutDoor createNewAsset() {
+        return new OutDoor(getType());
     }
 
     @Override

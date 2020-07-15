@@ -25,6 +25,12 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     public Container() {}
 
+    public Container(ItemType type) {
+        super(type);
+        this.openContainerCoverLine = new ArrayList<>(0);
+        this.openContainerCollisionPolygons = new ArrayList<>(0);
+    }
+
     public Container(Container prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }
@@ -193,7 +199,7 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
-    public boolean creatureInteract(Creature cr) {
+    public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             searchContainer(cr);
@@ -248,12 +254,17 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
-    public void interact() {
-        if (open) {
-            close();
-        } else {
-            open();
+    public boolean creatureSecondaryInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (open) {
+                close();
+            } else {
+                open();
+            }
+            return true;
         }
+        return false;
     }
 
     @Override

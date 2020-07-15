@@ -9,8 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     private static final String TITLE = "Container asset";
 
@@ -65,7 +63,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
         openable = new OpenableContainer(this, item, isContent);
         openable.initOpenable(container);
@@ -121,13 +119,8 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
     }
 
     @Override
-    protected Container createNewAsset(String name, String relativePath) {
-        Container c = new Container(null, name, getType(), relativePath, true);
-        c.setCoverLine(new ArrayList<>(0));
-        c.setCollisionPolygons(new ArrayList<>(0));
-        c.setOpenContainerCoverLine(new ArrayList<>(0));
-        c.setOpenContainerCollisionPolygons(new ArrayList<>(0));
-        return c;
+    protected Container createNewAsset() {
+        return new Container(getType());
     }
 
     @Override

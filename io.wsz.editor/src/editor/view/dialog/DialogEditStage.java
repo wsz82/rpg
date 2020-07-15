@@ -85,7 +85,7 @@ public class DialogEditStage extends ChildStage {
         startAnswerBox.setAlignment(Pos.CENTER);
         startAnswerCB = new ChoiceBox<>(answersList);
         startAnswerCB.setMaxWidth(100);
-        Answer startAnswer = dialog.getStartAnswer();
+        Answer startAnswer = dialog.getGreeting();
         if (startAnswer != null) {
             startAnswerCB.setValue(startAnswer);
         }
@@ -410,7 +410,7 @@ public class DialogEditStage extends ChildStage {
     private void saveDialog() {
         Answer startAnswer = startAnswerCB.getValue();
         int startAnswerIndex = answersList.indexOf(startAnswer);
-        dialog.setStartAnswerIndex(startAnswerIndex);
+        dialog.setGreetingIndex(startAnswerIndex);
 
         QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
         if (qi != null) {

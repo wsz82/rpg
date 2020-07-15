@@ -36,7 +36,7 @@ public class Task implements Externalizable {
         if (dest.x != -1) {
             move(cr);
             if (item != null) {
-                if (item.creatureInteract(cr)) {
+                if (item.creaturePrimaryInteract(cr)) {
                     item = null;
                     dest.x = -1;
                 }
@@ -45,7 +45,7 @@ public class Task implements Externalizable {
         }
         finished = true;
     }
-    
+
     private void move(Creature cr) {
         Inventory inventory = cr.getIndividualInventory();
         String name = cr.getName();

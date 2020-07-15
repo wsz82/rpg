@@ -8,8 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
 public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private static final String TITLE = "Weapon asset";
     private final DoubleField inputDamage = new DoubleField(0.0, isContent);
@@ -54,7 +52,7 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     @Override
     protected void fillInputs() {
         if (item == null) {
-            item = createNewAsset("", "");
+            item = createNewAsset();
         }
 
         super.fillInputs();
@@ -125,11 +123,8 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     }
 
     @Override
-    protected Weapon createNewAsset(String name, String relativePath) {
-        Weapon w = new Weapon(null, name, getType(), relativePath, true);
-        w.setCoverLine(new ArrayList<>(0));
-        w.setCollisionPolygons(new ArrayList<>(0));
-        return w;
+    protected Weapon createNewAsset() {
+        return new Weapon(getType());
     }
 
     @Override

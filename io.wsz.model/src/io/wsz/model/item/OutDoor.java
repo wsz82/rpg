@@ -14,6 +14,11 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor() {}
 
+    public OutDoor(ItemType type) {
+        super(type);
+        this.exit = new Coords();
+    }
+
     public OutDoor(OutDoor prototype, String name, ItemType type, String path, Boolean visible) {
         super(prototype, name, type, path, visible);
     }
@@ -42,7 +47,7 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     @Override
-    public boolean creatureInteract(Creature cr) {
+    public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (isOpen()) {
