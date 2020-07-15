@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -60,13 +61,21 @@ public class GameView extends CanvasView {
     private boolean inventoryStarted = true;
     private boolean constantWalk;
     private boolean selectionMode;
+    private ColorAdjust colorAdjust;
 
     public GameView(Stage parent) {
         super(new Canvas());
         this.parent = parent;
+        setUpVisionBrightness();
+
         hookUpEvents();
         defineRemovableEvents();
         hookUpRemovableEvents();
+    }
+
+    private void setUpVisionBrightness() {
+        colorAdjust = new ColorAdjust();
+        colorAdjust.setBrightness(-0.1);
     }
 
     public void refresh() {
@@ -113,6 +122,10 @@ public class GameView extends CanvasView {
         clear();
         sortItems();
 
+        gc.setEffect(colorAdjust);
+        drawItems();
+        gc.setEffect(null);
+
         gc.save();
         gc.beginPath();
         Location location = Controller.get().getCurrentLocation().getLocation();
@@ -128,6 +141,7 @@ public class GameView extends CanvasView {
             gc.arc(centerX, centerY, radiusX, radiusY, startAngle, length);
         }
         gc.closePath();
+
         gc.clip();
 
         drawItems();
