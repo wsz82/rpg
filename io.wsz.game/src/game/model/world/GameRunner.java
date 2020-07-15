@@ -43,6 +43,7 @@ public class GameRunner {
     }
 
     private void loadImages() {
+        Sizes.setReloadImages(false);
         gameController.setGame(false);
         Task<String> loader = new Loader();
         gameController.showLoaderView(loader);

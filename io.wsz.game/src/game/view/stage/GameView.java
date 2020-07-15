@@ -141,7 +141,6 @@ public class GameView extends CanvasView {
             gc.arc(centerX, centerY, radiusX, radiusY, startAngle, length);
         }
         gc.closePath();
-
         gc.clip();
 
         drawItems();
