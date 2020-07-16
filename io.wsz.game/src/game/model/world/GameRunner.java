@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -243,40 +244,63 @@ public class GameRunner {
     }
 
     private class Loader extends Task<String> {
-
         @Override
         protected String call() throws Exception {
             List<PosItem> items = controller.getCurrentLocation().getItems();
-            int total = items.size() - 1;
+            Set<Asset> assets = getAssets(items);
+            int total = assets.size() - 1;
             updateProgress(0, total);
 
-            for (int i = 0; i <= total; i++) {
-                PosItem item = items.get(i);
-                item.setImage(null);
-                item.getImage();
-                if (item instanceof Containable) {
-                    Containable c = (Containable) item;
-                    List<Equipment> equipment = c.getItems();
-                    if (!equipment.isEmpty()) {
-                        for (Equipment e : equipment) {
-                            e.setImage(null);
-                            e.getImage();
-                            if (e instanceof Openable) {
-                                Openable o = (Openable) e;
-                                o.setOpenImage(null);
-                                o.getOpenImage();
-                            }
-                        }
-                    }
-                }
-                if (item instanceof Openable) {
-                    Openable o = (Openable) item;
-                    o.setOpenImage(null);
-                    o.getOpenImage();
-                }
+            int i = 0;
+            for (Asset a : assets) {
+                reloadAssetImages(a);
                 updateProgress(i, total);
+                i++;
             }
+
             return "Completed";
+        }
+
+        private Set<Asset> getAssets(List<PosItem> items) {
+            Set<Asset> assets = new HashSet<>(1);
+            Set<Asset> locationAssets = items.stream()
+                    .map(pi -> (Asset) pi.getPrototype())
+                    .collect(Collectors.toSet());
+            assets.addAll(locationAssets);
+
+            List<Containable> locCons = items.stream()
+                    .filter(pi -> pi instanceof Containable)
+                    .map(pi -> (Containable) pi)
+                    .filter(c -> !c.getItems().isEmpty())
+                    .collect(Collectors.toList());
+            addInnerAssets(assets, locCons);
+            return assets;
+        }
+
+        private void addInnerAssets(Set<Asset> assets, List<Containable> locCons) {
+            for (Containable cons : locCons) {
+                List<Equipment> equipment = cons.getItems();
+                Set<Asset> equipmentAssets = equipment.stream()
+                        .map(pi -> (Asset) pi.getPrototype())
+                        .collect(Collectors.toSet());
+                assets.addAll(equipmentAssets);
+                List<Containable> containables = equipment.stream()
+                        .filter(pi -> pi instanceof Containable)
+                        .map(pi -> (Containable) pi)
+                        .filter(c -> !c.getItems().isEmpty())
+                        .collect(Collectors.toList());
+                addInnerAssets(assets, containables);
+            }
+        }
+
+        private void reloadAssetImages(Asset a) {
+            a.setImage(null);
+            a.getInitialImage();
+            if (a instanceof Openable) {
+                Openable o = (Openable) a;
+                o.setOpenImage(null);
+                o.getOpenImage();
+            }
         }
     }
 }

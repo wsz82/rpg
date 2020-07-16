@@ -17,15 +17,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static io.wsz.model.item.ItemType.*;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
-    private static final ItemType[] INTERACTION_TYPES = new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
-
-    private final Coords[] interactionCoords = new Coords[]{new Coords()};
     private final Coords centerBottom = new Coords();
     private final Coords reversCenterBottom = new Coords();
 

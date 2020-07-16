@@ -52,15 +52,36 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
 
     @Override
     public Image getOpenImage() {
-        if (this.openImage == null) {
-            setOpenImage(loadImageFromPath(getOpenImagePath()));
+        if (prototype == null) {
+            if (openImage == null) {
+                setOpenImage(loadImageFromPath(getOpenImagePath()));
+            }
+            return openImage;
+        } else {
+            return prototype.getOpenImage();
         }
-        return openImage;
     }
 
     @Override
     public void setOpenImage(Image openImage) {
         this.openImage = openImage;
+    }
+
+    @Override
+    public Image getImage() {
+        if (open) {
+            if (prototype == null) {
+                return getOpenImage();
+            } else {
+                return prototype.getOpenImage();
+            }
+        } else {
+            if (prototype == null) {
+                return getInitialImage();
+            } else {
+                return prototype.getInitialImage();
+            }
+        }
     }
 
     public boolean isOpen() {
@@ -93,15 +114,6 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
 
     public void setOpenDoorCollisionPolygons(List<List<Coords>> openDoorCollisionPolygons) {
         this.openDoorCollisionPolygons = openDoorCollisionPolygons;
-    }
-
-    @Override
-    public Image getImage() {
-        if (open) {
-            return getOpenImage();
-        } else {
-            return super.getImage();
-        }
     }
 
     @Override

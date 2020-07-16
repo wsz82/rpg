@@ -8,6 +8,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -271,6 +272,15 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
             return prototype.getName();
         }
         return super.getName();
+    }
+
+    @Override
+    public Image getImage() {
+        if (prototype == null) {
+            return super.getImage();
+        } else {
+            return prototype.getImage();
+        }
     }
 
     @Override
