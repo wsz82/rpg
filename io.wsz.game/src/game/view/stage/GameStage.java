@@ -25,6 +25,7 @@ import java.io.File;
 
 public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
+
     private Node parentToReturn;
     private StackPane mainMenu;
     private StackPane gameMenu;
@@ -32,6 +33,7 @@ public class GameStage extends Stage {
     private StackPane loads;
     private ListView<String> savesView;
     private ListView<String> loadsView;
+
     private final BorderPane root = new BorderPane();
     private final GameView gameView = new GameView(this);
     private final Button cancel = new Button("Cancel");
@@ -222,9 +224,7 @@ public class GameStage extends Stage {
         boolean gameStarted = gameController.startGame(memento);
         if (!gameStarted) {
             alertNoGame();
-            return;
         }
-//        setGameViewForCenter();
     }
 
     private void alertNoGame() {
@@ -293,7 +293,7 @@ public class GameStage extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        Coords currentPos = gameView.getCurrentPos();
+        Coords currentPos = gameView.getCurPos();
         gameController.saveGame(overwrite, name, currentPos, Main.getDir());
         gameController.resumeGame();
     }

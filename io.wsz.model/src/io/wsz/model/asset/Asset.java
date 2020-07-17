@@ -18,7 +18,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
@@ -100,10 +99,10 @@ public abstract class Asset implements Externalizable {
     }
 
     protected Image loadImageFromPath(String fileName) {
-        String path = getRelativeTypePath(getType()) + File.separator + fileName;
-        if (path.isEmpty()) {
-            throw new NoSuchElementException();
+        if (fileName.isEmpty()) {
+            return null;
         }
+        String path = getRelativeTypePath(getType()) + File.separator + fileName;
         File fixedFile = new File(Controller.getProgramDir() + path);
         String url = null;
         try {

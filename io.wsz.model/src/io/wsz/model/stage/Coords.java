@@ -198,10 +198,14 @@ public class Coords implements Externalizable {
     }
 
     public static boolean pointWithinOval(Coords point, Coords ovalCenter, double width, double height) {
-        double x = point.x;
-        double y = point.y;
-        double h = ovalCenter.x;
-        double k = ovalCenter.y;
+        return pointWithinOval(point.x, point.y, ovalCenter, width, height);
+    }
+
+    public static boolean pointWithinOval(double x, double y, Coords ovalCenter, double width, double height) {
+        return pointWithinOval(x, y, ovalCenter.x, ovalCenter.y, width, height);
+    }
+
+    public static boolean pointWithinOval(double x, double y, double h, double k, double width, double height) {
         double rx = width /2;
         double ry = height /2;
 
@@ -339,6 +343,10 @@ public class Coords implements Externalizable {
 
     public boolean is0() {
         return x == 0 && y == 0;
+    }
+
+    public boolean isEmpty() {
+        return x == 0 && y == 0 && level == 0 && location == null;
     }
 
     public Coords clonePos() {

@@ -111,7 +111,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private void onCreate() {
         String name = nameInput.getText();
         String path = imageLabel.getText();
-        boolean inputNameIsEmpty = name.equals("");
+        boolean inputNameIsEmpty = name == null || name.isEmpty();
         boolean inputFileIsEmpty = path == null || path.isEmpty();
         if (inputNameIsEmpty || inputFileIsEmpty) {
             return;

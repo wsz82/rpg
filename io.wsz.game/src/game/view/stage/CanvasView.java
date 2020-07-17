@@ -77,6 +77,7 @@ public abstract class CanvasView {
     protected void adjustCoverOpacity(List<Creature> visibleControllables, PosItem pi) {
         if (!pi.getActualCoverLine().isEmpty()) {
             for (Creature cr : visibleControllables) {
+                if (cr.getName().equals("a") && pi.getName().equals("mur")) return;
                 double crLeft = cr.getLeft();
                 double crRight = cr.getRight();
                 double crTop = cr.getTop();

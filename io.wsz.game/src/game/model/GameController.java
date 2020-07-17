@@ -197,7 +197,7 @@ public class GameController {
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
-        Coords currentPos = gameView.getCurrentPos();
+        Coords currentPos = gameView.getCurPos();
         Coords loadedPos = memento.getLastPos();
         currentPos.x = loadedPos.x;
         currentPos.y = loadedPos.y;
@@ -207,7 +207,7 @@ public class GameController {
         Plugin p = controller.getActivePlugin();
         double startX = p.getStartPos().x;
         double startY = p.getStartPos().y;
-        Coords currentPos = gameView.getCurrentPos();
+        Coords currentPos = gameView.getCurPos();
         currentPos.x = startX;
         currentPos.y = startY;
     }

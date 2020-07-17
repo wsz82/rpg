@@ -11,6 +11,9 @@ import static io.wsz.model.item.CreatureControl.CONTROL;
 
 public class Teleportation {
     public static void teleport(Creature cr, Coords exit) {
+        if (exit == null || exit.isEmpty()) {
+            return;
+        }
         Optional<Location> optLocation = Controller.get().getLocationsList().stream()
                 .filter(l -> l.getName().equals(exit.getLocation().getName()))
                 .findFirst();

@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import io.wsz.model.item.Openable;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import javafx.scene.control.Button;
@@ -36,7 +37,7 @@ public abstract class OpenableAsset<A extends PosItem> {
             container.getChildren().add(openDoorBox);
         }
 
-        if (item != null) {
+        if (item != null && ((Openable) item).getOpenImage() != null) {
             if (!isContent) {
                 container.getChildren().addAll(openCoverButton, openCollisionButton);
             }

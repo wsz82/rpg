@@ -127,7 +127,7 @@ public class GameRunner {
 
     private void updateView() {
         if (Sizes.isReloadImages()) {
-            clearImagesAndReload();
+            loadImages();
             Sizes.setReloadImages(false);
         }
         showGame();
@@ -148,31 +148,6 @@ public class GameRunner {
             }
             creaturesToControl.clear();
         }
-    }
-
-    private void clearImagesAndReload() {
-        gameController.setGame(false);
-//        List<Location> locations = Controller.get().getLocationsList();
-//        for (Location l : locations) {
-//            List<PosItem> items = l.getItems().get();
-//            for (PosItem pi : items) {
-//                pi.setImage(null);
-//                if (pi instanceof Containable) {
-//                    Containable c = (Containable) pi;
-//                    List<Equipment> equipment = c.getItems();
-//                    if (!equipment.isEmpty()) {
-//                        for (Equipment e : equipment) {
-//                            e.setImage(null);
-//                        }
-//                    }
-//                }
-//                if (pi instanceof Openable) {
-//                    Openable o = (Openable) pi;
-//                    o.setOpenImage(null);
-//                }
-//            }
-//        }
-        loadImages();
     }
 
     private void tryToStartDialog() {
