@@ -168,7 +168,7 @@ public class GameView extends CanvasView {
                     double visionRange = cr.getVisionRange();
                     translateCoordsToScreenCoords(cr.getCenter());
                     double visWidth = visionRange * 2 * Sizes.getMeter();
-                    double visHeight = visionRange * 2.0 / 3 * 2 * Sizes.getMeter();
+                    double visHeight = visionRange * 2.0/3 * 2 * Sizes.getMeter();
 //                    gc.setStroke(Color.WHITE);
 //                    double w = visWidth * Sizes.getMeter();
 //                    double h = visHeight * Sizes.getMeter();

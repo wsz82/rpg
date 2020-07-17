@@ -221,12 +221,12 @@ public class Board {
         if (i instanceof Creature && !(o instanceof Creature)) {
 
             Creature cr = (Creature) i;
-            if (getCreatureObstacleCollision(nextPos, cr.getSize(), oPolygons, o.getPos())) return o;
+            if (getCreatureObstacleCollision(nextPos, cr, oPolygons, o)) return o;
 
         } else if (o instanceof Creature && !(i instanceof Creature)) {
 
             Creature crO = (Creature) o;
-            if (getObstacleCreatureCollision(nextPos, crO, iPolygons)) return o;
+            if (getObstacleCreatureCollision(nextPos, crO, iPolygons, i)) return o;
 
         } else if (o instanceof Creature) {
 
@@ -236,7 +236,7 @@ public class Board {
 
         } else {
 
-            if (getObstacleObstacleCollision(nextPos, iPolygons, i.getPos(), oPolygons)) return o;
+            if (getObstacleObstacleCollision(nextPos, iPolygons, o.getPos(), oPolygons)) return o;
 
         }
         return null;
@@ -253,33 +253,34 @@ public class Board {
     private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
         boolean collides = Coords.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
         if (collides) {
-            System.out.println("Creature collides creature");
+            System.out.println(cr.getName() + " collides " + crO.getName());
         }
         return collides;
     }
 
-    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons) {
+    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem i) {
         for (List<Coords> polygon : iPolygons) {
             List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
             Coords.translateCoords(lostRef, nextPos.x, nextPos.y);
 
             boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println("Obstacle collides creature");
+                System.out.println(i.getName() + " collides " + cr.getName());
                 return true;
             }
         }
         return false;
     }
 
-    public boolean getCreatureObstacleCollision(Coords nextPos, CreatureSize s, List<List<Coords>> oPolygons, Coords oPos) {
+    public boolean getCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem o) {
         for (List<Coords> polygon : oPolygons) {
             List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
+            Coords oPos = o.getPos();
             Coords.translateCoords(lostRef, oPos.x, oPos.y);
 
-            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(nextPos, s, lostRef);
+            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println("Creature collides obstacle");
+                System.out.println(cr.getName() + " collides " + o.getName());
                 return true;
             }
         }

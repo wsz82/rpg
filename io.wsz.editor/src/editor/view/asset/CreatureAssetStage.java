@@ -44,6 +44,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         super.initWindow();
         setTitle(TITLE);
 
+        container.getChildren().remove(interactionButton);
         container.getChildren().remove(coverButton);
         container.getChildren().remove(collisionButton);
 

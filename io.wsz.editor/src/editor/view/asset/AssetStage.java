@@ -22,6 +22,7 @@ import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final VBox container = new VBox(5);
+    protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
     protected final Button dialogButton = new Button("Dialog");
@@ -82,7 +83,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         if (item != null) {
             if (!isContent) {
-                container.getChildren().addAll(coverButton, collisionButton);
+                container.getChildren().addAll(interactionButton, coverButton, collisionButton);
             }
         }
 
@@ -143,6 +144,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             String title = "Choose image for asset";
             setUpImageChooser(title, imageLabel);
         });
+        interactionButton.setOnAction(e -> openInteractionPointEdit());
         coverButton.setOnAction(e -> openCoverEdit());
         collisionButton.setOnAction(e -> openCollisionEdit());
         dialogButton.setOnAction(e -> openDialogEdit());
@@ -170,6 +172,17 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private void openDialogEdit() {
         Stage dialogEditStage = new DialogEditStage(this, item.getIndividualDialog());
         dialogEditStage.show();
+    }
+
+    protected void openInteractionPointEdit() {
+        Image background = item.getInitialImage();
+        if (background == null) {
+            return;
+        }
+        Coords interactionCoords = item.getIndividualInteractionCoords();
+        CoordsPointEditStage interactionEdit = new CoordsPointEditStage(this, item, interactionCoords, background);
+        interactionEdit.initWindow(isContent, "Interaction point edit");
+        interactionEdit.show();
     }
 
     private void openCoverEdit() {

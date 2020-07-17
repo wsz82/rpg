@@ -28,6 +28,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
+    protected Coords interactionCoords;
 
     public PosItem() {}
 
@@ -94,7 +95,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
-        return Coords.pointWithinOval(getCenter(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
+        return Coords.pointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
     public PosItem getCollision() {
@@ -199,6 +200,34 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.pos.x = x;
         this.pos.y = y;
         this.pos.setLocation(location);
+    }
+
+    public Coords getIndividualInteractionCoords() {
+        return interactionCoords;
+    }
+
+    public Coords getInteractionCoords() {
+        if (interactionCoords == null) {
+            if (prototype != null) {
+                if (prototype.interactionCoords != null) {
+                    center.x = prototype.interactionCoords.x;
+                    center.y = prototype.interactionCoords.y;
+                } else {
+                    return getCenter();
+                }
+            } else {
+                return getCenter();
+            }
+        } else {
+            center.x = interactionCoords.x;
+            center.y = interactionCoords.y;
+        }
+        center.add(pos);
+        return center;
+    }
+
+    public void setInteractionCoords(Coords interactionCoords) {
+        this.interactionCoords = interactionCoords;
     }
 
     public List<Coords> getCoverLine() {
@@ -337,6 +366,8 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         out.writeObject(collisionPolygons);
 
         out.writeObject(dialog);
+
+        out.writeObject(interactionCoords);
     }
 
     @Override
@@ -359,5 +390,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         collisionPolygons = (List<List<Coords>>) in.readObject();
 
         dialog = (Dialog) in.readObject();
+
+        interactionCoords = (Coords) in.readObject();
     }
 }

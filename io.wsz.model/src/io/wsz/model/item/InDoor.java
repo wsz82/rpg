@@ -17,18 +17,4 @@ public class InDoor extends Door<InDoor> {
     public boolean creaturePrimaryInteract(Creature cr) {
         return creatureSecondaryInteract(cr);
     }
-
-    @Override
-    public boolean creatureSecondaryInteract(Creature cr) {
-        CreatureSize size = cr.getSize();
-        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (open) {
-                close();
-            } else {
-                open();
-            }
-            return true;
-        }
-        return false;
-    }
 }
