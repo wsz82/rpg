@@ -47,6 +47,9 @@ public class Task implements Externalizable {
     }
 
     private void move(Creature cr) {
+        if (dest.x == -1) {
+            return;
+        }
         Inventory inventory = cr.getIndividualInventory();
         String name = cr.getName();
         if (inventory.getActualWeight() > inventory.getMaxWeight()) {
@@ -63,22 +66,23 @@ public class Task implements Externalizable {
         double x2 = dest.x;
         double y1 = cr.pos.y;
         double y2 = dest.y;
-        if (x1 <= x2 + 10.0/ Sizes.getMeter() && x1 >= x2 - 10.0/ Sizes.getMeter()
-                && y1 <= y2 + 10.0/ Sizes.getMeter() && y1 >= y2 - 10.0/ Sizes.getMeter()) {
+        int meter = Sizes.getMeter();
+        if (x1 <= x2 + 10.0/ meter && x1 >= x2 - 10.0/ meter
+                && y1 <= y2 + 10.0/ meter && y1 >= y2 - 10.0/ meter) {
             dest.x = -1;
             return;
         }
         double dist = Coords.getDistance(cr.pos, dest);
         double moveDist = cr.getSpeed();
-        if (dist < cr.getSpeed()) {
-            moveDist = dist;
-        }
         double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
         double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
         nextPos.x = x3;
         nextPos.y = y3;
         PosItem pi = cr.getCollision(cr.getCenter(nextPos));
         if (pi != null) {
+            cr.pos.x = x3 + (moveDist/dist * (x1 - x3)) / SECOND;
+            cr.pos.y = y3 + (moveDist/dist * (y1 - y3)) / SECOND;
+            dest.x = -1;
             return;
         }
         cr.pos.x = nextPos.x;
