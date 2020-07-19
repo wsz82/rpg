@@ -141,7 +141,7 @@ public class Board {
         return getObstacle(nextPos, item, location, allTypes);
     }
 
-    public PosItem getObstacle(Coords nextPos, PosItem item, Location location, ItemType[] types) {
+    public PosItem getObstacle(Coords nextPos, PosItem i, Location location, ItemType[] types) {
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
@@ -155,53 +155,53 @@ public class Board {
                 })
                 .filter(pi -> pi.getActualCollisionPolygons() != null || pi instanceof Creature)
                 .filter(pi -> {
-                    int level = item.getPos().level;
+                    int level = i.getPos().level;
                     return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) return null;
-        List<List<Coords>> iPolygons = item.getActualCollisionPolygons();
-        if (iPolygons.isEmpty() && !(item instanceof Creature)) return null;
+        List<List<Coords>> iPolygons = i.getActualCollisionPolygons();
+        if (iPolygons.isEmpty() && !(i instanceof Creature)) return null;
 
-        double left = item.getCollisionLeft(iPolygons, nextPos);
-        double right = item.getCollisionRight(iPolygons, nextPos);
-        double top = item.getCollisionTop(iPolygons, nextPos);
-        double bottom = item.getCollisionBottom(iPolygons, nextPos);
+        double left = i.getCollisionLeft(iPolygons, nextPos);
+        double right = i.getCollisionRight(iPolygons, nextPos);
+        double top = i.getCollisionTop(iPolygons, nextPos);
+        double bottom = i.getCollisionBottom(iPolygons, nextPos);
 
-        for (PosItem obstacle : items) {
-            if (obstacle == item) continue;
-            List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
-            PosItem collision = getCollision(left, right, top, bottom, nextPos, item, iPolygons, obstacle, oPolygons);
+        for (PosItem o : items) {
+            if (o == i) continue;
+            List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
+            PosItem collision = getCollision(left, right, top, bottom, nextPos, i, iPolygons, o, oPolygons);
             if (collision != null) return collision;
         }
         return null;
     }
 
-    public Teleport getTeleport(Coords nextPos, PosItem item, Location location) {
+    public Teleport getTeleport(Coords nextPos, PosItem i, Location l) {
         teleports.clear();
-        location.getItems().get().stream()
+        l.getItems().get().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi instanceof Teleport)
                 .map(pi -> (Teleport) pi)
                 .filter(pi -> pi.getActualCollisionPolygons() != null)
                 .filter(pi -> {
-                    int level = item.getPos().level;
+                    int level = i.getPos().level;
                     return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> teleports));
         if (teleports.isEmpty()) return null;
-        List<List<Coords>> iPolygons = item.getActualCollisionPolygons();
-        if (iPolygons.isEmpty() && !(item instanceof Creature)) return null;
+        List<List<Coords>> iPolygons = i.getActualCollisionPolygons();
+        if (iPolygons.isEmpty() && !(i instanceof Creature)) return null;
 
-        double left = item.getCollisionLeft(iPolygons, nextPos);
-        double right = item.getCollisionRight(iPolygons, nextPos);
-        double top = item.getCollisionTop(iPolygons, nextPos);
-        double bottom = item.getCollisionBottom(iPolygons, nextPos);
+        double left = i.getCollisionLeft(iPolygons, nextPos);
+        double right = i.getCollisionRight(iPolygons, nextPos);
+        double top = i.getCollisionTop(iPolygons, nextPos);
+        double bottom = i.getCollisionBottom(iPolygons, nextPos);
 
         for (Teleport t : teleports) {
-            if (t == item) continue;
+            if (t == i) continue;
             List<List<Coords>> oPolygons = t.getTeleportCollisionPolygons();
-            Teleport collision = getCollision(left, right, top, bottom, nextPos, item, iPolygons, t, oPolygons);
+            Teleport collision = getCollision(left, right, top, bottom, nextPos, i, iPolygons, t, oPolygons);
             if (collision != null) return collision;
         }
         return null;

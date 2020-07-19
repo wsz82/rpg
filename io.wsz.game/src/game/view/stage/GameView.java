@@ -47,11 +47,12 @@ public class GameView extends CanvasView {
     private final List<PosItem> items = new ArrayList<>(0);
     private final Coords curPos = controller.getBoardPos();
     private final Coords mousePos = new Coords();
-    private final Coords modifiedCoords = new Coords();
+    private final Coords modifiedCoords1 = new Coords();
+    private final Coords modifiedCoords2 = new Coords();
+    private final Coords nextPiecePos = new Coords();
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView = new BarView(canvas);
-    private final Coords nextPiecePos = new Coords();
 
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
@@ -139,56 +140,78 @@ public class GameView extends CanvasView {
     }
 
     private void drawFog(List<Creature> heroes) {
-        gc.setImageSmoothing(false);
-        gc.setGlobalAlpha(0.3);
-        int fogWidth = (int) fogPiece.getWidth();
-        int fogHeight = (int) fogPiece.getHeight();
-        int offset = fogHeight - 12;
-        int y = -fogWidth/2;
-        int x = -fogWidth/2;
+        Location loc = controller.getCurrentLocation().getLocation();
+        List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
+        int maxPiecesHeight = (int) Math.ceil(5.0/4 * loc.getHeight() * 2) + 4;
+        int maxPiecesWidth = (int) Math.ceil(loc.getWidth() * 2) + 1;
+        if (discoveredFog == null) {
+            discoveredFog = new ArrayList<>(maxPiecesHeight);
+            for (int i = 0; i < maxPiecesHeight; i++) {
+                ArrayList<Boolean> horList = new ArrayList<>(maxPiecesWidth);
+                for (int j = 0; j < maxPiecesWidth; j++) {
+                    horList.add(false);
+                }
+                discoveredFog.add(i, horList);
+            }
+            loc.setDiscoveredFog(discoveredFog);
+        }
 
-        int piecesWidth = (int) canvas.getWidth() / fogWidth + 2;
-        int piecesHeight = (int) canvas.getHeight() / offset + 2;
-        for (int i = 0; i < piecesHeight; i++) {
+        gc.setImageSmoothing(false);
+        double fogSize = Sizes.getFogSize();
+        double offset = 3.0/4 * fogSize;
+
+        double y = -1.0/4 * fogSize;
+        double x = 0;
+
+        for (int i = 0; i < maxPiecesHeight; i++) {
             if (i != 0) {
                 y += offset;
             }
-            for (int j = 0; j < piecesWidth; j++) {
+            for (int j = 0; j < maxPiecesWidth; j++) {
                 if (j == 0) {
                     if (i % 2 == 0) {
-                        x = -fogWidth/2;
+                        x = -fogSize/2;
                     } else {
-                        x = -fogWidth;
+                        x = -fogSize;
                     }
                 } else {
-                    x += fogWidth;
+                    x += fogSize;
                 }
+                nextPiecePos.x = x;
+                nextPiecePos.y = y;
+                Coords translatedPiecePos = translateCoordsToScreenCoords1(nextPiecePos);
                 boolean fogWithinVision = false;
                 for (Creature cr : heroes) {
                     double visionRange = cr.getVisionRange();
-                    translateCoordsToScreenCoords(cr.getCenter());
-                    double visWidth = visionRange * 2 * Sizes.getMeter();
-                    double visHeight = visionRange * 2.0/3 * 2 * Sizes.getMeter();
-//                    gc.setStroke(Color.WHITE);
-//                    double w = visWidth * Sizes.getMeter();
-//                    double h = visHeight * Sizes.getMeter();
-//                    gc.strokeOval(modifiedCoords.x * Sizes.getMeter() - w/2, modifiedCoords.y * Sizes.getMeter() - h/2, w, h);
-                    fogWithinVision = Coords.pointWithinOval(x, y, modifiedCoords.x * Sizes.getMeter(), modifiedCoords.y * Sizes.getMeter(), visWidth, visHeight);
+                    Coords translatedPos = translateCoordsToScreenCoords2(cr.getCenter());
+                    double visWidth = visionRange * 2;
+                    double visHeight = visionRange * 2.0/3 * 2;
+                    fogWithinVision = Coords.pointWithinOval(translatedPiecePos, translatedPos, visWidth, visHeight);
                     if (fogWithinVision) {
                         break;
                     }
                 }
-                if (!fogWithinVision) {
-                    drawFogPiece(x, y);
+                if (fogWithinVision) {
+                    discoveredFog.get(i).set(j, true);
+                } else {
+                    boolean pieceDiscovered = discoveredFog.get(i).get(j);
+                    if (pieceDiscovered) {
+                        gc.setGlobalAlpha(0.3);
+                        drawFogPiece(translatedPiecePos);
+                        gc.setGlobalAlpha(1);
+                    } else {
+                        drawFogPiece(translatedPiecePos);
+                    }
                 }
             }
         }
-        gc.setGlobalAlpha(1);
         gc.setImageSmoothing(true);
     }
 
-    private void drawFogPiece(int x, int y) {
-        gc.drawImage(fogPiece, x, y);
+    private void drawFogPiece(Coords pos) {
+        pos.x *= Sizes.getMeter();
+        pos.y *= Sizes.getMeter();
+        gc.drawImage(fogPiece, pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {
@@ -198,9 +221,9 @@ public class GameView extends CanvasView {
             }
 
             Coords pos = pi.getPos();
-            translateCoordsToScreenCoords(pos);
-            double x = modifiedCoords.x * Sizes.getMeter();
-            double y = modifiedCoords.y * Sizes.getMeter();
+            Coords translatedPos = translateCoordsToScreenCoords1(pos);
+            double x = translatedPos.x * Sizes.getMeter();
+            double y = translatedPos.y * Sizes.getMeter();
 
             if (pi instanceof Creature) {
                 drawCreatureSize((Creature) pi);
@@ -253,15 +276,13 @@ public class GameView extends CanvasView {
         if (selFirst.x == -1 || selSecond.x == -1) {
             return;
         }
-        final Coords first = selFirst;
-        translateCoordsToScreenCoords(first);
-        final int firstX = (int) (modifiedCoords.x * Sizes.getMeter());
-        final int firstY = (int) (modifiedCoords.y * Sizes.getMeter());
+        Coords translatedPos = translateCoordsToScreenCoords1(selFirst);
+        final int firstX = (int) (translatedPos.x * Sizes.getMeter());
+        final int firstY = (int) (translatedPos.y * Sizes.getMeter());
 
-        final Coords second = selSecond;
-        translateCoordsToScreenCoords(second);
-        final int secondX = (int) (modifiedCoords.x * Sizes.getMeter());
-        final int secondY = (int) (modifiedCoords.y * Sizes.getMeter());
+        translatedPos = translateCoordsToScreenCoords1(selSecond);
+        final int secondX = (int) (translatedPos.x * Sizes.getMeter());
+        final int secondY = (int) (translatedPos.y * Sizes.getMeter());
 
         int x = Math.min(firstX, secondX);
         int y = Math.min(firstY, secondY);
@@ -271,10 +292,18 @@ public class GameView extends CanvasView {
         gc.strokeRect(x, y, width, height);
     }
 
-    private void translateCoordsToScreenCoords(Coords pos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(curPos);
+    private Coords translateCoordsToScreenCoords1(Coords pos) {
+        modifiedCoords1.x = pos.x;
+        modifiedCoords1.y = pos.y;
+        modifiedCoords1.subtract(curPos);
+        return modifiedCoords1;
+    }
+
+    private Coords translateCoordsToScreenCoords2(Coords pos) {
+        modifiedCoords2.x = pos.x;
+        modifiedCoords2.y = pos.y;
+        modifiedCoords2.subtract(curPos);
+        return modifiedCoords2;
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
@@ -312,25 +341,25 @@ public class GameView extends CanvasView {
 
         if (selectionMode) {
             Coords pos = getMousePos(x, y, left, top);
-            modifiedCoords.x = pos.x;
-            modifiedCoords.y = pos.y;
-            modifiedCoords.add(curPos);
+            modifiedCoords1.x = pos.x;
+            modifiedCoords1.y = pos.y;
+            modifiedCoords1.add(curPos);
 
             if (selFirst.x == -1) {
-                selFirst.x = modifiedCoords.x;
-                selFirst.y = modifiedCoords.y;
+                selFirst.x = modifiedCoords1.x;
+                selFirst.y = modifiedCoords1.y;
             } else {
-                selSecond.x = modifiedCoords.x;
-                selSecond.y = modifiedCoords.y;
+                selSecond.x = modifiedCoords1.x;
+                selSecond.y = modifiedCoords1.y;
             }
         }
 
         if (constantWalk) {
             Coords pos = getMousePos(x, y, left, top);
-            modifiedCoords.x = pos.x;
-            modifiedCoords.y = pos.y;
-            modifiedCoords.add(curPos);
-            commandControllableGoTo(modifiedCoords);
+            modifiedCoords1.x = pos.x;
+            modifiedCoords1.y = pos.y;
+            modifiedCoords1.add(curPos);
+            commandControllableGoTo(modifiedCoords1);
         }
 
         if (Settings.isCenterOnPC()) {
@@ -416,9 +445,9 @@ public class GameView extends CanvasView {
         }
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenter();
-        translateCoordsToScreenCoords(centerBottomPos);
-        double x = modifiedCoords.x * Sizes.getMeter();
-        double y = modifiedCoords.y * Sizes.getMeter();
+        Coords translatedPos = translateCoordsToScreenCoords1(centerBottomPos);
+        double x = translatedPos.x * Sizes.getMeter();
+        double y = translatedPos.y * Sizes.getMeter();
         switch (control) {
             case CONTROL -> gc.setStroke(Color.GREEN);
             case ENEMY -> gc.setStroke(Color.RED);
@@ -561,11 +590,11 @@ public class GameView extends CanvasView {
 
     private void onMapSecondaryButtonClick(double x, double y) {
         Location location = controller.getCurrentLocation().getLocation();
-        modifiedCoords.x = x / Sizes.getMeter();
-        modifiedCoords.y = y / Sizes.getMeter();
-        modifiedCoords.add(curPos);
-        POSS[0].x = modifiedCoords.x;
-        POSS[0].y = modifiedCoords.y;
+        modifiedCoords1.x = x / Sizes.getMeter();
+        modifiedCoords1.y = y / Sizes.getMeter();
+        modifiedCoords1.add(curPos);
+        POSS[0].x = modifiedCoords1.x;
+        POSS[0].y = modifiedCoords1.y;
         PosItem pi = board.lookForContent(location, POSS, SECONDARY_ITEM_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
@@ -581,14 +610,14 @@ public class GameView extends CanvasView {
 
     private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
         Location location = controller.getCurrentLocation().getLocation();
-        modifiedCoords.x = x / Sizes.getMeter();
-        modifiedCoords.y = y / Sizes.getMeter();
-        modifiedCoords.add(curPos);
-        POSS[0].x = modifiedCoords.x;
-        POSS[0].y = modifiedCoords.y;
+        modifiedCoords1.x = x / Sizes.getMeter();
+        modifiedCoords1.y = y / Sizes.getMeter();
+        modifiedCoords1.add(curPos);
+        POSS[0].x = modifiedCoords1.x;
+        POSS[0].y = modifiedCoords1.y;
         PosItem pi = board.lookForContent(location, POSS, PRIMARY_ITEM_TYPES, false);
         if (pi == null) {
-            commandControllableGoTo(modifiedCoords);
+            commandControllableGoTo(modifiedCoords1);
             constantWalk = true;
         } else {
             boolean creatureSelected = false;

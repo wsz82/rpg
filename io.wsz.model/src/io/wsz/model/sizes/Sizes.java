@@ -15,6 +15,7 @@ public class Sizes {
     public static final double COVER_OPACITY = 0.4;
 
     private static int meter = CONSTANT_METER;
+    private static double fogSize = 0.5;
     private static FontSize fontSize = FontSize.M;
     private static int portraitSize;
 
@@ -36,6 +37,14 @@ public class Sizes {
     public static void setMeter(int resWidth) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
         Controller.get().clearHeroesPortraits();
+    }
+
+    public static double getFogSize() {
+        return fogSize;
+    }
+
+    public static void setFogSize(double fogSize) {
+        Sizes.fogSize = fogSize;
     }
 
     public static FontSize getFontSize() {
