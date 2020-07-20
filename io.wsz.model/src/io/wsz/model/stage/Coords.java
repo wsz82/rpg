@@ -74,6 +74,7 @@ public class Coords implements Externalizable {
     }
 
     public static void translateCoords(List<Coords> list, double x, double y) {
+        if (x == 0 && y == 0) return;
         list.forEach(c -> {
             c.x += x;
             c.y += y;
@@ -228,7 +229,7 @@ public class Coords implements Externalizable {
         return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
 
-    public static boolean polygonsIntersect(Coords nextPos,
+    public static boolean polygonsIntersect(double nextPosX, double nextPosY,
                                             List<List<Coords>> iPolygons, Coords oPos, List<List<Coords>> oPolygons) {
         if (iPolygons.isEmpty()) return false;
         if (oPolygons.isEmpty()) return false;
@@ -236,7 +237,7 @@ public class Coords implements Externalizable {
         for (List<Coords> rawIPolygon : iPolygons) {
 
             List<Coords> iPolygon = looseCoordsReferences1(rawIPolygon);
-            translateCoords(iPolygon, nextPos.x, nextPos.y);
+            translateCoords(iPolygon, nextPosX, nextPosY);
 
             for (List<Coords> rawOPolygon : oPolygons) {
 

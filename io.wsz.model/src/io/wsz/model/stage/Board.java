@@ -29,6 +29,8 @@ public class Board {
     private final List<Teleport> teleports = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
     private final Coords resultCoords = new Coords();
+    private final List<Coords> way = Collections.unmodifiableList(List.of(new Coords(), new Coords()));
+    private final List<List<Coords>> listOfWay = List.of(way);
     private final ItemType[] allTypes = ItemType.values();
 
     public static Board get() {
@@ -44,7 +46,7 @@ public class Board {
         return boardPos;
     }
 
-    public PosItem lookForContent(Location location, double x, double y, ItemType[] types, boolean includeLevelsBelow) {
+    public PosItem lookForItem(Location location, double x, double y, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         if (location == null) return null;
         allItems.addAll(location.getItems().get());
@@ -162,6 +164,45 @@ public class Board {
         return null;
     }
 
+    public PosItem getObstacleOnWay(Location location, int level, double fromX, double fromY, double toX, double toY) {
+        Coords from = way.get(0);
+        from.x = fromX;
+        from.y = fromY;
+        Coords to = way.get(1);
+        to.x = toX;
+        to.y = toY;
+
+        double left = Math.min(fromX, toX);
+        double right = Math.max(fromX, toX);
+        double top = Math.min(fromY, toY);
+        double bottom = Math.max(fromY, toY);
+
+        items.clear();
+        location.getItems().get().stream()
+                .filter(PosItem::getVisible)
+                .filter(pi -> {
+                    double piLeft = pi.getLeft();
+                    double piRight = pi.getRight();
+                    double piTop = pi.getTop();
+                    double piBottom = pi.getBottom();
+                    return Coords.doOverlap(
+                            left, top, right, bottom,
+                            piLeft, piTop, piRight, piBottom);
+                })
+                .filter(pi -> pi.getPos().level == level)
+                .collect(Collectors.toCollection(() -> items));
+
+        for (PosItem o : items) {
+            List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
+            if (oPolygons.isEmpty()) continue;
+            boolean obstacle = getWayCollision(o.getPos(), oPolygons);
+            if (obstacle) {
+                return o;
+            }
+        }
+        return null;
+    }
+
     public Teleport getTeleport(Coords nextPos, PosItem i, Location l) {
         teleports.clear();
         l.getItems().get().stream()
@@ -221,16 +262,24 @@ public class Board {
 
         } else {
 
-            if (getObstacleObstacleCollision(nextPos, iPolygons, o.getPos(), oPolygons)) return o;
+            if (getObstacleObstacleCollision(i, nextPos, iPolygons, o, o.getPos(), oPolygons)) return o;
 
         }
         return null;
     }
 
-    private boolean getObstacleObstacleCollision(Coords nextPos, List iPolygons, Coords oPos, List oPolygons) {
-        boolean collides = Coords.polygonsIntersect(nextPos, iPolygons, oPos, oPolygons);
+    private boolean getObstacleObstacleCollision(PosItem i, Coords nextPos, List iPolygons, PosItem o, Coords oPos, List oPolygons) {
+        boolean collides = Coords.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
-            System.out.println("Obstacle collides obstacle");
+            System.out.println(i.getName() + " collides " + o.getName());
+        }
+        return collides;
+    }
+
+    private boolean getWayCollision(Coords oPos, List oPolygons) {
+        boolean collides = Coords.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
+        if (collides) {
+            System.out.println("Way collision");
         }
         return collides;
     }

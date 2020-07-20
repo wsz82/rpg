@@ -37,9 +37,10 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
-    private static final ItemType[] PRIMARY_ITEM_TYPES =
+    private static final ItemType[] PRIMARY_TYPES =
             new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
-    private static final ItemType[] SECONDARY_ITEM_TYPES =
+    private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
+    private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
 
     private final Stage parent;
@@ -578,7 +579,7 @@ public class GameView extends CanvasView {
     }
 
     private void onMapSecondaryButtonClick(Location location, double x, double y) {
-        PosItem pi = board.lookForContent(location, x, y, SECONDARY_ITEM_TYPES, false);
+        PosItem pi = board.lookForItem(location, x, y, SECONDARY_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
         } else {
@@ -592,7 +593,13 @@ public class GameView extends CanvasView {
     }
 
     private void onMapPrimaryButtonClick(Location location, double x, double y, boolean multiple) {
-        PosItem pi = board.lookForContent(location, x, y, PRIMARY_ITEM_TYPES, false);
+        List<Creature> controlled = board.getControlledCreatures(location);
+        PosItem pi;
+        if (controlled.isEmpty()) {
+            pi = board.lookForItem(location, x, y, CREATURE_TYPE, false);
+        } else {
+            pi = board.lookForItem(location, x, y, PRIMARY_TYPES, false);
+        }
         if (pi == null) {
             commandControllableGoTo(x, y);
         } else {

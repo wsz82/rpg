@@ -2,7 +2,6 @@ package game.view.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -15,9 +14,6 @@ import javafx.scene.canvas.GraphicsContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static io.wsz.model.item.CreatureControl.CONTROL;
-import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
 
 public abstract class CanvasView {
     protected final Canvas canvas;
@@ -53,19 +49,6 @@ public abstract class CanvasView {
                 .collect(Collectors.toCollection(() -> items));
 
         board.sortPosItems(items);
-    }
-
-    protected List<Creature> getVisibleControllables(List<PosItem> items) {
-        visibleControllables.clear();
-        items.stream()
-                .filter(p -> p instanceof Creature)
-                .map(p -> (Creature) p)
-                .filter(c -> {
-                    CreatureControl control = c.getControl();
-                    return control.equals(CONTROLLABLE) || control.equals(CONTROL);
-                })
-                .collect(Collectors.toCollection(() -> visibleControllables));
-        return visibleControllables;
     }
 
     protected void adjustCoverOpacity(Creature cr, PosItem pi) {
