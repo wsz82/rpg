@@ -58,10 +58,10 @@ public class InventoryView {
 
     private void hookupEvents() {
         closeEvent = e -> {
-            synchronized (GameController.get().getGameRunner()) {
-                KeyCode code = e.getCode();
-                if (code.equals(KeyCode.I) || code.equals(KeyCode.ESCAPE)) {
-                    e.consume();
+            KeyCode code = e.getCode();
+            if (code.equals(KeyCode.I) || code.equals(KeyCode.ESCAPE)) {
+                e.consume();
+                synchronized (GameController.get().getGameRunner()) {
                     closeInventory();
                 }
             }

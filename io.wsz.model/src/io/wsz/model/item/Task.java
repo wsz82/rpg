@@ -43,13 +43,11 @@ public class Task implements Externalizable {
             }
             return;
         }
+        dest.x = -1;
         finished = true;
     }
 
     private void move(Creature cr) {
-        if (dest.x == -1) {
-            return;
-        }
         Inventory inventory = cr.getIndividualInventory();
         String name = cr.getName();
         if (inventory.getActualWeight() > inventory.getMaxWeight()) {
@@ -80,8 +78,6 @@ public class Task implements Externalizable {
         nextPos.y = y3;
         PosItem pi = cr.getCollision(cr.getCenter(nextPos));
         if (pi != null) {
-            cr.pos.x = x3 + (moveDist/dist * (x1 - x3)) / SECOND;
-            cr.pos.y = y3 + (moveDist/dist * (y1 - y3)) / SECOND;
             dest.x = -1;
             return;
         }
@@ -108,7 +104,7 @@ public class Task implements Externalizable {
         if (item instanceof Creature) {
             dest = cr.reverseCenterBottomPos(item.getCenter());
         } else {
-            dest = cr.reverseCenterBottomPos(item.getPos());
+            dest = cr.reverseCenterBottomPos(item.getInteractionCoords());
         }
         setDest(dest);
     }
@@ -121,6 +117,14 @@ public class Task implements Externalizable {
         this.dest.x = dest.x;
         this.dest.y = dest.y;
         this.dest.level = dest.level;
+    }
+
+    public void setDestX(double x) {
+        this.dest.x = x;
+    }
+
+    public void setDestY(double y) {
+        this.dest.y = y;
     }
 
     public boolean isFinished() {

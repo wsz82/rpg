@@ -250,10 +250,11 @@ public class EditorCanvas extends Canvas {
                             controller.getCurrentLocation().getLocation());
                     Coords translated = pos.clonePos();
                     translated.add(currentPos);
-                    Coords[] poss = new Coords[]{translated};
+                    double x = translated.x;
+                    double y = translated.y;
                     ItemType[] types = ItemType.values();
                     Location location = controller.getCurrentLocation().getLocation();
-                    pi = controller.getBoard().lookForContent(location, poss, types, true);
+                    pi = controller.getBoard().lookForContent(location, x, y, types, true);
                 }
                 if (pi != null) {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {

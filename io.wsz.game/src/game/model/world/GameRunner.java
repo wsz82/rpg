@@ -12,6 +12,7 @@ import io.wsz.model.sizes.Sizes;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ public class GameRunner {
     private final GameController gameController = GameController.get();
     private final Controller controller = Controller.get();
     private final Set<Location> heroesLocations = new HashSet<>(1);
+    private static final ArrayDeque<LaterRunner> laterRunBuffer = new ArrayDeque<>(0);
     private Thread gameThread;
 
     public GameRunner() {}
@@ -95,6 +97,10 @@ public class GameRunner {
         for (Location l : controller.getLocationsList()) {
             addItems(l);
             removeItems(l);
+        }
+
+        if (!laterRunBuffer.isEmpty()) {
+            laterRunBuffer.pop().run();
         }
 
         if (controller.isInventory() && Settings.isPauseOnInventory()) {
@@ -277,5 +283,9 @@ public class GameRunner {
                 o.getOpenImage();
             }
         }
+    }
+
+    public static void runLater(LaterRunner laterRunner) {
+        laterRunBuffer.addLast(laterRunner);
     }
 }

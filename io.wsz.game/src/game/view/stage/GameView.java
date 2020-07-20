@@ -2,6 +2,7 @@ package game.view.stage;
 
 import game.model.GameController;
 import game.model.setting.Settings;
+import game.model.world.GameRunner;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
@@ -36,7 +37,6 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
-    private static final Coords[] POSS = new Coords[]{new Coords()};
     private static final ItemType[] PRIMARY_ITEM_TYPES =
             new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
     private static final ItemType[] SECONDARY_ITEM_TYPES =
@@ -61,7 +61,6 @@ public class GameView extends CanvasView {
     private InventoryView inventoryView;
     private boolean dialogStarted = true;
     private boolean inventoryStarted = true;
-    private boolean constantWalk;
     private boolean selectionMode;
     private final Image fogPiece;
 
@@ -94,7 +93,6 @@ public class GameView extends CanvasView {
             return;
         }
         if (!dialogStarted) {
-            constantWalk = false;
             dialogStarted = true;
             hookUpRemovableEvents();
         }
@@ -110,7 +108,6 @@ public class GameView extends CanvasView {
             return;
         }
         if (!inventoryStarted) {
-            constantWalk = false;
             inventoryStarted = true;
             hookUpRemovableEvents();
         }
@@ -354,14 +351,6 @@ public class GameView extends CanvasView {
             }
         }
 
-        if (constantWalk) {
-            Coords pos = getMousePos(x, y, left, top);
-            modifiedCoords1.x = pos.x;
-            modifiedCoords1.y = pos.y;
-            modifiedCoords1.add(curPos);
-            commandControllableGoTo(modifiedCoords1);
-        }
-
         if (Settings.isCenterOnPC()) {
             Location location = controller.getCurrentLocation().getLocation();
             List<Creature> controlledCreatures = board.getControlledCreatures(location);
@@ -474,9 +463,11 @@ public class GameView extends CanvasView {
                 e.consume();
                 selectionMode = false;
                 boolean multiple = e.isShiftDown();
-                synchronized (gameController.getGameRunner()) {
-                    resolveSelection(selFirst, selSecond, multiple);
-                }
+                double left = selFirst.x;
+                double top = selFirst.y;
+                double right = selSecond.x;
+                double bottom = selSecond.y;
+                GameRunner.runLater(() -> resolveSelection(left, top, right, bottom, multiple));
                 selFirst.x = -1;
                 selFirst.y = -1;
                 selSecond.x = -1;
@@ -484,17 +475,8 @@ public class GameView extends CanvasView {
             }
         });
 
-        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            MouseButton button = e.getButton();
-            if (button.equals(MouseButton.PRIMARY)) {
-                e.consume();
-                constantWalk = false;
-            }
-        });
-
         CurrentLocation.get().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
-            constantWalk = false;
         });
 
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
@@ -505,9 +487,9 @@ public class GameView extends CanvasView {
         });
     }
 
-    private void resolveSelection(Coords selFirst, Coords selSecond, boolean multiple) {
+    private void resolveSelection(double left, double top, double right, double bottom, boolean multiple) {
         Location location = controller.getCurrentLocation().getLocation();
-        List<Creature> creatures = board.getControllablesWithinRectangle(selFirst, selSecond, location);
+        List<Creature> creatures = board.getControllablesWithinRectangle(left, top, right, bottom, location);
         creatures.forEach(c -> controller.getCreaturesToControl().add(c));
         if (!creatures.isEmpty() && !multiple) {
             board.looseCreaturesControl(location);
@@ -517,22 +499,31 @@ public class GameView extends CanvasView {
     private void defineRemovableEvents() {
         clickEvent = e -> {
             MouseButton button = e.getButton();
+            double x = e.getX();
+            double y = e.getY();
+
+            Location location = controller.getCurrentLocation().getLocation();
+            modifiedCoords1.x = x / Sizes.getMeter();
+            modifiedCoords1.y = y / Sizes.getMeter();
+            modifiedCoords1.add(curPos);
+            double finalX = modifiedCoords1.x;
+            double finalY = modifiedCoords1.y;
+
             if (button.equals(MouseButton.PRIMARY)) {
                 if (Settings.isShowBar()) {
                     double barLeft = barView.getLeft();
-                    if (e.getX() > barLeft) {
+                    if (x > barLeft) {
                         return;
                     }
                 }
                 e.consume();
-                synchronized (gameController.getGameRunner()) {
-                    onMapPrimaryButtonClick(e.getX(), e.getY(), e.isShiftDown());
-                }
+                boolean multiple = e.isShiftDown();
+                GameRunner.runLater(() -> {
+                    onMapPrimaryButtonClick(location, finalX, finalY, multiple);
+                });
             } else if (button.equals(MouseButton.SECONDARY)) {
                 e.consume();
-                synchronized (gameController.getGameRunner()) {
-                    onMapSecondaryButtonClick(e.getX(), e.getY());
-                }
+                GameRunner.runLater(() -> onMapSecondaryButtonClick(location, finalX, finalY));
             }
         };
         keyboardEvent = e -> {
@@ -548,9 +539,7 @@ public class GameView extends CanvasView {
                 }
                 case I -> {
                     e.consume();
-                    synchronized (gameController.getGameRunner()) {
-                        openInventory();
-                    }
+                    GameRunner.runLater(this::openInventory);
                 }
                 case SPACE -> {
                     e.consume();
@@ -558,7 +547,7 @@ public class GameView extends CanvasView {
                 }
                 case PAGE_UP -> {
                     e.consume();
-                    synchronized (gameController.getGameRunner()) {
+                    GameRunner.runLater(() -> {
                         Layer layer = controller.getCurrentLayer().getLayer();
                         Layer next = layer;
                         for (int i = 0; i < layers.size() - 1; i++) {
@@ -568,11 +557,11 @@ public class GameView extends CanvasView {
                             }
                         }
                         controller.getCurrentLayer().setLayer(next);
-                    }
+                    });
                 }
                 case PAGE_DOWN -> {
                     e.consume();
-                    synchronized (gameController.getGameRunner()) {
+                    GameRunner.runLater(() -> {
                         Layer layer = controller.getCurrentLayer().getLayer();
                         Layer prev = layer;
                         for (int i = 1; i < layers.size(); i++) {
@@ -582,20 +571,14 @@ public class GameView extends CanvasView {
                             }
                         }
                         controller.getCurrentLayer().setLayer(prev);
-                    }
+                    });
                 }
             }
         };
     }
 
-    private void onMapSecondaryButtonClick(double x, double y) {
-        Location location = controller.getCurrentLocation().getLocation();
-        modifiedCoords1.x = x / Sizes.getMeter();
-        modifiedCoords1.y = y / Sizes.getMeter();
-        modifiedCoords1.add(curPos);
-        POSS[0].x = modifiedCoords1.x;
-        POSS[0].y = modifiedCoords1.y;
-        PosItem pi = board.lookForContent(location, POSS, SECONDARY_ITEM_TYPES, false);
+    private void onMapSecondaryButtonClick(Location location, double x, double y) {
+        PosItem pi = board.lookForContent(location, x, y, SECONDARY_ITEM_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
         } else {
@@ -608,17 +591,10 @@ public class GameView extends CanvasView {
                 .forEach(c -> c.onSecondAction(pi));
     }
 
-    private void onMapPrimaryButtonClick(double x, double y, boolean multiple) {
-        Location location = controller.getCurrentLocation().getLocation();
-        modifiedCoords1.x = x / Sizes.getMeter();
-        modifiedCoords1.y = y / Sizes.getMeter();
-        modifiedCoords1.add(curPos);
-        POSS[0].x = modifiedCoords1.x;
-        POSS[0].y = modifiedCoords1.y;
-        PosItem pi = board.lookForContent(location, POSS, PRIMARY_ITEM_TYPES, false);
+    private void onMapPrimaryButtonClick(Location location, double x, double y, boolean multiple) {
+        PosItem pi = board.lookForContent(location, x, y, PRIMARY_ITEM_TYPES, false);
         if (pi == null) {
-            commandControllableGoTo(modifiedCoords1);
-            constantWalk = true;
+            commandControllableGoTo(x, y);
         } else {
             boolean creatureSelected = false;
             if (pi instanceof Creature) {
@@ -627,18 +603,17 @@ public class GameView extends CanvasView {
             }
             if (!creatureSelected) {
                 commandControllableFirstAction(pi);
-                constantWalk = true;
             }
         }
     }
 
     private void hookUpRemovableEvents() {
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
+        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         canvas.addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
     private void removeEvents() {
-        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickEvent);
+        canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
@@ -698,10 +673,10 @@ public class GameView extends CanvasView {
                 .forEach(c -> c.onFirstAction(pi));
     }
 
-    private void commandControllableGoTo(Coords pos) {
+    private void commandControllableGoTo(double x, double y) {
         Location location = controller.getCurrentLocation().getLocation();
         board.getControlledCreatures(location)
-                .forEach(c -> c.goTo(pos));
+                .forEach(c -> c.goTo(x, y));
     }
 
     private void setSize() {

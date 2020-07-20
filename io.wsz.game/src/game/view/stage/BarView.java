@@ -1,7 +1,7 @@
 package game.view.stage;
 
-import game.model.GameController;
 import game.model.setting.Settings;
+import game.model.world.GameRunner;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
@@ -70,9 +70,8 @@ public class BarView {
             if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
                 if (hoveredPortrait != -1) {
-                    synchronized (GameController.get().getGameRunner()) {
-                        resolveHeroControlAndLocation(e.isShiftDown());
-                    }
+                    int hoveredPortraitIndex = hoveredPortrait;
+                    GameRunner.runLater(() -> resolveHeroControlAndLocation(e.isShiftDown(), hoveredPortraitIndex));
                 }
             }
         };
@@ -105,7 +104,7 @@ public class BarView {
         resolveCreatureControlAndLocation(portraits.get(i));
     }
 
-    private void resolveHeroControlAndLocation(boolean multiple) {
+    private void resolveHeroControlAndLocation(boolean multiple, int hoveredPortrait) {
         if (!multiple){
             Location location = Controller.get().getCurrentLocation().getLocation();
             Controller.get().getBoard().looseCreaturesControl(location);

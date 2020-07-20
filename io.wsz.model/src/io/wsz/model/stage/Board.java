@@ -44,7 +44,7 @@ public class Board {
         return boardPos;
     }
 
-    public PosItem lookForContent(Location location, Coords[] poss, ItemType[] types, boolean includeLevelsBelow) {
+    public PosItem lookForContent(Location location, double x, double y, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         if (location == null) return null;
         allItems.addAll(location.getItems().get());
@@ -73,55 +73,40 @@ public class Board {
         this.sortPosItems(items);
         Collections.reverse(items);
 
+        int pixelX = (int) (x * Sizes.getMeter());
+        int pixelY = (int) (y * Sizes.getMeter());
+
         for (PosItem pi : items) {
-            for (Coords pos : poss) {
-                int x = (int) (pos.x * Sizes.getMeter());
-                int y = (int) (pos.y * Sizes.getMeter());
-
-                int cX = (int) (pi.getPos().x * Sizes.getMeter());
-                int cWidth = (int) pi.getImage().getWidth();
-                boolean fitX = x >= cX && x <= cX + cWidth;
-                if (!fitX) {
-                    continue;
-                }
-
-                int cY = (int) (pi.getPos().y * Sizes.getMeter());
-                int cHeight = (int) pi.getImage().getHeight();
-                boolean fitY = y >= cY && y <= cY + cHeight;
-                if (!fitY) {
-                    continue;
-                }
-
-                Image img = pi.getImage();
-                int imgX = x - cX;
-                int imgY = y - cY;
-                Color color;
-                try {
-                    color = img.getPixelReader().getColor(imgX, imgY);
-                } catch (IndexOutOfBoundsException e) {
-                    continue;
-                }
-                boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-                if (isPixelTransparent) {
-                    continue;
-                }
-                return pi;
+            int cX = (int) (pi.getPos().x * Sizes.getMeter());
+            int cWidth = (int) pi.getImage().getWidth();
+            boolean fitX = pixelX >= cX && pixelX <= cX + cWidth;
+            if (!fitX) {
+                continue;
             }
+
+            int cY = (int) (pi.getPos().y * Sizes.getMeter());
+            int cHeight = (int) pi.getImage().getHeight();
+            boolean fitY = pixelY >= cY && pixelY <= cY + cHeight;
+            if (!fitY) {
+                continue;
+            }
+
+            Image img = pi.getImage();
+            int imgX = pixelX - cX;
+            int imgY = pixelY - cY;
+            Color color;
+            try {
+                color = img.getPixelReader().getColor(imgX, imgY);
+            } catch (IndexOutOfBoundsException e) {
+                continue;
+            }
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (isPixelTransparent) {
+                continue;
+            }
+            return pi;
         }
         return null;
-    }
-
-    public List<Creature> getCreatures(Location location) {
-        creatures.clear();
-        location.getItems().get().stream()
-                .filter(pi -> {
-                    int level = Controller.get().getCurrentLayer().getLevel(); // TODO
-                    return pi.getPos().level == level;
-                })
-                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
-                .map(pi -> (Creature) pi)
-                .collect(Collectors.toCollection(() -> creatures));
-        return creatures;
     }
 
     public List<Creature> getControlledCreatures(Location location) {
@@ -405,26 +390,22 @@ public class Board {
         Controller.get().getCreaturesToLooseControl().addAll(creatures);
     }
 
-    public List<Creature> getControllablesWithinRectangle(Coords first, Coords second, Location location) {
-        double left;
-        double right;
-        if (first.x <= second.x) {
-            left = first.x;
-            right = second.x;
-        } else {
-            left = second.x;
-            right = first.x;
+    public List<Creature> getControllablesWithinRectangle(double left, double top, double right, double bottom, Location location) {
+        if (left > right) {
+            double tempLeft = left;
+            left = right;
+            right = tempLeft;
         }
-        double top;
-        double bottom;
-        if (first.y <= second.y) {
-            top = first.y;
-            bottom = second.y;
-        } else {
-            top = second.y;
-            bottom = first.y;
+        if (top > bottom) {
+            double tempTop = top;
+            top = bottom;
+            bottom = tempTop;
         }
         creatures.clear();
+        double finalLeft = left;
+        double finalRight = right;
+        double finalTop = top;
+        double finalBottom = bottom;
         location.getItems().get().stream()
                 .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
@@ -434,8 +415,8 @@ public class Board {
                     Coords centerBottom = c.getCenter();
                     double x = centerBottom.x;
                     double y = centerBottom.y;
-                    return x > left && x < right
-                            && y > top && y < bottom;
+                    return x > finalLeft && x < finalRight
+                            && y > finalTop && y < finalBottom;
                 })
                 .collect(Collectors.toCollection(() -> creatures));
         return creatures;

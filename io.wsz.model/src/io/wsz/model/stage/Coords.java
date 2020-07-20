@@ -167,7 +167,7 @@ public class Coords implements Externalizable {
             if (p2dist < powRadius) return true;
 
             if (powDist < powRadius) {
-                double dist = sqrt(powDist);
+                double dist = sqrt(powDist) + 0.01; //TODO collision with horizontal line
                 temp1.x = x1;
                 temp1.y = y1;
                 temp2.x = x2;

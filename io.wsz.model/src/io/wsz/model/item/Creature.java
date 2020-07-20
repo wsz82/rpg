@@ -23,7 +23,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
     private final Coords centerBottom = new Coords();
-    private final Coords reversCenterBottom = new Coords();
+    private final Coords reversedCenterBottom = new Coords();
 
     private Location enteredToFlag;
 
@@ -129,16 +129,28 @@ public class Creature extends PosItem<Creature> implements Containable {
         return centerBottom;
     }
 
-    public Coords reverseCenterBottomPos(Coords difPos) {
-        if (difPos == null) {
-            return null;
-        }
+    public Coords reverseCenterBottomPos(double x, double y) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
-        reversCenterBottom.x = difPos.x - width/2;
-        reversCenterBottom.y = difPos.y - height;
-        reversCenterBottom.level = difPos.level;
-        return reversCenterBottom;
+        reversedCenterBottom.x = x - width/2;
+        reversedCenterBottom.y = y - height;
+        return reversedCenterBottom;
+    }
+
+    public double reverseCenterBottomPosX(double x) {
+        double width = getImage().getWidth() / Sizes.getMeter();
+        x -= width/2;
+        return x;
+    }
+
+    public double reverseCenterBottomPosY(double y) {
+        double height = getImage().getHeight() / Sizes.getMeter();
+        y -= height;
+        return y;
+    }
+
+    public Coords reverseCenterBottomPos(Coords difPos) {
+        return reverseCenterBottomPos(difPos.x, difPos.y);
     }
 
     public void onFirstAction(PosItem pi) {
@@ -148,9 +160,10 @@ public class Creature extends PosItem<Creature> implements Containable {
         setItemTask(pi);
     }
 
-    public void goTo(Coords pos) {
+    public void goTo(double x, double y) {
         this.task.setFinished(false);
-        this.task.setDest(reverseCenterBottomPos(pos));
+        this.task.setDestX(reverseCenterBottomPosX(x));
+        this.task.setDestY(reverseCenterBottomPosY(y));
     }
 
     private void setItemTask(PosItem e) {
@@ -172,9 +185,6 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private void checkTask() {
-        if (task.getDest() == null && task.getItem() == null) {
-            return;
-        }
         task.doTask(this);
     }
 
