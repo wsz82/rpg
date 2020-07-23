@@ -94,9 +94,10 @@ public class ContainerView extends EquipmentView {
     }
 
     @Override
-    public void remove(Equipment e, Creature cr) {
+    public boolean remove(Equipment e, Creature cr) {
         getItems().remove(e);
         System.out.println(e.getName() + " removed from " + container.getName());
+        return true;
     }
 
     @Override

@@ -125,9 +125,10 @@ public class HoldView extends EquipmentView {
     }
 
     @Override
-    public void remove(Equipment e, Creature cr) {
+    public boolean remove(Equipment e, Creature cr) {
         inventory.remove(e);
         System.out.println(e.getName() + " removed from " + cr.getName() + " inventory");
+        return true;
     }
 
     @Override

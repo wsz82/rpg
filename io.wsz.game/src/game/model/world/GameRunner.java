@@ -21,11 +21,17 @@ import java.util.stream.Collectors;
 import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
+    private static final ArrayDeque<LaterRunner> laterRunBuffer = new ArrayDeque<>(0);
+
     private final GameController gameController = GameController.get();
     private final Controller controller = Controller.get();
     private final Set<Location> heroesLocations = new HashSet<>(1);
-    private static final ArrayDeque<LaterRunner> laterRunBuffer = new ArrayDeque<>(0);
+
     private Thread gameThread;
+
+    public static void runLater(LaterRunner laterRunner) {
+        laterRunBuffer.addLast(laterRunner);
+    }
 
     public GameRunner() {}
 
@@ -283,9 +289,5 @@ public class GameRunner {
                 o.getOpenImage();
             }
         }
-    }
-
-    public static void runLater(LaterRunner laterRunner) {
-        laterRunBuffer.addLast(laterRunner);
     }
 }

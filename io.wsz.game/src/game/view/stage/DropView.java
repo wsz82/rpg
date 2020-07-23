@@ -150,9 +150,12 @@ public class DropView extends EquipmentView {
     }
 
     @Override
-    public void remove(Equipment e, Creature cr) {
-        e.onTake(cr, 0, 0);
-        droppedEquipment.remove(e);
+    public boolean remove(Equipment e, Creature cr) {
+        if (e.onTake(cr, 0, 0)) {
+            droppedEquipment.remove(e);
+            return true;
+        }
+        return false;
     }
 
     @Override

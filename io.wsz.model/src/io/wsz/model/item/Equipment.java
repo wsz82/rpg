@@ -75,13 +75,29 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public abstract E cloneEquipment();
 
     @Override
-    public void onTake(Creature cr, double x, double y) {
-        pos.x = x;
-        pos.y = y;
-        pos.level = 0;
-        setVisible(false);
-        cr.pos.getLocation().getItemsToRemove().add(this);
-        System.out.println(this.getName() + " taken");
+    public boolean onTake(Creature cr, double x, double y) {
+        Coords crCenter = cr.getCenter();
+        double xFrom = crCenter.x;
+        double yFrom = crCenter.y;
+        Coords toCoords = getInteractionCoords();
+        double xTo = toCoords.x;
+        double yTo = toCoords.y;
+        PosItem obstacleOnWay = Controller.get().getBoard().getObstacleOnWay(
+                pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
+
+        if (obstacleOnWay != null) {
+            String message = getName() + " cannot be taken: behind " + obstacleOnWay.getName();
+            System.out.println(message);
+            return false;
+        } else {
+            pos.x = x;
+            pos.y = y;
+            pos.level = 0;
+            setVisible(false);
+            cr.pos.getLocation().getItemsToRemove().add(this);
+            System.out.println(getName() + " taken");
+            return true;
+        }
     }
 
     @Override
@@ -95,22 +111,28 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         pos.level = cr.getPos().level;
         Location l = cr.getPos().getLocation();
         pos.setLocation(l);
-        PosItem obstacle = this.getCollision();
         boolean outOfLocation = x < 0 || y < 0
                 || x > l.getWidth() || y > l.getHeight();
+        PosItem obstacle = null;
+        if (!outOfLocation) {
+            obstacle = getCollision();
+        }
         PosItem obstacleOnWay = null;
         if (obstacle == null) {
             Coords crCenter = cr.getCenter();
             double xFrom = crCenter.x;
             double yFrom = crCenter.y;
-            obstacleOnWay = Controller.get().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, x, y);
+            Coords toCoords = getInteractionCoords();
+            double xTo = toCoords.x;
+            double yTo = toCoords.y;
+            obstacleOnWay = Controller.get().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);
         }
         if (obstacle != null || outOfLocation || obstacleOnWay != null) {
             pos.x = tempX;
             pos.y = tempY;
             pos.level = tempLevel;
             pos.setLocation(tempLocation);
-            String message = this.getName() + " cannot be dropped here";
+            String message = getName() + " cannot be dropped here";
             if (obstacle != null) {
                 message += ": collides with " + obstacle.getName();
             } else if (outOfLocation) {
@@ -122,7 +144,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
             return false;
         } else {
             l.getItemsToAdd().add(this);
-            System.out.println(this.getName() + " dropped");
+            System.out.println(getName() + " dropped");
             return true;
         }
     }

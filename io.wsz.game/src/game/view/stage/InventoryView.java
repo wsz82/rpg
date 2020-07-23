@@ -106,8 +106,9 @@ public class InventoryView {
         Container con = Controller.get().getContainerToOpen();
         if (eq == con) return;
         if (eq != null) {
-            ev.remove(eq, Controller.get().getCreatureToOpenInventory());
-            dragged[0] = eq.cloneEquipment();
+            if (ev.remove(eq, Controller.get().getCreatureToOpenInventory())) {
+                dragged[0] = eq.cloneEquipment();
+            }
         }
     }
 

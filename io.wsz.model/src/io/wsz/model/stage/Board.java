@@ -164,7 +164,7 @@ public class Board {
         return null;
     }
 
-    public PosItem getObstacleOnWay(Location location, int level, double fromX, double fromY, double toX, double toY) {
+    public PosItem getObstacleOnWay(Location location, int level, double fromX, double fromY, PosItem i, double toX, double toY) {
         Coords from = way.get(0);
         from.x = fromX;
         from.y = fromY;
@@ -193,6 +193,7 @@ public class Board {
                 .collect(Collectors.toCollection(() -> items));
 
         for (PosItem o : items) {
+            if (o == i) continue;
             List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
             if (oPolygons.isEmpty()) continue;
             boolean obstacle = getWayCollision(o.getPos(), oPolygons);

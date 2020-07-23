@@ -123,7 +123,7 @@ public abstract class EquipmentView extends CanvasView {
         gc.strokeText(max, x, y);
     }
 
-    public abstract void remove(Equipment e, Creature cr);
+    public abstract boolean remove(Equipment e, Creature cr);
 
     public abstract void add(Equipment e, Creature cr, double x, double y);
 

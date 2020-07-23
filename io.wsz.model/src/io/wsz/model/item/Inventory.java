@@ -25,12 +25,16 @@ public class Inventory implements Externalizable {
     }
 
     public boolean add(Equipment equipment) {
-        double size = equipment.getSize();
-        if (getFilledSpace() + size > getMaxSize()) {
-            return false;
+        if (fitsInventory(equipment)) {
+            items.add(equipment);
+            return true;
         }
-        items.add(equipment);
-        return true;
+        return false;
+    }
+
+    public boolean fitsInventory(Equipment equipment) {
+        double size = equipment.getSize();
+        return getFilledSpace() + size < getMaxSize();
     }
 
     public void remove(Equipment e) {
