@@ -6,20 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node<A extends PosItem> {
-    private A content;
+    private A item;
     private final List<Node<A>> greater = new ArrayList<>(0);
     private final List<Node<A>> lesser = new ArrayList<>(0);
 
-    public Node(A content) {
-        this.content = content;
+    public Node(A item) {
+        this.item = item;
     }
 
     public A getItem() {
-        return content;
+        return item;
     }
 
-    public void setContent(A content) {
-        this.content = content;
+    public void setItem(A item) {
+        this.item = item;
     }
 
     public List<Node<A>> getGreater() {

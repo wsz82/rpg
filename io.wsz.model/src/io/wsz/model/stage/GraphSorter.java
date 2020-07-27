@@ -10,7 +10,7 @@ import static io.wsz.model.stage.ItemsComparator.Comparison.LESS;
 import static io.wsz.model.stage.ItemsComparator.compare;
 
 public class GraphSorter<A extends PosItem> {
-    private final Graph<A> graph = new Graph<A>(new ArrayList<>(0));
+    private final Graph<A> graph = new Graph<>(new ArrayList<>(0));
     private final List<A> sortedItems = new ArrayList<>(0);
 
     public void sortItems(List<A> items) {
@@ -20,12 +20,24 @@ public class GraphSorter<A extends PosItem> {
         }
 
         List<Node<A>> nodes = graph.getNodes();
-        nodes.clear();
 
-        for (A pi : items) {
-            Node<A> newNode = new Node<A>(pi);
+        int dif = items.size() - nodes.size();
+        if (dif > 0) {
+            for (int i = 0; i < dif; i++) {
+                Node<A> newNode = new Node<>(null);
+                nodes.add(newNode);
+            }
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            A pi = items.get(i);
+            Node<A> newNode = nodes.get(i);
+            newNode.setItem(pi);
 
             for (Node<A> n : nodes) {
+                if (n == newNode) continue;
+                A item = n.getItem();
+                if (item == null) break;
                 ItemsComparator.Comparison result = compare(pi, n);
 
                 if (result.equals(GREAT)) {
@@ -36,21 +48,30 @@ public class GraphSorter<A extends PosItem> {
                     newNode.getGreater().add(n);
                 }
             }
-            nodes.add(newNode);
         }
 
         sortedItems.clear();
         if (!nodes.isEmpty()) {
             Node<A> n = nodes.get(0);
-            int size  = nodes.size();
+
+            int size = 0;
+            for (Node<A> node : nodes) {
+                if (node.getItem() != null) size++;
+            }
+
             while (size > 0) {
+                if (n == null || n.getItem() == null) {
+                    for (Node<A> node : nodes) {
+                        if (node.getItem() != null) n = node;
+                    }
+                }
                 if (n == null) {
-                    n = nodes.get(0);
+                    break;
                 }
                 Node<A> min = findMin(n);
 
                 sortedItems.add(min.getItem());
-                nodes.remove(min);
+                clearNode(min);
 
                 size = size - 1;
 
@@ -60,6 +81,12 @@ public class GraphSorter<A extends PosItem> {
             items.clear();
             items.addAll(sortedItems);
         }
+    }
+
+    private void clearNode(Node<A> n) {
+        n.setItem(null);
+        n.getGreater().clear();
+        n.getLesser().clear();
     }
 
     private Node<A> findFirstNotEmptyGreater(Node<A> last) {
