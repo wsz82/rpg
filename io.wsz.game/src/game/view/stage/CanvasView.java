@@ -27,10 +27,8 @@ public abstract class CanvasView {
         gc = canvas.getGraphicsContext2D();
     }
 
-    protected void sortItems(Location location, Coords currentPos, double width, double height, List<PosItem> items, int level) {
-        double left = currentPos.x;
+    protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem> items, int level) {
         double right = left + width;
-        double top = currentPos.y;
         double bottom = top + height;
 
         items.clear();

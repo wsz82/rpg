@@ -101,7 +101,7 @@ public class InventoryView {
         EquipmentView ev = getEquipmentView(mouseX, mouseY);
         if (ev == null) return;
         origin = ev;
-        translateScreenCoordsToCoords(mousePos, ev.getCurrentPos(), ev.getViewPos());
+        translateScreenCoordsToCoords(mousePos, ev.getCurPos(), ev.getViewPos());
         Equipment eq = lookForEquipment(modifiedCoords.x, modifiedCoords.y, ev);
         Container con = Controller.get().getContainerToOpen();
         if (eq == con) return;
@@ -130,7 +130,7 @@ public class InventoryView {
     }
 
     private void checkFit(EquipmentView ev, Equipment e, Coords local) {
-        Coords currentPos = ev.getCurrentPos();
+        Coords currentPos = ev.getCurPos();
         if (local.x < currentPos.x) {
             local.x = currentPos.x;
         } else {
@@ -313,7 +313,7 @@ public class InventoryView {
     }
 
     public Equipment lookForEquipment(double x, double y, EquipmentView ev) {
-        Coords currentPos = ev.getCurrentPos();
+        Coords currentPos = ev.getCurPos();
         if (x < currentPos.x || x > currentPos.x + ev.getViewWidth()) return null;
         if (y < currentPos.y || y > currentPos.y + ev.getViewHeight()) return null;
         lookedEquipment.clear();

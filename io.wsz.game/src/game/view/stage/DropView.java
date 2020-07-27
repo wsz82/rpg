@@ -107,7 +107,7 @@ public class DropView extends EquipmentView {
     private Coords currentPosCorrection(Coords pos) {
         modifiedCoords.x = pos.x;
         modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(currentPos);
+        modifiedCoords.subtract(curPos);
         return modifiedCoords;
     }
 
@@ -130,7 +130,7 @@ public class DropView extends EquipmentView {
         Creature cr = controller.getCreatureToOpenInventory();
         Location loc = cr.getPos().getLocation();
 
-        sortItems(loc, currentPos, viewWidth, viewHeight, allItmes, cr.getPos().level);
+        sortItems(loc, curPos.x, curPos.y, viewWidth, viewHeight, allItmes, cr.getPos().level);
     }
 
     public void setDroppedEquipment(List<Equipment> droppedEquipment) {

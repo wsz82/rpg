@@ -16,7 +16,7 @@ public abstract class EquipmentView extends CanvasView {
     protected final List<Equipment> items = new ArrayList<>(0);
     protected final Coords modifiedCoords = new Coords();
     protected final Coords viewPos = new Coords();
-    protected final Coords currentPos = new Coords();
+    protected final Coords curPos = new Coords();
 
     protected double viewWidth;
     protected double viewHeight;
@@ -35,9 +35,9 @@ public abstract class EquipmentView extends CanvasView {
     protected abstract void drawEquipment();
 
     protected void selectEquipment() {
-        double left = currentPos.x;
+        double left = curPos.x;
         double right = left + viewWidth;
-        double top = currentPos.y;
+        double top = curPos.y;
         double bottom = top + viewHeight;
 
         items.clear();
@@ -59,7 +59,7 @@ public abstract class EquipmentView extends CanvasView {
     protected Coords translateCoordsToScreenCoords(Coords pos) {
         modifiedCoords.x = pos.x;
         modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(currentPos);
+        modifiedCoords.subtract(curPos);
         modifiedCoords.add(viewPos);
         return modifiedCoords;
     }
@@ -68,7 +68,7 @@ public abstract class EquipmentView extends CanvasView {
         modifiedCoords.x = pos.x;
         modifiedCoords.y = pos.y;
         modifiedCoords.subtract(viewPos);
-        modifiedCoords.add(currentPos);
+        modifiedCoords.add(curPos);
         return modifiedCoords;
     }
 
@@ -86,12 +86,12 @@ public abstract class EquipmentView extends CanvasView {
     }
 
     public void setCurrentPos(double x, double y) {
-        currentPos.x = x;
-        currentPos.y = y;
+        curPos.x = x;
+        curPos.y = y;
     }
 
-    public Coords getCurrentPos() {
-        return currentPos;
+    public Coords getCurPos() {
+        return curPos;
     }
 
     public void setViewPos(double x, double y) {
@@ -131,23 +131,23 @@ public abstract class EquipmentView extends CanvasView {
 
     public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
         if (mousePos.x < viewPos.x) {
-            mousePos.x = currentPos.x;
+            mousePos.x = curPos.x;
         } else {
             double width = viewWidth - e.getImageWidth();
             if (mousePos.x > viewPos.x + width) {
-                mousePos.x = currentPos.x + width;
+                mousePos.x = curPos.x + width;
             } else {
-                mousePos.x = mousePos.x - viewPos.x + currentPos.x - draggedCoords.x;
+                mousePos.x = mousePos.x - viewPos.x + curPos.x - draggedCoords.x;
             }
         }
         if (mousePos.y < viewPos.y) {
-            mousePos.y = currentPos.y;
+            mousePos.y = curPos.y;
         } else {
             double height = viewHeight - e.getImageHeight();
             if (mousePos.y > viewPos.y + height) {
-                mousePos.y = currentPos.y + height;
+                mousePos.y = curPos.y + height;
             } else {
-                mousePos.y = mousePos.y - viewPos.y + currentPos.y - draggedCoords.y;
+                mousePos.y = mousePos.y - viewPos.y + curPos.y - draggedCoords.y;
             }
         }
         return mousePos;

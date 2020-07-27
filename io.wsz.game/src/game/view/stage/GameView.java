@@ -54,6 +54,7 @@ public class GameView extends CanvasView {
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView = new BarView(canvas);
+    private final Image fogPiece;
 
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
@@ -63,7 +64,6 @@ public class GameView extends CanvasView {
     private boolean dialogStarted = true;
     private boolean inventoryStarted = true;
     private boolean selectionMode;
-    private final Image fogPiece;
 
     public GameView(Stage parent) {
         super(new Canvas());
@@ -266,8 +266,7 @@ public class GameView extends CanvasView {
         int level = controller.getCurrentLayer().getLevel();
         double canvasWidth = canvas.getWidth() / Sizes.getMeter();
         double canvasHeight = canvas.getHeight() / Sizes.getMeter();
-        sortItems(location, curPos, canvasWidth, canvasHeight,
-                items, level);
+        sortItems(location, curPos.x, curPos.y, canvasWidth, canvasHeight, items, level);
     }
 
     private void drawSelection() {
