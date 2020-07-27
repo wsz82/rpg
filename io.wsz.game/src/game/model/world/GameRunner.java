@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
-    private static final ArrayDeque<LaterRunner> laterRunBuffer = new ArrayDeque<>(0);
+    private static final ArrayDeque<Runnable> laterRunBuffer = new ArrayDeque<>(0);
 
     private final GameController gameController = GameController.get();
     private final Controller controller = Controller.get();
@@ -29,7 +29,7 @@ public class GameRunner {
 
     private Thread gameThread;
 
-    public static void runLater(LaterRunner laterRunner) {
+    public static void runLater(Runnable laterRunner) {
         laterRunBuffer.addLast(laterRunner);
     }
 
