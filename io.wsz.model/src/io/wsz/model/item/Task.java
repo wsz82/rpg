@@ -72,8 +72,9 @@ public class Task implements Externalizable {
         }
         double dist = Coords.getDistance(cr.pos, dest);
         double moveDist = cr.getSpeed();
-        double x3 = x1 + (moveDist/dist * (x2 - x1)) / SECOND;
-        double y3 = y1 + (moveDist/dist * (y2 - y1)) / SECOND;
+        double x3 = x1 + (moveDist * (x2 - x1) / dist) / SECOND;
+        double y3 = y1 + (moveDist * (y2 - y1) / dist) / SECOND;
+
         nextPos.x = x3;
         nextPos.y = y3;
         PosItem pi = cr.getCollision(cr.getCenter(nextPos));

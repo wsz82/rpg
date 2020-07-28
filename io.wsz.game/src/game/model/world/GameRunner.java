@@ -29,6 +29,8 @@ public class GameRunner {
 
     private Thread gameThread;
 
+    private final long[] viewStart = new long[1];
+
     public static void runLater(Runnable laterRunner) {
         laterRunBuffer.addLast(laterRunner);
     }
@@ -67,7 +69,15 @@ public class GameRunner {
 
     private void runGameThread() {
         gameThread = new Thread(() -> {
+            long startGameLoop = System.currentTimeMillis();
             while (true) {
+                long startGameLoopNext = System.currentTimeMillis();
+                long loopDif = startGameLoopNext - startGameLoop;
+                if (loopDif > 20) {
+                    System.out.println("Loop dif: " + loopDif);
+                }
+                startGameLoop = startGameLoopNext;
+
                 if (!gameController.isGame()) {
                     continue;
                 }
@@ -75,18 +85,38 @@ public class GameRunner {
                     updateModel();
                 }
 
-                try {
-                    Thread.sleep(TURN_DURATION_MILLIS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
                 Platform.runLater(() -> {
                     synchronized (this) {
+                        long startNext = System.currentTimeMillis();
+                        long viewLoopDif = startNext - viewStart[0];
+                        if (viewLoopDif > 20) {
+                            System.out.println("View loop dif: " + viewLoopDif);
+                        }
+                        viewStart[0] = startNext;
+
                         updateView();
+
+                        long end = System.currentTimeMillis();
+                        long dif = end - viewStart[0];
+                        if (dif > 20) {
+                            System.out.println("View: " + dif);
+                        }
                     }
                 });
 
+                long endGameLoop = System.currentTimeMillis();
+                long dif = endGameLoop - startGameLoop;
+                if (dif > 20) {
+                    System.out.println("Game loop: " + dif);
+                }
+
+                if (dif < TURN_DURATION_MILLIS) {
+                    try {
+                        Thread.sleep(TURN_DURATION_MILLIS - dif);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         });
         gameThread.setDaemon(true);

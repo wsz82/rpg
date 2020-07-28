@@ -10,7 +10,8 @@ public class Sizes {
     public static final int MIN_RESOLUTION_HEIGHT = 100;
     public static final int ORIGIN_RESOLUTION_WIDTH = 1600;
     public static final int CONSTANT_METER = 100;
-    public static final int TURN_DURATION_MILLIS = 16;
+    public static final int FPS = 60;
+    public static final int TURN_DURATION_MILLIS = 1000/FPS;
     public static final double SECOND = 1000.0/TURN_DURATION_MILLIS;
     public static final double COVER_OPACITY = 0.4;
 
