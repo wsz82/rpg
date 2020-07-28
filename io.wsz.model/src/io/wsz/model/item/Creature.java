@@ -444,6 +444,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
             Controller.get().setAsking(cr);
             Controller.get().setAnswering(this);
             return true;

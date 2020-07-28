@@ -314,12 +314,23 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
-        return false;
+        return getObstacleOnWay(cr) == null;
     }
 
     @Override
     public boolean creatureSecondaryInteract(Creature cr) {
-        return false;
+        return getObstacleOnWay(cr) == null;
+    }
+
+    protected PosItem getObstacleOnWay(Creature cr) {
+        Coords crCenter = cr.getCenter();
+        double xFrom = crCenter.x;
+        double yFrom = crCenter.y;
+        Coords toCoords = getInteractionCoords();
+        double xTo = toCoords.x;
+        double yTo = toCoords.y;
+        return Controller.get().getBoard().getObstacleOnWay(
+                pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
     }
 
     @Override

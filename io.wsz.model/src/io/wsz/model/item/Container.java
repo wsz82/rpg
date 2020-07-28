@@ -225,6 +225,7 @@ public class Container extends Equipment<Container> implements Containable, Open
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
             searchContainer(cr);
             return true;
         }
@@ -271,6 +272,7 @@ public class Container extends Equipment<Container> implements Containable, Open
     public boolean creatureSecondaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
             if (open) {
                 close();
             } else {

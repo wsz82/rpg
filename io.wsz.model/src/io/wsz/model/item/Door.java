@@ -162,6 +162,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
     public boolean creatureSecondaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
             if (open) {
                 close();
             } else {

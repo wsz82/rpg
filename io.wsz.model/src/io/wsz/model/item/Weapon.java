@@ -100,6 +100,7 @@ public class Weapon extends Equipment<Weapon> {
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
             boolean fits = cr.getIndividualInventory().fitsInventory(this);
             if (fits) {
                 cr.getIndividualInventory().add(this);
