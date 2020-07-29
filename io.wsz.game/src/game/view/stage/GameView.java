@@ -27,7 +27,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
@@ -54,7 +53,7 @@ public class GameView extends CanvasView {
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView = new BarView(canvas);
-    private final Image fogPiece;
+//    private final Image fogPiece;
 
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
@@ -68,16 +67,16 @@ public class GameView extends CanvasView {
     public GameView(Stage parent) {
         super(new Canvas());
         this.parent = parent;
-        fogPiece = getFogPiece();
+//        fogPiece = getFogPiece();
 
         hookUpEvents();
         defineRemovableEvents();
         hookUpRemovableEvents();
     }
 
-    private Image getFogPiece() {
-        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("fog.png")));
-    }
+//    private Image getFogPiece() {
+//        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("fog.png")));
+//    }
 
     public void refresh() {
         if (parent.isIconified()) {
@@ -140,10 +139,10 @@ public class GameView extends CanvasView {
     private void drawFog(List<Creature> heroes) {
         Location loc = controller.getCurrentLocation().getLocation();
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
-        double fogSize = Sizes.getFogSize();
-        int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
-        int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
+        double fogSize = Sizes.fog.getImage().getWidth() / Sizes.getMeter();
         if (discoveredFog == null) {
+            int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
+            int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
             discoveredFog = new ArrayList<>(maxPiecesHeight);
             for (int i = 0; i < maxPiecesHeight; i++) {
                 ArrayList<Boolean> horList = new ArrayList<>(maxPiecesWidth);
@@ -157,13 +156,16 @@ public class GameView extends CanvasView {
 
         gc.setImageSmoothing(false);
 
+        int heightPieces = discoveredFog.size();
+        int widthPieces = discoveredFog.get(0).size();
+
         double y = 0;
-        for (int i = 0; i < maxPiecesHeight; i++) {
+        for (int i = 0; i < heightPieces; i++) {
             if (i != 0) {
                 y += fogSize;
             }
             double x = 0;
-            for (int j = 0; j < maxPiecesWidth; j++) {
+            for (int j = 0; j < widthPieces; j++) {
                 if (j != 0) {
                     x += fogSize;
                 }
@@ -207,7 +209,7 @@ public class GameView extends CanvasView {
     private void drawFogPiece(Coords pos) {
         pos.x *= Sizes.getMeter();
         pos.y *= Sizes.getMeter();
-        gc.drawImage(fogPiece, pos.x, pos.y);
+        gc.drawImage(Sizes.fog.getImage(), pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {

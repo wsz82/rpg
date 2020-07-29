@@ -268,6 +268,9 @@ public class GameRunner {
             int total = assets.size() - 1;
             updateProgress(0, total);
 
+            Sizes.fog.setImage(null);
+            Sizes.fog.getInitialImage();
+
             int i = 0;
             for (Asset a : assets) {
                 reloadAssetImages(a);

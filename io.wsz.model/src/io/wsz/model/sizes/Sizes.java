@@ -1,6 +1,7 @@
 package io.wsz.model.sizes;
 
 import io.wsz.model.Controller;
+import io.wsz.model.asset.Fog;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
@@ -14,9 +15,9 @@ public class Sizes {
     public static final int TURN_DURATION_MILLIS = 1000/FPS;
     public static final double SECOND = 1000.0/TURN_DURATION_MILLIS;
     public static final double COVER_OPACITY = 0.4;
+    public static final Fog fog = new Fog();
 
     private static int meter = CONSTANT_METER;
-    private static double fogSize = 0.20;
     private static FontSize fontSize = FontSize.M;
     private static int portraitSize;
 
@@ -38,14 +39,6 @@ public class Sizes {
     public static void setMeter(int resWidth) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
         Controller.get().clearHeroesPortraits();
-    }
-
-    public static double getFogSize() {
-        return fogSize;
-    }
-
-    public static void setFogSize(double fogSize) {
-        Sizes.fogSize = fogSize;
     }
 
     public static FontSize getFontSize() {
