@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 

@@ -1,6 +1,7 @@
-package io.wsz.model.item;
+package io.wsz.model.effect;
 
 import io.wsz.model.Controller;
+import io.wsz.model.item.Creature;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
