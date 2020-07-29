@@ -184,13 +184,19 @@ public class GameView extends CanvasView {
                 if (fogWithinVision) {
                     discoveredFog.get(i).set(j, true);
                 } else {
-                    boolean pieceDiscovered = discoveredFog.get(i).get(j);
-                    if (pieceDiscovered) {
-                        gc.setGlobalAlpha(0.3);
-                        drawFogPiece(translatedPiecePos);
-                        gc.setGlobalAlpha(1);
-                    } else {
-                        drawFogPiece(translatedPiecePos);
+                    double screenWidth = canvas.getWidth() / Sizes.getMeter();
+                    double screenHeight = canvas.getHeight() / Sizes.getMeter();
+                    if (nextPiecePos.x + fogSize >= curPos.x && nextPiecePos.y + fogSize >= curPos.y
+                            && nextPiecePos.x <= curPos.x + screenWidth
+                            && nextPiecePos.y <= curPos.y + screenHeight) {
+                        boolean pieceDiscovered = discoveredFog.get(i).get(j);
+                        if (pieceDiscovered) {
+                            gc.setGlobalAlpha(0.3);
+                            drawFogPiece(translatedPiecePos);
+                            gc.setGlobalAlpha(1);
+                        } else {
+                            drawFogPiece(translatedPiecePos);
+                        }
                     }
                 }
             }
