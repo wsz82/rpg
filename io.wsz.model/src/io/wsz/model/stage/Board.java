@@ -180,11 +180,12 @@ public class Board {
         items.clear();
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
-                .filter(pi -> {
-                    double piLeft = pi.getLeft();
-                    double piRight = pi.getRight();
-                    double piTop = pi.getTop();
-                    double piBottom = pi.getBottom();
+                .filter(o -> {
+                    List<List<Coords>> actualCollisionPolygons = o.getActualCollisionPolygons();
+                    double piLeft = o.getCollisionLeft(actualCollisionPolygons);
+                    double piRight = o.getCollisionRight(actualCollisionPolygons);
+                    double piTop = o.getCollisionTop(actualCollisionPolygons);
+                    double piBottom = o.getCollisionBottom(actualCollisionPolygons);
                     return Coords.doOverlap(
                             left, top, right, bottom,
                             piLeft, piTop, piRight, piBottom);
