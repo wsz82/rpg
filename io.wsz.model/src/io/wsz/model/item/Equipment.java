@@ -76,6 +76,11 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
 
     @Override
     public boolean onTake(Creature cr, double x, double y) {
+        boolean notFitsInventory = !cr.getInventory().fitsInventory(this);
+        if (notFitsInventory) {
+            System.out.println(getName() + " does not fit " + cr.getName() + " inventory");
+            return false;
+        }
         Coords crCenter = cr.getCenter();
         double xFrom = crCenter.x;
         double yFrom = crCenter.y;
