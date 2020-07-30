@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DropView extends EquipmentView {
-    private final Coords creaturePos = new Coords();
     private final List<PosItem> allItmes = new ArrayList<>(0);
+    private final Coords creaturePos = new Coords();
 
     private List<Equipment> droppedEquipment;
+    private double visionHeightDiameter;
+    private double minCurPosY;
 
     public DropView(Canvas canvas) {
         super(canvas);
@@ -60,55 +62,42 @@ public class DropView extends EquipmentView {
             }
 
             Coords pos = pi.getPos();
-            currentPosCorrection(pos);
-            Coords corrected = modifiedCoords;
-            double x = corrected.x * Sizes.getMeter();
-            double y = corrected.y * Sizes.getMeter();
+            Coords corrected = currentPosCorrection(pos);
+            int meter = Sizes.getMeter();
+            double x = corrected.x * meter;
+            double y = corrected.y * meter;
 
             Image img = pi.getImage();
-            double width = img.getWidth();
-            double height = img.getHeight();
-            double viewX = viewPos.x * Sizes.getMeter();
-            double viewY = viewPos.y * Sizes.getMeter();
-            double viewWidth = this.viewWidth * Sizes.getMeter();
-            double viewHeight = this.viewHeight * Sizes.getMeter();
+            double viewX = viewPos.x * meter;
+            double viewY = viewPos.y * meter;
+            double viewWidth = this.viewWidth * meter;
+            double viewHeight = this.viewHeight * meter;
 
-            double startX = 0;
-            if (x < 0) {
-                startX = -x;
-                width = x + width;
-            }
-            if (width > viewWidth) {
-                width = viewWidth;
-            }
-
-            double startY = 0;
-            if (y < 0) {
-                startY = -y;
-                height = y + height;
-            }
-            if (height > viewHeight) {
-                height = viewHeight;
-            }
-
-            double destX = 0;
-            if (x > 0) {
-                destX = x;
-            }
-            double destY = 0;
-            if (y > 0) {
-                destY = y;
-            }
-            gc.drawImage(img, startX, startY, width, height, destX + viewX, destY + viewY, width, height);
+            cutImageAndDraw(x, y, img, viewX, viewY, viewWidth, viewHeight);
             gc.setGlobalAlpha(1.0);
         }
     }
 
-    private Coords currentPosCorrection(Coords pos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(curPos);
-        return modifiedCoords;
+    @Override
+    protected void drawVerScroll() {
+        if (visionHeightDiameter <= viewHeight) return;
+        int meter = Sizes.getMeter();
+        double x = (viewPos.x + viewWidth) * meter;
+
+        clearVerScroll(x);
+        drawVerScrollButton(x);
+    }
+
+    private void drawVerScrollButton(double x) {
+        minCurPosY = creaturePos.y - visionHeightDiameter/2;
+        maxCurPosY = creaturePos.y + visionHeightDiameter/2;
+        yScrollPos = (curPos.y - minCurPosY) * viewHeight / visionHeightDiameter;
+        double y = viewPos.y + yScrollPos;
+        yScrollButtonHeight = viewHeight * viewHeight / visionHeightDiameter;
+
+        gc.setFill(Color.GREEN);
+        int meter = Sizes.getMeter();
+        gc.fillRect(x, y * meter, scrollWidth * meter, yScrollButtonHeight * meter);
     }
 
     private void drawCreatureSize() {
@@ -144,11 +133,6 @@ public class DropView extends EquipmentView {
                 viewWidth * Sizes.getMeter(), viewHeight * Sizes.getMeter());
     }
 
-    public void setCreaturePos(Coords pos) {
-        this.creaturePos.x = pos.x;
-        this.creaturePos.y = pos.y;
-    }
-
     @Override
     public boolean remove(Equipment e, Creature cr) {
         if (e.onTake(cr, 0, 0)) {
@@ -168,5 +152,33 @@ public class DropView extends EquipmentView {
     @Override
     public List<Equipment> getItems() {
         return droppedEquipment;
+    }
+
+    @Override
+    public void setScrollPosY(double y) {
+        y -= yScrollButtonHeight/2;
+        double maxY;
+        if (y < 0) {
+            curPos.y = minCurPosY;
+        } else if (y > (maxY = viewHeight - yScrollButtonHeight)) {
+            curPos.y = maxY * ((maxCurPosY - minCurPosY) / viewHeight) + minCurPosY;
+        } else {
+            curPos.y = y * ((maxCurPosY - minCurPosY) / viewHeight) + minCurPosY;
+        }
+    }
+
+    public void setVisionHeightDiameter(double visionHeightDiameter) {
+        this.visionHeightDiameter = visionHeightDiameter;
+    }
+
+    public void setCreaturePos(double x, double y) {
+        if (x != creaturePos.x) {
+            creaturePos.x = x;
+            curPos.x = creaturePos.x - viewWidth/2;
+        }
+        if (y != creaturePos.y) {
+            creaturePos.y = y;
+            curPos.y = creaturePos.y - viewHeight/2;
+        }
     }
 }

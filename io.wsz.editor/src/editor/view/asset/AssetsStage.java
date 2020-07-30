@@ -74,6 +74,7 @@ public class AssetsStage extends ChildStage {
                     table = new OutDoorTableView(this, outDoors);
                 }
             }
+            if (table == null) continue;
             table.setPointer(pointer);
             table.setContentTableView(contentTableView);
             String tabName = type.toString();

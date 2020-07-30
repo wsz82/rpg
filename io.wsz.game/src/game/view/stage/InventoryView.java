@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class InventoryView {
+    protected static final double SCROLL_BUTTON_PART = 1.0/80;
+
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final Coords mousePos = new Coords();
@@ -39,8 +41,8 @@ public class InventoryView {
     private EventHandler<MouseEvent> equipmentLook;
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
-
     private EquipmentView origin;
+    private EquipmentView scrolled;
 
     public InventoryView(Canvas canvas) {
         this.canvas = canvas;
@@ -84,6 +86,7 @@ public class InventoryView {
         dragStop = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
+                scrolled = null;
                 if (dragged[0] != null) {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
@@ -150,6 +153,7 @@ public class InventoryView {
     }
 
     private EquipmentView getEquipmentView(double x, double y) {
+        scrolled = null;
         for (EquipmentView ev : equipmentViews) {
 
             double evLeft = ev.getViewPos().x;
@@ -159,6 +163,18 @@ public class InventoryView {
 
             if (x > evLeft && x < evRight
                     && y > evTop && y < evBottom) return ev;
+            double scrollWidth = ev.getScrollWidth();
+            double yScrollPos = ev.getYScrollPos();
+            double yScrollButtonHeight = ev.getYScrollButtonHeight();
+            if (x > evRight && x < evRight + scrollWidth
+                    && y > evTop + yScrollPos && y < evTop + yScrollPos + yScrollButtonHeight) {
+                scrolled = ev;
+                return null;
+            }
+            if (x > evRight && x < evRight + scrollWidth
+                    && y > evTop && y < evBottom) {
+                ev.setScrollPosY(y - evTop);
+            }
         }
         return null;
     }
@@ -215,11 +231,19 @@ public class InventoryView {
 
         Equipment drag = dragged[0];
         Coords mousePos = getMousePos(x, y, left, top);
+        int meter = Sizes.getMeter();
         if (drag != null) {
             Image img = drag.getImage();
             gc.drawImage(img,
-                    mousePos.x*Sizes.getMeter() - img.getWidth()/2,
-                    mousePos.y*Sizes.getMeter() - img.getHeight());
+                    mousePos.x*meter - img.getWidth()/2,
+                    mousePos.y*meter - img.getHeight());
+        }
+
+        if (scrolled != null) {
+            double scrolledPosY = scrolled.getViewPos().y;
+            double mousePosY = mousePos.y;
+            double scrollToY = mousePosY - scrolledPosY;
+            scrolled.setScrollPosY(scrollToY);
         }
     }
 
@@ -237,6 +261,8 @@ public class InventoryView {
         double x = 0.3 * inventoryWidth;
         double y = 0.6 * canvas.getHeight() / Sizes.getMeter();
 
+        holdView.setDragged(dragged[0]);
+        holdView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
         holdView.setInventory(inventory);
@@ -249,12 +275,13 @@ public class InventoryView {
             equipmentWithinRange = cr.getEquipmentWithinRange();
         }
 
-        double x = 0.6 * inventoryWidth;
+        double scrollWidth = canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter();
+        double x = 0.6 * inventoryWidth + scrollWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
-//        dropView.setCreaturePos(cr.getCenterBottomPos());
         double range = cr.getRange();
 
         double height = cr.getSize().getHeight() + 2*range;
+        dropView.setVisionHeightDiameter(height);
         double width = cr.getSize().getWidth() + 2*range;
 
         double maxDropHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
@@ -273,10 +300,11 @@ public class InventoryView {
             resultHeight = height*ratio;
         }
 
+        dropView.setScrollWidth(scrollWidth);
         dropView.setViewPos(x, y);
-        Coords bottom = cr.getCenter();
-        dropView.setCurrentPos(bottom.x - resultWidth/2, bottom.y - resultHeight/2);
+        Coords center = cr.getCenter();
         dropView.setSize(resultWidth, resultHeight);
+        dropView.setCreaturePos(center.x, center.y);
         dropView.setDroppedEquipment(equipmentWithinRange);
         dropView.refresh();
     }
@@ -292,6 +320,8 @@ public class InventoryView {
         double x = 0.3 * inventoryWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
 
+        containerView.setDragged(dragged[0]);
+        containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
         containerView.setContainer(c);

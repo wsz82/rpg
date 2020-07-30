@@ -10,6 +10,7 @@ import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ItemsComparator;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,5 +79,42 @@ public abstract class CanvasView {
                 }
             }
         }
+    }
+
+    protected void cutImageAndDraw(double x, double y, Image img, double viewX, double viewY,
+                                   double viewWidth, double viewHeight) {
+        double width = img.getWidth();
+        double height = img.getHeight();
+        double startX = 0;
+        if (x < 0) {
+            startX = -x;
+            width = x + width;
+        }
+        if (x + width > viewWidth) {
+            width = viewWidth - x;
+        } else if (width > viewWidth) {
+            width = viewWidth;
+        }
+
+        double startY = 0;
+        if (y < 0) {
+            startY = -y;
+            height = y + height;
+        }
+        if (y + height > viewHeight) {
+            height = viewHeight - y;
+        } else if (height > viewHeight) {
+            height = viewHeight;
+        }
+
+        double destX = 0;
+        if (x > 0) {
+            destX = x;
+        }
+        double destY = 0;
+        if (y > 0) {
+            destY = y;
+        }
+        gc.drawImage(img, startX, startY, width, height, destX + viewX, destY + viewY, width, height);
     }
 }

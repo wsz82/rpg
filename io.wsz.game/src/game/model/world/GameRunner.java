@@ -89,7 +89,7 @@ public class GameRunner {
                     synchronized (this) {
                         long startNext = System.currentTimeMillis();
                         long viewLoopDif = startNext - viewStart[0];
-                        if (viewLoopDif > 20) {
+                        if (viewLoopDif > 30) {
                             System.out.println("View loop dif: " + viewLoopDif);
                         }
                         viewStart[0] = startNext;

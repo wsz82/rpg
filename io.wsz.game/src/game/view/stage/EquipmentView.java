@@ -2,6 +2,7 @@ package game.view.stage;
 
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -10,6 +11,7 @@ import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 public abstract class EquipmentView extends CanvasView {
@@ -20,6 +22,12 @@ public abstract class EquipmentView extends CanvasView {
 
     protected double viewWidth;
     protected double viewHeight;
+    protected double scrollWidth;
+
+    protected double yScrollPos;
+    protected double yScrollButtonHeight;
+    protected double maxCurPosY;
+    protected Equipment dragged;
 
     public EquipmentView(Canvas canvas) {
         super(canvas);
@@ -30,6 +38,45 @@ public abstract class EquipmentView extends CanvasView {
             return;
         }
         drawBackground();
+
+        drawVerScroll();
+    }
+
+    protected void drawVerScroll() {
+        int meter = Sizes.getMeter();
+        double x = (viewPos.x + viewWidth) * meter;
+
+        clearVerScroll(x);
+        drawVerScroll(x);
+    }
+
+    private void drawVerScroll(double x) {
+        OptionalDouble optMaxHeight = getItems().stream()
+                .mapToDouble(i -> i.getPos().y)
+                .max();
+        if (dragged != null) {
+            maxCurPosY = Math.max(optMaxHeight.orElse(0), dragged.getPos().y);
+            maxCurPosY = Math.max(viewHeight, maxCurPosY);
+        } else {
+            maxCurPosY = Math.max(viewHeight, optMaxHeight.orElse(0));
+        }
+        maxCurPosY += 1;
+        yScrollPos = curPos.y * viewHeight / maxCurPosY;
+        yScrollButtonHeight = viewHeight * viewHeight / maxCurPosY;
+        if (yScrollPos + yScrollButtonHeight > viewHeight) {
+            yScrollPos = viewHeight - yScrollButtonHeight;
+        }
+        double y = viewPos.y + yScrollPos;
+
+        gc.setFill(Color.GREEN);
+        int meter = Sizes.getMeter();
+        gc.fillRect(x, y * meter, scrollWidth * meter, yScrollButtonHeight * meter);
+    }
+
+    protected void clearVerScroll(double x) {
+        gc.setFill(Color.BLUE);
+        int meter = Sizes.getMeter();
+        gc.fillRect(x, viewPos.y * meter, scrollWidth * meter, viewHeight * meter);
     }
 
     protected abstract void drawEquipment();
@@ -54,15 +101,14 @@ public abstract class EquipmentView extends CanvasView {
                 .collect(Collectors.toCollection(() -> items));
     }
 
-    protected abstract void drawBackground();
-
-    protected Coords translateCoordsToScreenCoords(Coords pos) {
+    protected Coords currentPosCorrection(Coords pos) {
         modifiedCoords.x = pos.x;
         modifiedCoords.y = pos.y;
         modifiedCoords.subtract(curPos);
-        modifiedCoords.add(viewPos);
         return modifiedCoords;
     }
+
+    protected abstract void drawBackground();
 
     public Coords getLocalCoords(Coords pos) {
         modifiedCoords.x = pos.x;
@@ -70,37 +116,6 @@ public abstract class EquipmentView extends CanvasView {
         modifiedCoords.subtract(viewPos);
         modifiedCoords.add(curPos);
         return modifiedCoords;
-    }
-
-    public void setSize(double width, double height) {
-        this.viewWidth = width;
-        this.viewHeight = height;
-    }
-
-    public double getViewWidth() {
-        return viewWidth;
-    }
-
-    public double getViewHeight() {
-        return viewHeight;
-    }
-
-    public void setCurrentPos(double x, double y) {
-        curPos.x = x;
-        curPos.y = y;
-    }
-
-    public Coords getCurPos() {
-        return curPos;
-    }
-
-    public void setViewPos(double x, double y) {
-        viewPos.x = x;
-        viewPos.y = y;
-    }
-
-    public Coords getViewPos() {
-        return viewPos;
     }
 
     protected void drawSize(int filledSpace, int maxSize, double x, double y) {
@@ -151,5 +166,68 @@ public abstract class EquipmentView extends CanvasView {
             }
         }
         return mousePos;
+    }
+
+    public void setSize(double width, double height) {
+        this.viewWidth = width;
+        this.viewHeight = height;
+    }
+
+    public double getViewWidth() {
+        return viewWidth;
+    }
+
+    public double getViewHeight() {
+        return viewHeight;
+    }
+
+    public void setCurPos(double x, double y) {
+        curPos.x = x;
+        curPos.y = y;
+    }
+
+    public void setScrollPosY(double y) {
+        y -= yScrollButtonHeight/2;
+        double maxY;
+        if (y < 0) {
+            curPos.y = 0;
+        } else if (y > (maxY = viewHeight - yScrollButtonHeight)) {
+            curPos.y = maxY / viewHeight * maxCurPosY;
+        } else {
+            curPos.y = y / viewHeight * maxCurPosY;
+        }
+    }
+
+    public Coords getCurPos() {
+        return curPos;
+    }
+
+    public void setViewPos(double x, double y) {
+        viewPos.x = x;
+        viewPos.y = y;
+    }
+
+    public Coords getViewPos() {
+        return viewPos;
+    }
+
+    public double getScrollWidth() {
+        return scrollWidth;
+    }
+
+    public void setScrollWidth(double scrollWidth) {
+        this.scrollWidth = scrollWidth;
+    }
+
+    public double getYScrollPos() {
+        return yScrollPos;
+    }
+
+    public double getYScrollButtonHeight() {
+        return yScrollButtonHeight;
+    }
+
+    public void setDragged(Equipment e) {
+        dragged = e;
     }
 }

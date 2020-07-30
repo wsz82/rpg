@@ -33,42 +33,18 @@ public class HoldView extends EquipmentView {
         selectEquipment();
 
         for (Equipment e : items) {
-            final Coords pos = e.getPos();
-            Coords screenCoords = translateCoordsToScreenCoords(pos);
-            final double x = (screenCoords.x * Sizes.getMeter());
-            final double y = (screenCoords.y * Sizes.getMeter());
-
+            Coords pos = e.getPos();
+            Coords corrected = currentPosCorrection(pos);
+            int meter = Sizes.getMeter();
+            double x = corrected.x * meter;
+            double y = corrected.y * meter;
             Image img = e.getImage();
-            double width = img.getWidth();
-            double height = img.getHeight();
+            double viewX = viewPos.x * meter;
+            double viewY = viewPos.y * meter;
+            double viewWidth = this.viewWidth * meter;
+            double viewHeight = this.viewHeight * meter;
 
-            double startX = 0;
-            if (x < 0) {
-                startX = -x;
-                width = x + width;
-            }
-            if (width > viewWidth * Sizes.getMeter()) {
-                width = viewWidth * Sizes.getMeter();
-            }
-
-            double startY = 0;
-            if (y < 0) {
-                startY = -y;
-                height = y + height;
-            }
-            if (height > viewHeight * Sizes.getMeter()) {
-                height = viewHeight * Sizes.getMeter();
-            }
-
-            double destX = 0;
-            if (x > 0) {
-                destX = x;
-            }
-            double destY = 0;
-            if (y > 0) {
-                destY = y;
-            }
-            gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
+            cutImageAndDraw(x, y, img, viewX, viewY, viewWidth, viewHeight);
         }
 
         drawHoldSize();

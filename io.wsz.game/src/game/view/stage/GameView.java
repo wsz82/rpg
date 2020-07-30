@@ -53,7 +53,6 @@ public class GameView extends CanvasView {
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView = new BarView(canvas);
-//    private final Image fogPiece;
 
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
@@ -67,16 +66,10 @@ public class GameView extends CanvasView {
     public GameView(Stage parent) {
         super(new Canvas());
         this.parent = parent;
-//        fogPiece = getFogPiece();
-
         hookUpEvents();
         defineRemovableEvents();
         hookUpRemovableEvents();
     }
-
-//    private Image getFogPiece() {
-//        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("fog.png")));
-//    }
 
     public void refresh() {
         if (parent.isIconified()) {
@@ -227,36 +220,9 @@ public class GameView extends CanvasView {
                 drawCreatureSize((Creature) pi);
             }
             Image img = pi.getImage();
-            double width = img.getWidth();
-            double height = img.getHeight();
 
-            double startX = 0;
-            if (x < 0) {
-                startX = -x;
-                width = x + width;
-            }
-            if (width > canvas.getWidth()) {
-                width = canvas.getWidth();
-            }
+            cutImageAndDraw(x, y, img, 0, 0, canvas.getWidth(), canvas.getHeight());
 
-            double startY = 0;
-            if (y < 0) {
-                startY = -y;
-                height = y + height;
-            }
-            if (height > canvas.getHeight()) {
-                height = canvas.getHeight();
-            }
-
-            double destX = 0;
-            if (x > 0) {
-                destX = x;
-            }
-            double destY = 0;
-            if (y > 0) {
-                destY = y;
-            }
-            gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
             gc.setGlobalAlpha(1);
         }
     }

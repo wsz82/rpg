@@ -48,9 +48,11 @@ public class EditorCanvas extends Canvas {
         clear(gc);
 
         double left = currentPos.x;
-        double right = left + getWidth()/Sizes.getMeter();
+        double canvasWidth = getWidth();
+        double right = left + canvasWidth/Sizes.getMeter();
         double top = currentPos.y;
-        double bottom = top + getHeight()/Sizes.getMeter();
+        double canvasHeight = getHeight();
+        double bottom = top + canvasHeight/Sizes.getMeter();
 
         List<PosItem> items = controller.getCurrentLocation().getItems();
         items = items.stream()
@@ -100,8 +102,10 @@ public class EditorCanvas extends Canvas {
                 startX = -x;
                 width = x + width;
             }
-            if (width > getWidth()) {
-                width = getWidth();
+            if (x + width > canvasWidth) {
+                width = canvasWidth - x;
+            } else if (width > canvasWidth) {
+                width = canvasWidth;
             }
 
             double startY = 0;
@@ -109,8 +113,10 @@ public class EditorCanvas extends Canvas {
                 startY = -y;
                 height = y + height;
             }
-            if (height > getHeight()) {
-                height = getHeight();
+            if (y + height > canvasHeight) {
+                height = canvasHeight - y;
+            } else if (height > canvasHeight) {
+                height = canvasHeight;
             }
 
             double destX = 0;
