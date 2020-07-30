@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import io.wsz.model.Controller;
@@ -24,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BarView {
-    private static final double PORTRAIT_PART = 0.9;
+    private static final double PORTRAIT_PART = 9.0/10;
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final LinkedList<Portrait> portraits = new LinkedList<>();
@@ -154,7 +155,11 @@ public class BarView {
     }
 
     private void updateHoveredPortrait(double leftX, double padding, double portraitSize) {
+        GameController gameController = GameController.get();
         if (hoveredPortrait == -1) {
+            if (gameController.getHoveredHero() != null) {
+                gameController.setHoveredHero(null);
+            }
             return;
         }
         Portrait cl = portraits.get(hoveredPortrait);
@@ -162,6 +167,13 @@ public class BarView {
         if (portraitY == 0) {
             return;
         }
+
+        Creature hero = cl.creature;
+        Creature hoveredHero = gameController.getHoveredHero();
+        if (hoveredHero != hero) {
+            gameController.setHoveredHero(hero);
+        }
+
         gc.setStroke(Color.LIGHTGREY);
         gc.setLineWidth(2);
         gc.strokeRect(leftX + padding, portraitY, portraitSize, portraitSize);

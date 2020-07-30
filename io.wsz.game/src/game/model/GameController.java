@@ -12,6 +12,7 @@ import game.view.launcher.Main;
 import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.item.Creature;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
@@ -28,12 +29,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
     private static GameController singleton;
+
     private final Controller controller = Controller.get();
     private final AtomicBoolean isGame = new AtomicBoolean(false);
     private final AtomicBoolean isDialog = new AtomicBoolean(false);
+
     private GameView gameView;
     private GameStage gameStage;
     private GameRunner gameRunner;
+    private Creature hoveredHero;
 
     public static GameController get() {
         if (singleton == null) {
@@ -256,5 +260,13 @@ public class GameController {
         setDialog(false);
         controller.setAsking(null);
         controller.setAnswering(null);
+    }
+
+    public Creature getHoveredHero() {
+        return hoveredHero;
+    }
+
+    public void setHoveredHero(Creature hoveredHero) {
+        this.hoveredHero = hoveredHero;
     }
 }

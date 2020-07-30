@@ -118,20 +118,42 @@ public class InventoryView {
     }
 
     private void stopDrag(double mouseX, double mouseY) {
+        if (dragged == null) return;
+        GameController gameController = GameController.get();
+        Creature hoveredHero = gameController.getHoveredHero();
+        if (!moveToHero(hoveredHero)) {
+            moveEquipmentWithinInventory(mouseX, mouseY);
+        }
+        dragged = null;
+    }
+
+    private boolean moveToHero(Creature hero) {
+        if (hero == null) return false;
+        Creature cr = Controller.get().getCreatureToOpenInventory();
+        CreatureSize size = cr.getSize();
+        if (hero.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (hero.getInventory().add(dragged)) {
+                System.out.println(dragged.getName() + " moved to " + hero.getName() + " inventory");
+                return true;
+            }
+        } else {
+            System.out.println(hero.getName() + " out of " + cr.getName() + " range");
+        }
+        return false;
+    }
+
+    private void moveEquipmentWithinInventory(double mouseX, double mouseY) {
         EquipmentView ev = getEquipmentView(mouseX, mouseY);
-        Equipment toAdd = dragged;
-        if (toAdd == null) return;
         Creature cr = Controller.get().getCreatureToOpenInventory();
         if (ev == null) {
-            Coords extreme = origin.getExtremePos(mousePos, draggedEquipmentCoords, toAdd);
-            origin.add(toAdd, cr, extreme.x, extreme.y);
+            Coords extreme = origin.getExtremePos(mousePos, draggedEquipmentCoords, dragged);
+            origin.add(dragged, cr, extreme.x, extreme.y);
         } else {
             Coords local = ev.getLocalCoords(mousePos);
             local.subtract(draggedEquipmentCoords);
-            checkFit(ev, toAdd, local);
-            ev.add(toAdd, cr, local.x, local.y);
+            checkFit(ev, dragged, local);
+            ev.add(dragged, cr, local.x, local.y);
         }
-        dragged = null;
     }
 
     private void checkFit(EquipmentView ev, Equipment e, Coords local) {
