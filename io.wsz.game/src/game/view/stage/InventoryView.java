@@ -36,8 +36,8 @@ public class InventoryView {
     private final HoldView holdView;
     private final DropView dropView;
     private final ContainerView containerView;
-    private final Equipment[] dragged = new Equipment[1];
 
+    private Equipment dragged;
     private EventHandler<MouseEvent> equipmentLook;
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
@@ -89,7 +89,7 @@ public class InventoryView {
             if (button.equals(MouseButton.PRIMARY)) {
                 scrolledVer = null;
                 scrolledHor = null;
-                if (dragged[0] != null) {
+                if (dragged != null) {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
                     mousePos.y = e.getY() / Sizes.getMeter();
@@ -112,14 +112,14 @@ public class InventoryView {
         if (eq == con) return;
         if (eq != null) {
             if (ev.remove(eq, Controller.get().getCreatureToOpenInventory())) {
-                dragged[0] = eq.cloneEquipment();
+                dragged = eq.cloneEquipment();
             }
         }
     }
 
     private void stopDrag(double mouseX, double mouseY) {
         EquipmentView ev = getEquipmentView(mouseX, mouseY);
-        Equipment toAdd = dragged[0];
+        Equipment toAdd = dragged;
         if (toAdd == null) return;
         Creature cr = Controller.get().getCreatureToOpenInventory();
         if (ev == null) {
@@ -131,7 +131,7 @@ public class InventoryView {
             checkFit(ev, toAdd, local);
             ev.add(toAdd, cr, local.x, local.y);
         }
-        dragged[0] = null;
+        dragged = null;
     }
 
     private void checkFit(EquipmentView ev, Equipment e, Coords local) {
@@ -203,11 +203,10 @@ public class InventoryView {
     }
 
     private void closeInventory() {
-        Equipment drag = dragged[0];
-        if (drag != null) {
+        if (dragged != null) {
             Creature cr = Controller.get().getCreatureToOpenInventory();
-            holdView.add(drag, cr, 0, 0);
-            dragged[0] = null;
+            holdView.add(dragged, cr, 0, 0);
+            dragged = null;
         }
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, equipmentLook);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
@@ -252,11 +251,10 @@ public class InventoryView {
                 || y < top
                 || y > bottom) return;
 
-        Equipment drag = dragged[0];
         Coords mousePos = getMousePos(x, y, left, top);
         int meter = Sizes.getMeter();
-        if (drag != null) {
-            Image img = drag.getImage();
+        if (dragged != null) {
+            Image img = dragged.getImage();
             gc.drawImage(img,
                     mousePos.x*meter - img.getWidth()/2,
                     mousePos.y*meter - img.getHeight());
@@ -291,7 +289,7 @@ public class InventoryView {
         double x = 0.3 * inventoryWidth;
         double y = 0.6 * canvas.getHeight() / Sizes.getMeter();
 
-        holdView.setDragged(dragged[0]);
+        holdView.setDragged(dragged);
         holdView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
@@ -359,7 +357,7 @@ public class InventoryView {
         double x = 0.3 * inventoryWidth;
         double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
 
-        containerView.setDragged(dragged[0]);
+        containerView.setDragged(dragged);
         containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
