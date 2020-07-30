@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.*;
 
 public class DialogView {
-    private static final double MAX_HEIGHT = 0.5;
-    private static final double TEXT_FIELD_WIDTH = 0.6;
+    private static final double MAX_HEIGHT = 1.0/2;
+    private static final double TEXT_FIELD_WIDTH = 3.0/5;
+    private static final double SCROLL_BAR_PART = 1.0/50;
 
     private final Canvas canvas;
     private final GraphicsContext gc;
@@ -41,32 +42,21 @@ public class DialogView {
 
     private Answer lastAnswer;
     private Question activeQuestion;
+    private EventHandler<MouseEvent> clickEvent;
+    private EventHandler<MouseEvent> scrollBarStart;
+    private EventHandler<MouseEvent> scrollBarStop;
     private double fontSize;
-    private double dialogRectangleTop;
-    private double textWidth;
-    private double dialogTextLeft;
+    private int dialogLeft;
+    private int dialogTop;
+    private int dialogWidth;
     private double caretPos;
-    private double scrollPos;
-    private double dialogHeight;
+    private int curPos;
+    private int dialogHeight;
     private boolean finished;
     private boolean isToRefresh = true;
-
-    private final EventHandler<MouseEvent> clickEvent = e -> {
-        synchronized (GameController.get().getGameRunner()) {
-            MouseButton button = e.getButton();
-            if (button.equals(MouseButton.PRIMARY)) {
-                e.consume();
-                if (activeQuestion != null) {
-                    addQuestionAndAnswer();
-                }
-            } else if (button.equals(MouseButton.SECONDARY)) {
-                e.consume();
-                if (finished) {
-                    endDialog();
-                }
-            }
-        }
-    };
+    private int scrollPos;
+    private int scrollButtonHeight;
+    private boolean scrollWithButton;
 
     public DialogView(Canvas canvas, double offset) {
         this.canvas = canvas;
@@ -76,7 +66,74 @@ public class DialogView {
     }
 
     private void hookupEvents() {
+        clickEvent = e -> {
+            synchronized (GameController.get().getGameRunner()) {
+                MouseButton button = e.getButton();
+                if (button.equals(MouseButton.PRIMARY)) {
+                    e.consume();
+                    if (activeQuestion != null) {
+                        addQuestionAndAnswer();
+                    }
+                } else if (button.equals(MouseButton.SECONDARY)) {
+                    e.consume();
+                    if (finished) {
+                        endDialog();
+                    }
+                }
+            }
+        };
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+
+        scrollBarStart = e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                e.consume();
+                startScrollWithButton(e.getX(), e.getY());
+            }
+        };
+        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
+
+        scrollBarStop = e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.PRIMARY)) {
+                stopScrollWithButton(e.getX(), e.getY());
+            }
+        };
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
+    }
+
+    private void startScrollWithButton(double x, double y) {
+        int scrollWidth = getScrollWidth();
+        int buttonX = dialogLeft + dialogWidth;
+        int buttonY = dialogTop + scrollPos;
+        double dialogBottom = canvas.getHeight();
+
+        if (x > buttonX && x < buttonX + scrollWidth) {
+            if (y > buttonY && y < buttonY + scrollButtonHeight) {
+                scrollWithButton = true;
+            } else if (y > dialogTop && y < dialogBottom) {
+                y -= dialogTop;
+                setCurPos((int) y);
+            }
+        }
+    }
+
+    private void setCurPos(int y) {
+        y -= scrollButtonHeight/2;
+        int scrollHeight = getViewHeight();
+        int maxY;
+        if (y < 0) {
+            curPos = 0;
+        } else if (y > (maxY = scrollHeight - scrollButtonHeight)) {
+            curPos = maxY * dialogHeight / scrollHeight;
+        } else {
+            curPos = y * dialogHeight / scrollHeight;
+        }
+        isToRefresh = true;
+    }
+
+    private void stopScrollWithButton(double x, double y) {
+        scrollWithButton = false;
     }
 
     private void addQuestionAndAnswer() {
@@ -103,6 +160,8 @@ public class DialogView {
 
     private void endDialog() {
         canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
+        canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
         GameController.get().endDialog();
     }
 
@@ -110,9 +169,9 @@ public class DialogView {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
         fontSize = width / Sizes.getFontSize().getSize();
-        dialogRectangleTop = height - height * MAX_HEIGHT;
-        textWidth = TEXT_FIELD_WIDTH * width;
-        dialogTextLeft = (width - textWidth) / 2;
+        dialogTop = (int) height - getViewHeight();
+        dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
+        dialogLeft = (int) ((width - dialogWidth) / 2);
         caretPos = 0;
 
         updatePos();
@@ -124,6 +183,8 @@ public class DialogView {
         }
 
         clear();
+
+        drawScrollBar(dialogTop);
 
         if (dialogs.isEmpty()) {
             PosItem speaker = controller.getAnswering();
@@ -143,8 +204,45 @@ public class DialogView {
             lastAnswer = answer;
         }
 
-        double lastPos = drawDialogs();
+        int lastPos = drawDialogs();
         drawQuestions(lastPos);
+    }
+
+    private int getViewHeight() {
+        return (int) (canvas.getHeight() * MAX_HEIGHT);
+    }
+
+    private void drawScrollBar(int dialogTop) {
+        if (dialogHeight <= getViewHeight()) return;
+        int right = dialogLeft + dialogWidth;
+        int scrollWidth = getScrollWidth();
+        int scrollHeight = getViewHeight();
+
+        clearScrollBar(dialogTop, right, scrollWidth, scrollHeight);
+
+        drawScrollButton(dialogTop, right, scrollWidth, scrollHeight);
+    }
+
+    private int getScrollWidth() {
+        return (int) (canvas.getWidth() * SCROLL_BAR_PART);
+    }
+
+    private void drawScrollButton(int dialogTop, int right, int scrollWidth, int scrollHeight) {
+        int dialogHeight = Math.max(this.dialogHeight, scrollHeight);
+        scrollPos = curPos * scrollHeight / dialogHeight;
+        scrollButtonHeight = scrollHeight * scrollHeight / dialogHeight;
+        if (scrollPos + scrollButtonHeight > scrollHeight) {
+            scrollPos = scrollHeight - scrollButtonHeight;
+        }
+        double y = dialogTop + scrollPos;
+
+        gc.setFill(Color.GREEN);
+        gc.fillRect(right, y, scrollWidth, scrollButtonHeight);
+    }
+
+    private void clearScrollBar(double dialogRectangleTop, double right, int scrollWidth, int scrollHeight) {
+        gc.setFill(Color.BLUE);
+        gc.fillRect(right, dialogRectangleTop, scrollWidth, scrollHeight);
     }
 
     private void addDialogItem(PosItem pi, String s) {
@@ -154,8 +252,8 @@ public class DialogView {
         dialogs.add(di);
     }
 
-    private double drawDialogs() {
-        double lastPos = 0;
+    private int drawDialogs() {
+        int lastPos = 0;
         for (DialogItem di : dialogs) {
 
             lastPos = drawText(lastPos, di.picture);
@@ -189,29 +287,29 @@ public class DialogView {
         TextFlow tf = new TextFlow();
         tf.getChildren().addAll(owner, answer);
         tf.setTextAlignment(TextAlignment.JUSTIFY);
-        tf.setMaxWidth(textWidth);
+        tf.setMaxWidth(dialogWidth);
         return tf;
     }
 
-    private double drawText(double lastPos, Image img) {
+    private int drawText(int lastPos, Image img) {
         double height = img.getHeight();
         double width = img.getWidth();
 
-        if (lastPos + height >= scrollPos) {
+        if (lastPos + height >= curPos) {
             double imgStartY = 0;
             double imgCutHeight = height;
-            if (lastPos < scrollPos) {
-                imgStartY = scrollPos - lastPos;
+            if (lastPos < curPos) {
+                imgStartY = curPos - lastPos;
                 imgCutHeight = height - imgStartY;
             }
-            gc.drawImage(img, 0, imgStartY, width, imgCutHeight, dialogTextLeft, caretPos + dialogRectangleTop, width, imgCutHeight);
+            gc.drawImage(img, 0, imgStartY, width, imgCutHeight, dialogLeft, caretPos + dialogTop, width, imgCutHeight);
             caretPos += imgCutHeight;
         }
 
-        return lastPos + height;
+        return lastPos + (int) height;
     }
 
-    private void drawQuestions(double lastPos) {
+    private void drawQuestions(int lastPos) {
         questionsPos.clear();
         List<Question> questions = lastAnswer.getQuestions();
 
@@ -231,7 +329,7 @@ public class DialogView {
             TextFlow tf = new TextFlow();
             tf.getChildren().add(question);
             tf.setTextAlignment(TextAlignment.JUSTIFY);
-            tf.setMaxWidth(textWidth);
+            tf.setMaxWidth(dialogWidth);
 
             Image img = getTextImage(tf);
 
@@ -252,14 +350,18 @@ public class DialogView {
         if (b == null) {
             return;
         }
-        int left = (int) b.getMinX() + (int) dialogTextLeft;
-        int top = (int) b.getMinY() + (int) dialogRectangleTop;
-        int right = (int) b.getMaxX() - (int) dialogTextLeft;
+        int left = (int) b.getMinX() + dialogLeft;
+        int top = (int) b.getMinY() + dialogTop;
+        int right = (int) b.getMaxX() - dialogLeft;
         int bottom = (int) b.getMaxY();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
         int y = p.y;
+
+        if (scrollWithButton) {
+            setCurPos(y - top);
+        }
 
         if (x < left
                 || x > right
@@ -297,9 +399,9 @@ public class DialogView {
                 .mapToDouble(q -> q.top + q.height)
                 .max();
         double minY = optMin.orElse(0);
-        double translatedMin = minY - scrollPos + top;
+        double translatedMin = minY - curPos + top;
         double maxY = optMax.orElse(0);
-        double translatedMax = maxY - scrollPos + top;
+        double translatedMax = maxY - curPos + top;
 
         return y > translatedMin && y < translatedMax;
     }
@@ -310,54 +412,55 @@ public class DialogView {
         for (Question q : keySet) {
             VerticalPos vp = questionsPos.get(q);
             double topQ = vp.top;
-            double translatedTopQ = topQ - scrollPos + top;
+            double translatedTopQ = topQ - curPos + top;
             double translatedBottomQ = translatedTopQ + vp.height;
 
             if (y > translatedTopQ && y < translatedBottomQ) {
                 if (activeQuestion != q) {
                     isToRefresh = true;
                 }
-                activeQuestion = q;
+                if (!scrollWithButton) {
+                    activeQuestion = q;
+                }
             }
         }
     }
 
     private void scrollDown() {
-        double newY = scrollPos + getScroll();
-        double maxPos = getMaxPos();
-        if (scrollPos >= maxPos) {
+        int newY = curPos + getScrollSpeed();
+        int maxPos = getMaxPos();
+        if (curPos >= maxPos) {
             return;
         }
-        scrollPos = Math.min(newY, maxPos);
+        curPos = Math.min(newY, maxPos);
         isToRefresh = true;
     }
 
-    private double getMaxPos() {
-        return dialogHeight - canvas.getHeight()*MAX_HEIGHT;
+    private int getMaxPos() {
+        return dialogHeight - getViewHeight();
     }
 
     private void scrollUp() {
-        if (scrollPos == 0) {
+        if (curPos == 0) {
             return;
         }
-        double newY = scrollPos - getScroll();
-        scrollPos = Math.max(newY, 0);
+        int newY = curPos - getScrollSpeed();
+        curPos = Math.max(newY, 0);
         isToRefresh = true;
     }
 
     private void clear() {
         gc.setFill(Color.LIGHTGREY);
         double width = canvas.getWidth();
-        double height = canvas.getHeight();
 
-        gc.fillRect(0, dialogRectangleTop, width, height*MAX_HEIGHT);
+        gc.fillRect(0, dialogTop, width, getViewHeight());
     }
 
-    private double getScroll() {
-        return Settings.getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3;
+    private int getScrollSpeed() {
+        return (int) (Settings.getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
     }
-
     private class DialogItem {
+
         private final PosItem speaker;
         private final String text;
         private Image picture;
