@@ -19,8 +19,14 @@ public class DropView extends EquipmentView {
     private final Coords creaturePos = new Coords();
 
     private List<Equipment> droppedEquipment;
+    private double visionWidthDiameter;
     private double visionHeightDiameter;
     private double minCurPosY;
+    private double minCurPosX;
+    private double maxCurPosX;
+    private double xScrollPos;
+    private double xScrollButtonWidth;
+    private boolean xScrollVisible;
 
     public DropView(Canvas canvas) {
         super(canvas);
@@ -29,6 +35,8 @@ public class DropView extends EquipmentView {
     @Override
     public void refresh() {
         super.refresh();
+
+        drawHorScroll();
 
         gc.save();
 
@@ -45,6 +53,36 @@ public class DropView extends EquipmentView {
 
         drawEquipment();
         gc.restore();
+    }
+
+    private void drawHorScroll() {
+        xScrollVisible = !(visionWidthDiameter <= viewWidth);
+        if (!xScrollVisible) {
+            return;
+        }
+        int meter = Sizes.getMeter();
+        double y = (viewPos.y + viewHeight) * meter;
+
+        clearHorScroll(y);
+        drawHorScrollButton(y);
+    }
+
+    private void drawHorScrollButton(double y) {
+        minCurPosX = creaturePos.x - visionWidthDiameter/2;
+        maxCurPosX = creaturePos.x + visionWidthDiameter/2;
+        xScrollPos = (curPos.x - minCurPosX) * viewWidth / visionWidthDiameter;
+        double x = viewPos.x + xScrollPos;
+        xScrollButtonWidth = viewWidth * viewWidth / visionWidthDiameter;
+
+        gc.setFill(Color.GREEN);
+        int meter = Sizes.getMeter();
+        gc.fillRect(x * meter, y, xScrollButtonWidth * meter, scrollWidth * meter);
+    }
+
+    private void clearHorScroll(double y) {
+        gc.setFill(Color.BLUE);
+        int meter = Sizes.getMeter();
+        gc.fillRect(viewPos.x * meter, y, viewWidth * meter, scrollWidth * meter);
     }
 
     @Override
@@ -80,7 +118,10 @@ public class DropView extends EquipmentView {
 
     @Override
     protected void drawVerScroll() {
-        if (visionHeightDiameter <= viewHeight) return;
+        yScrollVisible = !(visionHeightDiameter <= viewHeight);
+        if (!yScrollVisible) {
+            return;
+        }
         int meter = Sizes.getMeter();
         double x = (viewPos.x + viewWidth) * meter;
 
@@ -88,7 +129,8 @@ public class DropView extends EquipmentView {
         drawVerScrollButton(x);
     }
 
-    private void drawVerScrollButton(double x) {
+    @Override
+    protected void drawVerScrollButton(double x) {
         minCurPosY = creaturePos.y - visionHeightDiameter/2;
         maxCurPosY = creaturePos.y + visionHeightDiameter/2;
         yScrollPos = (curPos.y - minCurPosY) * viewHeight / visionHeightDiameter;
@@ -128,7 +170,7 @@ public class DropView extends EquipmentView {
 
     @Override
     protected void drawBackground() {
-        gc.setFill(Color.BROWN);
+        gc.setFill(Color.DARKGRAY);
         gc.fillOval(viewPos.x * Sizes.getMeter(), viewPos.y * Sizes.getMeter(),
                 viewWidth * Sizes.getMeter(), viewHeight * Sizes.getMeter());
     }
@@ -167,6 +209,10 @@ public class DropView extends EquipmentView {
         }
     }
 
+    public void setVisionWidthDiameter(double visionWidthDiameter) {
+        this.visionWidthDiameter = visionWidthDiameter;
+    }
+
     public void setVisionHeightDiameter(double visionHeightDiameter) {
         this.visionHeightDiameter = visionHeightDiameter;
     }
@@ -180,5 +226,29 @@ public class DropView extends EquipmentView {
             creaturePos.y = y;
             curPos.y = creaturePos.y - viewHeight/2;
         }
+    }
+
+    public double getXScrollPos() {
+        return xScrollPos;
+    }
+
+    public double getXScrollButtonWidth() {
+        return xScrollButtonWidth;
+    }
+
+    public void setScrollPosX(double x) {
+        x -= xScrollButtonWidth/2;
+        double maxX;
+        if (x < 0) {
+            curPos.x = minCurPosX;
+        } else if (x > (maxX = viewWidth - xScrollButtonWidth)) {
+            curPos.x = maxX * ((maxCurPosX - minCurPosX) / viewWidth) + minCurPosX;
+        } else {
+            curPos.x = x * ((maxCurPosX - minCurPosX) / viewWidth) + minCurPosX;
+        }
+    }
+
+    public boolean isXScrollVisible() {
+        return xScrollVisible;
     }
 }

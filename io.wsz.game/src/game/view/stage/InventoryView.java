@@ -42,7 +42,8 @@ public class InventoryView {
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
     private EquipmentView origin;
-    private EquipmentView scrolled;
+    private EquipmentView scrolledVer;
+    private DropView scrolledHor;
 
     public InventoryView(Canvas canvas) {
         this.canvas = canvas;
@@ -86,7 +87,8 @@ public class InventoryView {
         dragStop = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
-                scrolled = null;
+                scrolledVer = null;
+                scrolledHor = null;
                 if (dragged[0] != null) {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
@@ -153,7 +155,8 @@ public class InventoryView {
     }
 
     private EquipmentView getEquipmentView(double x, double y) {
-        scrolled = null;
+        scrolledVer = null;
+        scrolledHor = null;
         for (EquipmentView ev : equipmentViews) {
 
             double evLeft = ev.getViewPos().x;
@@ -163,17 +166,37 @@ public class InventoryView {
 
             if (x > evLeft && x < evRight
                     && y > evTop && y < evBottom) return ev;
+
             double scrollWidth = ev.getScrollWidth();
-            double yScrollPos = ev.getYScrollPos();
-            double yScrollButtonHeight = ev.getYScrollButtonHeight();
-            if (x > evRight && x < evRight + scrollWidth
-                    && y > evTop + yScrollPos && y < evTop + yScrollPos + yScrollButtonHeight) {
-                scrolled = ev;
-                return null;
+            if (ev.isYScrollVisible()) {
+                double yScrollPos = ev.getYScrollPos();
+                double yScrollButtonHeight = ev.getYScrollButtonHeight();
+                if (x > evRight && x < evRight + scrollWidth
+                        && y > evTop + yScrollPos && y < evTop + yScrollPos + yScrollButtonHeight) {
+                    scrolledVer = ev;
+                    return null;
+                }
+                if (x > evRight && x < evRight + scrollWidth
+                        && y > evTop && y < evBottom) {
+                    ev.setScrollPosY(y - evTop);
+                }
             }
-            if (x > evRight && x < evRight + scrollWidth
-                    && y > evTop && y < evBottom) {
-                ev.setScrollPosY(y - evTop);
+
+            if (ev instanceof DropView) {
+                DropView dv = (DropView) ev;
+                if (dv.isXScrollVisible()) {
+                    double xScrollPos = dv.getXScrollPos();
+                    double xScrollButtonHeight = dv.getXScrollButtonWidth();
+                    if (x > evLeft + xScrollPos && x < evLeft + xScrollPos + xScrollButtonHeight
+                            && y > evBottom && y < evBottom + scrollWidth) {
+                        scrolledHor = dv;
+                        return null;
+                    }
+                    if (x > evLeft && x < evRight
+                            && y > evBottom && y < evBottom + scrollWidth) {
+                        dv.setScrollPosX(x - evLeft);
+                    }
+                }
             }
         }
         return null;
@@ -239,11 +262,18 @@ public class InventoryView {
                     mousePos.y*meter - img.getHeight());
         }
 
-        if (scrolled != null) {
-            double scrolledPosY = scrolled.getViewPos().y;
+        if (scrolledVer != null) {
+            double scrolledPosY = scrolledVer.getViewPos().y;
             double mousePosY = mousePos.y;
             double scrollToY = mousePosY - scrolledPosY;
-            scrolled.setScrollPosY(scrollToY);
+            scrolledVer.setScrollPosY(scrollToY);
+        }
+
+        if (scrolledHor != null) {
+            double scrolledPosX = scrolledHor.getViewPos().x;
+            double mousePosX = mousePos.x;
+            double scrollToX = mousePosX - scrolledPosX;
+            scrolledHor.setScrollPosX(scrollToX);
         }
     }
 
@@ -283,6 +313,7 @@ public class InventoryView {
         double height = cr.getSize().getHeight() + 2*range;
         dropView.setVisionHeightDiameter(height);
         double width = cr.getSize().getWidth() + 2*range;
+        dropView.setVisionWidthDiameter(width);
 
         double maxDropHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
         double maxDropWidth = 0.3 * inventoryWidth;
@@ -290,14 +321,22 @@ public class InventoryView {
         double resultHeight = height;
         double resultWidth = width;
 
+        double ratio = height/width;
+
         if (height >= maxDropHeight) {
             resultHeight = maxDropHeight;
-            double ratio = maxDropWidth/height;
-            resultWidth = width*ratio;
+            resultWidth = width / ratio;
+            if (resultWidth >= maxDropWidth) {
+                resultWidth = maxDropWidth;
+                resultHeight = resultHeight * ratio;
+            }
         } else if (width >= maxDropWidth) {
             resultWidth = maxDropWidth;
-            double ratio = maxDropHeight/width;
-            resultHeight = height*ratio;
+            resultHeight = height * ratio;
+            if (resultHeight >= maxDropHeight) {
+                resultHeight = maxDropHeight;
+                resultWidth = resultWidth / ratio;
+            }
         }
 
         dropView.setScrollWidth(scrollWidth);

@@ -23,11 +23,11 @@ public abstract class EquipmentView extends CanvasView {
     protected double viewWidth;
     protected double viewHeight;
     protected double scrollWidth;
-
     protected double yScrollPos;
     protected double yScrollButtonHeight;
     protected double maxCurPosY;
     protected Equipment dragged;
+    protected boolean yScrollVisible = true;
 
     public EquipmentView(Canvas canvas) {
         super(canvas);
@@ -47,10 +47,10 @@ public abstract class EquipmentView extends CanvasView {
         double x = (viewPos.x + viewWidth) * meter;
 
         clearVerScroll(x);
-        drawVerScroll(x);
+        drawVerScrollButton(x);
     }
 
-    private void drawVerScroll(double x) {
+    protected void drawVerScrollButton(double x) {
         OptionalDouble optMaxHeight = getItems().stream()
                 .mapToDouble(i -> i.getPos().y)
                 .max();
@@ -181,11 +181,6 @@ public abstract class EquipmentView extends CanvasView {
         return viewHeight;
     }
 
-    public void setCurPos(double x, double y) {
-        curPos.x = x;
-        curPos.y = y;
-    }
-
     public void setScrollPosY(double y) {
         y -= yScrollButtonHeight/2;
         double maxY;
@@ -229,5 +224,9 @@ public abstract class EquipmentView extends CanvasView {
 
     public void setDragged(Equipment e) {
         dragged = e;
+    }
+
+    public boolean isYScrollVisible() {
+        return yScrollVisible;
     }
 }
