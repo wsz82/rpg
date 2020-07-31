@@ -12,6 +12,7 @@ public class OutDoor extends Door<OutDoor> {
     private static final long serialVersionUID = 1L;
 
     private Coords exit;
+    private OutDoor connection;
 
     public OutDoor() {}
 
@@ -47,6 +48,66 @@ public class OutDoor extends Door<OutDoor> {
         this.exit = exit;
     }
 
+    public OutDoor getIndividualConnection() {
+        return connection;
+    }
+
+    public OutDoor getConnection() {
+        if (connection == null) {
+            if (prototype == null) {
+                return null;
+            }
+            return prototype.connection;
+        }
+        return connection;
+    }
+
+    public void setConnection(OutDoor connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public void open() {
+        open = true;
+        PosItem collision = getCollision();
+        if (collision != null) {
+            open = false;
+            System.out.println(getName() + " cannot be open: collides with " + collision.getName());
+        } else {
+            OutDoor connection = getConnection();
+            connection.setOpen(true);
+            PosItem connectionCollision = connection.getCollision();
+            if (connectionCollision != null) {
+                open = false;
+                connection.setOpen(false);
+                System.out.println(getName() + " cannot be open: " + connectionCollision.getName() + " blocks behind");
+            } else {
+                System.out.println(getName() + " open");
+            }
+        }
+    }
+
+    @Override
+    public void close() {
+        open = false;
+        PosItem collision = getCollision();
+        if (collision != null) {
+            open = true;
+            System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
+        } else {
+            OutDoor connection = getConnection();
+            connection.setOpen(false);
+            PosItem connectionCollision = connection.getCollision();
+            if (connectionCollision != null) {
+                open = true;
+                connection.setOpen(true);
+                System.out.println(getName() + " cannot be closed: " + connectionCollision.getName() + " blocks behind");
+            } else {
+                System.out.println(getName() + " closed");
+            }
+        }
+    }
+
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
@@ -68,6 +129,22 @@ public class OutDoor extends Door<OutDoor> {
         out.writeLong(Sizes.VERSION);
 
         out.writeObject(exit);
+
+        String connectionName;
+        if (connection == null) {
+            connectionName = "";
+        } else {
+            connectionName = connection.getName();
+        }
+        out.writeUTF(connectionName);
+
+        Coords connectionPos;
+        if (connection == null) {
+            connectionPos = null;
+        } else {
+            connectionPos = connection.getPos();
+        }
+        out.writeObject(connectionPos);
     }
 
     @Override
@@ -76,5 +153,13 @@ public class OutDoor extends Door<OutDoor> {
         long ver = in.readLong();
 
         exit = (Coords) in.readObject();
+
+        String connectionName = in.readUTF();
+        Coords connectionPos = (Coords) in.readObject();
+        if (!connectionName.isEmpty()) {
+            connection = new OutDoor();
+            connection.setName(connectionName);
+            connection.setPos(connectionPos);
+        }
     }
 }

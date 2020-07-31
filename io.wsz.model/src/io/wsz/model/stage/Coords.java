@@ -1,5 +1,6 @@
 package io.wsz.model.stage;
 
+import io.wsz.model.Controller;
 import io.wsz.model.item.CreatureSize;
 import io.wsz.model.location.Location;
 
@@ -25,6 +26,36 @@ public class Coords implements Externalizable {
     private static final List<Coords> lostReferences2 = new ArrayList<>(0);
     private static final List<Coords> resultCoords1 = new ArrayList<>(0);
     private static final List<Coords> resultCoords2 = new ArrayList<>(0);
+
+    public static Coords parseCoords(String s) {
+        Coords pos = new Coords();
+        int stringEnd;
+        String substring;
+        if (s.startsWith("Location")) {
+            s = s.replaceFirst("Location:", "");
+            stringEnd = s.indexOf("X");
+            substring = s.substring(0, stringEnd);
+            String locName = substring;
+            Location loc = new Location(locName);
+            pos.setLocation(loc);
+            Controller.get().restoreCoordsLocation(pos);
+            s = s.replaceFirst(locName + "X:", "");
+        } else {
+            s = s.replaceFirst("X:", "");
+        }
+        stringEnd = s.indexOf("Y");
+        substring = s.substring(0, stringEnd);
+        pos.x = Double.parseDouble(substring);
+
+        s = s.replaceFirst(substring + "Y:", "");
+        stringEnd = s.indexOf("Level");
+        substring = s.substring(0, stringEnd);
+        pos.y = Double.parseDouble(substring);
+
+        s = s.replaceFirst(substring + "Level:", "");
+        pos.level = Integer.parseInt(s);
+        return pos;
+    }
 
     public static List<Coords> cloneCoordsList(List<Coords> from) {
         if (from == null) return null;
@@ -221,10 +252,10 @@ public class Coords implements Externalizable {
     public static double getDistance(Coords c1, Coords c2) {
         return sqrt(pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2));
     }
-
     public static double getSquareDistance(Coords c1, Coords c2) {
         return pow(c2.x - c1.x, 2) + pow(c2.y - c1.y, 2);
     }
+
     public static double getSquareDistance(double x1, double x2, double y1, double y2) {
         return pow(x2 - x1, 2) + pow(y2 - y1, 2);
     }
@@ -315,9 +346,9 @@ public class Coords implements Externalizable {
 
         return doOverlap(p1Left, p1Top, p1Right, p1Bottom, p2Left, p2Top, p2Right, p2Bottom);
     }
-
     public double x;
     public double y;
+
     public int level;
 
     private Location location;
@@ -457,11 +488,10 @@ public class Coords implements Externalizable {
         String locationName;
         if (location != null) {
             locationName = location.getName();
-            return "Location: " + locationName + ": " + "X: " + x + ", Y: " + y + ", level: " + level;
+            return "Location:" + locationName + "X:" + x + "Y:" + y + "Level:" + level;
         } else {
-            return "X: " + x + ", Y: " + y + ", level: " + level;
+            return "X:" + x + "Y:" + y + "Level:" + level;
         }
-
     }
 
     @Override
@@ -472,7 +502,7 @@ public class Coords implements Externalizable {
         return Double.compare(coords.x, x) == 0 &&
                 Double.compare(coords.y, y) == 0 &&
                 level == coords.level &&
-                Objects.equals(getLocation(), coords.getLocation());
+                Objects.equals(getLocation().getName(), coords.getLocation().getName());
     }
 
     @Override

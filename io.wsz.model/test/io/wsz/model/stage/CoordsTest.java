@@ -1,6 +1,8 @@
 package io.wsz.model.stage;
 
+import io.wsz.model.Controller;
 import io.wsz.model.item.CreatureSize;
+import io.wsz.model.location.Location;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -8,6 +10,26 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CoordsTest {
+
+    @Test
+    public void coordsWithoutLocationAreParsed() {
+        Coords pos = new Coords(4.36, 12.01);
+
+        String posText = pos.toString();
+        Coords parsed = Coords.parseCoords(posText);
+        assertEquals(pos, parsed);
+    }
+
+    @Test
+    public void coordsWithLocationAreParsed() {
+        Location loc = new Location("testLoc", 25, 30);
+        Controller.get().getLocationsList().add(loc);
+        Coords pos = new Coords(4.36, 12.01, 1, loc);
+
+        String posText = pos.toString();
+        Coords parsed = Coords.parseCoords(posText);
+        assertEquals(pos, parsed);
+    }
 
     @Test
     public void testEquals() {

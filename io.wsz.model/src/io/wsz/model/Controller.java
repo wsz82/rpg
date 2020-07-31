@@ -111,9 +111,30 @@ public class Controller {
                     OutDoor od = (OutDoor) pi;
                     Coords exit = od.getExit();
                     restoreCoordsLocation(exit);
+                    restoreOutDoorConnection(od);
                 }
             }
         }
+    }
+
+    private void restoreOutDoorConnection(OutDoor od) {
+        OutDoor serConnection = od.getIndividualConnection();
+        if (serConnection == null) return;
+        String name = serConnection.getName();
+        Coords pos = serConnection.getPos();
+        restoreCoordsLocation(pos);
+        Location loc = pos.getLocation();
+        Optional<OutDoor> optConnection = loc.getItems().get().stream()
+                .filter(o -> o instanceof OutDoor)
+                .map(o -> (OutDoor) o)
+                .filter(o -> o.getName().equals(name))
+                .filter(o -> o.getPos().equals(pos))
+                .findFirst();
+        OutDoor connection = optConnection.orElse(null);
+        if (connection == null) {
+            throw new NullPointerException("OutDoor connection \"" + serConnection.getName() + "\" should be in location outDoors list");
+        }
+        od.setConnection(connection);
     }
 
     public void restoreCoordsLocation(Coords pos) {

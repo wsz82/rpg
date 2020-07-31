@@ -88,10 +88,7 @@ public class CoordsEdit {
 
             @Override
             public Location fromString(String s) {
-                if (s == null) {
-                    return null;
-                }
-                if (s.isEmpty()) {
+                if (s == null || s.isEmpty()) {
                     return null;
                 }
                 return getLocation(s);
@@ -160,5 +157,9 @@ public class CoordsEdit {
             pos.y = y;
         }
         return pos;
+    }
+
+    public ChoiceBox<Location> getLocationChoice() {
+        return locationChoice;
     }
 }
