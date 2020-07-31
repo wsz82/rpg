@@ -47,7 +47,7 @@ class MainView {
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(stage, ctv, editorCanvas);
         assetsWindow = new AssetsStage(stage, pointer, ctv);
-        locationsWindow = new LocationsStage(stage);
+        locationsWindow = new LocationsStage(stage, editorCanvas);
         pss = new PluginSettingsStage(stage);
     }
 

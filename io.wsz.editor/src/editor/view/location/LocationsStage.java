@@ -1,6 +1,7 @@
 package editor.view.location;
 
 import editor.view.stage.ChildStage;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
@@ -15,10 +16,11 @@ import java.util.List;
 public class LocationsStage extends ChildStage {
     private static final String TITLE = "Locations";
     private final StackPane root = new StackPane();
-    private final LocationsTableView table = new LocationsTableView();
+    private final LocationsTableView table;
 
-    public LocationsStage(Stage parent) {
+    public LocationsStage(Stage parent, EditorCanvas editorCanvas) {
         super(parent);
+        this.table = new LocationsTableView(editorCanvas);
         initWindow();
     }
 

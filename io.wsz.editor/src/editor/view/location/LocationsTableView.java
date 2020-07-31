@@ -1,9 +1,11 @@
 package editor.view.location;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.location.LocationsList;
+import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -16,9 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LocationsTableView extends TableView<Location> {
+    private final EditorCanvas editorCanvas;
 
-    LocationsTableView() {
+    LocationsTableView(EditorCanvas editorCanvas) {
         super();
+        this.editorCanvas = editorCanvas;
         initTable();
     }
 
@@ -112,6 +116,12 @@ public class LocationsTableView extends TableView<Location> {
 
     public void goTo() {
         Location location = getSelectionModel().getSelectedItem();
-        Controller.get().getCurrentLocation().setLocation(location);
+        Controller controller = Controller.get();
+        controller.getCurrentLocation().setLocation(location);
+        Coords curPos = controller.getBoard().getBoardPos();
+        curPos.x = 0;
+        curPos.y = 0;
+        curPos.level = 0;
+        editorCanvas.refresh();
     }
 }
