@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Equipment;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -13,12 +14,12 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
 
     protected HBox weightBox;
 
-    public EquipmentAssetStage(Stage parent, A item, boolean isContent) {
-        super(parent, item, isContent);
+    public EquipmentAssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, item, isContent, editorCanvas);
     }
 
-    public EquipmentAssetStage(Stage parent) {
-        super(parent);
+    public EquipmentAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
     }
 
     @Override

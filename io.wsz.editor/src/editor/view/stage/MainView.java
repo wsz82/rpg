@@ -46,7 +46,7 @@ class MainView {
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(stage, ctv, editorCanvas);
-        assetsWindow = new AssetsStage(stage, pointer, ctv);
+        assetsWindow = new AssetsStage(stage, pointer, ctv, editorCanvas);
         locationsWindow = new LocationsStage(stage, editorCanvas);
         pss = new PluginSettingsStage(stage);
     }

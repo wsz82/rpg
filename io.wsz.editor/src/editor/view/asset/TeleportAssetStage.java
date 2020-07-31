@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
@@ -23,13 +24,13 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     private CoordsEdit coordsEdit;
 
-    public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent) {
-        super(parent, asset, isContent);
+    public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, asset, isContent, editorCanvas);
         initWindow();
     }
 
-    public TeleportAssetStage(Stage parent) {
-        super(parent);
+    public TeleportAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
         initWindow();
     }
 
@@ -103,7 +104,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         if (item == null) {
             item = createNewAsset();
         }
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent);
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas);
         coordsEdit.initCoords(container);
 
         super.fillInputs();

@@ -2,12 +2,16 @@ package editor.view.asset;
 
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -19,14 +23,17 @@ import java.util.Optional;
 public class CoordsEdit {
     private final Coords pos;
     private final boolean isContent;
+    private final EditorCanvas editorCanvas;
     private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
     private final DoubleField inputX;
     private final DoubleField inputY;
     private final IntegerField inputLayer;
+    private final Button goToButton = new Button("Go to");
 
-    public CoordsEdit(Coords pos, boolean isContent) {
+    public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas) {
         this.pos = pos;
         this.isContent = isContent;
+        this.editorCanvas = editorCanvas;
         inputX = new DoubleField(0.0, isContent);
         inputY = new DoubleField(0.0, isContent);
         inputLayer = new IntegerField(isContent);
@@ -49,11 +56,24 @@ public class CoordsEdit {
         inputLayer.setPrefWidth(50);
         posBox.getChildren().addAll(xLabel, inputX, yLabel, inputY, layerLabel, inputLayer);
 
-        container.getChildren().addAll(location, posBox);
+        container.getChildren().addAll(location, posBox, goToButton);
 
-        setUpLocationChoice(locationChoice);
+        hookUpEvents();
 
         fillCoordsInputs();
+    }
+
+    private void hookUpEvents() {
+        setUpLocationChoice(locationChoice);
+        goToButton.setOnAction(e -> goToPos());
+    }
+
+    private void goToPos() {
+        Controller controller = Controller.get();
+        Board board = controller.getBoard();
+        int meter = Sizes.getMeter();
+        board.centerScreenOn(pos, editorCanvas.getWidth() / meter, editorCanvas.getHeight() / meter);
+        editorCanvas.refresh();
     }
 
     private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {

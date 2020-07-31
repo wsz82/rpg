@@ -257,7 +257,7 @@ class SettingsMenu extends StackPane {
 
     private void changeFullScreenSetting(boolean isSelected) {
         gameStage.setFullScreen(isSelected);
-        Coords current = Controller.get().getBoardPos();
+        Coords current = Controller.get().getCurPos();
         current.x = 0;
         current.y = 0;
     }

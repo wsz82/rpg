@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
 import javafx.stage.Stage;
@@ -9,13 +10,13 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     private final OpenableInDoor openable = new OpenableInDoor(this, item, isContent);
 
-    public InDoorAssetStage(Stage parent, InDoor item, boolean isContent) {
-        super(parent, item, isContent);
+    public InDoorAssetStage(Stage parent, InDoor item, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, item, isContent, editorCanvas);
         initWindow();
     }
 
-    public InDoorAssetStage(Stage parent) {
-        super(parent);
+    public InDoorAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
         initWindow();
     }
 

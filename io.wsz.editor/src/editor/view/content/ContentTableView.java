@@ -180,21 +180,21 @@ public class ContentTableView extends TableView<PosItem> {
         ItemType type = pi.getType();
         AssetStage itemStage = switch (type) {
             case CREATURE -> new CreatureAssetStage(
-                    parent, (Creature) pi, true);
+                    parent, (Creature) pi, true, editorCanvas);
             case TELEPORT -> new TeleportAssetStage(
-                    parent, (Teleport) pi, true);
+                    parent, (Teleport) pi, true, editorCanvas);
             case LANDSCAPE -> new LandscapeAssetStage(
-                    parent, (Landscape) pi, true);
+                    parent, (Landscape) pi, true, editorCanvas);
             case COVER -> new CoverAssetStage(
-                    parent, (Cover) pi, true);
+                    parent, (Cover) pi, true, editorCanvas);
             case WEAPON -> new WeaponAssetStage(
-                    parent, (Weapon) pi, true);
+                    parent, (Weapon) pi, true, editorCanvas);
             case CONTAINER -> new ContainerAssetStage(
-                    parent, (Container) pi, true);
+                    parent, (Container) pi, true, editorCanvas);
             case INDOOR -> new InDoorAssetStage(
-                    parent, (InDoor) pi, true);
+                    parent, (InDoor) pi, true, editorCanvas);
             case OUTDOOR -> new OutDoorAssetStage(
-                    parent, (OutDoor) pi, true);
+                    parent, (OutDoor) pi, true, editorCanvas);
             case FOG -> null;
         };
         if (itemStage == null) return;

@@ -55,7 +55,7 @@ public class Sizes {
 
     public static void setResizeWithResolution(boolean resizeWithResolution) {
         setReloadImages(true);
-        Coords screenPos = Board.get().getBoardPos();
+        Coords screenPos = Board.get().getCurPos();
         screenPos.x = 0;
         screenPos.y = 0;
         Sizes.resizeWithResolution = resizeWithResolution;

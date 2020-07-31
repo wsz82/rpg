@@ -20,7 +20,7 @@ public class Pointer {
                 mark.x = event.getX() / Sizes.getMeter();
                 mark.y = event.getY() / Sizes.getMeter();
                 mark.level = Controller.get().getCurrentLayer().getLevel();
-                mark.add(Controller.get().getBoardPos());
+                mark.add(Controller.get().getCurPos());
                 if (markerImage == null) {
                     loadMarkerImage();
                 }

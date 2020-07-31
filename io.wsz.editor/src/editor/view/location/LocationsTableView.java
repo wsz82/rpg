@@ -118,7 +118,7 @@ public class LocationsTableView extends TableView<Location> {
         Location location = getSelectionModel().getSelectedItem();
         Controller controller = Controller.get();
         controller.getCurrentLocation().setLocation(location);
-        Coords curPos = controller.getBoard().getBoardPos();
+        Coords curPos = controller.getBoard().getCurPos();
         curPos.x = 0;
         curPos.y = 0;
         curPos.level = 0;

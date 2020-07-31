@@ -165,8 +165,8 @@ public class Controller {
         this.locationToUpdate = locationToUpdate;
     }
 
-    public Coords getBoardPos() {
-        return Board.get().getBoardPos();
+    public Coords getCurPos() {
+        return Board.get().getCurPos();
     }
 
     public Creature getCreatureToOpenInventory() {

@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
 import io.wsz.model.stage.Coords;
@@ -11,13 +12,13 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private OpenableOutDoor openable;
     private CoordsEdit coordsEdit;
 
-    public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent) {
-        super(parent, item, isContent);
+    public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, item, isContent, editorCanvas);
         initWindow();
     }
 
-    public OutDoorAssetStage(Stage parent) {
-        super(parent);
+    public OutDoorAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
         initWindow();
     }
 
@@ -36,7 +37,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         }
         openable = new OpenableOutDoor(this, item, isContent);
         openable.initOpenable(container);
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent);
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas);
         coordsEdit.initCoords(container);
 
         super.fillInputs();

@@ -201,19 +201,19 @@ public class GameController {
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
-        Coords currentPos = gameView.getCurPos();
+        Coords curPos = controller.getCurPos();
         Coords loadedPos = memento.getLastPos();
-        currentPos.x = loadedPos.x;
-        currentPos.y = loadedPos.y;
+        curPos.x = loadedPos.x;
+        curPos.y = loadedPos.y;
     }
 
     public void initNewGameSettings() {
         Plugin p = controller.getActivePlugin();
         double startX = p.getStartPos().x;
         double startY = p.getStartPos().y;
-        Coords currentPos = gameView.getCurPos();
-        currentPos.x = startX;
-        currentPos.y = startY;
+        Coords curPos = controller.getCurPos();
+        curPos.x = startX;
+        curPos.y = startY;
     }
 
     public void showLoaderView(Task<String> loader) {

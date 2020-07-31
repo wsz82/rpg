@@ -19,7 +19,7 @@ class CoordinatesBox extends HBox {
                 mousePos.x = event.getX() / Sizes.getMeter();
                 mousePos.y = event.getY() / Sizes.getMeter();
                 Controller.get();
-                Coords boardPos = Controller.get().getBoardPos();
+                Coords boardPos = Controller.get().getCurPos();
                 mousePos.add(boardPos);
                 mouseX.setText("X: " + String.format("%.2f", mousePos.x));
                 mouseY.setText("Y: " + String.format("%.2f", mousePos.y));

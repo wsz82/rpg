@@ -45,7 +45,7 @@ public class GameView extends CanvasView {
     private final Stage parent;
     private final GameController gameController = GameController.get();
     private final List<PosItem> items = new ArrayList<>(0);
-    private final Coords curPos = controller.getBoardPos();
+    private final Coords curPos = controller.getCurPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords1 = new Coords();
     private final Coords modifiedCoords2 = new Coords();
@@ -277,8 +277,9 @@ public class GameView extends CanvasView {
 
     private void updatePos() {
         Coords posToCenter = controller.getPosToCenter();
+        int meter = Sizes.getMeter();
         if (posToCenter.x != -1) {
-            centerScreenOn(posToCenter);
+            board.centerScreenOn(posToCenter, canvas.getWidth() / meter, canvas.getHeight() / meter);
             posToCenter.x = -1;
             return;
         }
@@ -323,7 +324,7 @@ public class GameView extends CanvasView {
             if (!controlledCreatures.isEmpty()) {
                 Creature cr = controlledCreatures.get(0);
                 if (cr != null) {
-                    centerScreenOn(cr.getCenter());
+                    board.centerScreenOn(cr.getCenter(), canvas.getWidth() / meter, canvas.getHeight() / meter);
                     return;
                 }
             }
@@ -620,25 +621,6 @@ public class GameView extends CanvasView {
         controller.setInventory(true);
     }
 
-    private void centerScreenOn(Coords posToCenter) {
-        double canvasWidth = canvas.getWidth()/ Sizes.getMeter();
-        double canvasHeight = canvas.getHeight()/ Sizes.getMeter();
-        double x = posToCenter.x - canvasWidth/2;
-        double y = posToCenter.y - canvasHeight/2;
-        double locWidth = controller.getCurrentLocation().getWidth();
-        double locHeight = controller.getCurrentLocation().getHeight();
-        if (x > locWidth - canvasWidth) {
-            curPos.x = locWidth - canvasWidth;
-        } else {
-            curPos.x = Math.max(x, 0);
-        }
-        if (y > locHeight - canvasHeight) {
-            curPos.y = locHeight - canvasHeight;
-        } else {
-            curPos.y = Math.max(y, 0);
-        }
-    }
-
     private void commandControllableFirstAction(PosItem pi) {
         Location location = controller.getCurrentLocation().getLocation();
         board.getControlledCreatures(location)
@@ -705,9 +687,5 @@ public class GameView extends CanvasView {
 
     public Canvas getCanvas() {
         return canvas;
-    }
-
-    public Coords getCurPos() {
-        return curPos;
     }
 }

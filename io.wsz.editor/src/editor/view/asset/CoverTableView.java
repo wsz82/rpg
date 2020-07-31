@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.sizes.Sizes;
@@ -12,8 +13,8 @@ import java.util.List;
 
 public class CoverTableView extends AssetsTableView<Cover> {
 
-    CoverTableView(Stage parent, ObservableList<Cover> assets) {
-        super(parent, assets);
+    CoverTableView(Stage parent, ObservableList<Cover> assets, EditorCanvas editorCanvas) {
+        super(parent, assets, editorCanvas);
     }
 
     @Override
@@ -22,13 +23,13 @@ public class CoverTableView extends AssetsTableView<Cover> {
         if (c == null) {
             return;
         }
-        CoverAssetStage as = new CoverAssetStage(parent, c, false);
+        CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        CoverAssetStage as = new CoverAssetStage(parent);
+        CoverAssetStage as = new CoverAssetStage(parent, editorCanvas);
         as.show();
     }
 

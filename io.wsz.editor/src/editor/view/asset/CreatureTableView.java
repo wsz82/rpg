@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
@@ -17,8 +18,8 @@ import java.util.List;
 
 class CreatureTableView extends AssetsTableView<Creature> {
 
-    CreatureTableView(Stage parent, ObservableList<Creature> assets) {
-        super(parent, assets);
+    CreatureTableView(Stage parent, ObservableList<Creature> assets, EditorCanvas editorCanvas) {
+        super(parent, assets, editorCanvas);
         initCreatureTable();
     }
 
@@ -52,13 +53,13 @@ class CreatureTableView extends AssetsTableView<Creature> {
         if (cr == null) {
             return;
         }
-        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false);
+        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false, editorCanvas);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        CreatureAssetStage as = new CreatureAssetStage(parent);
+        CreatureAssetStage as = new CreatureAssetStage(parent, editorCanvas);
         as.show();
     }
 

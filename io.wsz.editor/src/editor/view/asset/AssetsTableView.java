@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.model.EditorController;
 import editor.view.content.ContentTableView;
+import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
@@ -25,15 +26,19 @@ import java.util.stream.Collectors;
 public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private static final double MAX_HEIGHT = 8000;
     private static final double MAX_WIDTH = 8000;
+
+    protected final EditorCanvas editorCanvas;
     protected final Stage parent;
     protected final ObservableList<A> assets;
+
     private Pointer pointer;
     private ContentTableView contentTableView;
 
-    AssetsTableView(Stage parent, ObservableList<A> assets) {
+    AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas) {
         super();
         this.parent = parent;
         this.assets = assets;
+        this.editorCanvas = editorCanvas;
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         initTable();
         setItems(assets);

@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
 import javafx.scene.control.Button;
@@ -18,13 +19,13 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     private OpenableContainer openable;
 
-    public ContainerAssetStage(Stage parent, Container item, boolean isContent) {
-        super(parent, item, isContent);
+    public ContainerAssetStage(Stage parent, Container item, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, item, isContent, editorCanvas);
         initWindow();
     }
 
-    public ContainerAssetStage(Stage parent) {
-        super(parent);
+    public ContainerAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
         initWindow();
     }
 

@@ -30,7 +30,7 @@ public class EditorCanvas extends Canvas {
     private final Pointer pointer;
     private final Pane parent;
     private final Controller controller = Controller.get();
-    private final Coords currentPos = controller.getBoardPos();
+    private final Coords currentPos = controller.getCurPos();
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
 
@@ -298,7 +298,7 @@ public class EditorCanvas extends Canvas {
                         e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter(),
                         controller.getCurrentLayer().getLevel(),
                         controller.getCurrentLocation().getLocation());
-                dragPos.add(controller.getBoardPos());
+                dragPos.add(controller.getCurPos());
                 EditorController.get().setDragPos(dragPos);
                 success = true;
             }

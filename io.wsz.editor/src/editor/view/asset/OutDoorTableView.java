@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
 import io.wsz.model.sizes.Sizes;
@@ -15,8 +16,8 @@ import java.util.List;
 
 public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
-    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets) {
-        super(parent, assets);
+    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets, EditorCanvas editorCanvas) {
+        super(parent, assets, editorCanvas);
         initOutDoorTable();
     }
 
@@ -50,13 +51,13 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         if (id == null) {
             return;
         }
-        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        OutDoorAssetStage as = new OutDoorAssetStage(parent);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, editorCanvas);
         as.show();
     }
 

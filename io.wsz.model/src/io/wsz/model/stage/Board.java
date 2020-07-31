@@ -18,9 +18,10 @@ import static java.lang.Math.toRadians;
 public class Board {
     private static Board singleton;
 
+    private final Controller controller = Controller.get();
     private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
     private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
-    private final Coords boardPos = new Coords(0, 0);
+    private final Coords curPos = new Coords(0, 0);
 
     private final List<PosItem> allItems = new ArrayList<>(0);
     private final List<PosItem> items = new ArrayList<>(0);
@@ -42,8 +43,33 @@ public class Board {
 
     private Board() {}
 
-    public Coords getBoardPos() {
-        return boardPos;
+    public Coords getCurPos() {
+        return curPos;
+    }
+
+    public void centerScreenOn(Coords posToCenter, double canvasWidth, double canvasHeight) {
+        Location locationToGo = posToCenter.getLocation();
+        if (locationToGo != null) {
+            Location actual = controller.getCurrentLocation().getLocation();
+            if (actual != locationToGo) {
+                controller.getCurrentLocation().setLocation(locationToGo);
+            }
+        }
+        curPos.level = posToCenter.level;
+        double x = posToCenter.x - canvasWidth/2;
+        double y = posToCenter.y - canvasHeight/2;
+        double locWidth = controller.getCurrentLocation().getWidth();
+        double locHeight = controller.getCurrentLocation().getHeight();
+        if (x > locWidth - canvasWidth) {
+            curPos.x = locWidth - canvasWidth;
+        } else {
+            curPos.x = Math.max(x, 0);
+        }
+        if (y > locHeight - canvasHeight) {
+            curPos.y = locHeight - canvasHeight;
+        } else {
+            curPos.y = Math.max(y, 0);
+        }
     }
 
     public PosItem lookForItem(Location location, double x, double y, ItemType[] types, boolean includeLevelsBelow) {
@@ -61,7 +87,7 @@ public class Board {
                 })
                 .filter(pi -> {
                     int level = pi.getPos().level;
-                    int actualLevel = Controller.get().getCurrentLayer().getLevel(); //TODO checked location
+                    int actualLevel = controller.getCurrentLayer().getLevel(); //TODO checked location
                     if (includeLevelsBelow) {
                         return level <= actualLevel;
                     } else {
@@ -439,7 +465,7 @@ public class Board {
 
     public void looseCreaturesControl(Location location) {
         List<Creature> creatures = getControlledCreatures(location);
-        Controller.get().getCreaturesToLooseControl().addAll(creatures);
+        controller.getCreaturesToLooseControl().addAll(creatures);
     }
 
     public List<Creature> getControllablesWithinRectangle(double left, double top, double right, double bottom, Location location) {

@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.ItemType;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
+    protected final EditorCanvas editorCanvas;
     protected final VBox container = new VBox(5);
     protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
@@ -37,14 +39,16 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
 
-    public AssetStage(Stage parent, A item, boolean isContent) {
+    public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas) {
         super(parent);
         this.item = item;
         this.isContent = isContent;
+        this.editorCanvas = editorCanvas;
     }
 
-    public AssetStage(Stage parent) {
+    public AssetStage(Stage parent, EditorCanvas editorCanvas) {
         super(parent);
+        this.editorCanvas = editorCanvas;
     }
 
     protected void initWindow() {

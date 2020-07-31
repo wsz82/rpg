@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.launcher.Main;
+import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
@@ -293,8 +294,9 @@ public class GameStage extends Stage {
     }
 
     private void saveGame(boolean overwrite, String name) {
-        Coords currentPos = gameView.getCurPos();
-        gameController.saveGame(overwrite, name, currentPos, Main.getDir());
+        Controller controller = Controller.get();
+        Coords curPos = controller.getCurPos();
+        gameController.saveGame(overwrite, name, curPos, Main.getDir());
         gameController.resumeGame();
     }
 

@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.view.DoubleField;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
 import javafx.geometry.Pos;
@@ -14,13 +15,13 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private final DoubleField inputRange = new DoubleField(0.0, isContent);
     private final DoubleField inputSpeed = new DoubleField(0.0, isContent);
 
-    public WeaponAssetStage(Stage parent, Weapon asset, boolean isContent) {
-        super(parent, asset, isContent);
+    public WeaponAssetStage(Stage parent, Weapon asset, boolean isContent, EditorCanvas editorCanvas) {
+        super(parent, asset, isContent, editorCanvas);
         initWindow();
     }
 
-    public WeaponAssetStage(Stage parent) {
-        super(parent);
+    public WeaponAssetStage(Stage parent, EditorCanvas editorCanvas) {
+        super(parent, editorCanvas);
         initWindow();
     }
 

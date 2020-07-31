@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;
@@ -29,13 +30,13 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final IntegerField strengthInput = new IntegerField(isContent);
     private final Button itemsButton = new Button("Items");
 
-    public CreatureAssetStage(Stage parent, Creature asset, boolean isContent){
-        super(parent, asset, isContent);
+    public CreatureAssetStage(Stage parent, Creature asset, boolean isContent, EditorCanvas editorCanvas){
+        super(parent, asset, isContent, editorCanvas);
         initWindow();
     }
 
-    public CreatureAssetStage(Stage parent){
-        super(parent);
+    public CreatureAssetStage(Stage parent, EditorCanvas editorCanvas){
+        super(parent, editorCanvas);
         initWindow();
     }
 
