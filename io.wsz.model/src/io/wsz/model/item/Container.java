@@ -70,14 +70,21 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     public void searchContainer(Creature cr) {
         if (open) {
-            if (cr.getControl() == CreatureControl.CONTROL) {
-                Controller.get().setCreatureToOpenInventory(cr);
-                Controller.get().setContainerToOpen(this);
-                Controller.get().setInventory(true);
-                System.out.println(getName() + " searched by " + cr.getName());
-            }
+            searchOpenContainer(cr);
         } else {
             open();
+            if (open) {
+                searchOpenContainer(cr);
+            }
+        }
+    }
+
+    private void searchOpenContainer(Creature cr) {
+        if (cr.getControl() == CreatureControl.CONTROL) {
+            Controller.get().setCreatureToOpenInventory(cr);
+            Controller.get().setContainerToOpen(this);
+            Controller.get().setInventory(true);
+            System.out.println(getName() + " searched by " + cr.getName());
         }
     }
 

@@ -130,6 +130,7 @@ public class Board {
 
     public PosItem getObstacle(Coords nextPos, PosItem i, Location location, ItemType[] types) {
         items.clear();
+        if (location == null) return null;
         location.getItems().get().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> {

@@ -38,7 +38,7 @@ public class InventoryView {
     private final ContainerView containerView;
 
     private Equipment dragged;
-    private EventHandler<MouseEvent> equipmentLook;
+    private EventHandler<MouseEvent> onClick;
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
     private EquipmentView origin;
@@ -71,7 +71,7 @@ public class InventoryView {
         };
         canvas.addEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
 
-        equipmentLook = e -> {
+        onClick = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
@@ -80,9 +80,16 @@ public class InventoryView {
                 synchronized (GameController.get().getGameRunner()) {
                     startDrag(mousePos.x, mousePos.y);
                 }
+            } else if (button.equals(MouseButton.SECONDARY)) {
+                e.consume();
+                mousePos.x = e.getX() / Sizes.getMeter();
+                mousePos.y = e.getY() / Sizes.getMeter();
+                synchronized (GameController.get().getGameRunner()) {
+                    openContainer();
+                }
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, equipmentLook);
+        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
 
         dragStop = e -> {
             MouseButton button = e.getButton();
@@ -100,6 +107,25 @@ public class InventoryView {
             }
         };
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
+    }
+
+    private void openContainer() {
+        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+        if (ev instanceof ContainerView) return;
+        origin = ev;
+        translateScreenCoordsToCoords(mousePos, ev.getCurPos(), ev.getViewPos());
+        Equipment eq = lookForEquipment(modifiedCoords.x, modifiedCoords.y, ev);
+        if (!(eq instanceof Container)) return;
+        Container toOpen = (Container) eq;
+        Controller controller = Controller.get();
+        Container openCon = controller.getContainerToOpen();
+        if (toOpen == openCon) {
+            openCon.close();
+            controller.setContainerToOpen(null);
+        } else {
+            Creature cr = controller.getCreatureToOpenInventory();
+            toOpen.searchContainer(cr);
+        }
     }
 
     private void startDrag(double mouseX, double mouseY) {
@@ -230,7 +256,7 @@ public class InventoryView {
             holdView.add(dragged, cr, 0, 0);
             dragged = null;
         }
-        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, equipmentLook);
+        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
         Controller.get().closeInventory();
@@ -370,10 +396,14 @@ public class InventoryView {
 
     private void drawContainer(double inventoryWidth) {
         Creature cr = Controller.get().getCreatureToOpenInventory();
-        Container c = Controller.get().getContainerToOpen();
-        if (c == null) return;
+        Container con = Controller.get().getContainerToOpen();
+        if (con == null) return;
         CreatureSize size = cr.getSize();
-        if (!c.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) return;
+        boolean inventoryNotContainContainerToOpen = !holdView.getItems().contains(con);
+        if (inventoryNotContainContainerToOpen) {
+            boolean containerOutOfRange = !con.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
+            if (containerOutOfRange) return;
+        }
         double width = 0.3 * inventoryWidth;
         double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
         double x = 0.3 * inventoryWidth;
@@ -383,7 +413,7 @@ public class InventoryView {
         containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
-        containerView.setContainer(c);
+        containerView.setContainer(con);
         containerView.refresh();
     }
 
