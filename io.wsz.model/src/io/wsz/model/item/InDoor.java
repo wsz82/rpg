@@ -9,8 +9,8 @@ public class InDoor extends Door<InDoor> {
         super(type);
     }
 
-    public InDoor(InDoor prototype, String name, ItemType type, String path, Boolean visible) {
-        super(prototype, name, type, path, visible);
+    public InDoor(InDoor prototype, Boolean visible) {
+        super(prototype, visible);
     }
 
     @Override

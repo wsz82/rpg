@@ -45,13 +45,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Cover cover = new Cover(
-                    p, name, type, path,
-                    true);
+            Cover cover = new Cover(p, true);
             cover.setPos(pos);
             output.add(cover);
         }

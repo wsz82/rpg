@@ -498,11 +498,21 @@ public class Coords implements Externalizable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Coords)) return false;
-        Coords coords = (Coords) o;
-        return Double.compare(coords.x, x) == 0 &&
-                Double.compare(coords.y, y) == 0 &&
-                level == coords.level &&
-                Objects.equals(getLocation().getName(), coords.getLocation().getName());
+        Coords pos = (Coords) o;
+        Location loc = getLocation();
+        Location posLoc = pos.getLocation();
+        boolean locsEquals;
+        if (loc == null && posLoc == null) {
+            locsEquals = true;
+        } else if (loc != null && posLoc != null) {
+            locsEquals = Objects.equals(loc.getName(), posLoc.getName());
+        } else {
+            locsEquals = false;
+        }
+        return Double.compare(pos.x, x) == 0 &&
+                Double.compare(pos.y, y) == 0 &&
+                level == pos.level &&
+                locsEquals;
     }
 
     @Override

@@ -85,13 +85,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Weapon w = new Weapon(
-                    p, name, type, path,
-                    true);
+            Weapon w = new Weapon(p, true);
             w.setPos(pos);
             output.add(w);
         }

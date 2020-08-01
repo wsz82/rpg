@@ -26,6 +26,7 @@ public abstract class Asset implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private static final String ASSETS_DIR = File.separator + "assets";
+
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
@@ -104,6 +105,9 @@ public abstract class Asset implements Externalizable {
         }
         String path = getRelativeTypePath(getType()) + File.separator + fileName;
         File fixedFile = new File(Controller.getProgramDir() + path);
+        if (!fixedFile.exists()) {
+            throw new NullPointerException(fixedFile + " does not exist");
+        }
         String url = null;
         try {
             url = fixedFile.toURI().toURL().toString();
@@ -202,7 +206,9 @@ public abstract class Asset implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name.get());
+        String name = this.name.get();
+        if (name == null) name = "";
+        out.writeUTF(name);
 
         out.writeObject(type.get());
 
@@ -213,7 +219,9 @@ public abstract class Asset implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name.set(in.readUTF());
+        String name = in.readUTF();
+        if (name.isEmpty()) name = null;
+        this.name.set(name);
 
         type.set((ItemType) in.readObject());
 

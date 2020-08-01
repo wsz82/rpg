@@ -75,13 +75,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Creature cr = new Creature(
-                    p, name, type, path,
-                    true);
+            Creature cr = new Creature(p, true);
             cr.setPos(pos);
 
             Task pTasks = p.getTask();

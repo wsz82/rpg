@@ -22,9 +22,10 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
 
     protected final Coords center = new Coords();
 
-    protected A prototype;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
     protected final Coords pos = new Coords();
+
+    protected A prototype;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
@@ -40,8 +41,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         this.dialog = new Dialog();
     }
 
-    public PosItem(A prototype, String name, ItemType type, String path, Boolean visible) {
-        super(name, type, path);
+    public PosItem(A prototype, Boolean visible) {
         this.prototype = prototype;
         this.visible.set(visible);
     }
@@ -301,6 +301,22 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
             return prototype.getName();
         }
         return super.getName();
+    }
+
+    @Override
+    public ItemType getType() {
+        if (prototype != null) {
+            return prototype.getType();
+        }
+        return super.getType();
+    }
+
+    @Override
+    public String getRelativePath() {
+        if (prototype != null) {
+            return prototype.getRelativePath();
+        }
+        return super.getRelativePath();
     }
 
     @Override

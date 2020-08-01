@@ -27,8 +27,8 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         this.openDoorCollisionPolygons = new ArrayList<>(0);
     }
 
-    public Door(I prototype, String name, ItemType type, String path, Boolean visible) {
-            super(prototype, name, type, path, visible);
+    public Door(I prototype, Boolean visible) {
+            super(prototype, visible);
     }
 
     public String getIndividualOpenImagePath() {

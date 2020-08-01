@@ -15,8 +15,8 @@ public class Landscape extends PosItem<Landscape> {
         super(type);
     }
 
-    public Landscape(Landscape prototype, String name, ItemType type, String path, Boolean visible) {
-        super(prototype, name, type, path, visible);
+    public Landscape(Landscape prototype, Boolean visible) {
+        super(prototype, visible);
     }
 
     @Override

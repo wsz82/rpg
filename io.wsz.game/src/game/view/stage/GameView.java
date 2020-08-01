@@ -402,15 +402,12 @@ public class GameView extends CanvasView {
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenter();
         Coords translatedPos = translateCoordsToScreenCoords1(centerBottomPos);
-        double x = translatedPos.x * Sizes.getMeter();
-        double y = translatedPos.y * Sizes.getMeter();
-        switch (control) {
-            case CONTROL -> gc.setStroke(Color.GREEN);
-            case ENEMY -> gc.setStroke(Color.RED);
-        }
-        gc.setLineWidth(1.5);
-        gc.strokeOval(x - size.getWidth()/2.0 * Sizes.getMeter(), y - size.getHeight()/2.0 * Sizes.getMeter(),
-                size.getWidth() * Sizes.getMeter(), size.getHeight() * Sizes.getMeter());
+        int meter = Sizes.getMeter();
+        double x = translatedPos.x - size.getWidth() / 2.0;
+        double y = translatedPos.y - size.getHeight() / 2.0;
+        CreatureBase base = CreatureBase.getCreatureBase(size, control);
+        Image img = base.getImage();
+        gc.drawImage(img, x * meter, y * meter);
     }
 
     private void hookUpEvents() {

@@ -16,7 +16,7 @@ class CreatureTest {
     public void testEquals() {
         List<Coords> pcl = new ArrayList<>(0);
         List<List<Coords>> pcp = new ArrayList<>(0);
-        Creature p = new Creature(null, "Enemy", ItemType.CREATURE, "C:/enemy.png",
+        Creature p = new Creature(null,
                 true);
         p.setCoverLine(pcl);
         p.setCollisionPolygons(pcp);
@@ -28,14 +28,14 @@ class CreatureTest {
 
         Integer level = 0;
 
-        Creature a = new Creature(p, p.getName(), p.getType(), p.getRelativePath(), true);
+        Creature a = new Creature(p, true);
 
         Inventory inventoryA = new Inventory(a);
         a.setInventory(inventoryA);
 
         a.getTask().setDest(new Coords(12, 7));
 
-        Creature b = new Creature(p, p.getName(), p.getType(), p.getRelativePath(), true);
+        Creature b = new Creature(p, true);
 
         a.getTask().clone(b);
 

@@ -63,13 +63,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Container c = new Container(
-                    p, name, type, path,
-                    true);
+            Container c = new Container(p, true);
             c.setPos(pos);
             c.getItems().addAll(p.getItems());
             c.setOpen(p.isOpen());

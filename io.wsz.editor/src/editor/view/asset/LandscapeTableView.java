@@ -45,11 +45,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Landscape l = new Landscape(p, name, type, path, true);
+            Landscape l = new Landscape(p, true);
             l.setPos(pos);
             output.add(l);
         }

@@ -32,8 +32,8 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         super(type);
     }
 
-    public Equipment(E prototype, String name, ItemType type, String path, Boolean visible) {
-        super(prototype, name, type, path, visible);
+    public Equipment(E prototype, Boolean visible) {
+        super(prototype, visible);
     }
 
     public Double getIndividualWeight() {

@@ -265,13 +265,23 @@ public class GameRunner {
         protected String call() throws Exception {
             List<PosItem> items = controller.getCurrentLocation().getItems();
             Set<Asset> assets = getAssets(items);
-            int total = assets.size() - 1;
+            CreatureBase[] bases = CreatureBase.getBases();
+            int total = assets.size() + bases.length;
+            int i = 0;
             updateProgress(0, total);
 
             Sizes.fog.setImage(null);
             Sizes.fog.getInitialImage();
+            i++;
+            updateProgress(i, total);
 
-            int i = 0;
+            for (CreatureBase base : bases) {
+                base.setImg(null);
+                base.getImage();
+                i++;
+                updateProgress(i, total);
+            }
+
             for (Asset a : assets) {
                 reloadAssetImages(a);
                 updateProgress(i, total);

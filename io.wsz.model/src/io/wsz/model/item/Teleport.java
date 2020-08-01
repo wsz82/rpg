@@ -24,8 +24,8 @@ public class Teleport extends PosItem<Teleport> {
         this.teleportCollisionPolygons = new ArrayList<>(0);
     }
 
-    public Teleport(Teleport prototype, String name, ItemType type, String path, Boolean visible) {
-        super(prototype, name, type, path, visible);
+    public Teleport(Teleport prototype, Boolean visible) {
+        super(prototype, visible);
     }
 
     public void enter(Creature cr) {

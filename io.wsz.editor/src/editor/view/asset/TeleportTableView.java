@@ -90,13 +90,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getRelativePath();
-
-            Teleport t = new Teleport(
-                    p, name, type, path,
-                    true);
+            Teleport t = new Teleport(p, true);
             t.setPos(pos);
 
             output.add(t);

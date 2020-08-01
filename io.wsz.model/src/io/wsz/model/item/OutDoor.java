@@ -21,8 +21,8 @@ public class OutDoor extends Door<OutDoor> {
         this.exit = new Coords();
     }
 
-    public OutDoor(OutDoor prototype, String name, ItemType type, String path, Boolean visible) {
-        super(prototype, name, type, path, visible);
+    public OutDoor(OutDoor prototype, Boolean visible) {
+        super(prototype, visible);
     }
 
     public void enter(Creature cr) {
