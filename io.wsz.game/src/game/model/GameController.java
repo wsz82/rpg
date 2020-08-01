@@ -68,9 +68,7 @@ public class GameController {
         LastPluginCaretaker pc = new LastPluginCaretaker();
         String lastPluginName = pc.loadMemento(Main.getDir());
         Plugin p = controller.loadPlugin(lastPluginName);
-        if (p == null) {
-            return;
-        }
+        if (p == null) return;
         if (p.getLocations() != null) {
             controller.setActivePlugin(p);
         }

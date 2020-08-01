@@ -7,7 +7,7 @@ import io.wsz.model.location.Location;
 
 import java.io.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class PluginCaretaker {
 
@@ -35,9 +35,8 @@ public class PluginCaretaker {
 
     public Plugin load(String name) {
         Plugin deserialized = deserializeAll(name);
-
+        if (deserialized == null) return null;
         retrievePrototypeReferences(deserialized);
-
         return deserializeAll(name);
     }
 
@@ -48,10 +47,14 @@ public class PluginCaretaker {
                 PosItem prototype = pi.getPrototype();
                 if (prototype != null) {
                     String prototypeName = prototype.getName();
-                    List<Asset> singleAsset = assets.stream()
+                    Optional<Asset> optAsset = assets.stream()
                             .filter(a -> a.getName().equals(prototypeName))
-                            .collect(Collectors.toList());
-                    pi.setPrototype((PosItem) singleAsset.get(0));
+                            .findFirst();
+                    Asset p = optAsset.orElse(null);
+                    if (p == null) {
+                        throw new NullPointerException(prototypeName + " reference is not found");
+                    }
+                    pi.setPrototype((PosItem) p);
                 }
             }
         }
@@ -59,27 +62,29 @@ public class PluginCaretaker {
 
     private Plugin deserializeAll(String name) {
         File file = Controller.getProgramDir();
-        Plugin plugin;
+        Plugin p;
         try (
             FileInputStream fos = new FileInputStream(file + File.separator + name);
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
-            plugin = (Plugin) oos.readObject();
+            p = (Plugin) oos.readObject();
+            p.setName(name);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        return plugin;
+        return p;
     }
 
-    public Plugin getPluginMetadata(String pluginName) {
+    public Plugin getPluginMetadata(String name) {
         File file = Controller.getProgramDir();
         Plugin p;
         try (
-                FileInputStream fos = new FileInputStream(file + File.separator + pluginName);
+                FileInputStream fos = new FileInputStream(file + File.separator + name);
                 ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             p = (Plugin) oos.readObject();
+            p.setName(name);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -225,7 +225,7 @@ class MainView {
         if (saveFile == null) {
             return;
         }
-        editorController.savePluginAs(saveFile.getName(), pss);    //TODO fill only name
+        editorController.savePluginAs(saveFile.getName(), pss);
     }
 
     private void saveFile() {

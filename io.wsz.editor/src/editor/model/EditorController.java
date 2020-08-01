@@ -99,6 +99,7 @@ public class EditorController {
     public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
         PluginCaretaker pc = new PluginCaretaker();
         Plugin p = pc.load(pluginName);
+        if (p == null) return;
         controller.setActivePlugin(p);
         loadEditorActivePluginToLists();
         restorePluginSettingsStage(pss, p);

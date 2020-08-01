@@ -82,6 +82,7 @@ public class GamePluginsTable extends Stage {
         }
         String pluginToActivateName = pluginToActivate.getName();
         Plugin plugin = Controller.get().loadPlugin(pluginToActivateName);
+        if (plugin == null) return;
         Controller.get().setActivePlugin(plugin);
         GameController.get().storeLastPlugin(plugin);
         close();
