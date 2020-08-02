@@ -170,6 +170,8 @@ public class Controller {
     public void setPosToCenter(Coords posToCenter) {
         this.posToCenter.x = posToCenter.x;
         this.posToCenter.y = posToCenter.y;
+        this.posToCenter.level = posToCenter.level;
+        this.posToCenter.setLocation(posToCenter.getLocation());
     }
 
     public Plugin loadPluginMetadata(String name) {

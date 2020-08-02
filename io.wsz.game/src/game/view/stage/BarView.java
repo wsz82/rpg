@@ -31,6 +31,7 @@ public class BarView {
     private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
     private int hoveredPortrait;
+    private Controller controller;
 
     public BarView(Canvas canvas) {
         this.canvas = canvas;
@@ -123,20 +124,21 @@ public class BarView {
             return;
         }
 
-        Controller.get().setCreatureToOpenInventory(cr);
+        controller = Controller.get();
+        controller.setCreatureToOpenInventory(cr);
 
         CreatureControl control = cr.getControl();
         if (control == CreatureControl.CONTROLLABLE) {
-            Controller.get().getCreaturesToControl().add(cr);
+            controller.getCreaturesToControl().add(cr);
         } else {
-            Controller.get().getCreaturesToLooseControl().add(cr);
+            controller.getCreaturesToLooseControl().add(cr);
         }
-        Location current = Controller.get().getCurrentLocation().getLocation();
+        Location current = controller.getCurrentLocation().getLocation();
         Location heroLocation = cr.getPos().getLocation();
         if (current != heroLocation) {
-            Controller.get().setLocationToUpdate(heroLocation);
+            controller.setLocationToUpdate(heroLocation);
         }
-        Controller.get().setPosToCenter(cr.getImageCenter());
+        controller.setPosToCenter(cr.getCenter());
     }
 
     private void updateActivePortrait(double leftX, double padding, double portraitSize) {

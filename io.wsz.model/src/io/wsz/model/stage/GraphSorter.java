@@ -12,7 +12,6 @@ import static io.wsz.model.stage.ItemsComparator.compare;
 public class GraphSorter<A extends PosItem> {
     private final Graph<A> graph = new Graph<>(new ArrayList<>(0));
     private final List<A> sortedItems = new ArrayList<>(0);
-    private final Node<A> tempNode = new Node<>(null);
 
     public void sortItems(List<A> items) {
 

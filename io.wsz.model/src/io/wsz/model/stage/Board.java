@@ -2,6 +2,7 @@ package io.wsz.model.stage;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
+import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import javafx.scene.image.Image;
@@ -56,6 +57,15 @@ public class Board {
             }
         }
         curPos.level = posToCenter.level;
+        List<Layer> layers = controller.getCurrentLocation().getLayers();
+        Layer layer;
+        try {
+            layer = layers.get(curPos.level);
+        } catch (IndexOutOfBoundsException e) {
+            layer = layers.get(0);
+        }
+        controller.getCurrentLayer().setLayer(layer);
+
         double x = posToCenter.x - canvasWidth/2;
         double y = posToCenter.y - canvasHeight/2;
         double locWidth = controller.getCurrentLocation().getWidth();

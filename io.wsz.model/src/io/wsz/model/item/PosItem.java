@@ -49,12 +49,14 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     public Coords getImageCenter() {
         center.x = pos.x + getImageWidth()/2;
         center.y = pos.y + getImageHeight()/2;
+        center.level = pos.level;
         return center;
     }
 
     public Coords getCenter() {
         center.x = pos.x + getImageWidth()/2;
         center.y = pos.y + getImageHeight()/2;
+        center.level = pos.level;
         return center;
     }
 
