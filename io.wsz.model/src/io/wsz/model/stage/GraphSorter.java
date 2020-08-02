@@ -12,6 +12,7 @@ import static io.wsz.model.stage.ItemsComparator.compare;
 public class GraphSorter<A extends PosItem> {
     private final Graph<A> graph = new Graph<>(new ArrayList<>(0));
     private final List<A> sortedItems = new ArrayList<>(0);
+    private final Node<A> tempNode = new Node<>(null);
 
     public void sortItems(List<A> items) {
 
@@ -96,13 +97,22 @@ public class GraphSorter<A extends PosItem> {
 
     private Node<A> findMin(Node<A> n) {
         List<Node<A>> lesser = n.getLesser();
+        Node<A> first = null;
+        Node<A> last = n;
         while (!lesser.isEmpty()) {
             n = lesser.get(0);
-            lesser = n.getLesser();
+            if (first != null && n == first) {
+                break;
+            }
+            if (first == null) {
+                first = n;
+            }
+            last = n;
+            lesser = last.getLesser();
         }
-        for (Node<A> greater : n.getGreater()) {
-            greater.getLesser().remove(n);
+        for (Node<A> greater : last.getGreater()) {
+            greater.getLesser().remove(last);
         }
-        return n;
+        return last;
     }
 }
