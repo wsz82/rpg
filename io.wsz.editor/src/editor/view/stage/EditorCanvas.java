@@ -30,16 +30,19 @@ public class EditorCanvas extends Canvas {
     private final Pointer pointer;
     private final Pane parent;
     private final Controller controller = Controller.get();
-    private final Coords currentPos = controller.getCurPos();
+    private final Coords curPos = controller.getCurPos();
+    private final Coords draggedItemMousePos = new Coords();
+
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
+    private PosItem draggedItem;
 
     public EditorCanvas(Stage stage, Pane parent, Pointer pointer){
         this.stage = stage;
         this.pointer = pointer;
         this.parent = parent;
         setSize();
-        hookupEvents();
+        hookUpEvents();
     }
 
     public void refresh() {
@@ -47,12 +50,13 @@ public class EditorCanvas extends Canvas {
         GraphicsContext gc = getGraphicsContext2D();
         clear(gc);
 
-        double left = currentPos.x;
+        double left = curPos.x;
         double canvasWidth = getWidth();
-        double right = left + canvasWidth/Sizes.getMeter();
-        double top = currentPos.y;
+        int meter = Sizes.getMeter();
+        double right = left + canvasWidth/ meter;
+        double top = curPos.y;
         double canvasHeight = getHeight();
-        double bottom = top + canvasHeight/Sizes.getMeter();
+        double bottom = top + canvasHeight/ meter;
 
         List<PosItem> items = controller.getCurrentLocation().getItems();
         items = items.stream()
@@ -89,9 +93,9 @@ public class EditorCanvas extends Canvas {
 
             Coords pos = pi.getPos();
             Coords translated = pos.clonePos();
-            translated.subtract(currentPos);
-            double x = (translated.x * Sizes.getMeter());
-            double y = (translated.y * Sizes.getMeter());
+            translated.subtract(curPos);
+            double x = (translated.x * meter);
+            double y = (translated.y * meter);
 
             Image img = pi.getImage();
             double width = img.getWidth();
@@ -145,20 +149,20 @@ public class EditorCanvas extends Canvas {
             }
             Coords translated = mark.clonePos();
             translated.setLocation(controller.getCurrentLocation().getLocation());
-            translated.subtract(currentPos);
+            translated.subtract(curPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
                 return;
             }
-            double x = translated.x * Sizes.getMeter() - marker.getWidth()/2;
-            double y = translated.y * Sizes.getMeter() - marker.getHeight()/2;
+            double x = translated.x * meter - marker.getWidth()/2;
+            double y = translated.y * meter - marker.getHeight()/2;
             gc.drawImage(marker, x, y);
         }
     }
 
     private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
         Coords translated = pi.getPos().clonePos();
-        translated.subtract(currentPos);
+        translated.subtract(curPos);
         double width = pi.getImage().getWidth();
         double height = pi.getImage().getHeight();
         gc.setStroke(Color.RED);
@@ -167,78 +171,16 @@ public class EditorCanvas extends Canvas {
         gc.strokeRect(translated.x * Sizes.getMeter(), translated.y * Sizes.getMeter(), width, height);
     }
 
-    private void hookupEvents() {
-        double[] dx = new double[2];
-        double[] dy = new double[2];
+    private void hookUpEvents() {
+        hookUpScreenDragEvents();
+        hookUpItemsPermutationEvents();
+        hookUpLocationSizeEvents();
+        hookUpClickEvents();
+        hookUpItemDragEvents();
+    }
 
-        EventHandler<MouseEvent> startDrag = e -> {
-            e.consume();
-            this.startFullDrag();
-            dx[0] = e.getX();
-            dy[0] = e.getY();
-        };
-        EventHandler<MouseEvent> progressDrag = e -> {
-            e.consume();
-            dx[1] = e.getX();
-            dy[1] = e.getY();
-            double dX = dx[1] - dx[0];
-            double dY = dy[1] - dy[0];
-            double newX = currentPos.x * Sizes.getMeter() - dX;
-            double newY = currentPos.y * Sizes.getMeter() - dY;
-            double locWidth = controller.getCurrentLocation().getWidth() * Sizes.getMeter();
-            double locHeight = controller.getCurrentLocation().getHeight() * Sizes.getMeter();
-
-            if (newX + getWidth() <= locWidth) {
-                currentPos.x = Math.max(newX, 0) / Sizes.getMeter();
-            } else {
-                currentPos.x = (locWidth - getWidth()) / Sizes.getMeter();
-            }
-
-            if (newY + getHeight() <= locHeight) {
-                currentPos.y = Math.max(newY, 0) / Sizes.getMeter();
-            } else {
-                currentPos.y = (locHeight - getHeight()) / Sizes.getMeter();
-            }
-
-            refresh();
-        };
-        addEventHandler(MouseDragEvent.DRAG_DETECTED, startDrag);
-        addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressDrag);
-
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            currentPos.x = 0;
-            refresh();
-        });
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
-            currentPos.y = 0;
-            refresh();
-        });
-        ListChangeListener<? super PosItem> locationListener = c -> {
-            if (!c.next()) {
-                return;
-            }
-            if (c.wasAdded() || c.wasRemoved()) {
-                List<PosItem> addedContent = (List<PosItem>) c.getAddedSubList();
-                hookupItemsEvents(addedContent);
-            }
-            refresh();
-        };
-        controller.getCurrentLocation().getItems().addListener(locationListener);
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
-            hookupItemsEvents(controller.getCurrentLocation().getItems());
-            controller.getCurrentLocation().getItems().addListener(locationListener);
-        });
-
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
-            refresh();
-        });
-        controller.getCurrentLocation().widthProperty().addListener((observable, oldValue, newValue) -> {
-            refresh();
-        });
-        controller.getCurrentLocation().heightProperty().addListener((observable, oldValue, newValue) -> {
-            refresh();
-        });
-
+    private void hookUpClickEvents() {
+        int meter = Sizes.getMeter();
         setOnMouseClicked(e -> {
             e.consume();
             setFocusTraversable(true);
@@ -250,17 +192,9 @@ public class EditorCanvas extends Canvas {
                 }
                 PosItem pi = null;
                 if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    Coords pos = new Coords(
-                            e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter(),
-                            controller.getCurrentLayer().getLevel(),
-                            controller.getCurrentLocation().getLocation());
-                    Coords translated = pos.clonePos();
-                    translated.add(currentPos);
-                    double x = translated.x;
-                    double y = translated.y;
-                    ItemType[] types = ItemType.values();
-                    Location location = controller.getCurrentLocation().getLocation();
-                    pi = controller.getBoard().lookForItem(location, x, y, types, true);
+                    double xPos = e.getX() / meter;
+                    double yPos = e.getY() / meter;
+                    pi = getPosItem(xPos, yPos);
                 }
                 if (pi != null) {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
@@ -280,32 +214,158 @@ public class EditorCanvas extends Canvas {
                 refresh();
             }
         });
+    }
+
+    private void hookUpLocationSizeEvents() {
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
+            curPos.x = 0;
+            refresh();
+        });
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
+            curPos.y = 0;
+            refresh();
+        });
+        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
+            refresh();
+        });
+        controller.getCurrentLocation().widthProperty().addListener((observable, oldValue, newValue) -> {
+            refresh();
+        });
+        controller.getCurrentLocation().heightProperty().addListener((observable, oldValue, newValue) -> {
+            refresh();
+        });
+    }
+
+    private void hookUpItemsPermutationEvents() {
+        ListChangeListener<? super PosItem> locationListener = c -> {
+            if (!c.next()) {
+                return;
+            }
+            if (c.wasAdded() || c.wasRemoved()) {
+                List<PosItem> addedContent = (List<PosItem>) c.getAddedSubList();
+                hookupItemsEvents(addedContent);
+            }
+            refresh();
+        };
+        controller.getCurrentLocation().getItems().addListener(locationListener);
+        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
+            hookupItemsEvents(controller.getCurrentLocation().getItems());
+            controller.getCurrentLocation().getItems().addListener(locationListener);
+        });
+    }
+
+    private void hookUpItemDragEvents() {
+        int meter = Sizes.getMeter();
+        setOnDragDetected(e -> {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                e.consume();
+                double xPos = e.getX() / meter;
+                double yPos = e.getY() / meter;
+                PosItem selectedItem = getPosItem(xPos, yPos);
+                if (selectedItem == null) {
+                    return;
+                }
+                draggedItem = selectedItem;
+                Coords itemPos = selectedItem.getPos();
+                draggedItemMousePos.x = xPos - itemPos.x;
+                draggedItemMousePos.y = yPos - itemPos.y;
+
+                Dragboard db = startDragAndDrop(TransferMode.MOVE);
+
+                ClipboardContent content = new ClipboardContent();
+                content.putImage(selectedItem.getImage());
+                db.setContent(content);
+            }
+        });
 
         setOnDragOver(e -> {
-            if (e.getGestureSource() != this
-                    && e.getDragboard().hasImage()) {
-                e.acceptTransferModes(TransferMode.COPY);
-            }
-
             e.consume();
+            if (e.getDragboard().hasImage()) {
+                e.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+            }
         });
 
         setOnDragDropped(e -> {
+            e.consume();
             Dragboard db = e.getDragboard();
             boolean success = false;
             if (db.hasImage()) {
                 Coords dragPos = new Coords(
-                        e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter(),
+                        e.getX() / meter, e.getY() / meter,
                         controller.getCurrentLayer().getLevel(),
                         controller.getCurrentLocation().getLocation());
-                dragPos.add(controller.getCurPos());
-                EditorController.get().setDragPos(dragPos);
+                if (draggedItem == null) {
+                    dragPos.add(controller.getCurPos());
+                    EditorController.get().setDragPos(dragPos);
+                } else {
+                    dragPos.x -= draggedItemMousePos.x;
+                    dragPos.y -= draggedItemMousePos.y;
+                    draggedItem.setPos(dragPos);
+                    refresh();
+                    draggedItem = null;
+                }
                 success = true;
             }
             e.setDropCompleted(success);
-
-            e.consume();
         });
+    }
+
+    private PosItem getPosItem(double xPos, double yPos) {
+        PosItem pi;
+        Coords pos = new Coords(
+                xPos, yPos,
+                controller.getCurrentLayer().getLevel(),
+                controller.getCurrentLocation().getLocation());
+        Coords translated = pos.clonePos();
+        translated.add(curPos);
+        double x = translated.x;
+        double y = translated.y;
+        ItemType[] types = ItemType.values();
+        Location location = controller.getCurrentLocation().getLocation();
+        pi = controller.getBoard().lookForItem(location, x, y, types, true);
+        return pi;
+    }
+
+    private void hookUpScreenDragEvents() {
+        double[] dx = new double[2];
+        double[] dy = new double[2];
+
+        EventHandler<MouseEvent> startScreenDrag = e -> {
+            MouseButton button = e.getButton();
+            if (button.equals(MouseButton.MIDDLE)) {
+                e.consume();
+                this.startFullDrag();
+                dx[0] = e.getX();
+                dy[0] = e.getY();
+            }
+        };
+        EventHandler<MouseEvent> progressScreenDrag = e -> {
+            e.consume();
+            dx[1] = e.getX();
+            dy[1] = e.getY();
+            double dX = dx[1] - dx[0];
+            double dY = dy[1] - dy[0];
+            double newX = curPos.x * Sizes.getMeter() - dX;
+            double newY = curPos.y * Sizes.getMeter() - dY;
+            double locWidth = controller.getCurrentLocation().getWidth() * Sizes.getMeter();
+            double locHeight = controller.getCurrentLocation().getHeight() * Sizes.getMeter();
+
+            if (newX + getWidth() <= locWidth) {
+                curPos.x = Math.max(newX, 0) / Sizes.getMeter();
+            } else {
+                curPos.x = (locWidth - getWidth()) / Sizes.getMeter();
+            }
+
+            if (newY + getHeight() <= locHeight) {
+                curPos.y = Math.max(newY, 0) / Sizes.getMeter();
+            } else {
+                curPos.y = (locHeight - getHeight()) / Sizes.getMeter();
+            }
+
+            refresh();
+        };
+        addEventHandler(MouseDragEvent.DRAG_DETECTED, startScreenDrag);
+        addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressScreenDrag);
     }
 
     private void attachArrowsEventToPointer() {

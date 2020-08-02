@@ -49,6 +49,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     private void hookupEvents() {
         setOnDragDetected(e -> {
+            e.consume();
             List<A> selectedAssets = getSelectionModel().getSelectedItems();
             if (selectedAssets == null || selectedAssets.isEmpty()) {
                 return;
@@ -60,11 +61,10 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
             ClipboardContent content = new ClipboardContent();
             content.putImage(firstAsset.getImage());
             db.setContent(content);
-
-            e.consume();
         });
 
         setOnDragDone(e -> {
+            e.consume();
             if (e.getTransferMode() == TransferMode.COPY) {
                 EditorController editorController = EditorController.get();
                 Coords dragPos = editorController.getDragPos();
@@ -77,7 +77,6 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                     editorController.setItemsStageToAddItems(null);
                 }
             }
-            e.consume();
         });
     }
 
