@@ -5,6 +5,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
 import java.awt.*;
@@ -407,11 +408,8 @@ public class Creature extends PosItem<Creature> implements Containable {
             return new Image(url, portraitSize, portraitSize, false, false, true);
         } else {
             Dimension d = new Dimension(portraitSize, portraitSize);
-            if (d == null) {
-                throw new NullPointerException(url + " dimension is null");
-            }
-            Dimension rd = getRequestedDimension(d);
-            return getChangedImage(url, d, rd);
+            Dimension rd = ResolutionImage.getRequestedDimension(d);
+            return ResolutionImage.getChangedImage(url, d, rd);
         }
     }
 

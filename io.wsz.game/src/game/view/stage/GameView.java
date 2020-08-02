@@ -132,7 +132,7 @@ public class GameView extends CanvasView {
     private void drawFog(List<Creature> heroes) {
         Location loc = controller.getCurrentLocation().getLocation();
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
-        double fogSize = Sizes.fog.getImage().getWidth() / Sizes.getMeter();
+        double fogSize = Sizes.FOG.getImage().getWidth() / Sizes.getMeter();
         if (discoveredFog == null) {
             int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
             int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
@@ -202,7 +202,7 @@ public class GameView extends CanvasView {
     private void drawFogPiece(Coords pos) {
         pos.x *= Sizes.getMeter();
         pos.y *= Sizes.getMeter();
-        gc.drawImage(Sizes.fog.getImage(), pos.x, pos.y);
+        gc.drawImage(Sizes.FOG.getImage(), pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {

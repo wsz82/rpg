@@ -270,8 +270,8 @@ public class GameRunner {
             int i = 0;
             updateProgress(0, total);
 
-            Sizes.fog.setImage(null);
-            Sizes.fog.getInitialImage();
+            Sizes.FOG.setImage(null);
+            Sizes.FOG.getInitialImage();
             i++;
             updateProgress(i, total);
 
