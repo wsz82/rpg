@@ -121,7 +121,7 @@ public class OutDoor extends Door<OutDoor> {
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (getObstacleOnWay(cr) != null) return false;
-            if (isOpen()) {
+            if (isOpen() || getOpenImagePath().isEmpty()) {
                 enter(cr);
             } else {
                 open();
@@ -129,6 +129,15 @@ public class OutDoor extends Door<OutDoor> {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean creatureSecondaryInteract(Creature cr) {
+        if (getOpenImagePath().isEmpty()) {
+            return false;
+        } else {
+            return super.creatureSecondaryInteract(cr);
+        }
     }
 
     @Override
