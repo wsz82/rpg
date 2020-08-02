@@ -15,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -28,6 +29,7 @@ public class ItemsStage<A extends Containable> extends ChildStage {
     private final A containable;
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
+
     private TableView<TableItem> table;
     private ObservableList<TableItem> tableItems;
 
@@ -81,6 +83,18 @@ public class ItemsStage<A extends Containable> extends ChildStage {
             e.setDropCompleted(success);
 
             e.consume();
+        });
+
+        table.setOnKeyPressed(e -> {
+            KeyCode code = e.getCode();
+            if (code.equals(KeyCode.DELETE)) {
+                e.consume();
+                TableItem selTableItem = table.getSelectionModel().getSelectedItem();
+                if (selTableItem == null) return;
+                Equipment selEquipment = selTableItem.equipment;
+                if (selEquipment == null) return;
+                table.getItems().remove(selTableItem);
+            }
         });
     }
 
