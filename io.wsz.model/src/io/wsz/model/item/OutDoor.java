@@ -75,6 +75,10 @@ public class OutDoor extends Door<OutDoor> {
             System.out.println(getName() + " cannot be open: collides with " + collision.getName());
         } else {
             OutDoor connection = getConnection();
+            if (connection == null) {
+                System.out.println(getName() + " open");
+                return;
+            }
             connection.setOpen(true);
             PosItem connectionCollision = connection.getCollision();
             if (connectionCollision != null) {
@@ -96,6 +100,10 @@ public class OutDoor extends Door<OutDoor> {
             System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
         } else {
             OutDoor connection = getConnection();
+            if (connection == null) {
+                System.out.println(getName() + " open");
+                return;
+            }
             connection.setOpen(false);
             PosItem connectionCollision = connection.getCollision();
             if (connectionCollision != null) {
