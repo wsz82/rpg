@@ -189,6 +189,9 @@ public class Container extends Equipment<Container> implements Containable, Open
     @Override
     public Image getOpenImage() {
         if (prototype == null) {
+            if (openImagePath.isEmpty()) {
+                return getInitialImage();
+            }
             if (openImage == null) {
                 setOpenImage(loadImageFromPath(getOpenImagePath()));
             }

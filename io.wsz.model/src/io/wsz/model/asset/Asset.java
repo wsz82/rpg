@@ -99,6 +99,18 @@ public abstract class Asset implements Externalizable {
         return image.get();
     }
 
+    public double getImageHeight() {
+        Image img = getImage();
+        if (img == null) return 0;
+        return img.getHeight() / Sizes.getMeter();
+    }
+
+    public double getImageWidth() {
+        Image img = getImage();
+        if (img == null) return 0;
+        return img.getWidth() / Sizes.getMeter();
+    }
+
     protected Image loadImageFromPath(String fileName) {
         if (fileName.isEmpty()) {
             return null;
@@ -106,7 +118,12 @@ public abstract class Asset implements Externalizable {
         String path = getRelativeTypePath(getType()) + File.separator + fileName;
         File fixedFile = new File(Controller.getProgramDir() + path);
         if (!fixedFile.exists()) {
-            throw new NullPointerException(fixedFile + " does not exist");
+            try {
+                throw new NullPointerException(fixedFile + " does not exist");
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
         String url = null;
         try {

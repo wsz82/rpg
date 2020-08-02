@@ -129,11 +129,13 @@ public class Creature extends PosItem<Creature> implements Containable {
         return centerBottom;
     }
 
-    public Coords reverseCenterBottomPos(double x, double y) {
+    public Coords reverseCenterBottomPos(double x, double y, int level, Location location) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
         reversedCenterBottom.x = x - width/2;
         reversedCenterBottom.y = y - height;
+        reversedCenterBottom.level = level;
+        reversedCenterBottom.setLocation(location);
         return reversedCenterBottom;
     }
 
@@ -150,7 +152,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     public Coords reverseCenterBottomPos(Coords difPos) {
-        return reverseCenterBottomPos(difPos.x, difPos.y);
+        return reverseCenterBottomPos(difPos.x, difPos.y, difPos.level, difPos.getLocation());
     }
 
     public void onFirstAction(PosItem pi) {

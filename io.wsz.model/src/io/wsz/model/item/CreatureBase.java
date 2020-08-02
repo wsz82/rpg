@@ -100,7 +100,12 @@ public class CreatureBase {
         String path = getRelativeTypePath() + File.separator + fileName;
         File fixedFile = new File(Controller.getProgramDir() + path);
         if (!fixedFile.exists()) {
-            throw new NullPointerException(fixedFile + " does not exist");
+            try {
+                throw new NullPointerException(fixedFile + " does not exist");
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
         String url = null;
         try {

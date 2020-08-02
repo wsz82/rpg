@@ -74,14 +74,6 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
         return pos.y + getImageHeight();
     }
 
-    public double getImageHeight() {
-        return getImage().getHeight() / Sizes.getMeter();
-    }
-
-    public double getImageWidth() {
-        return getImage().getWidth() / Sizes.getMeter();
-    }
-
     public void changeLocation(Location from, Coords exit) {
         Location target = exit.getLocation();
         if (!from.equals(target)) {

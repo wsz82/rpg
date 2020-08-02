@@ -53,6 +53,9 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
     @Override
     public Image getOpenImage() {
         if (prototype == null) {
+            if (openImagePath.isEmpty()) {
+                return getInitialImage();
+            }
             if (openImage == null) {
                 setOpenImage(loadImageFromPath(getOpenImagePath()));
             }
