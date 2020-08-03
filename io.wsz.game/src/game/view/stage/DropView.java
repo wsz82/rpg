@@ -1,9 +1,6 @@
 package game.view.stage;
 
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.Equipment;
-import io.wsz.model.item.PosItem;
+import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -96,7 +93,7 @@ public class DropView extends EquipmentView {
             adjustCoverOpacity(cr, pi);
 
             if (pi == cr) {
-                drawCreatureSize();
+                drawCreatureBase(cr);
             }
 
             Coords pos = pi.getPos();
@@ -142,19 +139,14 @@ public class DropView extends EquipmentView {
         gc.fillRect(x, y * meter, scrollWidth * meter, yScrollButtonHeight * meter);
     }
 
-    private void drawCreatureSize() {
-        Creature cr = controller.getCreatureToOpenInventory();
+    private void drawCreatureBase(Creature cr) {
         CreatureSize size = cr.getSize();
-
+        CreatureControl control = cr.getControl();
         Coords pos = cr.getCenter();
         Coords corrected = currentPosCorrection(pos);
-        double x = (corrected.x + viewPos.x) * Sizes.getMeter();
-        double y = (corrected.y + viewPos.y) * Sizes.getMeter();
-
-        gc.setStroke(Color.GREEN);
-        gc.setLineWidth(1.5);
-        gc.strokeOval(x - size.getWidth()/2.0 * Sizes.getMeter(), y - size.getHeight()/2.0 * Sizes.getMeter(),
-                size.getWidth() * Sizes.getMeter(), size.getHeight() * Sizes.getMeter());
+        double x = (corrected.x + viewPos.x);
+        double y = (corrected.y + viewPos.y);
+        drawCreatureBase(x, y, size, control);
     }
 
     private void sortItems() {

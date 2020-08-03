@@ -217,7 +217,7 @@ public class GameView extends CanvasView {
             double y = translatedPos.y * Sizes.getMeter();
 
             if (pi instanceof Creature) {
-                drawCreatureSize((Creature) pi);
+                drawCreatureBase((Creature) pi);
             }
             Image img = pi.getImage();
 
@@ -393,7 +393,7 @@ public class GameView extends CanvasView {
         curPos.x = Math.max(newX, 0);
     }
 
-    private void drawCreatureSize(Creature cr) {
+    private void drawCreatureBase(Creature cr) {
         CreatureControl control = cr.getControl();
         if (control != CreatureControl.CONTROL
                 && control != CreatureControl.ENEMY) {
@@ -402,12 +402,7 @@ public class GameView extends CanvasView {
         CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenter();
         Coords translatedPos = translateCoordsToScreenCoords1(centerBottomPos);
-        int meter = Sizes.getMeter();
-        double x = translatedPos.x - size.getWidth() / 2.0;
-        double y = translatedPos.y - size.getHeight() / 2.0;
-        CreatureBase base = CreatureBase.getCreatureBase(size, control);
-        Image img = base.getImage();
-        gc.drawImage(img, x * meter, y * meter);
+        drawCreatureBase(translatedPos.x, translatedPos.y, size, control);
     }
 
     private void hookUpEvents() {

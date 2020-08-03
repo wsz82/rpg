@@ -1,8 +1,7 @@
 package game.view.stage;
 
 import io.wsz.model.Controller;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.PosItem;
+import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -116,5 +115,14 @@ public abstract class CanvasView {
             destY = y;
         }
         gc.drawImage(img, startX, startY, width, height, destX + viewX, destY + viewY, width, height);
+    }
+
+    protected void drawCreatureBase(double x, double y, CreatureSize size, CreatureControl control) {
+        int meter = Sizes.getMeter();
+        x -= size.getWidth() / 2.0;
+        y -= size.getHeight() / 2.0;
+        CreatureBase base = CreatureBase.getCreatureBase(size, control);
+        Image img = base.getImage();
+        gc.drawImage(img, x * meter, y * meter);
     }
 }
