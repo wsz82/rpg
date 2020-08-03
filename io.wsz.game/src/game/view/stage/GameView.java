@@ -132,7 +132,8 @@ public class GameView extends CanvasView {
     private void drawFog(List<Creature> heroes) {
         Location loc = controller.getCurrentLocation().getLocation();
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
-        double fogSize = Sizes.FOG.getImage().getWidth() / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        double fogSize = Sizes.FOG.getImage().getWidth() / meter;
         if (discoveredFog == null) {
             int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
             int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
@@ -179,8 +180,8 @@ public class GameView extends CanvasView {
                 if (fogWithinVision) {
                     discoveredFog.get(i).set(j, true);
                 } else {
-                    double screenWidth = canvas.getWidth() / Sizes.getMeter();
-                    double screenHeight = canvas.getHeight() / Sizes.getMeter();
+                    double screenWidth = canvas.getWidth() / meter;
+                    double screenHeight = canvas.getHeight() / meter;
                     if (nextPiecePos.x + fogSize >= curPos.x && nextPiecePos.y + fogSize >= curPos.y
                             && nextPiecePos.x <= curPos.x + screenWidth
                             && nextPiecePos.y <= curPos.y + screenHeight) {
@@ -200,8 +201,9 @@ public class GameView extends CanvasView {
     }
 
     private void drawFogPiece(Coords pos) {
-        pos.x *= Sizes.getMeter();
-        pos.y *= Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        pos.x *= meter;
+        pos.y *= meter;
         gc.drawImage(Sizes.FOG.getImage(), pos.x, pos.y);
     }
 
@@ -213,8 +215,9 @@ public class GameView extends CanvasView {
 
             Coords pos = pi.getPos();
             Coords translatedPos = translateCoordsToScreenCoords1(pos);
-            double x = translatedPos.x * Sizes.getMeter();
-            double y = translatedPos.y * Sizes.getMeter();
+            int meter = Sizes.getMeter();
+            double x = translatedPos.x * meter;
+            double y = translatedPos.y * meter;
 
             if (pi instanceof Creature) {
                 drawCreatureBase((Creature) pi);
@@ -230,8 +233,9 @@ public class GameView extends CanvasView {
     private void sortItems() {
         Location location = controller.getCurrentLocation().getLocation();
         int level = controller.getCurrentLayer().getLevel();
-        double canvasWidth = canvas.getWidth() / Sizes.getMeter();
-        double canvasHeight = canvas.getHeight() / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        double canvasWidth = canvas.getWidth() / meter;
+        double canvasHeight = canvas.getHeight() / meter;
         sortItems(location, curPos.x, curPos.y, canvasWidth, canvasHeight, items, level);
     }
 
@@ -240,12 +244,13 @@ public class GameView extends CanvasView {
             return;
         }
         Coords translatedPos = translateCoordsToScreenCoords1(selFirst);
-        final int firstX = (int) (translatedPos.x * Sizes.getMeter());
-        final int firstY = (int) (translatedPos.y * Sizes.getMeter());
+        int meter = Sizes.getMeter();
+        final int firstX = (int) (translatedPos.x * meter);
+        final int firstY = (int) (translatedPos.y * meter);
 
         translatedPos = translateCoordsToScreenCoords1(selSecond);
-        final int secondX = (int) (translatedPos.x * Sizes.getMeter());
-        final int secondY = (int) (translatedPos.y * Sizes.getMeter());
+        final int secondX = (int) (translatedPos.x * meter);
+        final int secondY = (int) (translatedPos.y * meter);
 
         int x = Math.min(firstX, secondX);
         int y = Math.min(firstY, secondY);
@@ -270,8 +275,9 @@ public class GameView extends CanvasView {
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
-        mousePos.x = (mouseX - left) / Sizes.getMeter();
-        mousePos.y = (mouseY - top) / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        mousePos.x = (mouseX - left) / meter;
+        mousePos.y = (mouseY - top) / meter;
         return mousePos;
     }
 
