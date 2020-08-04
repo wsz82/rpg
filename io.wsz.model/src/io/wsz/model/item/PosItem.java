@@ -101,7 +101,11 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     public PosItem getCollision(Coords nextPos) {
-        return Controller.get().getBoard().getObstacle(nextPos, this, pos.getLocation());
+        return getCollision(nextPos, pos.getLocation());
+    }
+
+    public PosItem getCollision(Coords nextPos, Location nextLocation) {
+        return Controller.get().getBoard().getObstacle(nextPos, this, nextLocation);
     }
 
     public double getCollisionLeft(List<List<Coords>> cp) {

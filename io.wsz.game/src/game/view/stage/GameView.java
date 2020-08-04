@@ -543,7 +543,8 @@ public class GameView extends CanvasView {
     }
 
     private void onMapSecondaryButtonClick(Location location, double x, double y) {
-        PosItem pi = board.lookForItem(location, x, y, SECONDARY_TYPES, false);
+        int level = Controller.get().getCurrentLayer().getLevel();
+        PosItem pi = board.lookForItem(location, x, y, level, SECONDARY_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
         } else {
@@ -559,10 +560,11 @@ public class GameView extends CanvasView {
     private void onMapPrimaryButtonClick(Location location, double x, double y, boolean multiple) {
         List<Creature> controlled = board.getControlledCreatures(location);
         PosItem pi;
+        int level = Controller.get().getCurrentLayer().getLevel();
         if (controlled.isEmpty()) {
-            pi = board.lookForItem(location, x, y, CREATURE_TYPE, false);
+            pi = board.lookForItem(location, x, y, level, CREATURE_TYPE, false);
         } else {
-            pi = board.lookForItem(location, x, y, PRIMARY_TYPES, false);
+            pi = board.lookForItem(location, x, y, level, PRIMARY_TYPES, false);
         }
         if (pi == null) {
             commandControllableGoTo(x, y);

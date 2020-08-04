@@ -3,7 +3,6 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
@@ -25,8 +24,6 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     private final Coords centerBottom = new Coords();
     private final Coords reversedCenterBottom = new Coords();
-
-    private Location enteredToFlag;
 
     private final Task task = new Task();
     private Image portrait;
@@ -98,17 +95,6 @@ public class Creature extends PosItem<Creature> implements Containable {
     private void checkSurrounding() {
         Teleport t = Controller.get().getBoard().getTeleport(getCenter(), this, this.pos.getLocation());
         if (t != null) t.enter(this);
-
-        if (enteredToFlag != null && enteredToFlag == pos.getLocation()) {
-            enteredToFlag = null;
-            PosItem collided = getCollision(getCenter());
-            if (collided != null) {
-                Coords freePos = Board.get().getFreePosAround(this);
-                Coords reversed = reverseCenterBottomPos(freePos);
-                pos.x = reversed.x;
-                pos.y = reversed.y;
-            }
-        }
     }
 
     @Override
@@ -165,6 +151,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public void goTo(double x, double y) {
         this.task.setFinished(false);
+        this.task.setItem(this, null);
         this.task.setDestX(reverseCenterBottomPosX(x));
         this.task.setDestY(reverseCenterBottomPosY(y));
     }
@@ -462,7 +449,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.pos.y = reversed.y;
         this.pos.level = reversed.level;
         task.clear();
-        enteredToFlag = exit.getLocation();
     }
 
     @Override

@@ -13,9 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.tan;
-import static java.lang.Math.toRadians;
-
 public class Board {
     private static Board singleton;
 
@@ -82,7 +79,7 @@ public class Board {
         }
     }
 
-    public PosItem lookForItem(Location location, double x, double y, ItemType[] types, boolean includeLevelsBelow) {
+    public PosItem lookForItem(Location location, double x, double y, int lookedLevel, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         if (location == null) return null;
         allItems.addAll(location.getItems().get());
@@ -97,11 +94,10 @@ public class Board {
                 })
                 .filter(pi -> {
                     int level = pi.getPos().level;
-                    int actualLevel = controller.getCurrentLayer().getLevel(); //TODO checked location
                     if (includeLevelsBelow) {
-                        return level <= actualLevel;
+                        return level <= lookedLevel;
                     } else {
-                        return level == actualLevel;
+                        return level == lookedLevel;
                     }
                 })
                 .collect(Collectors.toCollection(() -> items));
@@ -179,7 +175,7 @@ public class Board {
                 })
                 .filter(pi -> pi.getActualCollisionPolygons() != null || pi instanceof Creature)
                 .filter(pi -> {
-                    int level = i.getPos().level;
+                    int level = nextPos.level;
                     return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> items));
@@ -386,67 +382,6 @@ public class Board {
         }
         sortEquipment(equipmentResult);
         return equipmentResult;
-    }
-
-    public Coords getFreePosAround(Creature cr) {
-        Coords pos = cr.getCenter();
-
-        CreatureSize size = cr.getSize();
-        double height = size.getHeight();
-        double width = size.getWidth();
-        double offset = 0.1;
-
-        for (int i = 1; i < 10; i++) {
-            double angleScope = 45.0 / i;
-            int iterations = i * 8;
-            int angle = 0;
-            for (int j = 1; j < iterations; j++) {
-                double dx = i*width + offset;
-                double dyAngle = dx * tan(toRadians(angle));
-                double dyStraight = i*height + offset;
-                double x = 0;
-                double y = 0;
-                if (angle >= 360) {
-                    break;
-                } else if (angle == 0) {
-                    x = pos.x + dx;
-                    y = pos.y;
-                } else if (angle == 90) {
-                    x = pos.x;
-                    y = pos.y - dyStraight;
-                } else if (angle == 180) {
-                    x = pos.x - dx;
-                    y = pos.y;
-                } else if (angle == 270) {
-                    x = pos.x;
-                    y = pos.y + dyStraight;
-                } else if (angle > 270) {
-                    x = pos.x + dx;
-                    y = pos.y + dyAngle;
-                } else if (angle > 180) {
-                    x = pos.x - dx;
-                    y = pos.y + dyAngle;
-                } else if (angle > 90) {
-                    x = pos.x - dx;
-                    y = pos.y - dyAngle;
-                } else if (angle > 0) {
-                    x = pos.x + dx;
-                    y = pos.y - dyAngle;
-                }
-
-                Location location = cr.getPos().getLocation();
-                if (x < 0 || x > location.getWidth()) continue;
-                if (y < 0 || y > location.getHeight()) continue;
-
-                resultCoords.x = x;
-                resultCoords.y = y;
-                PosItem pi = cr.getCollision(resultCoords);
-
-                if (pi == null) return resultCoords;
-                angle = (int) (angleScope * j);
-            }
-        }
-        return pos;
     }
 
     public List<Creature> getControllableCreatures(Location location) {

@@ -312,9 +312,10 @@ public class EditorCanvas extends Canvas {
 
     private PosItem getPosItem(double xPos, double yPos) {
         PosItem pi;
+        int level = controller.getCurrentLayer().getLevel();
         Coords pos = new Coords(
                 xPos, yPos,
-                controller.getCurrentLayer().getLevel(),
+                level,
                 controller.getCurrentLocation().getLocation());
         Coords translated = pos.clonePos();
         translated.add(curPos);
@@ -322,7 +323,7 @@ public class EditorCanvas extends Canvas {
         double y = translated.y;
         ItemType[] types = ItemType.values();
         Location location = controller.getCurrentLocation().getLocation();
-        pi = controller.getBoard().lookForItem(location, x, y, types, true);
+        pi = controller.getBoard().lookForItem(location, x, y, level, types, true);
         return pi;
     }
 

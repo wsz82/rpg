@@ -35,16 +35,16 @@ public class Task implements Externalizable {
         }
         if (dest.x != -1) {
             move(cr);
-            if (item != null) {
-                if (item.creaturePrimaryInteract(cr)) {
-                    item = null;
-                    dest.x = -1;
-                }
-            }
-            return;
         }
-        dest.x = -1;
-        finished = true;
+        if (item != null) {
+            if (item.creaturePrimaryInteract(cr)) {
+                item = null;
+                dest.x = -1;
+            }
+        }
+        if (dest.x == -1 && item == null) {
+            finished = true;
+        }
     }
 
     private void move(Creature cr) {
@@ -77,6 +77,7 @@ public class Task implements Externalizable {
 
         nextPos.x = x3;
         nextPos.y = y3;
+        nextPos.level = cr.pos.level;
         PosItem pi = cr.getCollision(cr.getCenter(nextPos));
         if (pi != null) {
             dest.x = -1;

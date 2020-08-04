@@ -25,8 +25,8 @@ public class OutDoor extends Door<OutDoor> {
         super(prototype, visible);
     }
 
-    public void enter(Creature cr) {
-        Teleportation.teleport(cr, getExit());
+    public boolean enter(Creature cr) {
+        return Teleportation.teleport(cr, getExit());
     }
 
     public Coords getIndividualExit() {
@@ -122,7 +122,7 @@ public class OutDoor extends Door<OutDoor> {
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (getObstacleOnWay(cr) != null) return false;
             if (isOpen() || getOpenImagePath().isEmpty()) {
-                enter(cr);
+                return enter(cr);
             } else {
                 open();
             }
