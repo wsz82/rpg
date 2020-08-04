@@ -37,7 +37,7 @@ import static javafx.scene.input.KeyCode.*;
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
     private static final ItemType[] PRIMARY_TYPES =
-            new ItemType[] {CREATURE, CONTAINER, WEAPON, TELEPORT, INDOOR, OUTDOOR};
+            new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
