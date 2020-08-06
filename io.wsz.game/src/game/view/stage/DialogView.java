@@ -2,10 +2,8 @@ package game.view.stage;
 
 import game.model.GameController;
 import game.model.setting.Settings;
-import io.wsz.model.Controller;
-import io.wsz.model.dialog.Answer;
 import io.wsz.model.dialog.Dialog;
-import io.wsz.model.dialog.Question;
+import io.wsz.model.dialog.*;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
@@ -36,11 +34,9 @@ public class DialogView {
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final double offset;
-    private final List<DialogItem> dialogs = new ArrayList<>(0);
-    private final Controller controller = Controller.get();
+    private final DialogMemento dialogMemento;
     private final Map<Question, VerticalPos> questionsPos = new HashMap<>(0);
 
-    private Answer lastAnswer;
     private Question activeQuestion;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<MouseEvent> scrollBarStart;
@@ -50,19 +46,66 @@ public class DialogView {
     private int dialogTop;
     private int dialogWidth;
     private double caretPos;
-    private int curPos;
     private int dialogHeight;
-    private boolean finished;
     private boolean isToRefresh = true;
     private int scrollPos;
     private int scrollButtonHeight;
     private boolean scrollWithButton;
 
-    public DialogView(Canvas canvas, double offset) {
+    public DialogView(Canvas canvas, double offset, DialogMemento dialogMemento) {
         this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         this.offset = offset;
+        this.dialogMemento = dialogMemento;
         hookupEvents();
+    }
+
+    public void refresh() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+        fontSize = width / Sizes.getFontSize().getSize();
+        dialogTop = (int) height - getViewHeight();
+        dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
+        dialogLeft = (int) ((width - dialogWidth) / 2);
+        caretPos = 0;
+
+        updatePos();
+
+        if (!isToRefresh) {
+            return;
+        } else {
+            isToRefresh = false;
+        }
+
+        clear();
+
+        drawScrollBar(dialogTop);
+
+        if (dialogMemento == null) {
+            endDialog();
+        }
+
+        List<DialogItem> dialogs = dialogMemento.getDialogs();
+        if (dialogs.isEmpty()) {
+            PosItem speaker = dialogMemento.getAnswering();
+            Dialog dialog = speaker.getDialog();
+            if (dialog == null) {
+                System.out.println(speaker.getName() + " does not speak");
+                endDialog();
+                return;
+            }
+            Answer answer = dialog.getGreeting();
+            if (answer == null) {
+                System.out.println(speaker.getName() + " does not greet");
+                endDialog();
+                return;
+            }
+            addDialogItem(speaker, answer.getText());
+            dialogMemento.setLastAnswer(answer);
+        }
+
+        int lastPos = drawDialogs();
+        drawQuestions(lastPos);
     }
 
     private void hookupEvents() {
@@ -76,7 +119,7 @@ public class DialogView {
                     }
                 } else if (button.equals(MouseButton.SECONDARY)) {
                     e.consume();
-                    if (finished) {
+                    if (dialogMemento.isFinished()) {
                         endDialog();
                     }
                 }
@@ -123,11 +166,11 @@ public class DialogView {
         int scrollHeight = getViewHeight();
         int maxY;
         if (y < 0) {
-            curPos = 0;
+            dialogMemento.setCurPos(0);
         } else if (y > (maxY = scrollHeight - scrollButtonHeight)) {
-            curPos = maxY * dialogHeight / scrollHeight;
+            dialogMemento.setCurPos(maxY * dialogHeight / scrollHeight);
         } else {
-            curPos = y * dialogHeight / scrollHeight;
+            dialogMemento.setCurPos(y * dialogHeight / scrollHeight);
         }
         isToRefresh = true;
     }
@@ -137,24 +180,24 @@ public class DialogView {
     }
 
     private void addQuestionAndAnswer() {
-        PosItem asker = controller.getAsking();
+        PosItem asker = dialogMemento.getAsking();
         addDialogItem(asker, activeQuestion.getText());
 
-        PosItem speaker = controller.getAnswering();
-        Dialog dialog = controller.getAnswering().getDialog();
+        PosItem speaker = dialogMemento.getAnswering();
+        Dialog dialog = dialogMemento.getAnswering().getDialog();
         int answerIndex = activeQuestion.getAnswerIndex();
         Answer answer = dialog.getAnswers().get(answerIndex);
 
         if (answer != null) {
             addDialogItem(speaker, answer.getText());
 
-            lastAnswer = answer;
+            dialogMemento.setLastAnswer(answer);
         }
 
         isToRefresh = true;
 
         if (activeQuestion.isFinish()) {
-            finished = true;
+            dialogMemento.setFinished(true);
         }
     }
 
@@ -163,49 +206,6 @@ public class DialogView {
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
         GameController.get().endDialog();
-    }
-
-    public void refresh() {
-        double width = canvas.getWidth();
-        double height = canvas.getHeight();
-        fontSize = width / Sizes.getFontSize().getSize();
-        dialogTop = (int) height - getViewHeight();
-        dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
-        dialogLeft = (int) ((width - dialogWidth) / 2);
-        caretPos = 0;
-
-        updatePos();
-
-        if (!isToRefresh) {
-            return;
-        } else {
-            isToRefresh = false;
-        }
-
-        clear();
-
-        drawScrollBar(dialogTop);
-
-        if (dialogs.isEmpty()) {
-            PosItem speaker = controller.getAnswering();
-            Dialog dialog = speaker.getDialog();
-            if (dialog == null) {
-                System.out.println(speaker.getName() + " does not speak");
-                endDialog();
-                return;
-            }
-            Answer answer = dialog.getGreeting();
-            if (answer == null) {
-                System.out.println(speaker.getName() + " does not greet");
-                endDialog();
-                return;
-            }
-            addDialogItem(speaker, answer.getText());
-            lastAnswer = answer;
-        }
-
-        int lastPos = drawDialogs();
-        drawQuestions(lastPos);
     }
 
     private int getViewHeight() {
@@ -229,7 +229,7 @@ public class DialogView {
 
     private void drawScrollButton(int dialogTop, int right, int scrollWidth, int scrollHeight) {
         int dialogHeight = Math.max(this.dialogHeight, scrollHeight);
-        scrollPos = curPos * scrollHeight / dialogHeight;
+        scrollPos = dialogMemento.getCurPos() * scrollHeight / dialogHeight;
         scrollButtonHeight = scrollHeight * scrollHeight / dialogHeight;
         if (scrollPos + scrollButtonHeight > scrollHeight) {
             scrollPos = scrollHeight - scrollButtonHeight;
@@ -246,17 +246,16 @@ public class DialogView {
     }
 
     private void addDialogItem(PosItem pi, String s) {
-        DialogItem di = new DialogItem(pi, s);
-        TextFlow tf = getDialogTextFlow(di);
-        di.picture = getTextImage(tf);
-        dialogs.add(di);
+        DialogItem di = new DialogItem(pi.getName(), s);
+        dialogMemento.getDialogs().add(di);
     }
 
     private int drawDialogs() {
         int lastPos = 0;
+        List<DialogItem> dialogs = dialogMemento.getDialogs();
         for (DialogItem di : dialogs) {
 
-            lastPos = drawText(lastPos, di.picture);
+            lastPos = drawText(lastPos, di);
 
             int lastIndex = dialogs.size() - 1;
             if (di == dialogs.get(lastIndex)) {
@@ -274,12 +273,12 @@ public class DialogView {
     }
 
     private TextFlow getDialogTextFlow(DialogItem di) {
-        String ownerText = di.speaker.getName() + " - ";
+        String ownerText = di.getSpeaker() + " - ";
         Text owner = new Text(ownerText);
         owner.setFont(new Font(fontSize));
         owner.setFill(Color.RED);
 
-        String answerText = di.text;
+        String answerText = di.getText();
         Text answer = new Text();
         answer.setFont(new Font(fontSize));
         answer.setText(answerText);
@@ -295,6 +294,7 @@ public class DialogView {
         double height = img.getHeight();
         double width = img.getWidth();
 
+        int curPos = dialogMemento.getCurPos();
         if (lastPos + height >= curPos) {
             double imgStartY = 0;
             double imgCutHeight = height;
@@ -309,9 +309,20 @@ public class DialogView {
         return lastPos + (int) height;
     }
 
+    private int drawText(int lastPos, DialogItem di) {
+        Image img = di.getPicture();
+        if (img == null) {
+            TextFlow tf = getDialogTextFlow(di);
+            Image image = getTextImage(tf);
+            di.setPicture(image);
+            img = di.getPicture();
+        }
+        return drawText(lastPos, img);
+    }
+
     private void drawQuestions(int lastPos) {
         questionsPos.clear();
-        List<Question> questions = lastAnswer.getQuestions();
+        List<Question> questions = dialogMemento.getLastAnswer().getQuestions();
 
         for (int i = 0; i < questions.size(); i++) {
             Question q = questions.get(i);
@@ -399,6 +410,7 @@ public class DialogView {
                 .mapToDouble(q -> q.top + q.height)
                 .max();
         double minY = optMin.orElse(0);
+        int curPos = dialogMemento.getCurPos();
         double translatedMin = minY - curPos + top;
         double maxY = optMax.orElse(0);
         double translatedMax = maxY - curPos + top;
@@ -412,7 +424,7 @@ public class DialogView {
         for (Question q : keySet) {
             VerticalPos vp = questionsPos.get(q);
             double topQ = vp.top;
-            double translatedTopQ = topQ - curPos + top;
+            double translatedTopQ = topQ - dialogMemento.getCurPos() + top;
             double translatedBottomQ = translatedTopQ + vp.height;
 
             if (y > translatedTopQ && y < translatedBottomQ) {
@@ -427,12 +439,13 @@ public class DialogView {
     }
 
     private void scrollDown() {
+        int curPos = dialogMemento.getCurPos();
         int newY = curPos + getScrollSpeed();
         int maxPos = getMaxPos();
         if (curPos >= maxPos) {
             return;
         }
-        curPos = Math.min(newY, maxPos);
+        dialogMemento.setCurPos(Math.min(newY, maxPos));
         isToRefresh = true;
     }
 
@@ -441,11 +454,12 @@ public class DialogView {
     }
 
     private void scrollUp() {
+        int curPos = dialogMemento.getCurPos();
         if (curPos == 0) {
             return;
         }
         int newY = curPos - getScrollSpeed();
-        curPos = Math.max(newY, 0);
+        dialogMemento.setCurPos(Math.max(newY, 0));
         isToRefresh = true;
     }
 
@@ -458,17 +472,6 @@ public class DialogView {
 
     private int getScrollSpeed() {
         return (int) (Settings.getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
-    }
-    private class DialogItem {
-
-        private final PosItem speaker;
-        private final String text;
-        private Image picture;
-
-        public DialogItem(PosItem speaker, String text) {
-            this.speaker = speaker;
-            this.text = text;
-        }
     }
 
     private class VerticalPos {

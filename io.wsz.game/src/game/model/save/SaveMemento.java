@@ -1,5 +1,6 @@
 package game.model.save;
 
+import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -19,13 +20,15 @@ public class SaveMemento implements Externalizable {
     private Coords lastPos;
     private LinkedList<Creature> heroes;
     private List<Location> locations;
+    private DialogMemento dialogMemento;
 
     public SaveMemento() {}
 
-    public SaveMemento(String name, Coords lastPos, LinkedList<Creature> heroes) {
+    public SaveMemento(String name, Coords lastPos, LinkedList<Creature> heroes, DialogMemento dialogMemento) {
         this.name = name;
         this.lastPos = lastPos;
         this.heroes = heroes;
+        this.dialogMemento = dialogMemento;
     }
 
     public String getName() {
@@ -60,6 +63,14 @@ public class SaveMemento implements Externalizable {
         this.heroes = heroes;
     }
 
+    public DialogMemento getDialogMemento() {
+        return dialogMemento;
+    }
+
+    public void setDialogMemento(DialogMemento dialogMemento) {
+        this.dialogMemento = dialogMemento;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
@@ -71,6 +82,8 @@ public class SaveMemento implements Externalizable {
         out.writeObject(heroes);
 
         out.writeObject(locations);
+
+        out.writeObject(dialogMemento);
     }
 
     @Override
@@ -84,5 +97,7 @@ public class SaveMemento implements Externalizable {
         heroes = (LinkedList<Creature>) in.readObject();
 
         locations = (List<Location>) in.readObject();
+
+        dialogMemento = (DialogMemento) in.readObject();
     }
 }

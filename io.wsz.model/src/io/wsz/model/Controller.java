@@ -2,6 +2,7 @@ package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.asset.AssetsList;
+import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
@@ -34,8 +35,7 @@ public class Controller {
     private Location locationToUpdate;
     private Creature creatureToOpenInventory;
     private Container containerToOpen;
-    private PosItem asking;
-    private PosItem answering;
+    private DialogMemento dialogMemento;
 
     public static Controller get() {
         if (singleton == null) {
@@ -209,19 +209,35 @@ public class Controller {
     }
 
     public PosItem getAsking() {
-        return asking;
+        if (dialogMemento == null) {
+            return null;
+        } else {
+            return dialogMemento.getAsking();
+        }
     }
 
     public void setAsking(PosItem asking) {
-        this.asking = asking;
+        initDialogMementoIfNull();
+        this.dialogMemento.setAsking(asking);
     }
 
     public PosItem getAnswering() {
-        return answering;
+        if (dialogMemento == null) {
+            return null;
+        } else {
+            return dialogMemento.getAnswering();
+        }
     }
 
     public void setAnswering(PosItem answering) {
-        this.answering = answering;
+        initDialogMementoIfNull();
+        this.dialogMemento.setAnswering(answering);
+    }
+
+    private void initDialogMementoIfNull() {
+        if (dialogMemento == null) {
+            dialogMemento = new DialogMemento();
+        }
     }
 
 
@@ -269,5 +285,13 @@ public class Controller {
         setInventory(false);
         setContainerToOpen(null);
         setCreatureToOpenInventory(null);
+    }
+
+    public DialogMemento getDialogMemento() {
+        return dialogMemento;
+    }
+
+    public void setDialogMemento(DialogMemento dialogMemento) {
+        this.dialogMemento = dialogMemento;
     }
 }

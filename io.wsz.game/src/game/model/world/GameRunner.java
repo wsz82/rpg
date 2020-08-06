@@ -258,6 +258,7 @@ public class GameRunner {
         gameController.loadGameActivePluginToLists();
         gameController.initNewGameSettings();
         controller.initNewGameHeroes();
+        controller.setDialogMemento(null);
     }
 
     private class Loader extends Task<String> {

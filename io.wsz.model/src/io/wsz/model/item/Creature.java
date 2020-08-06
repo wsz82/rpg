@@ -433,8 +433,9 @@ public class Creature extends PosItem<Creature> implements Containable {
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (getControl() != CreatureControl.ENEMY) {
                 if (getObstacleOnWay(cr) != null) return false;
-                Controller.get().setAsking(cr);
-                Controller.get().setAnswering(this);
+                Controller controller = Controller.get();
+                controller.setAsking(cr);
+                controller.setAnswering(this);
                 return true;
             }
         }

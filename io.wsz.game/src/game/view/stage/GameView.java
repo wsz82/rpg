@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import io.wsz.model.Controller;
+import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
@@ -77,13 +78,18 @@ public class GameView extends CanvasView {
         }
 
         if (gameController.isDialog()) {
-            if (dialogStarted) {
-                dialogStarted = false;
-                removeEvents();
-                dialogView = new DialogView(canvas, OFFSET);
+            DialogMemento dialogMemento = controller.getDialogMemento();
+            if (!dialogMemento.isRefreshGameViewOnce()) {
+                if (dialogStarted) {
+                    dialogStarted = false;
+                    removeEvents();
+                    dialogView = new DialogView(canvas, OFFSET, dialogMemento);
+                }
+                dialogView.refresh();
+                return;
+            } else {
+                dialogMemento.setRefreshGameViewOnce(false);
             }
-            dialogView.refresh();
-            return;
         }
         if (!dialogStarted) {
             dialogStarted = true;

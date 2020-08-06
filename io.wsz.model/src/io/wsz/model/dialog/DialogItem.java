@@ -1,26 +1,33 @@
 package io.wsz.model.dialog;
 
 import io.wsz.model.sizes.Sizes;
+import javafx.scene.image.Image;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Answer implements Externalizable {
+public class DialogItem implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private final List<Question> questions = new ArrayList<>(0);
-
+    private String speaker;
     private String text;
+    private Image picture;
 
-    public Answer() {}
+    public DialogItem() {}
 
-    public Answer(String text, List<Question> questions) {
+    public DialogItem(String speaker, String text) {
+        this.speaker = speaker;
         this.text = text;
-        this.questions.addAll(questions);
+    }
+
+    public String getSpeaker() {
+        return speaker;
+    }
+
+    public void setSpeaker(String speaker) {
+        this.speaker = speaker;
     }
 
     public String getText() {
@@ -31,31 +38,29 @@ public class Answer implements Externalizable {
         this.text = text;
     }
 
-    public List<Question> getQuestions() {
-        return questions;
+    public Image getPicture() {
+        return picture;
     }
 
-    @Override
-    public String toString() {
-        return text;
+    public void setPicture(Image picture) {
+        this.picture = picture;
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(text);
+        out.writeUTF(speaker);
 
-        out.writeObject(questions);
+        out.writeUTF(text);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        text = in.readUTF();
+        speaker = in.readUTF();
 
-        List<Question> input = (List<Question>) in.readObject();
-        questions.addAll(input);
+        text = in.readUTF();
     }
 }

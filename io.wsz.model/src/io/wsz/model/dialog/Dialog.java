@@ -14,6 +14,7 @@ public class Dialog implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private final List<Answer> answers = new ArrayList<>(0);
+
     private int greetingIndex;
 
     public Dialog() {}

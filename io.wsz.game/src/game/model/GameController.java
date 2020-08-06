@@ -12,7 +12,9 @@ import game.view.launcher.Main;
 import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.ActivePlugin;
@@ -84,7 +86,29 @@ public class GameController {
         SaveCaretaker sc = new SaveCaretaker(programDir);
         SaveMemento memento = sc.loadMemento(name);
         controller.getHeroes().addAll(memento.getHeroes());
+        DialogMemento dialogMemento = memento.getDialogMemento();
+        controller.setDialogMemento(dialogMemento);
+        restoreAskingAndAnswering(dialogMemento.getAsking(), dialogMemento.getAnswering());
         return memento;
+    }
+
+    private void restoreAskingAndAnswering(PosItem asking, PosItem answering) {
+        List<Location> locations = controller.getLocationsList();
+        boolean askingSet = false;
+        boolean answeringSet = false;
+        for (Location l : locations) {
+            for (PosItem pi : l.getItems().get()) {
+                if (!askingSet && asking.equals(pi)) {
+                    controller.setAsking(pi);
+                    askingSet = true;
+                    continue;
+                }
+                if (!answeringSet && answering.equals(pi)) {
+                    controller.setAnswering(pi);
+                    answeringSet = true;
+                }
+            }
+        }
     }
 
     public void deleteGameSave(String name, File programDir) {
@@ -97,7 +121,7 @@ public class GameController {
     }
 
     public void saveGame(boolean overwrite, String name, Coords savedPos, File programDir) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             return;
         }
         if (!overwrite) {
@@ -106,7 +130,7 @@ public class GameController {
         }
         savedPos.setLocation(controller.getCurrentLocation().getLocation());
         savedPos.level = controller.getCurrentLayer().getLevel();
-        SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes());
+        SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes(), controller.getDialogMemento());
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.createSave(memento);
     }
@@ -256,8 +280,7 @@ public class GameController {
 
     public void endDialog() {
         setDialog(false);
-        controller.setAsking(null);
-        controller.setAnswering(null);
+        controller.setDialogMemento(null);
     }
 
     public Creature getHoveredHero() {
