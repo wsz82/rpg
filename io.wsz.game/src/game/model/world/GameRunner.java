@@ -332,6 +332,11 @@ public class GameRunner {
                 o.setOpenImage(null);
                 o.getOpenImage();
             }
+            if (a instanceof Creature) {
+                Creature c = (Creature) a;
+                c.setPortrait(null);
+                c.getPortrait();
+            }
         }
     }
 }

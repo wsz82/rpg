@@ -392,7 +392,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         }
 
         if (Sizes.getTrueMeter() == CONSTANT_METER) {
-            return new Image(url, portraitSize, portraitSize, false, false, true);
+            return new Image(url, portraitSize, portraitSize, false, false, false);
         } else {
             Dimension d = new Dimension(portraitSize, portraitSize);
             Dimension rd = ResolutionImage.getRequestedDimension(d);
