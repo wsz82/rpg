@@ -3,7 +3,9 @@ package io.wsz.model.stage;
 import io.wsz.model.item.PosItem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.wsz.model.stage.ItemsComparator.Comparison.GREAT;
 import static io.wsz.model.stage.ItemsComparator.Comparison.LESS;
@@ -12,6 +14,7 @@ import static io.wsz.model.stage.ItemsComparator.compare;
 public class GraphSorter<A extends PosItem> {
     private final Graph<A> graph = new Graph<>(new ArrayList<>(0));
     private final List<A> sortedItems = new ArrayList<>(0);
+    private final Set<Node<A>> uniNodesInCycle = new HashSet<>();
 
     public void sortItems(List<A> items) {
 
@@ -96,22 +99,19 @@ public class GraphSorter<A extends PosItem> {
 
     private Node<A> findMin(Node<A> n) {
         List<Node<A>> lesser = n.getLesser();
-        Node<A> first = null;
-        Node<A> last = n;
         while (!lesser.isEmpty()) {
             n = lesser.get(0);
-            if (first != null && n == first) {
+            if (uniNodesInCycle.contains(n)) {
+                System.out.println("Graph should not be cyclic: cycle starts with " + n);
                 break;
             }
-            if (first == null) {
-                first = n;
-            }
-            last = n;
-            lesser = last.getLesser();
+            uniNodesInCycle.add(n);
+            lesser = n.getLesser();
         }
-        for (Node<A> greater : last.getGreater()) {
-            greater.getLesser().remove(last);
+        uniNodesInCycle.clear();
+        for (Node<A> greater : n.getGreater()) {
+            greater.getLesser().remove(n);
         }
-        return last;
+        return n;
     }
 }

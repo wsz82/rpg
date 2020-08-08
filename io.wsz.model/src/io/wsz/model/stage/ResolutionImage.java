@@ -55,7 +55,7 @@ public class ResolutionImage {
             if (Sizes.isResizeWithResolution()) {
                 return new Image(url, rd.width, rd.height, false, false);
             } else {
-                return getChangedImage(url, d, rd);
+                return getResizedImage(url, d, rd);
             }
         }
     }
@@ -64,7 +64,23 @@ public class ResolutionImage {
         return Sizes.ASSETS_DIR + File.separator + type;
     }
 
-    public static Image getChangedImage(String url, Dimension d, Dimension rd) {
+    public static Image getDecreasedQualityWithResolutionImage(Image img) {
+        double width = img.getWidth();
+        double height = img.getHeight();
+        Dimension rd = getRequestedDimension(width, height);
+        BufferedImage bInput = SwingFXUtils.fromFXImage(img, null);
+        java.awt.Image imgInput = bInput.getScaledInstance(rd.width, rd.height, java.awt.Image.SCALE_DEFAULT);
+        BufferedImage bSmall = imageToBufferedImage(imgInput);
+        if (Sizes.isResizeWithResolution()) {
+            return SwingFXUtils.toFXImage(bSmall, null);
+        } else {
+            java.awt.Image imgBig = bSmall.getScaledInstance((int) width, (int) height, java.awt.Image.SCALE_SMOOTH);
+            BufferedImage bBig = imageToBufferedImage(imgBig);
+            return SwingFXUtils.toFXImage(bBig, null);
+        }
+    }
+
+    public static Image getResizedImage(String url, Dimension d, Dimension rd) {
         Image img = new Image(url, rd.width, rd.height, false, false);
         BufferedImage bInput = SwingFXUtils.fromFXImage(img, null);
         java.awt.Image imgInput = bInput.getScaledInstance(d.width, d.height, java.awt.Image.SCALE_DEFAULT);
@@ -81,11 +97,14 @@ public class ResolutionImage {
         return bi;
     }
 
-
     public static Dimension getRequestedDimension(Dimension d) {
+        return getRequestedDimension(d.width, d.height);
+    }
+
+    public static Dimension getRequestedDimension(double width, double height) {
         double ratio = (double) Sizes.getTrueMeter() / (double) CONSTANT_METER;
-        int rw = (int) (d.width * ratio);
-        int rh = (int) (d.height * ratio);
+        int rw = (int) (width * ratio);
+        int rh = (int) (height * ratio);
         return new Dimension(rw, rh);
     }
 

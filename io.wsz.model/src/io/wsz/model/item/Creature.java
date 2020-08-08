@@ -396,7 +396,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         } else {
             Dimension d = new Dimension(portraitSize, portraitSize);
             Dimension rd = ResolutionImage.getRequestedDimension(d);
-            return ResolutionImage.getChangedImage(url, d, rd);
+            return ResolutionImage.getResizedImage(url, d, rd);
         }
     }
 

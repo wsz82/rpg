@@ -13,7 +13,6 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -265,11 +264,13 @@ public class DialogView {
         return lastPos;
     }
 
-    private WritableImage getTextImage(TextFlow tf) {
+    private Image getTextImage(TextFlow tf) {
         Group s = new Group(tf);
         SnapshotParameters sp = new SnapshotParameters();
         sp.setFill(Color.TRANSPARENT);
-        return s.snapshot(sp, null);
+        Image snapshot = s.snapshot(sp, null);
+//        Image resized = ResolutionImage.getDecreasedQualityWithResolutionImage(snapshot); //TODO readable decreased quality pictures
+        return snapshot;
     }
 
     private TextFlow getDialogTextFlow(DialogItem di) {
