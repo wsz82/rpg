@@ -68,6 +68,20 @@ public class DialogView {
         dialogLeft = (int) ((width - dialogWidth) / 2);
         caretPos = 0;
 
+        if (dialogMemento == null) {
+            endDialog();
+        }
+
+        List<DialogItem> dialogs = dialogMemento.getDialogs();
+        if (Sizes.isReloadDialogImages()) {
+            Sizes.setReloadDialogImages(false);
+            isToRefresh = true;
+            setCurPos(0);
+            for (DialogItem di : dialogs) {
+                loadDialogItemPicture(di);
+            }
+        }
+
         updatePos();
 
         if (!isToRefresh) {
@@ -78,13 +92,6 @@ public class DialogView {
 
         clear();
 
-        drawScrollBar(dialogTop);
-
-        if (dialogMemento == null) {
-            endDialog();
-        }
-
-        List<DialogItem> dialogs = dialogMemento.getDialogs();
         if (dialogs.isEmpty()) {
             PosItem speaker = dialogMemento.getAnswering();
             Dialog dialog = speaker.getDialog();
@@ -105,6 +112,8 @@ public class DialogView {
 
         int lastPos = drawDialogs();
         drawQuestions(lastPos);
+
+        drawScrollBar(dialogTop);
     }
 
     private void hookupEvents() {
@@ -145,6 +154,7 @@ public class DialogView {
     }
 
     private void startScrollWithButton(double x, double y) {
+        if (dialogHeight <= getViewHeight()) return;
         int scrollWidth = getScrollWidth();
         int buttonX = dialogLeft + dialogWidth;
         int buttonY = dialogTop + scrollPos;
@@ -313,12 +323,16 @@ public class DialogView {
     private int drawText(int lastPos, DialogItem di) {
         Image img = di.getPicture();
         if (img == null) {
-            TextFlow tf = getDialogTextFlow(di);
-            Image image = getTextImage(tf);
-            di.setPicture(image);
+            loadDialogItemPicture(di);
             img = di.getPicture();
         }
         return drawText(lastPos, img);
+    }
+
+    private void loadDialogItemPicture(DialogItem di) {
+        TextFlow tf = getDialogTextFlow(di);
+        Image image = getTextImage(tf);
+        di.setPicture(image);
     }
 
     private void drawQuestions(int lastPos) {

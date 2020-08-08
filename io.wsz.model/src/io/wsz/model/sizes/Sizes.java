@@ -26,6 +26,7 @@ public class Sizes {
 
     private static boolean resizeWithResolution;
     private static boolean reloadImages;
+    private static boolean reloadDialogImages;
 
     public static int getMeter() {
         if (resizeWithResolution) {
@@ -49,6 +50,7 @@ public class Sizes {
     }
 
     public static void setFontSize(FontSize fontSize) {
+        setReloadDialogImages(true);
         Sizes.fontSize = fontSize;
     }
 
@@ -78,5 +80,13 @@ public class Sizes {
 
     public static void setPortraitSize(int portraitSize) {
         Sizes.portraitSize = portraitSize;
+    }
+
+    public static boolean isReloadDialogImages() {
+        return reloadDialogImages;
+    }
+
+    public static void setReloadDialogImages(boolean reloadDialogImages) {
+        Sizes.reloadDialogImages = reloadDialogImages;
     }
 }
