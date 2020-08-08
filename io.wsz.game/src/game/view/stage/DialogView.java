@@ -15,6 +15,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -40,6 +41,7 @@ public class DialogView {
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<MouseEvent> scrollBarStart;
     private EventHandler<MouseEvent> scrollBarStop;
+    private EventHandler<ScrollEvent> wheelScroll;
     private double fontSize;
     private int dialogLeft;
     private int dialogTop;
@@ -151,6 +153,21 @@ public class DialogView {
             }
         };
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
+
+        wheelScroll = e -> {
+            e.consume();
+            scrollWithWheel(e);
+        };
+        canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
+    }
+
+    private void scrollWithWheel(ScrollEvent e) {
+        double dY = e.getDeltaY();
+        if (dY < 0) {
+            scrollDown();
+        } else {
+            scrollUp();
+        }
     }
 
     private void startScrollWithButton(double x, double y) {
@@ -214,6 +231,7 @@ public class DialogView {
         canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
+        canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
         GameController.get().endDialog();
     }
 
