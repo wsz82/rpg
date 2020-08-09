@@ -12,10 +12,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
@@ -41,6 +38,7 @@ public class InventoryView {
     private EventHandler<MouseEvent> onClick;
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
+    private EventHandler<ScrollEvent> wheelScroll;
     private EquipmentView origin;
     private EquipmentView scrolledVer;
     private DropView scrolledHor;
@@ -107,6 +105,49 @@ public class InventoryView {
             }
         };
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
+
+        wheelScroll = e -> {
+            e.consume();
+            EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+            if (ev == null) {
+                return;
+            }
+            double dY = e.getDeltaY();
+            if (dY < 0) {
+                scrollDown(ev);
+            } else {
+                scrollUp(ev);
+            }
+        };
+        canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
+    }
+
+    private void scrollDown(EquipmentView ev) {
+        Coords curPos = ev.getCurPos();
+        double y = curPos.y;
+        double maxPos = ev.getMaxCurPosY() - ev.getViewHeight();
+        if (y >= maxPos) {
+            return;
+        }
+        double newY = y + getScrollSpeed();
+        newY = Math.min(newY, maxPos);
+        curPos.y = newY;
+    }
+
+    private double getScrollSpeed() {
+        return Settings.getDialogScrollSpeed();
+    }
+
+    private void scrollUp(EquipmentView ev) {
+        Coords curPos = ev.getCurPos();
+        double curPosY = curPos.y;
+        double minCurPosY = ev.getMinCurPosY();
+        if (curPosY <= minCurPosY) {
+            return;
+        }
+        double newY = curPosY - getScrollSpeed();
+        newY = Math.max(newY, minCurPosY);
+        curPos.y = newY;
     }
 
     private void openContainer() {
@@ -226,7 +267,7 @@ public class InventoryView {
                 }
                 if (x > evRight && x < evRight + scrollWidth
                         && y > evTop && y < evBottom) {
-                    ev.setScrollPosY(y - evTop);
+                    ev.setCurPosY(y - evTop);
                 }
             }
 
@@ -259,6 +300,7 @@ public class InventoryView {
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
+        canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
         Controller.get().closeInventory();
     }
 
@@ -312,7 +354,7 @@ public class InventoryView {
             double scrolledPosY = scrolledVer.getViewPos().y;
             double mousePosY = mousePos.y;
             double scrollToY = mousePosY - scrolledPosY;
-            scrolledVer.setScrollPosY(scrollToY);
+            scrolledVer.setCurPosY(scrollToY);
         }
 
         if (scrolledHor != null) {

@@ -181,7 +181,7 @@ public abstract class EquipmentView extends CanvasView {
         return viewHeight;
     }
 
-    public void setScrollPosY(double y) {
+    public void setCurPosY(double y) {
         y -= yScrollButtonHeight/2;
         double maxY;
         if (y < 0) {
@@ -228,5 +228,13 @@ public abstract class EquipmentView extends CanvasView {
 
     public boolean isYScrollVisible() {
         return yScrollVisible;
+    }
+
+    public double getMaxCurPosY() {
+        return maxCurPosY;
+    }
+
+    public double getMinCurPosY() {
+        return 0;
     }
 }

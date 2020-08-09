@@ -189,7 +189,7 @@ public class DropView extends EquipmentView {
     }
 
     @Override
-    public void setScrollPosY(double y) {
+    public void setCurPosY(double y) {
         y -= yScrollButtonHeight/2;
         double maxY;
         if (y < 0) {
@@ -242,5 +242,9 @@ public class DropView extends EquipmentView {
 
     public boolean isXScrollVisible() {
         return xScrollVisible;
+    }
+
+    public double getMinCurPosY() {
+        return minCurPosY;
     }
 }
