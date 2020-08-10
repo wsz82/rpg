@@ -108,7 +108,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         nameInput.setText(item.getName());
-        imageLabel.setText(item.getRelativePath());
+        imageLabel.setText(item.getPath());
     }
 
     protected abstract void defineAsset();
@@ -213,7 +213,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void editAsset() {
         String path = imageLabel.getText();
-        item.setRelativePath(path);
+        item.setPath(path);
         close();
     }
 
@@ -245,7 +245,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         String path = imageLabel.getText();
         String relativePath = Asset.convertToRelativePath(path);
         item.setName(name);
-        item.setRelativePath(relativePath);
+        item.setPath(relativePath);
         addAssetToList(item);
     }
 

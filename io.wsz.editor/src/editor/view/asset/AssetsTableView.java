@@ -102,7 +102,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         });
 
         TableColumn<A, String> pathCol = new TableColumn<>("Path");
-        pathCol.setCellValueFactory(new PropertyValueFactory<>("relativePath"));
+        pathCol.setCellValueFactory(new PropertyValueFactory<>("path"));
         pathCol.setEditable(false);
         pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
 

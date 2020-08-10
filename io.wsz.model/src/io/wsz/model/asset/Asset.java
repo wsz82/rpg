@@ -18,7 +18,7 @@ public abstract class Asset implements Externalizable {
 
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
-    protected final StringProperty relativePath = new SimpleStringProperty(this, "relativePath");
+    protected final StringProperty path = new SimpleStringProperty(this, "path");
     protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
 
     public Asset() {}
@@ -27,10 +27,10 @@ public abstract class Asset implements Externalizable {
         this.type.set(type);
     }
 
-    public Asset(String name, ItemType type, String relativePath) {
+    public Asset(String name, ItemType type, String path) {
         this.name.set(name);
         this.type.set(type);
-        this.relativePath.set(relativePath);
+        this.path.set(path);
     }
 
     public static File createAssetTypeDir(ItemType type) {
@@ -66,24 +66,24 @@ public abstract class Asset implements Externalizable {
         this.type.set(type);
     }
 
-    public String getRelativePath() {
-        return relativePath.get();
+    public String getPath() {
+        return path.get();
     }
 
-    public void setRelativePath(String relativePath) {
-        this.relativePath.set(relativePath);
+    public void setPath(String path) {
+        this.path.set(path);
     }
 
     public final Image getInitialImage() {
         if (image.get() == null) {
-            setImage(ResolutionImage.loadImageFromPath(getRelativePath(), getType().toString().toLowerCase()));
+            setImage(ResolutionImage.loadImageFromPath(getPath(), getType().toString().toLowerCase()));
         }
         return image.get();
     }
 
     public Image getImage() {
         if (image.get() == null) {
-            setImage(ResolutionImage.loadImageFromPath(getRelativePath(), getType().toString().toLowerCase()));
+            setImage(ResolutionImage.loadImageFromPath(getPath(), getType().toString().toLowerCase()));
         }
         return image.get();
     }
@@ -116,12 +116,12 @@ public abstract class Asset implements Externalizable {
         Asset asset = (Asset) o;
         return Objects.equals(getName(), asset.getName()) &&
                 Objects.equals(getType(), asset.getType()) &&
-                Objects.equals(getRelativePath(), asset.getRelativePath());
+                Objects.equals(getPath(), asset.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getType(), getRelativePath());
+        return Objects.hash(getName(), getType(), getPath());
     }
 
     @Override
@@ -134,7 +134,7 @@ public abstract class Asset implements Externalizable {
 
         out.writeObject(type.get());
 
-        out.writeObject(relativePath.get());
+        out.writeObject(path.get());
     }
 
     @Override
@@ -147,6 +147,6 @@ public abstract class Asset implements Externalizable {
 
         type.set((ItemType) in.readObject());
 
-        relativePath.set((String) in.readObject());
+        path.set((String) in.readObject());
     }
 }

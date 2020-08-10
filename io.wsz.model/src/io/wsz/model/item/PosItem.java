@@ -311,11 +311,11 @@ public abstract class PosItem<A extends PosItem> extends Asset implements ItemUp
     }
 
     @Override
-    public String getRelativePath() {
+    public String getPath() {
         if (prototype != null) {
-            return prototype.getRelativePath();
+            return prototype.getPath();
         }
-        return super.getRelativePath();
+        return super.getPath();
     }
 
     @Override
