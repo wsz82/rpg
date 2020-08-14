@@ -1,5 +1,7 @@
 package io.wsz.model.item;
 
-public interface ItemUpdater {
+public interface Updatable {
+
     void update();
+
 }

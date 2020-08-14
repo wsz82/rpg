@@ -119,7 +119,7 @@ public class GameView extends CanvasView {
         clear();
         sortItems();
 
-        Location location = Controller.get().getCurrentLocation().getLocation();
+        Location location = Controller.get().getCurrentLocation().getLocation(); //TODO pass location in refresh?
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
         drawItems(heroes);

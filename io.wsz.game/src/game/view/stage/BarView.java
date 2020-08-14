@@ -246,13 +246,16 @@ public class BarView {
             }
         }
         for (int i = 0; i < creatures.size(); i++) {
-            Portrait p = portraits.get(i);
+            Portrait portrait = portraits.get(i);
             Creature cr = creatures.get(i);
 
-            p.creature = cr;
-            p.image = cr.getPortrait();
-            p.y = y;
-            gc.drawImage(p.image, portraitX, y);
+            portrait.creature = cr;
+            List<Image> portraitFrames = cr.getAnimation().getPortrait();
+            if (!portraitFrames.isEmpty()) {
+                portrait.image = portraitFrames.get(0); //TODO portrait animation
+            }
+            portrait.y = y;
+            gc.drawImage(portrait.image, portraitX, y);
 
             y += portraitSize + 2*padding;
         }

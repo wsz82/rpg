@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -28,13 +29,14 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
     protected final Button dialogButton = new Button("Dialog");
+    protected final HBox imageBox = new HBox(10);
+    protected final Button imageButton = new Button("Image");
+    protected final Label pathLabel = new Label();
 
     protected A item;
     protected boolean isContent;
 
     private final TextField nameInput = new TextField();
-    private final Button imageButton = new Button("Image");
-    private final Label imageLabel = new Label();
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
@@ -77,8 +79,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         }
 
         nameInput.setPromptText("Name");
-        final HBox imageBox = new HBox(10);
-        imageBox.getChildren().addAll(imageButton, imageLabel);
+        imageBox.getChildren().addAll(imageButton, pathLabel);
         container.getChildren().addAll(nameInput);
 
         if (!isContent) {
@@ -108,14 +109,14 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         nameInput.setText(item.getName());
-        imageLabel.setText(item.getPath());
+        pathLabel.setText(item.getPath());
     }
 
     protected abstract void defineAsset();
 
     private void onCreate() {
         String name = nameInput.getText();
-        String path = imageLabel.getText();
+        String path = pathLabel.getText();
         boolean inputNameIsEmpty = name == null || name.isEmpty();
         boolean inputFileIsEmpty = path == null || path.isEmpty();
         if (inputNameIsEmpty || inputFileIsEmpty) {
@@ -134,7 +135,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void onEdit() {
-        String path = imageLabel.getText();
+        String path = pathLabel.getText();
         boolean inputFileIsEmpty = path == null || path.isEmpty();
         if (inputFileIsEmpty) {
             return;
@@ -146,7 +147,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private void hookupEvents() {
         imageButton.setOnAction(e -> {
             String title = "Choose image for asset";
-            setUpImageChooser(title, imageLabel);
+            setUpFileChooser(title, pathLabel);
         });
         interactionButton.setOnAction(e -> openInteractionPointEdit());
         coverButton.setOnAction(e -> openCoverEdit());
@@ -156,19 +157,32 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         cancel.setOnAction(event -> close());
     }
 
-    protected void setUpImageChooser(String title, Label label) {
+    protected void setUpFileChooser(String title, Label label) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image files", "*.png", "*.jpg", "*.gif")
-        );
         File selectedFile = fileChooser.showOpenDialog(this);
-        if (selectedFile == null || !selectedFile.isFile()) {
+        fillLabel(label, selectedFile);
+    }
+
+    protected void setUpDirChooser(String title, Label label) {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle(title);
+        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
+        File selectedFile = dirChooser.showDialog(this);
+        fillLabel(label, selectedFile);
+    }
+
+    private void fillLabel(Label label, File selectedFile) {
+        if (selectedFile == null) {
+            return;
+        }
+        boolean isNotFileOrDirectory = !selectedFile.isFile() && !selectedFile.isDirectory();
+        if (isNotFileOrDirectory) {
             return;
         }
         String selectedFilePath = selectedFile.getAbsolutePath();
-        if (pathIsIncorrect(selectedFilePath)) return;
+        if (isPathIncorrect(selectedFilePath)) return;
         String path = Asset.convertToRelativePath(selectedFilePath);
         label.setText(path);
     }
@@ -212,12 +226,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void editAsset() {
-        String path = imageLabel.getText();
+        String path = pathLabel.getText();
         item.setPath(path);
         close();
     }
 
-    protected boolean pathIsIncorrect(String path) {
+    protected boolean isPathIncorrect(String path) {
         File selectedFile = new File(path);
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
@@ -242,7 +256,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void addNewAsset() {
         String name = nameInput.getText();
-        String path = imageLabel.getText();
+        String path = pathLabel.getText();
         String relativePath = Asset.convertToRelativePath(path);
         item.setName(name);
         item.setPath(relativePath);

@@ -6,6 +6,7 @@ module io.wsz.model {
     requires java.desktop;
 
     exports io.wsz.model;
+    exports io.wsz.model.animation;
     exports io.wsz.model.content;
     exports io.wsz.model.sizes;
     exports io.wsz.model.dialog;

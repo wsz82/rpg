@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class PosItem<A extends PosItem> extends Asset implements ItemUpdater, Interactable {
+public abstract class PosItem<A extends PosItem> extends Asset implements Updatable, Interactable {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();

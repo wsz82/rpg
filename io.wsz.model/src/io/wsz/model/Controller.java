@@ -269,7 +269,7 @@ public class Controller {
 
     public void clearHeroesPortraits() {
         for (Creature hero : Controller.get().getHeroes()) {
-            hero.setPortrait(null);
+            hero.getAnimation().clearPortrait();
         }
     }
 

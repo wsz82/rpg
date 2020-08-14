@@ -20,8 +20,7 @@ import java.util.Arrays;
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
 
-    private final Button portraitButton = new Button("Portrait");
-    private final Label portraitLabel = new Label();
+    private final Button animationDirButton = new Button("Animation");
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final DoubleField speedInput = new DoubleField(isContent);
@@ -45,12 +44,13 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         super.initWindow();
         setTitle(TITLE);
 
+        container.getChildren().remove(imageBox);
         container.getChildren().remove(interactionButton);
         container.getChildren().remove(coverButton);
         container.getChildren().remove(collisionButton);
 
-        final HBox portraitBox = new HBox(10);
-        portraitBox.getChildren().addAll(portraitButton, portraitLabel);
+        final HBox animationBox = new HBox(10);
+        animationBox.getChildren().addAll(animationDirButton, pathLabel);
 
         final HBox sizeBox = new HBox(10);
         final Label sizeLabel = new Label("Size");
@@ -88,11 +88,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             controls.add(null);
         }
 
-        if (!isContent) {
-            container.getChildren().add(portraitBox);
-        }
-
-        container.getChildren().addAll(sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
+        container.getChildren().addAll(animationBox, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
 
         if (item != null) {
             container.getChildren().add(itemsButton);
@@ -100,13 +96,14 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         }
 
         fillInputs();
-        hookUpCreatureEvents();
+
+        hookUpEvents();
     }
 
-    private void hookUpCreatureEvents() {
-        portraitButton.setOnAction(e -> {
-            String title = "Choose image for creature portrait";
-            setUpImageChooser(title, portraitLabel);
+    private void hookUpEvents() {
+        animationDirButton.setOnAction(e -> {
+            String title = "Choose animation for asset";
+            setUpDirChooser(title, pathLabel);
         });
     }
 
@@ -124,13 +121,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         }
 
         super.fillInputs();
-
-        String portraitPath = item.getIndividualPortraitPath();
-        if (portraitPath == null) {
-            portraitLabel.setText("");
-        } else {
-            portraitLabel.setText(portraitPath);
-        }
 
         CreatureSize size = item.getIndividualSize();
         sizeCB.setValue(size);
@@ -169,13 +159,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void defineAsset() {
-        String portraitPath = portraitLabel.getText();
-        if (!isContent && portraitPath == null) {
-            item.setPortraitPath("");
-        } else {
-            item.setPortraitPath(portraitPath);
-        }
-
         CreatureSize size = sizeCB.getValue();
         if (!isContent && size == null) {
             item.setSize(CreatureSize.getDefault());

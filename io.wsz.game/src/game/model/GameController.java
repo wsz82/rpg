@@ -87,8 +87,10 @@ public class GameController {
         SaveMemento memento = sc.loadMemento(name);
         controller.getHeroes().addAll(memento.getHeroes());
         DialogMemento dialogMemento = memento.getDialogMemento();
-        controller.setDialogMemento(dialogMemento);
-        restoreAskingAndAnswering(dialogMemento.getAsking(), dialogMemento.getAnswering());
+        if (dialogMemento != null) {
+            controller.setDialogMemento(dialogMemento);
+            restoreAskingAndAnswering(dialogMemento.getAsking(), dialogMemento.getAnswering());
+        }
         return memento;
     }
 

@@ -19,15 +19,23 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class ResolutionImage {
 
-    public static Image loadImageFromPath(String fileName, String type) {
+    public static Image loadImage(String type, String fileName) {
         if (fileName.isEmpty()) {
             return null;
         }
-        String path = getRelativeTypePath(type) + File.separator + fileName;
-        File fixedFile = new File(Controller.getProgramDir() + path);
-        if (!fixedFile.exists()) {
+        String path = Controller.getProgramDir() + getRelativeTypePath(type) + File.separator + fileName;
+        return loadImage(path);
+    }
+
+    public static Image loadImage(String path) {
+        File file = new File(path);
+        return loadImage(file);
+    }
+
+    public static Image loadImage(File file) {
+        if (!file.exists()) {
             try {
-                throw new NullPointerException(fixedFile + " does not exist");
+                throw new NullPointerException(file + " does not exist");
             } catch (NullPointerException e) {
                 e.printStackTrace();
                 return null;
@@ -35,7 +43,7 @@ public class ResolutionImage {
         }
         String url = null;
         try {
-            url = fixedFile.toURI().toURL().toString();
+            url = file.toURI().toURL().toString();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -46,7 +54,7 @@ public class ResolutionImage {
         if (Sizes.getTrueMeter() == CONSTANT_METER) {
             return new Image(url);
         } else {
-            Dimension d = getImageDimension(fixedFile);
+            Dimension d = getImageDimension(file);
             if (d == null) {
                 throw new NullPointerException(url + " dimension is null");
             }
@@ -62,22 +70,6 @@ public class ResolutionImage {
 
     private static String getRelativeTypePath(String type) {
         return Sizes.ASSETS_DIR + File.separator + type;
-    }
-
-    public static Image getDecreasedQualityWithResolutionImage(Image img) {
-        double width = img.getWidth();
-        double height = img.getHeight();
-        Dimension rd = getRequestedDimension(width, height);
-        BufferedImage bInput = SwingFXUtils.fromFXImage(img, null);
-        java.awt.Image imgInput = bInput.getScaledInstance(rd.width, rd.height, java.awt.Image.SCALE_DEFAULT);
-        BufferedImage bSmall = imageToBufferedImage(imgInput);
-        if (Sizes.isResizeWithResolution()) {
-            return SwingFXUtils.toFXImage(bSmall, null);
-        } else {
-            java.awt.Image imgBig = bSmall.getScaledInstance((int) width, (int) height, java.awt.Image.SCALE_SMOOTH);
-            BufferedImage bBig = imageToBufferedImage(imgBig);
-            return SwingFXUtils.toFXImage(bBig, null);
-        }
     }
 
     public static Image getResizedImage(String url, Dimension d, Dimension rd) {

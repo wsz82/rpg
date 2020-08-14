@@ -83,6 +83,7 @@ public class Task implements Externalizable {
             dest.x = -1;
             return;
         }
+        cr.getAnimation().updateMoveAnimation(cr, cr.pos.x, cr.pos.y, dest.x, dest.y);
         cr.pos.x = nextPos.x;
         cr.pos.y = nextPos.y;
     }

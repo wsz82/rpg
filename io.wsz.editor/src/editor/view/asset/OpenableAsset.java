@@ -51,7 +51,7 @@ public abstract class OpenableAsset<A extends PosItem> {
     private void hookUpOpenableEvents() {
         openButton.setOnAction(e -> {
             String title = "Choose image for open";
-            assetStage.setUpImageChooser(title, openLabel);
+            assetStage.setUpFileChooser(title, openLabel);
         });
         openCoverButton.setOnAction(e -> openOpenDoorCoverEdit());
         openCollisionButton.setOnAction(e -> openOpenDoorCollisionEdit());

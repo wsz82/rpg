@@ -124,9 +124,9 @@ public class EditorPluginsTable extends Stage {
     }
 
     public List<Plugin> getPlugins() {
-        File[] files = Main.getDir().listFiles((dir, name) -> name.endsWith(".rpg"));
+        File[] pluginsFiles = Main.getDir().listFiles((dir, name) -> name.endsWith(".rpg"));
         List<Plugin> plugins = new ArrayList<>(0);
-        for (File file : Objects.requireNonNull(files)) {
+        for (File file : Objects.requireNonNull(pluginsFiles)) {
             Plugin p = Controller.get().loadPluginMetadata(file.getName());
             if (p == null) continue;
             plugins.add(p);

@@ -194,7 +194,7 @@ public class Container extends Equipment<Container> implements Containable, Open
                 return getInitialImage();
             }
             if (openImage == null) {
-                setOpenImage(ResolutionImage.loadImageFromPath(getOpenImagePath(), getType().toString().toLowerCase()));
+                setOpenImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getOpenImagePath()));
             }
             return openImage;
         } else {

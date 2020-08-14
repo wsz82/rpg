@@ -1,35 +1,30 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.CreatureAnimation;
+import io.wsz.model.animation.CreatureAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.net.MalformedURLException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
-
-import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class Creature extends PosItem<Creature> implements Containable {
     private static final long serialVersionUID = 1L;
 
     private final Coords centerBottom = new Coords();
     private final Coords reversedCenterBottom = new Coords();
+    private final CreatureAnimationPos animationPos = new CreatureAnimationPos();
 
     private final Task task = new Task();
-    private Image portrait;
-    private String portraitPath;
-    private Inventory inventory;
 
+    private CreatureAnimation animation;
+    private Inventory inventory;
     private CreatureSize size;
     private CreatureControl control;
     private Double speed;
@@ -41,6 +36,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     public Creature(ItemType type) {
         super(type);
+        this.animation = new CreatureAnimation(getDir());
         this.inventory = new Inventory(this);
     }
 
@@ -230,6 +226,14 @@ public class Creature extends PosItem<Creature> implements Containable {
         return task;
     }
 
+    public CreatureAnimation getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
+        }
+    }
+
     public Inventory getIndividualInventory() {
         return inventory;
     }
@@ -363,68 +367,29 @@ public class Creature extends PosItem<Creature> implements Containable {
         this.strength = strength;
     }
 
-    public Image getPortrait() {
-        if (this.portrait == null) {
-            setPortrait(loadPortraitFromPath(getPortraitPath()));
-        }
-        return portrait;
-    }
-
-    private Image loadPortraitFromPath(String fileName) {
-        String path = getRelativeTypePath(getType()) + File.separator + fileName;
-        if (path.isEmpty()) {
-            throw new NoSuchElementException();
-        }
-        File fixedFile = new File(Controller.getProgramDir() + path);
-        String url = null;
-        try {
-            url = fixedFile.toURI().toURL().toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        if (url == null) {
-            return null;
-        }
-
-        int portraitSize = Sizes.getPortraitSize();
-        if (portraitSize == 0) {
-            return null;
-        }
-
-        if (Sizes.getTrueMeter() == CONSTANT_METER) {
-            return new Image(url, portraitSize, portraitSize, false, false, false);
-        } else {
-            Dimension d = new Dimension(portraitSize, portraitSize);
-            Dimension rd = ResolutionImage.getRequestedDimension(d);
-            return ResolutionImage.getResizedImage(url, d, rd);
-        }
-    }
-
-    public void setPortrait(Image portrait) {
-        this.portrait = portrait;
-    }
-
-    public String getIndividualPortraitPath() {
-        return portraitPath;
-    }
-
-    public String getPortraitPath() {
-        if (portraitPath == null || portraitPath.isEmpty()) {
-            if (prototype == null) {
-                return "";
-            }
-            return prototype.portraitPath;
-        } else {
-            return portraitPath;
-        }
-    }
-
-    public void setPortraitPath(String portraitPath) {
-        this.portraitPath = portraitPath;
-    }
-
     public void onSecondAction(PosItem pi) {
         pi.creatureSecondaryInteract(this);
+    }
+
+    public CreatureAnimationPos getAnimationPos() {
+        return animationPos;
+    }
+
+    @Override
+    public Image getImage() {
+        if (this.image == null) {
+            if (this.prototype == null) {
+                List<Image> idle = getAnimation().getIdle();
+                if (!idle.isEmpty()) {
+                    this.image = idle.get(0);
+                }
+                return this.image;
+            } else {
+                return prototype.getImage();
+            }
+        } else {
+            return this.image;
+        }
     }
 
     @Override
@@ -503,14 +468,16 @@ public class Creature extends PosItem<Creature> implements Containable {
         out.writeObject(range);
 
         out.writeObject(strength);
-
-        out.writeObject(portraitPath);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        if (prototype == null) {
+            animation = new CreatureAnimation(getDir());
+        }
 
         Task readTask = (Task) in.readObject();
         task.setDest(readTask.getDest());
@@ -529,7 +496,5 @@ public class Creature extends PosItem<Creature> implements Containable {
         range = (Double) in.readObject();
 
         strength = (Integer) in.readObject();
-
-        portraitPath = (String) in.readObject();
     }
 }

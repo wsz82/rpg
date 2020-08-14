@@ -62,7 +62,7 @@ public class CreatureBase {
 
     public Image getImage() {
         if (img == null) {
-            setImg(ResolutionImage.loadImageFromPath(getRelativePath(), "circle"));
+            setImg(ResolutionImage.loadImage("circle", getRelativePath()));
         }
         return img;
     }

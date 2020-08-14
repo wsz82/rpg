@@ -172,7 +172,7 @@ public class GameRunner {
             loadImages();
             Sizes.setReloadImages(false);
         }
-        showGame();
+        refreshGame();
     }
 
     private void updateControls() {
@@ -244,7 +244,7 @@ public class GameRunner {
         }
     }
 
-    private void showGame() {
+    private void refreshGame() {
         gameController.refreshGame();
     }
 
@@ -293,49 +293,47 @@ public class GameRunner {
         }
 
         private Set<Asset> getAssets(List<PosItem> items) {
-            Set<Asset> assets = new HashSet<>(1);
-            Set<Asset> locationAssets = items.stream()
+            Set<Asset> prototypes = items.stream()
                     .map(pi -> (Asset) pi.getPrototype())
                     .collect(Collectors.toSet());
-            assets.addAll(locationAssets);
 
-            List<Containable> locCons = items.stream()
+            List<Containable> locationContainers = items.stream()
                     .filter(pi -> pi instanceof Containable)
                     .map(pi -> (Containable) pi)
                     .filter(c -> !c.getItems().isEmpty())
                     .collect(Collectors.toList());
-            addInnerAssets(assets, locCons);
-            return assets;
+            addInnerAssets(prototypes, locationContainers);
+            return prototypes;
         }
 
-        private void addInnerAssets(Set<Asset> assets, List<Containable> locCons) {
-            for (Containable cons : locCons) {
+        private void addInnerAssets(Set<Asset> prototypes, List<Containable> locationContainers) {
+            for (Containable cons : locationContainers) {
                 List<Equipment> equipment = cons.getItems();
                 Set<Asset> equipmentAssets = equipment.stream()
                         .map(pi -> (Asset) pi.getPrototype())
                         .collect(Collectors.toSet());
-                assets.addAll(equipmentAssets);
+                prototypes.addAll(equipmentAssets);
                 List<Containable> containables = equipment.stream()
                         .filter(pi -> pi instanceof Containable)
                         .map(pi -> (Containable) pi)
                         .filter(c -> !c.getItems().isEmpty())
                         .collect(Collectors.toList());
-                addInnerAssets(assets, containables);
+                addInnerAssets(prototypes, containables);
             }
         }
 
         private void reloadAssetImages(Asset a) {
             a.setImage(null);
-            a.getInitialImage();
+            if (a instanceof Creature) {
+                Creature c = (Creature) a;
+                c.getAnimation().initAllFrames();
+            } else {
+                a.getInitialImage();
+            }
             if (a instanceof Openable) {
                 Openable o = (Openable) a;
                 o.setOpenImage(null);
                 o.getOpenImage();
-            }
-            if (a instanceof Creature) {
-                Creature c = (Creature) a;
-                c.setPortrait(null);
-                c.getPortrait();
             }
         }
     }

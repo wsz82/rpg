@@ -58,7 +58,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
                 return getInitialImage();
             }
             if (openImage == null) {
-                setOpenImage(ResolutionImage.loadImageFromPath(getOpenImagePath(), getType().toString().toLowerCase()));
+                setOpenImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getOpenImagePath()));
             }
             return openImage;
         } else {

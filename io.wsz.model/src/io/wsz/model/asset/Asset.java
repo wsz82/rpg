@@ -19,7 +19,8 @@ public abstract class Asset implements Externalizable {
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty path = new SimpleStringProperty(this, "path");
-    protected final ObjectProperty<Image> image = new SimpleObjectProperty<>(this, "image");
+
+    protected Image image;
 
     public Asset() {}
 
@@ -31,6 +32,10 @@ public abstract class Asset implements Externalizable {
         this.name.set(name);
         this.type.set(type);
         this.path.set(path);
+    }
+
+    public String getDir() {
+        return getRelativeTypePath(getType()) + getPath();
     }
 
     public static File createAssetTypeDir(ItemType type) {
@@ -75,17 +80,14 @@ public abstract class Asset implements Externalizable {
     }
 
     public final Image getInitialImage() {
-        if (image.get() == null) {
-            setImage(ResolutionImage.loadImageFromPath(getPath(), getType().toString().toLowerCase()));
+        if (image == null) {
+            setImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getPath()));
         }
-        return image.get();
+        return image;
     }
 
     public Image getImage() {
-        if (image.get() == null) {
-            setImage(ResolutionImage.loadImageFromPath(getPath(), getType().toString().toLowerCase()));
-        }
-        return image.get();
+        return getInitialImage();
     }
 
     public double getImageHeight() {
@@ -101,7 +103,7 @@ public abstract class Asset implements Externalizable {
     }
 
     public void setImage(Image image) {
-        this.image.set(image);
+        this.image = image;
     }
 
     @Override
