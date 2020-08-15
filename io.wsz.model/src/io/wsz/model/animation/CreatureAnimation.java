@@ -26,16 +26,14 @@ public class CreatureAnimation {
     private final String animationDir;
     private final List<Image> idle = new ArrayList<>(0);
     private final List<Image> portrait = new ArrayList<>(0);
-    private final List<Image> moveUp = new ArrayList<>(0);
-    private final List<Image> moveUpRight = new ArrayList<>(0);
-    private final List<Image> moveRight = new ArrayList<>(0);
-    private final List<Image> moveDownRight = new ArrayList<>(0);
-    private final List<Image> moveDown = new ArrayList<>(0);
-    private final List<Image> moveDownLeft = new ArrayList<>(0);
-    private final List<Image> moveLeft = new ArrayList<>(0);
-    private final List<Image> moveUpLeft = new ArrayList<>(0);
-    private final List<List<Image>> allSides = List.of(moveUp, moveUpRight, moveRight, moveDownRight,
-            moveDown, moveDownLeft, moveLeft, moveUpLeft) ;
+    private final CreatureMoveAnimationFrames moveUp = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveUpRight = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveRight = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveDownRight = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveDown = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveDownLeft = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveLeft = new CreatureMoveAnimationFrames();
+    private final CreatureMoveAnimationFrames moveUpLeft = new CreatureMoveAnimationFrames();
 
     public CreatureAnimation(String animationDir) {
         if (animationDir.isEmpty()) {
@@ -53,24 +51,25 @@ public class CreatureAnimation {
         for (File framesDir : animationsDirs) {
             String fileName = framesDir.getName();
 
-            List<Image> moveFrames = getMoveFrames(fileName);
+            CreatureMoveAnimationFrames moveFrames = getMoveAnimationFrames(fileName);
             if (moveFrames != null) {
                 initFrames(framesDir, moveFrames);
             } else {
                 switch (fileName) {
-                    case IDLE -> initFrames(framesDir, idle);
+                    case IDLE -> initIdleFrames(framesDir, idle);
                     case PORTRAIT -> initPortraitFrames(framesDir, portrait);
                 }
             }
         }
     }
 
-    private List<Image> getMoveFrames(MoveSide moveSide) {
+    private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveSide moveSide) {
+        if (moveSide == null) return null;
         String moveSideString = String.valueOf(moveSide.ordinal() + 1);
-        return getMoveFrames(moveSideString);
+        return getMoveAnimationFrames(moveSideString);
     }
 
-    private List<Image> getMoveFrames(String moveSideString) {
+    private CreatureMoveAnimationFrames getMoveAnimationFrames(String moveSideString) {
         return switch (moveSideString) {
             case "1" -> moveUp;
             case "2" -> moveUpRight;
@@ -84,23 +83,39 @@ public class CreatureAnimation {
         };
     }
 
+    private void initIdleFrames(File framesDir, List<Image> idle) {
+        idle.clear();
+        File[] imagesFiles = framesDir.listFiles(PNGfileFilter);
+        if (imagesFiles == null || imagesFiles.length == 0) return;
+        for (File imageFile : imagesFiles) {
+            Image loadedFrame = ResolutionImage.loadImage(imageFile);
+            idle.add(loadedFrame);
+        }
+    }
+
     private void initPortraitFrames(File framesDir, List<Image> portrait) {
         portrait.clear();
         File[] imagesFiles = framesDir.listFiles(PNGfileFilter);
         if (imagesFiles == null || imagesFiles.length == 0) return;
         for (File imageFile : imagesFiles) {
-            Image loadedImage = loadPortrait(imageFile);
-            portrait.add(loadedImage);
+            Image loadedFrame = loadPortrait(imageFile);
+            portrait.add(loadedFrame);
         }
     }
 
-    private void initFrames(File framesDir, List<Image> framesList) {
-        framesList.clear();
-        File[] imagesFiles = framesDir.listFiles(f -> f.getName().endsWith(".png"));
+    private void initFrames(File framesDir, CreatureMoveAnimationFrames frames) {
+        List<Image> moveFrames = frames.getMoveFrames();
+        moveFrames.clear();
+        File[] imagesFiles = framesDir.listFiles(PNGfileFilter);
         if (imagesFiles == null || imagesFiles.length == 0) return;
         for (File imageFile : imagesFiles) {
             Image loadedFrame = ResolutionImage.loadImage(imageFile);
-            framesList.add(loadedFrame);
+            boolean isStopFrame = imageFile.getName().equals("stop.png");
+            if (isStopFrame) {
+                frames.setStop(loadedFrame);
+            } else {
+                moveFrames.add(loadedFrame);
+            }
         }
     }
 
@@ -127,6 +142,16 @@ public class CreatureAnimation {
             Dimension rd = ResolutionImage.getRequestedDimension(d);
             return ResolutionImage.getResizedImage(url, d, rd);
         }
+    }
+
+    public void updateStopAnimation(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
+        MoveSide moveSide = animationPos.getMoveSide();
+        if (moveSide == null) return;
+        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveSide);
+        Image stop = animationFrames.getStop();
+        if (stop == null) return;
+        cr.setImage(stop);
     }
 
     public void updateMoveAnimation(Creature cr, double xFrom, double yFrom, double xTo, double yTo) {
@@ -176,7 +201,8 @@ public class CreatureAnimation {
     private Image getNextFrame(double speed, CreatureAnimationPos animationPos) {
         int frameNumber = animationPos.getFrame();
         MoveSide moveSide = animationPos.getMoveSide();
-        List<Image> frames = getMoveFrames(moveSide);
+        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveSide);
+        List<Image> frames = animationFrames.getMoveFrames();
 
         if (frames == null) return null;
         int framesSize = frames.size();
@@ -199,7 +225,7 @@ public class CreatureAnimation {
             String path = Controller.getProgramDir() + animationDir + IDLE_PATH;
             File file = new File(path);
             if (file.exists()) {
-                initFrames(file, idle);
+                initIdleFrames(file, idle);
             }
         }
         return idle;
@@ -220,35 +246,35 @@ public class CreatureAnimation {
         portrait.clear();
     }
 
-    public List<Image> getMoveUp() {
+    public CreatureMoveAnimationFrames getMoveUp() {
         return moveUp;
     }
 
-    public List<Image> getMoveUpRight() {
+    public CreatureMoveAnimationFrames getMoveUpRight() {
         return moveUpRight;
     }
 
-    public List<Image> getMoveRight() {
+    public CreatureMoveAnimationFrames getMoveRight() {
         return moveRight;
     }
 
-    public List<Image> getMoveDownRight() {
+    public CreatureMoveAnimationFrames getMoveDownRight() {
         return moveDownRight;
     }
 
-    public List<Image> getMoveDown() {
+    public CreatureMoveAnimationFrames getMoveDown() {
         return moveDown;
     }
 
-    public List<Image> getMoveDownLeft() {
+    public CreatureMoveAnimationFrames getMoveDownLeft() {
         return moveDownLeft;
     }
 
-    public List<Image> getMoveLeft() {
+    public CreatureMoveAnimationFrames getMoveLeft() {
         return moveLeft;
     }
 
-    public List<Image> getMoveUpLeft() {
+    public CreatureMoveAnimationFrames getMoveUpLeft() {
         return moveUpLeft;
     }
 }

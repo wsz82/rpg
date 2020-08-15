@@ -33,9 +33,8 @@ public class Task implements Externalizable {
         if (isFinished()) {
             return;
         }
-        if (dest.x != -1) {
-            move(cr);
-        }
+
+        move(cr);
         if (item != null) {
             if (item.creaturePrimaryInteract(cr)) {
                 item = null;
@@ -43,11 +42,15 @@ public class Task implements Externalizable {
             }
         }
         if (dest.x == -1 && item == null) {
+            cr.getAnimation().updateStopAnimation(cr);
             finished = true;
         }
     }
 
     private void move(Creature cr) {
+        if (dest.x == -1) {
+            return;
+        }
         Inventory inventory = cr.getIndividualInventory();
         String name = cr.getName();
         if (inventory.getActualWeight() > inventory.getMaxWeight()) {
