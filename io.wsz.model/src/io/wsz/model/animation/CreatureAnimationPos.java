@@ -4,6 +4,7 @@ public class CreatureAnimationPos {
     private MoveSide moveSide;
     private int frame;
     private long nextFrameUpdate;
+    private long nextPortraitUpdate;
 
     public CreatureAnimationPos() {}
 
@@ -29,5 +30,13 @@ public class CreatureAnimationPos {
 
     public void setNextFrameUpdate(long nextFrameUpdate) {
         this.nextFrameUpdate = nextFrameUpdate;
+    }
+
+    public long getNextPortraitUpdate() {
+        return nextPortraitUpdate;
+    }
+
+    public void setNextPortraitUpdate(long nextPortraitUpdate) {
+        this.nextPortraitUpdate = nextPortraitUpdate;
     }
 }

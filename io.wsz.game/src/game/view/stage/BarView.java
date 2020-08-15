@@ -250,9 +250,9 @@ public class BarView {
             Creature cr = creatures.get(i);
 
             portrait.creature = cr;
-            List<Image> portraitFrames = cr.getAnimation().getPortrait();
-            if (!portraitFrames.isEmpty()) {
-                portrait.image = portraitFrames.get(0); //TODO portrait animation
+            Image animationPortrait = cr.getAnimation().getPortrait(cr);
+            if (animationPortrait != null) {
+                portrait.image = animationPortrait;
             }
             portrait.y = y;
             gc.drawImage(portrait.image, portraitX, y);

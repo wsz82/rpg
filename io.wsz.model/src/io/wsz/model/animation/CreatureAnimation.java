@@ -12,6 +12,7 @@ import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static io.wsz.model.animation.MoveSide.*;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
@@ -22,10 +23,13 @@ public class CreatureAnimation {
     private static final String PORTRAIT = "portrait";
     private static final String PORTRAIT_PATH = File.separator + PORTRAIT;
     private static final FileFilter PNGfileFilter = f -> f.getName().endsWith(".png");
+    private static final int MIN_PORTRAIT_UPDATE_TIME_SEC = 1;
+    private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;
+    private static final Random RANDOM = new Random();
 
     private final String animationDir;
     private final List<Image> idle = new ArrayList<>(0);
-    private final List<Image> portrait = new ArrayList<>(0);
+    private final List<Image> portraits = new ArrayList<>(0);
     private final CreatureMoveAnimationFrames moveUp = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveUpRight = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveRight = new CreatureMoveAnimationFrames();
@@ -57,7 +61,7 @@ public class CreatureAnimation {
             } else {
                 switch (fileName) {
                     case IDLE -> initIdleFrames(framesDir, idle);
-                    case PORTRAIT -> initPortraitFrames(framesDir, portrait);
+                    case PORTRAIT -> initPortraitFrames(framesDir, portraits);
                 }
             }
         }
@@ -142,6 +146,22 @@ public class CreatureAnimation {
             Dimension rd = ResolutionImage.getRequestedDimension(d);
             return ResolutionImage.getResizedImage(url, d, rd);
         }
+    }
+
+    public Image getPortrait(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
+        long curTime = System.currentTimeMillis();
+        if (curTime < animationPos.getNextPortraitUpdate()) return null;
+        int randomDifTimeSeconds = (int) (Math.random() *
+                        (MAX_PORTRAIT_UPDATE_TIME_SEC - MIN_PORTRAIT_UPDATE_TIME_SEC + 1) + MIN_PORTRAIT_UPDATE_TIME_SEC);
+        long randomDifTimeMillis = randomDifTimeSeconds * 1000;
+        long nextPortraitUpdate = curTime + randomDifTimeMillis;
+        animationPos.setNextPortraitUpdate(nextPortraitUpdate);
+        List<Image> portraits = getPortraits();
+        int portraitsSize = portraits.size();
+        if (portraitsSize == 0) return null;
+        int randomIndex = RANDOM.nextInt(portraitsSize);
+        return portraits.get(randomIndex);
     }
 
     public void updateStopAnimation(Creature cr) {
@@ -231,19 +251,19 @@ public class CreatureAnimation {
         return idle;
     }
 
-    public List<Image> getPortrait() {
-        if (portrait.isEmpty()) {
+    public List<Image> getPortraits() {
+        if (portraits.isEmpty()) {
             String path = Controller.getProgramDir() + animationDir + PORTRAIT_PATH;
             File file = new File(path);
             if (file.exists()) {
-                initPortraitFrames(file, portrait);
+                initPortraitFrames(file, portraits);
             }
         }
-        return portrait;
+        return portraits;
     }
 
-    public void clearPortrait() {
-        portrait.clear();
+    public void reloadPortraits() {
+        portraits.clear();
     }
 
     public CreatureMoveAnimationFrames getMoveUp() {
