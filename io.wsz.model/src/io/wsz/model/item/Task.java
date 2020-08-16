@@ -31,6 +31,7 @@ public class Task implements Externalizable {
 
     public void doTask(Creature cr) {
         if (isFinished()) {
+            cr.getAnimation().updateIdleAnimation(cr);
             return;
         }
 

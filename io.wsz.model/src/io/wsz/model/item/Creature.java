@@ -379,10 +379,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     public Image getImage() {
         if (this.image == null) {
             if (this.prototype == null) {
-                List<Image> idle = getAnimation().getIdle();
-                if (!idle.isEmpty()) {
-                    this.image = idle.get(0);
-                }
+                this.image = getAnimation().getMainIdle();
                 return this.image;
             } else {
                 return prototype.getImage();
