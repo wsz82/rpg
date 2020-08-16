@@ -22,6 +22,10 @@ import java.util.List;
 
 public class InventoryView {
     protected static final double SCROLL_BUTTON_PART = 1.0/80;
+    private static final double CREATURE_X_POS = 0.05;
+    private static final double CREATURE_Y_POS = 0.1;
+    private static final double CREATURE_WIDTH = 0.2;
+    private static final double CREATURE_HEIGHT = 0.4;
 
     private final Canvas canvas;
     private final GraphicsContext gc;
@@ -463,10 +467,10 @@ public class InventoryView {
     private void drawCreature(double inventoryWidth, Creature cr) {
         int meter = Sizes.getMeter();
         double meterFactor = inventoryWidth * meter;
-        double x = 0.05 * meterFactor;
-        double pictureWidth = 0.2 * meterFactor;
-        double y = 0.1 * canvas.getHeight();
-        double pictureHeight = 0.4 * meterFactor;
+        double x = CREATURE_X_POS * meterFactor;
+        double pictureWidth = CREATURE_WIDTH * meterFactor;
+        double y = CREATURE_Y_POS * canvas.getHeight();
+        double pictureHeight = CREATURE_HEIGHT * meterFactor;
 
         Image img = cr.getAnimation().getCreatureInventoryImage(cr, (int) pictureWidth, (int) pictureHeight);
         gc.drawImage(img, x, y);
