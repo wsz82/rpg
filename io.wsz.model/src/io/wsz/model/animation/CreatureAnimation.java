@@ -10,9 +10,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static io.wsz.model.animation.MoveSide.*;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
@@ -22,6 +21,9 @@ public class CreatureAnimation {
     private static final String IDLE_PATH = File.separator + IDLE;
     private static final String PORTRAIT = "portrait";
     private static final String PORTRAIT_PATH = File.separator + PORTRAIT;
+    private static final String INVENTORY = "inventory";
+    private static final String INVENTORY_PATH = File.separator + INVENTORY;
+    private static final String INVENTORY_EMPTY = "empty";
     private static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     private static final int MIN_PORTRAIT_UPDATE_TIME_SEC = 1;
     private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;
@@ -32,8 +34,6 @@ public class CreatureAnimation {
     private static final Random RANDOM = new Random();
 
     private final String animationDir;
-    private final CreatureIdleAnimationFrames idles = new CreatureIdleAnimationFrames();
-    private final List<Image> portraits = new ArrayList<>(0);
     private final CreatureMoveAnimationFrames moveUp = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveUpRight = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveRight = new CreatureMoveAnimationFrames();
@@ -42,6 +42,10 @@ public class CreatureAnimation {
     private final CreatureMoveAnimationFrames moveDownLeft = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveLeft = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveUpLeft = new CreatureMoveAnimationFrames();
+    private final CreatureIdleAnimationFrames idles = new CreatureIdleAnimationFrames();
+    private final List<Image> portraits = new ArrayList<>(0);
+    private final Map<String, File> creatureInventoryFiles = new HashMap<>(0);
+    private final Map<String, Image> creatureInventoryPictures = new HashMap<>(0);
 
     public CreatureAnimation(String animationDir) {
         if (animationDir.isEmpty()) {
@@ -66,9 +70,34 @@ public class CreatureAnimation {
                 switch (fileName) {
                     case IDLE -> initIdleFrames(framesDir, idles);
                     case PORTRAIT -> initPortraitFrames(framesDir, portraits);
+                    case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
                 }
             }
         }
+    }
+
+    private void initInventoryCreaturePicturesFiles(File inventoryDir, Map<String, File> creatureInventoryFiles) {
+        creatureInventoryFiles.clear();
+        File[] inventoryFiles = inventoryDir.listFiles();
+        if (inventoryFiles == null || inventoryFiles.length == 0) return;
+        for (File inventoryFile : inventoryFiles) {
+            boolean isNotPNGfile = !inventoryFile.getName().endsWith(".png");
+            if (isNotPNGfile) continue;
+            String fileName = inventoryFile.getName().replace(".png", "");
+            creatureInventoryFiles.put(fileName, inventoryFile);
+        }
+    }
+
+    public Image getCreatureInventoryImage(Creature cr, int width, int height) {
+        Image emptyInventoryImage = creatureInventoryPictures.get(INVENTORY_EMPTY);
+        if (emptyInventoryImage == null) {
+            File emptyInventoryFile = creatureInventoryFiles.get(INVENTORY_EMPTY);
+            if (emptyInventoryFile != null && emptyInventoryFile.exists()) {
+                emptyInventoryImage = loadDefinedDimensionImage(emptyInventoryFile, width, height);
+                creatureInventoryPictures.put(INVENTORY_EMPTY, emptyInventoryImage);
+            }
+        }
+        return emptyInventoryImage;
     }
 
     private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveSide moveSide) {
@@ -126,7 +155,8 @@ public class CreatureAnimation {
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
         if (imagesFiles == null || imagesFiles.length == 0) return;
         for (File imageFile : imagesFiles) {
-            Image loadedFrame = loadPortrait(imageFile);
+            int portraitSize = Sizes.getPortraitSize();
+            Image loadedFrame = loadDefinedDimensionImage(imageFile, portraitSize, portraitSize);
             portrait.add(loadedFrame);
         }
     }
@@ -147,7 +177,7 @@ public class CreatureAnimation {
         }
     }
 
-    private Image loadPortrait(File file) {
+    private Image loadDefinedDimensionImage(File file, int width, int height) {
         String url = null;
         try {
             url = file.toURI().toURL().toString();
@@ -158,15 +188,15 @@ public class CreatureAnimation {
             return null;
         }
 
-        int portraitSize = Sizes.getPortraitSize();
-        if (portraitSize == 0) {
+
+        if (width == 0 || height == 0) {
             return null;
         }
 
         if (Sizes.getTrueMeter() == CONSTANT_METER) {
-            return new Image(url, portraitSize, portraitSize, false, false, false);
+            return new Image(url, width, height, false, false, false);
         } else {
-            Dimension d = new Dimension(portraitSize, portraitSize);
+            Dimension d = new Dimension(width, height);
             Dimension rd = ResolutionImage.getRequestedDimension(d);
             return ResolutionImage.getResizedImage(url, d, rd);
         }
@@ -362,7 +392,8 @@ public class CreatureAnimation {
         return portraits;
     }
 
-    public void clearPortraits() {
+    public void clearResizablePictures() {
         portraits.clear();
+        creatureInventoryPictures.clear();
     }
 }

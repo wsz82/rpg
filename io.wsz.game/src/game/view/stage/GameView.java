@@ -451,10 +451,10 @@ public class GameView extends CanvasView {
         });
 
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearHeroesPortraits();
+            Controller.get().clearResizablePictures();
         });
         canvas.heightProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearHeroesPortraits();
+            Controller.get().clearResizablePictures();
         });
     }
 

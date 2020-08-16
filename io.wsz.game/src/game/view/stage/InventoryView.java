@@ -307,19 +307,20 @@ public class InventoryView {
     public void refresh() {
         double width = canvas.getWidth();
         if (width == 0) return;
-        double right = (width - Settings.getBarPart()*width) / Sizes.getMeter();
+        double barViewWidth = Settings.getBarPart() * width;
+        double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
 
         Creature cr = Controller.get().getCreatureToOpenInventory();
 
-        drawBackground(right);
+        drawBackground(inventoryWidth);
 
-        drawCreature(right, cr);
+        drawCreature(inventoryWidth, cr);
 
-        drawHold(right, cr);
+        drawHold(inventoryWidth, cr);
 
-        drawDrop(right, cr);
+        drawDrop(inventoryWidth, cr);
 
-        drawContainer(right);
+        drawContainer(inventoryWidth);
 
         checkPos();
     }
@@ -460,11 +461,14 @@ public class InventoryView {
     }
 
     private void drawCreature(double inventoryWidth, Creature cr) {
-        Image img = cr.getImage();
+        int meter = Sizes.getMeter();
+        double meterFactor = inventoryWidth * meter;
+        double x = 0.05 * meterFactor;
+        double pictureWidth = 0.2 * meterFactor;
+        double y = 0.1 * canvas.getHeight();
+        double pictureHeight = 0.4 * meterFactor;
 
-        double x = 0.1 * inventoryWidth * Sizes.getMeter();
-        double y = 0.2 * canvas.getHeight();
-
+        Image img = cr.getAnimation().getCreatureInventoryImage(cr, (int) pictureWidth, (int) pictureHeight);
         gc.drawImage(img, x, y);
     }
 

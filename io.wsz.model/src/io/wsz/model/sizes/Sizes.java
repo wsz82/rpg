@@ -42,7 +42,7 @@ public class Sizes {
 
     public static void setMeter(int resWidth) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
-        Controller.get().clearHeroesPortraits();
+        Controller.get().clearResizablePictures();
     }
 
     public static FontSize getFontSize() {

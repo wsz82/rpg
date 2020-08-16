@@ -267,10 +267,10 @@ public class Controller {
         this.heroes.addAll(heroes);
     }
 
-    public void clearHeroesPortraits() {
-        for (Creature hero : Controller.get().getHeroes()) {
-            hero.getAnimation().clearPortraits();
-        }
+    public void clearResizablePictures() {
+        getAssetsList().stream()
+                .filter(a -> a instanceof Creature)
+                .forEach(a -> ((Creature) a).getAnimation().clearResizablePictures());
     }
 
     public boolean isInventory() {
