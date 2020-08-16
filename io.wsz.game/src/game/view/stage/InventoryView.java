@@ -26,6 +26,10 @@ public class InventoryView {
     private static final double CREATURE_Y_POS = 0.1;
     private static final double CREATURE_WIDTH = 0.2;
     private static final double CREATURE_HEIGHT = 0.4;
+    private static final double HOLD_X_POS = 0.3;
+    private static final double HOLD_Y_POS = 0.6;
+    private static final double HOLD_WIDTH = 0.6;
+    private static final double HOLD_HEIGHT = 0.3;
 
     private final Canvas canvas;
     private final GraphicsContext gc;
@@ -371,21 +375,25 @@ public class InventoryView {
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
-        mousePos.x = (mouseX - left) / Sizes.getMeter();
-        mousePos.y = (mouseY - top) / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        mousePos.x = (mouseX - left) / meter;
+        mousePos.y = (mouseY - top) / meter;
         return mousePos;
     }
 
     private void drawHold(double inventoryWidth, Creature cr) {
         Inventory inventory = cr.getInventory();
 
-        double holdWidth = 0.6 * inventoryWidth;
-        double holdHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
-        double x = 0.3 * inventoryWidth;
-        double y = 0.6 * canvas.getHeight() / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        double canvasHeight = canvas.getHeight();
+        double holdWidth = HOLD_WIDTH * inventoryWidth;
+        double holdHeight = HOLD_HEIGHT * canvasHeight / meter;
+        double x = HOLD_X_POS * inventoryWidth;
+        double y = HOLD_Y_POS * canvasHeight / meter;
 
+        holdView.setInventoryWidth(inventoryWidth);
         holdView.setDragged(dragged);
-        holdView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
+        holdView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / meter);
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
         holdView.setInventory(inventory);
@@ -398,9 +406,11 @@ public class InventoryView {
             equipmentWithinRange = cr.getEquipmentWithinRange();
         }
 
-        double scrollWidth = canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter();
+        int meter = Sizes.getMeter();
+        double canvasHeight = canvas.getHeight();
+        double scrollWidth = canvas.getWidth() * SCROLL_BUTTON_PART / meter;
         double x = 0.6 * inventoryWidth + scrollWidth;
-        double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
+        double y = 0.2 * canvasHeight / meter;
         double range = cr.getRange();
 
         double height = cr.getSize().getHeight() + 2*range;
@@ -408,7 +418,7 @@ public class InventoryView {
         double width = cr.getSize().getWidth() + 2*range;
         dropView.setVisionWidthDiameter(width);
 
-        double maxDropHeight = 0.3 * canvas.getHeight() / Sizes.getMeter();
+        double maxDropHeight = 0.3 * canvasHeight / meter;
         double maxDropWidth = 0.3 * inventoryWidth;
 
         double resultHeight = height;
@@ -434,8 +444,8 @@ public class InventoryView {
 
         dropView.setScrollWidth(scrollWidth);
         dropView.setViewPos(x, y);
-        Coords center = cr.getCenter();
         dropView.setSize(resultWidth, resultHeight);
+        Coords center = cr.getCenter();
         dropView.setCreaturePos(center.x, center.y);
         dropView.setDroppedEquipment(equipmentWithinRange);
         dropView.refresh();
@@ -451,13 +461,15 @@ public class InventoryView {
             boolean containerOutOfRange = !con.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
             if (containerOutOfRange) return;
         }
+        int meter = Sizes.getMeter();
         double width = 0.3 * inventoryWidth;
-        double height = 0.3 * canvas.getHeight() / Sizes.getMeter();
+        double height = 0.3 * canvas.getHeight() / meter;
         double x = 0.3 * inventoryWidth;
-        double y = 0.2 * canvas.getHeight() / Sizes.getMeter();
+        double y = 0.2 * canvas.getHeight() / meter;
 
+        containerView.setInventoryWidth(inventoryWidth);
         containerView.setDragged(dragged);
-        containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / Sizes.getMeter());
+        containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / meter);
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
         containerView.setContainer(con);
@@ -500,8 +512,9 @@ public class InventoryView {
             if (!fitY) continue;
 
             Image img = eq.getImage();
-            int imgX = (int) ((x - cX) * Sizes.getMeter());
-            int imgY = (int) ((y - cY) * Sizes.getMeter());
+            int meter = Sizes.getMeter();
+            int imgX = (int) ((x - cX) * meter);
+            int imgY = (int) ((y - cY) * meter);
             Color color;
             try {
                 color = img.getPixelReader().getColor(imgX, imgY);
@@ -510,8 +523,8 @@ public class InventoryView {
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (isPixelTransparent) continue;
-            draggedEquipmentCoords.x = (double) imgX / Sizes.getMeter();
-            draggedEquipmentCoords.y = (double) imgY / Sizes.getMeter();
+            draggedEquipmentCoords.x = (double) imgX / meter;
+            draggedEquipmentCoords.y = (double) imgY / meter;
             return eq;
         }
         return null;

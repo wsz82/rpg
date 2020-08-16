@@ -4,10 +4,8 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +13,15 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 public abstract class EquipmentView extends CanvasView {
+    protected static final double SIZE_COLUMN_WIDTH = 0.01;
+    protected static final double WEIGHT_COLUMN_WIDTH = 0.01;
+
     protected final List<Equipment> items = new ArrayList<>(0);
     protected final Coords modifiedCoords = new Coords();
     protected final Coords viewPos = new Coords();
     protected final Coords curPos = new Coords();
 
+    protected double inventoryWidth;
     protected double viewWidth;
     protected double viewHeight;
     protected double scrollWidth;
@@ -118,24 +120,28 @@ public abstract class EquipmentView extends CanvasView {
         return modifiedCoords;
     }
 
-    protected void drawSize(int filledSpace, int maxSize, double x, double y) {
-        gc.setTextBaseline(VPos.TOP);
-        gc.setTextAlign(TextAlignment.CENTER);
-
-        Color filledSpaceTextColor;
-        if (filledSpace >= maxSize) {
-            filledSpaceTextColor = Color.RED;
+    protected void drawColumn(double filled, double max, double columnWidth, double columnHeight,
+                              double columnX, double columnY, Color backgroundColor) {
+        drawColumn(columnWidth, columnHeight, columnX, columnY, backgroundColor);
+        double columnFilledHeight = columnHeight * filled / max;
+        columnFilledHeight = Math.min(columnFilledHeight, columnHeight);
+        double columnFilledY = columnY + columnHeight - columnFilledHeight;
+        Color filledColor;
+        if (filled < 1.0/3 * max) {
+            filledColor = Color.GREEN;
+        } else if (filled >= 1.0/3 * max && filled < 2.0/3 * max) {
+            filledColor = Color.YELLOW;
         } else {
-            filledSpaceTextColor = Color.BLACK;
+            filledColor = Color.RED;
         }
-        gc.setStroke(filledSpaceTextColor);
-        String filled = String.valueOf(filledSpace);
-        gc.strokeText(filled, x, y);
+        drawColumn(columnWidth, columnFilledHeight, columnX, columnFilledY, filledColor);
+    }
 
-        gc.setStroke(Color.BLACK);
-        y += gc.getFont().getSize();
-        String max = String.valueOf(maxSize);
-        gc.strokeText(max, x, y);
+    private void drawColumn(double columnWidth, double columnHeight, double columnX, double columnY,
+                            Color backgroundColor) {
+        gc.setFill(backgroundColor);
+        int meter = Sizes.getMeter();
+        gc.fillRect(columnX * meter, columnY * meter, columnWidth * meter, columnHeight * meter);
     }
 
     public abstract boolean remove(Equipment e, Creature cr);
@@ -236,5 +242,13 @@ public abstract class EquipmentView extends CanvasView {
 
     public double getMinCurPosY() {
         return 0;
+    }
+
+    public double getInventoryWidth() {
+        return inventoryWidth;
+    }
+
+    public void setInventoryWidth(double inventoryWidth) {
+        this.inventoryWidth = inventoryWidth;
     }
 }

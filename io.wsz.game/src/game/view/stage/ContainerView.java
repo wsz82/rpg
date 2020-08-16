@@ -30,6 +30,23 @@ public class ContainerView extends EquipmentView {
 
         selectEquipment();
 
+        drawContainerEquipment();
+
+        drawContainerSize();
+    }
+
+    private void drawContainerSize() {
+        int filledSpace = container.getFilledSpace();
+        int maxSize = container.getSize() - container.getNettoSize();
+        double columnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
+        double viewHeight = this.viewHeight;
+        double columnX = viewPos.x - columnWidth;
+        double columnY = viewPos.y;
+        Color backgroundColor = Color.WHITE;
+        drawColumn(filledSpace, maxSize, columnWidth, viewHeight, columnX, columnY, backgroundColor);
+    }
+
+    private void drawContainerEquipment() {
         for (Equipment e : items) {
             Coords pos = e.getPos();
             Coords corrected = currentPosCorrection(pos);
@@ -44,14 +61,6 @@ public class ContainerView extends EquipmentView {
 
             cutImageAndDraw(x, y, img, viewX, viewY, viewWidth, viewHeight);
         }
-
-        drawContainerSize();
-    }
-
-    private void drawContainerSize() {
-        double x = (viewPos.x + 4.0/5*viewWidth) * Sizes.getMeter();
-        double y = viewPos.y*Sizes.getMeter() - gc.getFont().getSize()*3;
-        drawSize(container.getFilledSpace(), container.getSize() - container.getNettoSize(), x, y);
     }
 
     public Container getContainer() {

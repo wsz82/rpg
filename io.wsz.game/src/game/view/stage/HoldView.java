@@ -5,11 +5,9 @@ import io.wsz.model.item.Equipment;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 
 import java.util.List;
 
@@ -25,6 +23,33 @@ public class HoldView extends EquipmentView {
         super.refresh();
 
         drawEquipment();
+
+        drawHoldSize();
+
+        drawHoldWeight();
+    }
+
+    private void drawHoldWeight() {
+        double actualWeight = inventory.getActualWeight();
+        double maxWeight = inventory.getMaxWeight();
+        double columnWidth = WEIGHT_COLUMN_WIDTH * inventoryWidth;
+        double viewHeight = this.viewHeight;
+        double sizeColumnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
+        double columnX = viewPos.x - columnWidth - sizeColumnWidth;
+        double columnY = viewPos.y;
+        Color backgroundColor = Color.BLACK;
+        drawColumn(actualWeight, maxWeight, columnWidth, viewHeight, columnX, columnY, backgroundColor);
+    }
+
+    private void drawHoldSize() {
+        int filledSpace = inventory.getFilledSpace();
+        int maxSize = inventory.getMaxSize();
+        double columnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
+        double viewHeight = this.viewHeight;
+        double columnX = viewPos.x - columnWidth;
+        double columnY = viewPos.y;
+        Color backgroundColor = Color.WHITE;
+        drawColumn(filledSpace, maxSize, columnWidth, viewHeight, columnX, columnY, backgroundColor);
     }
 
     @Override
@@ -46,43 +71,6 @@ public class HoldView extends EquipmentView {
 
             cutImageAndDraw(x, y, img, viewX, viewY, viewWidth, viewHeight);
         }
-
-        drawHoldSize();
-
-        drawHoldWeight();
-    }
-
-    private void drawHoldSize() {
-        double x = (viewPos.x - viewHeight/2) * Sizes.getMeter();
-        double y = (viewPos.y + 1.0/5*viewHeight) * Sizes.getMeter();
-        drawSize(inventory.getFilledSpace(), inventory.getMaxSize(), x, y);
-    }
-
-    private void drawHoldWeight() {
-        double x = (viewPos.x - viewHeight/2) * Sizes.getMeter();
-        double y = (viewPos.y + 4.0/5*viewHeight) * Sizes.getMeter();
-        double weight = inventory.getActualWeight();
-        double maxWeight = inventory.getMaxWeight();
-
-        gc.setTextBaseline(VPos.TOP);
-        gc.setTextAlign(TextAlignment.CENTER);
-
-        Color actualWeightTextColor;
-        if (weight > maxWeight) {
-            actualWeightTextColor = Color.RED;
-        } else if (weight > maxWeight/2) {
-            actualWeightTextColor = Color.YELLOW;
-        } else {
-            actualWeightTextColor = Color.BLACK;
-        }
-        gc.setStroke(actualWeightTextColor);
-        String filled = String.format("%.2f", weight);
-        gc.strokeText(filled, x, y);
-
-        gc.setStroke(Color.BLACK);
-        y += gc.getFont().getSize();
-        String max = String.format("%.2f", maxWeight);
-        gc.strokeText(max, x, y);
     }
 
     public Inventory getInventory() {
