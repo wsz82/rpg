@@ -18,7 +18,7 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class ResolutionImage {
 
-    public static Image loadImage(File programDir, String type, String fileName) {
+    public static Image loadAssetImage(File programDir, String type, String fileName) {
         if (fileName.isEmpty()) {
             return null;
         }

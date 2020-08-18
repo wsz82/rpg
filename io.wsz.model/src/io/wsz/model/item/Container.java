@@ -199,7 +199,7 @@ public class Container extends Equipment<Container> implements Containable, Open
                 String type = getType().toString().toLowerCase();
                 String openImagePath = getOpenImagePath();
                 File programDir = getController().getProgramDir();
-                setOpenImage(ResolutionImage.loadImage(programDir, type, openImagePath));
+                setOpenImage(ResolutionImage.loadAssetImage(programDir, type, openImagePath));
             }
             return openImage;
         } else {

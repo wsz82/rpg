@@ -14,6 +14,7 @@ module io.wsz.model {
     exports io.wsz.model.layer;
     exports io.wsz.model.location;
     exports io.wsz.model.plugin;
+    exports io.wsz.model.textures;
     exports io.wsz.model.stage;
     exports io.wsz.model.world;
 }

@@ -1,12 +1,15 @@
-package io.wsz.model.item;
+package io.wsz.model.textures;
 
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.CreatureSize;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
 import java.io.File;
 
 public class CreatureBase {
-    private static final String CIRCLE = "circle";
+    private static final String BASE = "base";
 
     private static final CreatureBase XS_C = new CreatureBase("xs_c.png");
     private static final CreatureBase XS_E = new CreatureBase("xs_e.png");
@@ -32,30 +35,30 @@ public class CreatureBase {
             L_C, L_E, L_N, XL_C, XL_E, XL_N};
 
     private Image img;
-    private String relativePath;
+    private String fileName;
 
-    public CreatureBase(String path) {
-        this.setRelativePath(path);
+    public CreatureBase(String fileName) {
+        this.setFileName(fileName);
     }
 
     public static CreatureBase getCreatureBase(CreatureSize size, CreatureControl control) {
-        String path = "";
-        path += switch (size) {
+        String fileName = "";
+        fileName += switch (size) {
             case XS -> "xs";
             case S -> "s";
             case M -> "m";
             case L -> "l";
             case XL -> "xl";
         };
-        path += "_";
-        path += switch (control) {
+        fileName += "_";
+        fileName += switch (control) {
             case CONTROL, CONTROLLABLE -> "c";
             case NEUTRAL -> "n";
             case ENEMY -> "e";
         };
-        path += ".png";
+        fileName += ".png";
         for (CreatureBase base : bases) {
-            if (base.getRelativePath().equals(path)) return base;
+            if (base.getFileName().equals(fileName)) return base;
         }
         return null;
     }
@@ -66,7 +69,8 @@ public class CreatureBase {
 
     public Image getImage(File programDir) {
         if (img == null) {
-            setImg(ResolutionImage.loadImage(programDir, CIRCLE, getRelativePath()));
+            String path = programDir + Sizes.TEXTURES_DIR + File.separator + BASE + File.separator + fileName;
+            setImg(ResolutionImage.loadImage(path));
         }
         return img;
     }
@@ -75,11 +79,11 @@ public class CreatureBase {
         this.img = img;
     }
 
-    public String getRelativePath() {
-        return relativePath;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setRelativePath(String relativePath) {
-        this.relativePath = relativePath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

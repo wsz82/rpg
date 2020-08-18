@@ -339,7 +339,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
             String type = getType().toString().toLowerCase();
             String path = getPath();
             File programDir = getController().getProgramDir();
-            setImage(ResolutionImage.loadImage(programDir, type, path));
+            setImage(ResolutionImage.loadAssetImage(programDir, type, path));
         }
         return image;
     }

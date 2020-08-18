@@ -62,7 +62,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
                 String type = getType().toString().toLowerCase();
                 String openImagePath = getOpenImagePath();
                 File programDir = getController().getProgramDir();
-                setOpenImage(ResolutionImage.loadImage(programDir, type, openImagePath));
+                setOpenImage(ResolutionImage.loadAssetImage(programDir, type, openImagePath));
             }
             return openImage;
         } else {

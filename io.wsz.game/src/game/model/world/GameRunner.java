@@ -4,11 +4,12 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.Fog;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.textures.CreatureBase;
+import io.wsz.model.textures.Fog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 

@@ -2,12 +2,16 @@ package game.view.stage;
 
 import game.model.GameController;
 import io.wsz.model.Controller;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.CreatureSize;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ItemsComparator;
+import io.wsz.model.textures.CreatureBase;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
