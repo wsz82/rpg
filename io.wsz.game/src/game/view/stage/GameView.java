@@ -123,7 +123,7 @@ public class GameView extends CanvasView {
 
         drawItems(heroes);
 
-//        drawFog(heroes);
+        drawFog(heroes);
 
         if (selectionMode) {
             drawSelection();
@@ -139,7 +139,7 @@ public class GameView extends CanvasView {
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
         int meter = Sizes.getMeter();
         File programDir = controller.getProgramDir();
-        Image image = Sizes.FOG.getImage(programDir);
+        Image image = gameController.getFog().getImage(programDir);
         double fogSize = image.getWidth() / meter;
         if (discoveredFog == null) {
             int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
@@ -212,7 +212,8 @@ public class GameView extends CanvasView {
         pos.x *= meter;
         pos.y *= meter;
         File programDir = controller.getProgramDir();
-        gc.drawImage(Sizes.FOG.getImage(programDir), pos.x, pos.y);
+        Image fog = gameController.getFog().getImage(programDir);
+        gc.drawImage(fog, pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {

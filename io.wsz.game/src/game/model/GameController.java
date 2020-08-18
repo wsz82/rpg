@@ -11,6 +11,7 @@ import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
+import io.wsz.model.asset.Fog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
@@ -30,10 +31,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
     private final Controller controller;
+    private final Fog fog = new Fog();
     private final ObservableList<String> saves = FXCollections.observableArrayList();
-
     private final AtomicBoolean isGame = new AtomicBoolean();
     private final AtomicBoolean isDialog = new AtomicBoolean();
+
     private GameView gameView;
     private GameStage gameStage;
     private GameRunner gameRunner;
@@ -280,5 +282,9 @@ public class GameController {
 
     public Controller getController() {
         return controller;
+    }
+
+    public Fog getFog() {
+        return fog;
     }
 }

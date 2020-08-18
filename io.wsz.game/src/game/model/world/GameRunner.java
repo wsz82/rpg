@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
+import io.wsz.model.asset.Fog;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -274,9 +275,10 @@ public class GameRunner {
             int i = 0;
             updateProgress(0, total);
 
-            Sizes.FOG.setImage(null);
+            Fog fog = gameController.getFog();
+            fog.setImage(null);
             File programDir = controller.getProgramDir();
-            Sizes.FOG.getImage(programDir);
+            fog.getImage(programDir);
             i++;
             updateProgress(i, total);
 
