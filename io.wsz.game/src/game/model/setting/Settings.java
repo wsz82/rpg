@@ -1,5 +1,6 @@
 package game.model.setting;
 
+import io.wsz.model.Controller;
 import io.wsz.model.sizes.Sizes;
 
 public class Settings {
@@ -56,9 +57,9 @@ public class Settings {
         return resolutionWidth;
     }
 
-    public static void setResolutionWidth(int resolutionWidth) {
+    public static void setResolutionWidth(int resolutionWidth, Controller controller) {
         Sizes.setReloadImages(true);
-        Sizes.setMeter(resolutionWidth);
+        Sizes.setMeter(resolutionWidth, controller);
         Settings.resolutionWidth = resolutionWidth;
     }
 

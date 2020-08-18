@@ -1,8 +1,5 @@
 package game.model.save;
 
-import io.wsz.model.Controller;
-import io.wsz.model.location.Location;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +14,7 @@ public class SaveCaretaker {
         this.programDir = programDir;
     }
 
-    public void createSave(SaveMemento memento) {
-        List<Location> locations = new ArrayList<>(Controller.get().getLocationsList());
-        memento.setLocations(locations);
+    public void makeSave(SaveMemento memento) {
         String path = programDir + File.separator + FILE_NAME + File.separator + memento.getName();
         new File(programDir + File.separator + FILE_NAME).mkdir();
         try (

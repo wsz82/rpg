@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
@@ -10,13 +11,14 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     private final OpenableInDoor openable = new OpenableInDoor(this, item, isContent);
 
-    public InDoorAssetStage(Stage parent, InDoor item, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, item, isContent, editorCanvas);
+    public InDoorAssetStage(Stage parent, InDoor item, boolean isContent,
+                            EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, item, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public InDoorAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public InDoorAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -47,7 +49,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected void addAssetToList(InDoor asset) {
-        ObservableAssets.get().getInDoors().add(asset);
+        editorController.getObservableAssets().getInDoors().add(asset);
     }
 
     @Override

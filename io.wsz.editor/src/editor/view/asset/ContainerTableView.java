@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
@@ -17,8 +18,9 @@ import java.util.List;
 
 public class ContainerTableView extends AssetsTableView<Container> {
 
-    public ContainerTableView(Stage parent, ObservableList<Container> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    public ContainerTableView(Stage parent, ObservableList<Container> assets,
+                              EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
         initContainersTable();
     }
 
@@ -41,13 +43,13 @@ public class ContainerTableView extends AssetsTableView<Container> {
         if (c == null) {
             return;
         }
-        ContainerAssetStage as = new ContainerAssetStage(parent, c, false, editorCanvas);
+        ContainerAssetStage as = new ContainerAssetStage(parent, c, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        ContainerAssetStage as = new ContainerAssetStage(parent, editorCanvas);
+        ContainerAssetStage as = new ContainerAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -75,7 +77,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
 
     @Override
     protected void removeAssetFromList(List assetsToRemove) {
-        ObservableAssets.get().getContainers().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getContainers().removeAll(assetsToRemove);
     }
 
     @Override

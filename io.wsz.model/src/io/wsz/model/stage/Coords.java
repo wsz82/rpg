@@ -27,7 +27,7 @@ public class Coords implements Externalizable {
     private static final List<Coords> resultCoords1 = new ArrayList<>(0);
     private static final List<Coords> resultCoords2 = new ArrayList<>(0);
 
-    public static Coords parseCoords(String s) {
+    public static Coords parseCoords(String s, Controller controller) {
         Coords pos = new Coords();
         int stringEnd;
         String substring;
@@ -38,7 +38,7 @@ public class Coords implements Externalizable {
             String locName = substring;
             Location loc = new Location(locName);
             pos.setLocation(loc);
-            Controller.get().restoreCoordsLocation(pos);
+            controller.restoreCoordsOfLocation(pos);
             s = s.replaceFirst(locName + "X:", "");
         } else {
             s = s.replaceFirst("X:", "");

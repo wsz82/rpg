@@ -1,6 +1,5 @@
 package io.wsz.model.animation;
 
-import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
@@ -54,8 +53,8 @@ public class CreatureAnimation {
         this.animationDir = animationDir;
     }
 
-    public void initAllFrames() {
-        String path = Controller.getProgramDir() + animationDir;
+    public void initAllFrames(File programDir) {
+        String path = programDir + animationDir;
         File pathFile = new File(path);
         File[] animationsDirs = pathFile.listFiles();
         if (animationsDirs == null || animationsDirs.length == 0) return;
@@ -202,14 +201,14 @@ public class CreatureAnimation {
         }
     }
 
-    public Image getPortrait(Creature cr) {
+    public Image getPortrait(Creature cr, File programDir) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
         if (curTime < animationPos.getNextPortraitUpdate()) return null;
         int randomDifTimeMillis = getRandomMillis(MAX_PORTRAIT_UPDATE_TIME_SEC, MIN_PORTRAIT_UPDATE_TIME_SEC);
         long nextPortraitUpdate = curTime + randomDifTimeMillis;
         animationPos.setNextPortraitUpdate(nextPortraitUpdate);
-        List<Image> portraits = getPortraits();
+        List<Image> portraits = getPortraits(programDir);
         int portraitsSize = portraits.size();
         if (portraitsSize == 0) return null;
         int randomIndex = RANDOM.nextInt(portraitsSize);
@@ -368,9 +367,9 @@ public class CreatureAnimation {
         return (long) (1 / speed * 1000 / framesSize);
     }
 
-    public Image getMainIdle() {
+    public Image getMainIdle(File programDir) {
         if (idles.getMain() == null) {
-            String path = Controller.getProgramDir() + animationDir + IDLE_PATH;
+            String path = programDir + animationDir + IDLE_PATH;
             File idleDir = new File(path);
             File[] imagesFiles = idleDir.listFiles(PNG_FILE_FILTER);
             if (imagesFiles == null || imagesFiles.length == 0) return null;
@@ -381,9 +380,9 @@ public class CreatureAnimation {
         return idles.getMain();
     }
 
-    public List<Image> getPortraits() {
+    public List<Image> getPortraits(File programDir) {
         if (portraits.isEmpty()) {
-            String path = Controller.getProgramDir() + animationDir + PORTRAIT_PATH;
+            String path = programDir + animationDir + PORTRAIT_PATH;
             File file = new File(path);
             if (file.exists()) {
                 initPortraitFrames(file, portraits);

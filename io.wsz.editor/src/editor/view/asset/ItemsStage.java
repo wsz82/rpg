@@ -29,13 +29,15 @@ public class ItemsStage<A extends Containable> extends ChildStage {
     private final A containable;
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
+    private final EditorController editorController;
 
     private TableView<TableItem> table;
     private ObservableList<TableItem> tableItems;
 
-    public ItemsStage(Stage parent, A containable) {
+    public ItemsStage(Stage parent, A containable, EditorController editorController) {
         super(parent);
         this.containable = containable;
+        this.editorController = editorController;
         initWindow();
     }
 
@@ -77,7 +79,7 @@ public class ItemsStage<A extends Containable> extends ChildStage {
             Dragboard db = e.getDragboard();
             boolean success = false;
             if (db.hasImage()) {
-                EditorController.get().setItemsStageToAddItems(this);
+                editorController.setItemsStageToAddItems(this);
                 success = true;
             }
             e.setDropCompleted(success);

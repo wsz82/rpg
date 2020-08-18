@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
@@ -16,8 +17,9 @@ import java.util.List;
 
 public class InDoorTableView extends AssetsTableView<InDoor> {
 
-    InDoorTableView(Stage parent, ObservableList<InDoor> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    InDoorTableView(Stage parent, ObservableList<InDoor> assets,
+                    EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
         initInDoorTable();
     }
 
@@ -40,13 +42,13 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         if (id == null) {
             return;
         }
-        InDoorAssetStage as = new InDoorAssetStage(parent, id, false, editorCanvas);
+        InDoorAssetStage as = new InDoorAssetStage(parent, id, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        InDoorAssetStage as = new InDoorAssetStage(parent, editorCanvas);
+        InDoorAssetStage as = new InDoorAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -78,7 +80,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
 
     @Override
     protected void removeAssetFromList(List<InDoor> assetsToRemove) {
-        ObservableAssets.get().getInDoors().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getInDoors().removeAll(assetsToRemove);
     }
 
     @Override

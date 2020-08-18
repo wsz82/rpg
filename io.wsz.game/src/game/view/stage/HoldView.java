@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.Inventory;
@@ -14,8 +15,8 @@ import java.util.List;
 public class HoldView extends EquipmentView {
     private Inventory inventory;
 
-    public HoldView(Canvas canvas) {
-        super(canvas);
+    public HoldView(Canvas canvas, GameController gameController) {
+        super(canvas, gameController);
     }
 
     @Override

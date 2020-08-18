@@ -16,11 +16,11 @@ import static io.wsz.model.item.CreatureControl.CONTROL;
 public class Teleportation {
     private static final ItemType[] landscapeType = new ItemType[] {ItemType.LANDSCAPE};
 
-    public static boolean teleport(Creature cr, Coords exit) {
+    public static boolean teleport(Creature cr, Coords exit, Controller controller) {
         if (exit == null || exit.isEmpty()) {
             return false;
         }
-        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
+        Optional<Location> optLocation = controller.getLocations().stream()
                 .filter(l -> l.getName().equals(exit.getLocation().getName()))
                 .findFirst();
         Location target = optLocation.orElse(null);
@@ -28,7 +28,7 @@ public class Teleportation {
             return false;
         }
         int targetLevel = exit.level;
-        Optional<Layer> optLayer = target.getLayers().get().stream()
+        Optional<Layer> optLayer = target.getLayers().stream()
                 .filter(l -> l.getLevel() == targetLevel)
                 .findFirst();
         Layer targetLayer = optLayer.orElse(null);
@@ -42,7 +42,7 @@ public class Teleportation {
         if (targetX > targetWidth || targetY > targetHeight) {
             return false;
         }
-        Board board = Controller.get().getBoard();
+        Board board = controller.getBoard();
         PosItem landscape = board.lookForItem(target, exit.x, exit.y, exit.level, landscapeType, false);
         if (landscape == null) {
             return false;
@@ -54,9 +54,9 @@ public class Teleportation {
         Location from = cr.getPos().getLocation();
         cr.changeLocation(from, exit);
         if (cr.getControl().equals(CONTROL)) {
-            Controller.get().setLocationToUpdate(target);
-            Controller.get().getCurrentLayer().setLayer(targetLayer);
-            Controller.get().setPosToCenter(exit);
+            controller.setLocationToUpdate(target);
+            controller.getCurrentLayer().setLayer(targetLayer);
+            controller.setPosToCenter(exit);
         }
         return true;
     }

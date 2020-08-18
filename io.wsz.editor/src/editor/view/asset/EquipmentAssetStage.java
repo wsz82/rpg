@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
@@ -14,12 +15,12 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
 
     protected HBox weightBox;
 
-    public EquipmentAssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, item, isContent, editorCanvas);
+    public EquipmentAssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, item, isContent, editorCanvas, editorController);
     }
 
-    public EquipmentAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public EquipmentAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
     }
 
     @Override

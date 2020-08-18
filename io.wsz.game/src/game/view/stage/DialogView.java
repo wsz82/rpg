@@ -32,6 +32,7 @@ public class DialogView {
     private static final double SCROLL_BAR_PART = 1.0/50;
 
     private final Canvas canvas;
+    private final GameController gameController;
     private final GraphicsContext gc;
     private final double offset;
     private final DialogMemento dialogMemento;
@@ -53,11 +54,12 @@ public class DialogView {
     private int scrollButtonHeight;
     private boolean scrollWithButton;
 
-    public DialogView(Canvas canvas, double offset, DialogMemento dialogMemento) {
+    public DialogView(Canvas canvas, GameController gameController, double offset, DialogMemento dialogMemento) {
         this.canvas = canvas;
-        this.gc = canvas.getGraphicsContext2D();
+        this.gameController = gameController;
         this.offset = offset;
         this.dialogMemento = dialogMemento;
+        gc = canvas.getGraphicsContext2D();
         hookupEvents();
     }
 
@@ -120,7 +122,7 @@ public class DialogView {
 
     private void hookupEvents() {
         clickEvent = e -> {
-            synchronized (GameController.get().getGameRunner()) {
+            synchronized (gameController.getGameRunner()) {
                 MouseButton button = e.getButton();
                 if (button.equals(MouseButton.PRIMARY)) {
                     e.consume();
@@ -232,7 +234,7 @@ public class DialogView {
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
         canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
-        GameController.get().endDialog();
+        gameController.endDialog();
     }
 
     private int getViewHeight() {

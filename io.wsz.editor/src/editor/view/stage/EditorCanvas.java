@@ -1,6 +1,5 @@
 package editor.view.stage;
 
-import editor.model.ActiveItem;
 import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
@@ -8,7 +7,6 @@ import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
@@ -29,16 +27,20 @@ public class EditorCanvas extends Canvas {
     private final Stage stage;
     private final Pointer pointer;
     private final Pane parent;
-    private final Controller controller = Controller.get();
-    private final Coords curPos = controller.getCurPos();
+    private final Controller controller;
+    private final EditorController editorController;
+    private final Coords curPos;
     private final Coords draggedItemMousePos = new Coords();
 
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
     private PosItem draggedItem;
 
-    public EditorCanvas(Stage stage, Pane parent, Pointer pointer){
+    public EditorCanvas(Stage stage, EditorController editorController, Pane parent, Pointer pointer){
         this.stage = stage;
+        this.editorController = editorController;
+        this.controller = editorController.getController();
+        this.curPos = controller.getCurPos();
         this.pointer = pointer;
         this.parent = parent;
         setSize();
@@ -72,7 +74,7 @@ public class EditorCanvas extends Canvas {
                 })
                 .collect(Collectors.toList());
 
-        Board.get().sortPosItems(items);
+        controller.getBoard().sortPosItems(items);
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
@@ -85,7 +87,7 @@ public class EditorCanvas extends Canvas {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 } else {
-                    if (pi == EditorController.get().getActiveContent().getItem()) {
+                    if (pi == editorController.getActiveItem()) {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 }
@@ -134,7 +136,7 @@ public class EditorCanvas extends Canvas {
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
             if (!activeContentMarked
-                    && pi.equals(EditorController.get().getActiveContent().getItem())) {
+                    && pi.equals(editorController.getActiveItem())) {
                 activeContentMarked = true;
                 drawActiveContentRectangle(gc, pi);
             }
@@ -185,7 +187,6 @@ public class EditorCanvas extends Canvas {
             e.consume();
             setFocusTraversable(true);
             requestFocus();
-            ActiveItem ac = EditorController.get().getActiveContent();
             try {
                 if (pointer.isActive()) {
                     attachArrowsEventToPointer();
@@ -200,15 +201,15 @@ public class EditorCanvas extends Canvas {
                     if (e.getButton().equals(MouseButton.PRIMARY)) {
                         attachArrowsEventToContent(pi);
                     } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                        EditorController.get().getActiveContent().setItem(pi);
+                        editorController.setActiveItem(pi);
                         openContextMenu(pi, e);
                     }
                 } else {
-                    ac.setItem(null);
+                    editorController.setActiveItem(null);
                 }
             } finally {
                 if (((e.getButton().equals(MouseButton.SECONDARY)
-                        || (ac.getItem()) == null) && !pointer.isActive())) {
+                        || editorController.getActiveItem() == null) && !pointer.isActive())) {
                     removeArrowsEvent();
                 }
                 refresh();
@@ -228,10 +229,10 @@ public class EditorCanvas extends Canvas {
         controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
-        controller.getCurrentLocation().widthProperty().addListener((observable, oldValue, newValue) -> {
+        controller.getCurrentLocation().getWidthProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
-        controller.getCurrentLocation().heightProperty().addListener((observable, oldValue, newValue) -> {
+        controller.getCurrentLocation().getHeightProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
     }
@@ -296,7 +297,7 @@ public class EditorCanvas extends Canvas {
                         controller.getCurrentLocation().getLocation());
                 if (draggedItem == null) {
                     dragPos.add(controller.getCurPos());
-                    EditorController.get().setDragPos(dragPos);
+                    editorController.setDragPos(dragPos);
                 } else {
                     dragPos.x -= draggedItemMousePos.x;
                     dragPos.y -= draggedItemMousePos.y;
@@ -391,7 +392,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void attachArrowsEventToContent(PosItem pi) {
-        EditorController.get().getActiveContent().setItem(pi);
+        editorController.setActiveItem(pi);
         removeArrowsEvent();
         arrowsEvent = e -> {
             if (pointer.isActive()) {
@@ -402,7 +403,7 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.UP
                     || e.getCode() == KeyCode.RIGHT
                     || e.getCode() == KeyCode.LEFT) {
-                PosItem active = EditorController.get().getActiveContent().getItem();
+                PosItem active = editorController.getActiveItem();
                 moveContent(e.getCode(), active);
                 contentTableView.refresh();
                 refresh();
@@ -502,7 +503,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void removeItem(PosItem pi) {
-        controller.removeItem(pi);
+        controller.getModel().getCurrentLocation().getLocation().getItems().remove(pi);
         refresh();
     }
 

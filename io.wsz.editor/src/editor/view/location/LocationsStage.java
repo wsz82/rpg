@@ -1,10 +1,10 @@
 package editor.view.location;
 
+import editor.model.EditorController;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
-import io.wsz.model.location.LocationsList;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -15,12 +15,15 @@ import java.util.List;
 
 public class LocationsStage extends ChildStage {
     private static final String TITLE = "Locations";
+
+    private final EditorController editorController;
     private final StackPane root = new StackPane();
     private final LocationsTableView table;
 
-    public LocationsStage(Stage parent, EditorCanvas editorCanvas) {
+    public LocationsStage(Stage parent, EditorController editorController, EditorCanvas editorCanvas) {
         super(parent);
-        this.table = new LocationsTableView(editorCanvas);
+        this.editorController = editorController;
+        this.table = new LocationsTableView(editorCanvas, editorController);
         initWindow();
     }
 
@@ -52,19 +55,19 @@ public class LocationsStage extends ChildStage {
 
     private void addLocation() {
         Location location = new Location("new", 20, 20);
-        Location uniqueLocation = getUniqueLocation(location);
+        List<Location> locations = editorController.getController().getLocations();
+        Location uniqueLocation = getUniqueLocation(location, locations);
         Layer layer = new Layer("new");
-        location.getLayers().get().add(layer);
-        LocationsList.get().add(uniqueLocation);
+        location.getLayers().add(layer);
+        locations.add(uniqueLocation);
     }
 
-    private Location getUniqueLocation(Location location) {
-        List<Location> locations = LocationsList.get();
+    private Location getUniqueLocation(Location location, List<Location> locations) {
         boolean nameExists = locations.stream()
                 .anyMatch(l -> l.getName().equals(location.getName()));
         if (nameExists) {
             location.setName(location.getName() + "New");
-            return getUniqueLocation(location);
+            return getUniqueLocation(location, locations);
         } else {
             return location;
         }

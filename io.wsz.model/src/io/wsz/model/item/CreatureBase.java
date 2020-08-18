@@ -3,7 +3,11 @@ package io.wsz.model.item;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
+import java.io.File;
+
 public class CreatureBase {
+    private static final String CIRCLE = "circle";
+
     private static final CreatureBase XS_C = new CreatureBase("xs_c.png");
     private static final CreatureBase XS_E = new CreatureBase("xs_e.png");
     private static final CreatureBase XS_N = new CreatureBase("xs_n.png");
@@ -60,9 +64,9 @@ public class CreatureBase {
         return bases;
     }
 
-    public Image getImage() {
+    public Image getImage(File programDir) {
         if (img == null) {
-            setImg(ResolutionImage.loadImage("circle", getRelativePath()));
+            setImg(ResolutionImage.loadImage(programDir, CIRCLE, getRelativePath()));
         }
         return img;
     }

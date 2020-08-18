@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
@@ -15,13 +16,14 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private final DoubleField inputRange = new DoubleField(0.0, isContent);
     private final DoubleField inputSpeed = new DoubleField(0.0, isContent);
 
-    public WeaponAssetStage(Stage parent, Weapon asset, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, asset, isContent, editorCanvas);
+    public WeaponAssetStage(Stage parent, Weapon asset, boolean isContent,
+                            EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public WeaponAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public WeaponAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -120,7 +122,7 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
 
     @Override
     protected void addAssetToList(Weapon asset) {
-        ObservableAssets.get().getWeapons().add(asset);
+        editorController.getObservableAssets().getWeapons().add(asset);
     }
 
     @Override

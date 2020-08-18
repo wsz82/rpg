@@ -1,7 +1,6 @@
 package editor.view.plugin;
 
 import editor.model.EditorController;
-import editor.view.stage.Main;
 import io.wsz.model.Controller;
 import io.wsz.model.plugin.Plugin;
 import javafx.beans.binding.ObjectBinding;
@@ -26,10 +25,14 @@ public class EditorPluginsTable extends Stage {
     private final ObservableList<Plugin> pluginList = FXCollections.observableArrayList();
     private final TableView<Plugin> table = new TableView<>();
     private final PluginSettingsStage pss;
+    private final EditorController editorController;
+    private final Controller controller;
 
-    public EditorPluginsTable(PluginSettingsStage pss) {
+    public EditorPluginsTable(PluginSettingsStage pss, EditorController editorController) {
         super(StageStyle.UTILITY);
         this.pss = pss;
+        this.editorController = editorController;
+        controller = editorController.getController();
         pluginList.addAll(getPlugins());
         initWindow();
     }
@@ -65,7 +68,7 @@ public class EditorPluginsTable extends Stage {
     }
 
     private void setUpActivePluginText(Label activePluginName) {
-        Plugin active = Controller.get().getActivePlugin();
+        Plugin active = controller.getActivePlugin();
         if (active != null) {
             activePluginName.setText(active.getName());
         }
@@ -84,7 +87,7 @@ public class EditorPluginsTable extends Stage {
             alertNoPluginChosen();
             return;
         }
-        EditorController.get().loadAndRestorePlugin(plugin.getName(), pss);
+        editorController.loadAndRestorePlugin(plugin.getName(), pss);
         close();
     }
 
@@ -124,10 +127,11 @@ public class EditorPluginsTable extends Stage {
     }
 
     public List<Plugin> getPlugins() {
-        File[] pluginsFiles = Main.getDir().listFiles((dir, name) -> name.endsWith(".rpg"));
+        File programDir = controller.getProgramDir();
+        File[] pluginsFiles = programDir.listFiles((dir, name) -> name.endsWith(".rpg"));
         List<Plugin> plugins = new ArrayList<>(0);
         for (File file : Objects.requireNonNull(pluginsFiles)) {
-            Plugin p = Controller.get().loadPluginMetadata(file.getName());
+            Plugin p = controller.loadPluginMetadata(file.getName());
             if (p == null) continue;
             plugins.add(p);
         }

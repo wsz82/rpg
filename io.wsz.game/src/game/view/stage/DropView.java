@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -25,8 +26,8 @@ public class DropView extends EquipmentView {
     private double xScrollButtonWidth;
     private boolean xScrollVisible;
 
-    public DropView(Canvas canvas) {
-        super(canvas);
+    public DropView(Canvas canvas, GameController gameController) {
+        super(canvas, gameController);
     }
 
     @Override

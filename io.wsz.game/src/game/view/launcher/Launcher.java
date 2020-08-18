@@ -12,24 +12,27 @@ import javafx.stage.Stage;
 class Launcher {
     private final Stage stage;
 
-    Launcher(Stage stage) {
+    public Launcher(Stage stage) {
         this.stage = stage;
-        initLauncher();
-        restorePluginMemento();
     }
 
-    private void restorePluginMemento() {
-        GameController.get().restoreLastPlugin();
+    public void launch(GameController gameController) {
+        initLauncher(gameController);
+        restorePluginMemento(gameController);
     }
 
-    private void initLauncher() {
+    private void restorePluginMemento(GameController gameController) {
+        gameController.restoreLastPlugin();
+    }
+
+    private void initLauncher(GameController gameController) {
         StackPane root = new StackPane();
 
         VBox menu = new VBox(10);
         Button play = new Button("Play");
-        play.setOnAction(event -> play());
+        play.setOnAction(event -> play(gameController));
         Button plugins = new Button("Plugins");
-        plugins.setOnAction(event -> openPluginsTable());
+        plugins.setOnAction(event -> openPluginsTable(gameController));
         Button exit = new Button("Exit");
         exit.setOnAction(event -> exit());
         menu.getChildren().addAll(play, plugins, exit);
@@ -41,14 +44,14 @@ class Launcher {
         stage.show();
     }
 
-    private void play() {
-        GameStage gameStage = new GameStage();
+    private void play(GameController gameController) {
+        GameStage gameStage = new GameStage(gameController);
         gameStage.open();
         stage.close();
     }
 
-    private void openPluginsTable() {
-        Stage plugins = new GamePluginsTable();
+    private void openPluginsTable(GameController gameController) {
+        Stage plugins = new GamePluginsTable(gameController);
         plugins.initOwner(stage);
         plugins.show();
     }

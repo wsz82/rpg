@@ -12,28 +12,32 @@ import javafx.scene.input.MouseEvent;
 import java.util.Objects;
 
 public class Pointer {
-    private final EventHandler<MouseEvent> clickEvent = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent event) {
-            event.consume();
-            if (event.getButton().equals(MouseButton.PRIMARY)) {
-                mark.x = event.getX() / Sizes.getMeter();
-                mark.y = event.getY() / Sizes.getMeter();
-                mark.level = Controller.get().getCurrentLayer().getLevel();
-                mark.add(Controller.get().getCurPos());
-                if (markerImage == null) {
-                    loadMarkerImage();
-                }
-                editorCanvas.refresh();
-            }
-        }
-    };
+    private final EventHandler<MouseEvent> clickEvent;
     private final Coords mark = new Coords();
+
     private boolean active;
     private Image markerImage;
     private EditorCanvas editorCanvas;
 
-    public Pointer() {}
+    public Pointer(Controller controller) {
+        clickEvent = e -> {
+            e.consume();
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                setMark(controller, e);
+            }
+        };
+    }
+
+    private void setMark(Controller controller, MouseEvent e) {
+        mark.x = e.getX() / Sizes.getMeter();
+        mark.y = e.getY() / Sizes.getMeter();
+        mark.level = controller.getCurrentLayer().getLevel();
+        mark.add(controller.getCurPos());
+        if (markerImage == null) {
+            loadMarkerImage();
+        }
+        editorCanvas.refresh();
+    }
 
     private void loadMarkerImage() {
         markerImage = new Image(

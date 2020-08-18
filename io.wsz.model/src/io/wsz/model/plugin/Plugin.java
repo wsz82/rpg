@@ -1,15 +1,13 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.asset.Asset;
-import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 
 public class Plugin implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -18,8 +16,7 @@ public class Plugin implements Externalizable {
     private boolean active;
     private boolean isStartingLocation;
     private Coords startPos;
-    private List<Location> locations;
-    private List<Asset> assets;
+    private World world;
 
     public Plugin() {}
 
@@ -29,22 +26,6 @@ public class Plugin implements Externalizable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Location> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<Location> locations) {
-        this.locations = locations;
-    }
-
-    public List<Asset> getAssets() {
-        return assets;
-    }
-
-    public void setAssets(List<Asset> assets) {
-        this.assets = assets;
     }
 
     public boolean isActive() {
@@ -71,6 +52,14 @@ public class Plugin implements Externalizable {
         this.startPos = startPos;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
@@ -83,9 +72,7 @@ public class Plugin implements Externalizable {
 
         out.writeObject(startPos);
 
-        out.writeObject(locations);
-
-        out.writeObject(assets);
+        out.writeObject(world);
     }
 
     @Override
@@ -100,8 +87,13 @@ public class Plugin implements Externalizable {
 
         startPos = (Coords) in.readObject();
 
-        locations = (List<Location>) in.readObject();
+//        List<Location> locations = (List<Location>) in.readObject();
+//
+//        List<Asset> assets = (List<Asset>) in.readObject();
 
-        assets = (List<Asset>) in.readObject();
+//        world = new World();
+//        world.setLocations(locations);
+//        world.setAssets(assets);
+        world = (World) in.readObject();
     }
 }

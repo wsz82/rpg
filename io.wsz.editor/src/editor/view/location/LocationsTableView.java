@@ -1,10 +1,9 @@
 package editor.view.location;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
-import io.wsz.model.location.LocationsList;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -19,15 +18,19 @@ import java.util.stream.Collectors;
 
 public class LocationsTableView extends TableView<Location> {
     private final EditorCanvas editorCanvas;
+    private final EditorController editorController;
+    private final Controller controller;
 
-    LocationsTableView(EditorCanvas editorCanvas) {
+    LocationsTableView(EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
         initTable();
     }
 
     private void initTable() {
-        setItems(LocationsList.get());
+        setItems(editorController.getObservableLocations());
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
@@ -44,9 +47,9 @@ public class LocationsTableView extends TableView<Location> {
             } else {
                 location.setName(t.getOldValue());
             }
-            Location currentLocation = CurrentLocation.get().getLocation();
+            Location currentLocation = controller.getCurrentLocation().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setName(newValue);
+                controller.getCurrentLocation().setName(newValue);
             }
             refresh();
         });
@@ -60,9 +63,9 @@ public class LocationsTableView extends TableView<Location> {
             double newWidth = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setWidth(newWidth);
-            Location currentLocation = CurrentLocation.get().getLocation();
+            Location currentLocation = controller.getCurrentLocation().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setWidth(newWidth);
+                controller.getCurrentLocation().setWidth(newWidth);
             }
             refresh();
         });
@@ -75,9 +78,9 @@ public class LocationsTableView extends TableView<Location> {
             double newHeight = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setHeight(t.getNewValue());
-            Location currentLocation = CurrentLocation.get().getLocation();
+            Location currentLocation = controller.getCurrentLocation().getLocation();
             if (location.equals(currentLocation)) {
-                Controller.get().getCurrentLocation().setHeight(newHeight);
+                controller.getCurrentLocation().setHeight(newHeight);
             }
             refresh();
         });
@@ -89,13 +92,13 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private boolean isNameUnique(String newValue) {
-        return Controller.get().getLocationsList().stream()
+        return controller.getLocations().stream()
                 .noneMatch(layer -> layer.getName().equals(newValue));
     }
 
     void removeLocations() {
         List<Location> locationsToRemove = this.getSelectionModel().getSelectedItems();
-        List<Location> locations = Controller.get().getLocationsList();
+        List<Location> locations = controller.getLocations();
         boolean listSizesAreEqual = locations.size() == locationsToRemove.size();
         if (listSizesAreEqual) {
             locationsToRemove = locationsToRemove.stream()
@@ -108,15 +111,14 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private void changeCurrentLocationIfWasRemoved(List<Location> locations) {
-        Location currentLocation = Controller.get().getCurrentLocation().getLocation();
+        Location currentLocation = controller.getCurrentLocation().getLocation();
         if (!locations.contains(currentLocation)) {
-            Controller.get().getCurrentLocation().setLocation(locations.get(0));
+            controller.getCurrentLocation().setLocation(locations.get(0));
         }
     }
 
     public void goTo() {
         Location location = getSelectionModel().getSelectedItem();
-        Controller controller = Controller.get();
         controller.getCurrentLocation().setLocation(location);
         Coords curPos = controller.getBoard().getCurPos();
         curPos.x = 0;

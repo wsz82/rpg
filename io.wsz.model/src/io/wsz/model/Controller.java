@@ -1,19 +1,15 @@
 package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
-import io.wsz.model.asset.AssetsList;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
-import io.wsz.model.location.LocationsList;
-import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
-import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,94 +19,54 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
-    private static Controller singleton;
-    private static File programDir;
-
-    private final AtomicBoolean isInventory = new AtomicBoolean(false);
+    private final Board board = new Board(this);
     private final LinkedList<Creature> heroes = new LinkedList<>();
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
     private final Coords posToCenter = new Coords();
+    private final AtomicBoolean isInventory = new AtomicBoolean();
 
+    private Model model;
+    private File programDir;
     private Location locationToUpdate;
     private Creature creatureToOpenInventory;
     private Container containerToOpen;
     private DialogMemento dialogMemento;
 
-    public static Controller get() {
-        if (singleton == null) {
-            singleton = new Controller();
-        }
-        return singleton;
-    }
+    public Controller(){}
 
-    public static File getProgramDir() {
+    public File getProgramDir() {
         return programDir;
     }
 
-    public static void setProgramDir(File programDir) {
-        Controller.programDir = programDir;
-    }
-
-    private Controller(){}
-
-    public void setActivePlugin(Plugin plugin) {
-        ActivePlugin.get().setPlugin(plugin);
-    }
-
-    public Plugin getActivePlugin() {
-        return ActivePlugin.get().getPlugin();
-    }
-
-    public void loadAssetsToList() {
-        Plugin plugin = ActivePlugin.get().getPlugin();
-
-        AssetsList.get().clear();
-        AssetsList.get().addAll(plugin.getAssets());
+    public void setProgramDir(File programDir) {
+        this.programDir = programDir;
     }
 
     public Plugin loadPlugin(String pluginName) {
         if (pluginName == null) {
             return new Plugin();
         }
-        PluginCaretaker pc = new PluginCaretaker();
-        return pc.load(pluginName);
+        PluginCaretaker pc = new PluginCaretaker(programDir);
+        return pc.load(pluginName, this);
     }
 
-    public void removeItem(PosItem pi) {
-        CurrentLocation.get().getItems().remove(pi);
-    }
-
-    public CurrentLayer getCurrentLayer() {
-        return CurrentLayer.get();
-    }
-
-    public CurrentLocation getCurrentLocation() {
-        return CurrentLocation.get();
-    }
-
-    public void fillLocationsList(List<Location> locations) {
-        getLocationsList().addAll(locations);
-        restoreCoordsLocations();
-    }
-
-    private void restoreCoordsLocations() {
-        List<Location> locations = getLocationsList();
+    public void restoreItemsCoords(List<Location> locations) {
         for (Location l : locations) {
-            for (PosItem pi : l.getItems().get()) {
+            for (PosItem pi : l.getItems()) {
                 Coords pos = pi.getPos();
-                restoreCoordsLocation(pos);
+                restoreCoordsOfLocation(pos);
 
                 if (pi instanceof Teleport) {
                     Teleport t = (Teleport) pi;
                     Coords exit = t.getExit();
-                    restoreCoordsLocation(exit);
+                    restoreCoordsOfLocation(exit);
                 }
 
                 if (pi instanceof OutDoor) {
                     OutDoor od = (OutDoor) pi;
                     Coords exit = od.getExit();
-                    restoreCoordsLocation(exit);
+                    restoreCoordsOfLocation(exit);
                     restoreOutDoorConnection(od);
                 }
             }
@@ -122,9 +78,9 @@ public class Controller {
         if (serConnection == null) return;
         String name = serConnection.getName();
         Coords pos = serConnection.getPos();
-        restoreCoordsLocation(pos);
-        Location loc = pos.getLocation();
-        Optional<OutDoor> optConnection = loc.getItems().get().stream()
+        restoreCoordsOfLocation(pos);
+        Location location = pos.getLocation();
+        Optional<OutDoor> optConnection = location.getItems().stream()
                 .filter(o -> o instanceof OutDoor)
                 .map(o -> (OutDoor) o)
                 .filter(o -> o.getName().equals(name))
@@ -137,10 +93,10 @@ public class Controller {
         od.setConnection(connection);
     }
 
-    public void restoreCoordsLocation(Coords pos) {
+    public void restoreCoordsOfLocation(Coords pos) {
         Location serLoc = pos.getLocation();
         if (serLoc != null) {
-            Optional<Location> optionalLocation = getLocationsList().stream()
+            Optional<Location> optionalLocation = getLocations().stream()
                     .filter(refLoc -> refLoc.getName().equals(serLoc.getName()))
                     .findFirst();
             Location foundLoc = optionalLocation.orElse(null);
@@ -151,16 +107,8 @@ public class Controller {
         }
     }
 
-    public ObservableList<Location> getLocationsList() {
-        return LocationsList.get();
-    }
-
-    public List<Asset> getAssetsList() {
-        return AssetsList.get();
-    }
-
     public Board getBoard() {
-        return Board.get();
+        return board;
     }
 
     public Coords getPosToCenter() {
@@ -175,7 +123,7 @@ public class Controller {
     }
 
     public Plugin loadPluginMetadata(String name) {
-        PluginCaretaker pc = new PluginCaretaker();
+        PluginCaretaker pc = new PluginCaretaker(programDir);
         return pc.getPluginMetadata(name);
     }
 
@@ -189,7 +137,7 @@ public class Controller {
     }
 
     public Coords getCurPos() {
-        return Board.get().getCurPos();
+        return board.getCurPos();
     }
 
     public Creature getCreatureToOpenInventory() {
@@ -240,15 +188,14 @@ public class Controller {
         }
     }
 
-
     public LinkedList<Creature> getHeroes() {
         return heroes;
     }
 
     public void initNewGameHeroes() {
         this.heroes.clear();
-        Location start = getCurrentLocation().getLocation();
-        List<Creature> controllables = Controller.get().getBoard().getControllableCreatures(start);
+        Location start = model.getCurrentLocation().getLocation();
+        List<Creature> controllables = board.getControllableCreatures(start);
         for (Creature cr : controllables) {
             this.heroes.addLast(cr);
         }
@@ -268,7 +215,7 @@ public class Controller {
     }
 
     public void clearResizablePictures() {
-        getAssetsList().stream()
+        getAssets().stream()
                 .filter(a -> a instanceof Creature)
                 .forEach(a -> ((Creature) a).getAnimation().clearResizablePictures());
     }
@@ -277,8 +224,8 @@ public class Controller {
         return isInventory.get();
     }
 
-    public void setInventory(boolean inventory) {
-        isInventory.set(inventory);
+    public void setInventory(boolean isInventory) {
+        this.isInventory.set(isInventory);
     }
 
     public void closeInventory() {
@@ -293,5 +240,39 @@ public class Controller {
 
     public void setDialogMemento(DialogMemento dialogMemento) {
         this.dialogMemento = dialogMemento;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
+    public List<Location> getLocations() {
+        return model.getActivePlugin().getWorld().getLocations();
+    }
+
+    public List<Asset> getAssets() {
+        return model.getActivePlugin().getWorld().getAssets();
+    }
+
+    public CurrentLocation getCurrentLocation() {
+        return model.getCurrentLocation();
+    }
+
+    public CurrentLayer getCurrentLayer() {
+        return model.getCurrentLayer();
+    }
+
+    public Plugin getActivePlugin() {
+        return model.getActivePlugin();
+    }
+
+    public void initNewModel() {
+        model = new Model();
+        model.setCurrentLocation(new CurrentLocation());
+        model.setCurrentLayer(new CurrentLayer());
     }
 }

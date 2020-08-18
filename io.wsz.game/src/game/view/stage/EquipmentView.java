@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
@@ -31,8 +32,8 @@ public abstract class EquipmentView extends CanvasView {
     protected Equipment dragged;
     protected boolean yScrollVisible = true;
 
-    public EquipmentView(Canvas canvas) {
-        super(canvas);
+    public EquipmentView(Canvas canvas, GameController gameController) {
+        super(canvas, gameController);
     }
 
     public void refresh() {

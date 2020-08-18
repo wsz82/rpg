@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
@@ -13,8 +14,9 @@ import java.util.List;
 
 class LandscapeTableView extends AssetsTableView<Landscape> {
 
-    LandscapeTableView(Stage parent, ObservableList<Landscape> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    LandscapeTableView(Stage parent, ObservableList<Landscape> assets,
+                       EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
     }
 
     @Override
@@ -23,13 +25,13 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
         if (l == null) {
             return;
         }
-        LandscapeAssetStage as = new LandscapeAssetStage(parent, l, false, editorCanvas);
+        LandscapeAssetStage as = new LandscapeAssetStage(parent, l, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        LandscapeAssetStage as = new LandscapeAssetStage(parent, editorCanvas);
+        LandscapeAssetStage as = new LandscapeAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -54,7 +56,7 @@ class LandscapeTableView extends AssetsTableView<Landscape> {
 
     @Override
     protected void removeAssetFromList(List<Landscape> assetsToRemove) {
-        ObservableAssets.get().getLandscapes().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getLandscapes().removeAll(assetsToRemove);
     }
 
     @Override

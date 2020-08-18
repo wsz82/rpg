@@ -3,12 +3,10 @@ package io.wsz.model.asset;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.ResolutionImage;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.image.Image;
 
 import java.io.*;
 import java.util.Objects;
@@ -19,8 +17,6 @@ public abstract class Asset implements Externalizable {
     protected final StringProperty name = new SimpleStringProperty(this, "name");
     protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
     protected final StringProperty path = new SimpleStringProperty(this, "path");
-
-    protected Image image;
 
     public Asset() {}
 
@@ -38,9 +34,9 @@ public abstract class Asset implements Externalizable {
         return getRelativeTypePath(getType()) + getPath();
     }
 
-    public static File createAssetTypeDir(ItemType type) {
+    public static File createAssetTypeDir(ItemType type, Controller controller) {
         String relativeTypePath = getRelativeTypePath(type);
-        File dir = new File(Controller.getProgramDir() + relativeTypePath);
+        File dir = new File(controller.getProgramDir() + relativeTypePath);
         if (!dir.exists()) dir.mkdirs();
         return dir;
     }
@@ -77,33 +73,6 @@ public abstract class Asset implements Externalizable {
 
     public void setPath(String path) {
         this.path.set(path);
-    }
-
-    public final Image getInitialImage() {
-        if (image == null) {
-            setImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getPath()));
-        }
-        return image;
-    }
-
-    public Image getImage() {
-        return getInitialImage();
-    }
-
-    public double getImageHeight() {
-        Image img = getImage();
-        if (img == null) return 0;
-        return img.getHeight() / Sizes.getMeter();
-    }
-
-    public double getImageWidth() {
-        Image img = getImage();
-        if (img == null) return 0;
-        return img.getWidth() / Sizes.getMeter();
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
     }
 
     @Override

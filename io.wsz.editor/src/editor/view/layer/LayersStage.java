@@ -1,10 +1,11 @@
 package editor.view.layer;
 
+import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
+import io.wsz.model.Controller;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -17,10 +18,14 @@ public class LayersStage extends ChildStage {
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
     private final LayersTableView table;
+    private final EditorController editorController;
+    private final Controller controller;
 
-    public LayersStage(Stage parent, ContentTableView contentTableView, EditorCanvas editorCanvas) {
+    public LayersStage(Stage parent, ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
-        table = new LayersTableView(contentTableView, editorCanvas);
+        this.editorController = editorController;
+        controller = editorController.getController();
+        table = new LayersTableView(contentTableView, editorCanvas, editorController);
         initWindow();
     }
 
@@ -53,11 +58,11 @@ public class LayersStage extends ChildStage {
     private void addLayer() {
         Layer layer = new Layer("new layer");
         Layer uniqueLayer = getUniqueLayer(layer);
-        CurrentLocation.get().getLayers().add(uniqueLayer);
+        controller.getCurrentLocation().getLayers().add(uniqueLayer);
     }
 
     private Layer getUniqueLayer(Layer layer) {
-        List<Layer> layers = CurrentLocation.get().getLayers();
+        List<Layer> layers = controller.getCurrentLocation().getLayers();
         boolean levelExists = layers.stream()
                 .anyMatch(l -> l.getLevel() == layer.getLevel());
         boolean nameExists = layers.stream()

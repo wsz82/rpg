@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Board {
-    private static Board singleton;
-
-    private final Controller controller = Controller.get();
+    private final Controller controller;
     private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
     private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
     private final Coords curPos = new Coords(0, 0);
@@ -27,19 +25,13 @@ public class Board {
     private final List<Equipment> equipmentResult = new ArrayList<>(0);
     private final List<Teleport> teleports = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
-    private final Coords resultCoords = new Coords();
     private final List<Coords> way = Collections.unmodifiableList(List.of(new Coords(), new Coords()));
     private final List<List<Coords>> listOfWay = List.of(way);
     private final ItemType[] allTypes = ItemType.values();
 
-    public static Board get() {
-        if (singleton == null) {
-            singleton = new Board();
-        }
-        return singleton;
+    public Board(Controller controller) {
+        this.controller = controller;
     }
-
-    private Board() {}
 
     public Coords getCurPos() {
         return curPos;
@@ -82,7 +74,7 @@ public class Board {
     public PosItem lookForItem(Location location, double x, double y, int lookedLevel, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         if (location == null) return null;
-        allItems.addAll(location.getItems().get());
+        allItems.addAll(location.getItems());
         items.clear();
         allItems.stream()
                 .filter(PosItem::getVisible)
@@ -145,7 +137,7 @@ public class Board {
 
     public List<Creature> getControlledCreatures(Location location) {
         creatures.clear();
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(pi -> pi.getType().equals(ItemType.CREATURE))
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
@@ -163,7 +155,7 @@ public class Board {
     public PosItem getObstacle(Coords nextPos, PosItem i, Location location, ItemType[] types) {
         items.clear();
         if (location == null) return null;
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> {
                     if (types == this.allTypes) return true;
@@ -211,7 +203,7 @@ public class Board {
         double bottom = Math.max(fromY, toY);
 
         items.clear();
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(o -> {
                     List<List<Coords>> actualCollisionPolygons = o.getActualCollisionPolygons();
@@ -240,7 +232,7 @@ public class Board {
 
     public Teleport getTeleport(Coords nextPos, PosItem i, Location l) {
         teleports.clear();
-        l.getItems().get().stream()
+        l.getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> pi instanceof Teleport)
                 .map(pi -> (Teleport) pi)
@@ -360,7 +352,7 @@ public class Board {
         equipmentResult.clear();
         items.clear();
         Location location = cr.getPos().getLocation();
-        items.addAll(location.getItems().get());
+        items.addAll(location.getItems());
         equipment.clear();
         items.stream()
                 .filter(PosItem::getVisible)
@@ -386,7 +378,7 @@ public class Board {
 
     public List<Creature> getControllableCreatures(Location location) {
         creatures.clear();
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
                 .filter(pi -> {
@@ -399,7 +391,7 @@ public class Board {
 
     public List<Creature> getControlledAndControllableCreatures(Location location) {
         creatures.clear();
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
@@ -429,7 +421,7 @@ public class Board {
         double finalRight = right;
         double finalTop = top;
         double finalBottom = bottom;
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(pi -> pi instanceof Creature)
                 .map(pi -> (Creature) pi)
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)

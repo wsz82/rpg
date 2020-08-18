@@ -4,7 +4,6 @@ import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -12,6 +11,7 @@ import io.wsz.model.sizes.Sizes;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import java.io.File;
 import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
@@ -23,8 +23,8 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 public class GameRunner {
     private static final ArrayDeque<Runnable> laterRunBuffer = new ArrayDeque<>(0);
 
-    private final GameController gameController = GameController.get();
-    private final Controller controller = Controller.get();
+    private final GameController gameController;
+    private final Controller controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
 
     private Thread gameThread;
@@ -35,7 +35,10 @@ public class GameRunner {
         laterRunBuffer.addLast(laterRunner);
     }
 
-    public GameRunner() {}
+    public GameRunner(GameController gameController) {
+        this.gameController = gameController;
+        controller = gameController.getController();
+    }
 
     public void startGame(SaveMemento memento) {
         gameController.setGame(false);
@@ -130,7 +133,7 @@ public class GameRunner {
 
         updateControls();
 
-        for (Location l : controller.getLocationsList()) {
+        for (Location l : controller.getLocations()) {
             addItems(l);
             removeItems(l);
         }
@@ -144,7 +147,7 @@ public class GameRunner {
         }
 
         Location currentLocation = controller.getCurrentLocation().getLocation();
-        List<PosItem> items = currentLocation.getItems().get();
+        List<PosItem> items = currentLocation.getItems();
 
         for (PosItem pi : items) {
             pi.update();
@@ -158,7 +161,7 @@ public class GameRunner {
 
         for (Location l : heroesLocations) {
             if (l == null) continue;
-            for (PosItem pi : l.getItems().get()) {
+            for (PosItem pi : l.getItems()) {
                 pi.update();
             }
         }
@@ -204,30 +207,30 @@ public class GameRunner {
         gameController.setDialog(true);
     }
 
-    private void addItems(Location l) {
-        List<PosItem> p = l.getItemsToAdd();
+    private void addItems(Location location) {
+        List<PosItem> itemsToAdd = location.getItemsToAdd();
 
-        if (p.isEmpty()) {
+        if (itemsToAdd.isEmpty()) {
             return;
         }
-        l.getItems().get().addAll(p);
-        for (PosItem pi : p) {
-            pi.getPos().setLocation(l);
+        location.getItems().addAll(itemsToAdd);
+        for (PosItem pi : itemsToAdd) {
+            pi.getPos().setLocation(location);
             pi.setVisible(true);
         }
-        p.clear();
+        itemsToAdd.clear();
     }
 
-    private void removeItems(Location l) {
-        List<PosItem> p = l.getItemsToRemove();
-        if (p.isEmpty()) {
+    private void removeItems(Location location) {
+        List<PosItem> itemsToRemove = location.getItemsToRemove();
+        if (itemsToRemove.isEmpty()) {
             return;
         }
-        l.getItems().get().removeAll(p);
-        for (PosItem pi : p) {
+        location.getItems().removeAll(itemsToRemove);
+        for (PosItem pi : itemsToRemove) {
             pi.setVisible(true);
         }
-        p.clear();
+        itemsToRemove.clear();
     }
 
     private void updateLocation() {
@@ -249,13 +252,13 @@ public class GameRunner {
     }
 
     private void loadSave(SaveMemento memento) {
-        gameController.loadSaveToLists(memento);
+        gameController.restoreMemento(memento);
         gameController.initLoadedGameSettings(memento);
         controller.initLoadGameHeroes(memento.getHeroes());
     }
 
     private void loadNewGame() {
-        gameController.loadGameActivePluginToLists();
+        gameController.restoreActivePlugin();
         gameController.initNewGameSettings();
         controller.initNewGameHeroes();
         controller.setDialogMemento(null);
@@ -265,26 +268,27 @@ public class GameRunner {
         @Override
         protected String call() throws Exception {
             List<PosItem> items = controller.getCurrentLocation().getItems();
-            Set<Asset> assets = getAssets(items);
+            Set<PosItem> assets = getAssets(items);
             CreatureBase[] bases = CreatureBase.getBases();
             int total = assets.size() + bases.length;
             int i = 0;
             updateProgress(0, total);
 
             Sizes.FOG.setImage(null);
-            Sizes.FOG.getInitialImage();
+            File programDir = controller.getProgramDir();
+            Sizes.FOG.getImage(programDir);
             i++;
             updateProgress(i, total);
 
             for (CreatureBase base : bases) {
                 base.setImg(null);
-                base.getImage();
+                base.getImage(programDir);
                 i++;
                 updateProgress(i, total);
             }
 
-            for (Asset a : assets) {
-                reloadAssetImages(a);
+            for (PosItem pi : assets) {
+                reloadAssetImages(pi, programDir);
                 updateProgress(i, total);
                 i++;
             }
@@ -292,9 +296,9 @@ public class GameRunner {
             return "Completed";
         }
 
-        private Set<Asset> getAssets(List<PosItem> items) {
-            Set<Asset> prototypes = items.stream()
-                    .map(pi -> (Asset) pi.getPrototype())
+        private Set<PosItem> getAssets(List<PosItem> items) {
+            Set<PosItem> prototypes = items.stream()
+                    .map(pi -> pi.getPrototype())
                     .collect(Collectors.toSet());
 
             List<Containable> locationContainers = items.stream()
@@ -306,11 +310,11 @@ public class GameRunner {
             return prototypes;
         }
 
-        private void addInnerAssets(Set<Asset> prototypes, List<Containable> locationContainers) {
+        private void addInnerAssets(Set<PosItem> prototypes, List<Containable> locationContainers) {
             for (Containable cons : locationContainers) {
                 List<Equipment> equipment = cons.getItems();
-                Set<Asset> equipmentAssets = equipment.stream()
-                        .map(pi -> (Asset) pi.getPrototype())
+                Set<PosItem> equipmentAssets = equipment.stream()
+                        .map(pi -> pi.getPrototype())
                         .collect(Collectors.toSet());
                 prototypes.addAll(equipmentAssets);
                 List<Containable> containables = equipment.stream()
@@ -322,16 +326,16 @@ public class GameRunner {
             }
         }
 
-        private void reloadAssetImages(Asset a) {
-            a.setImage(null);
-            if (a instanceof Creature) {
-                Creature c = (Creature) a;
-                c.getAnimation().initAllFrames();
+        private void reloadAssetImages(PosItem pi, File programDir) {
+            pi.setImage(null);
+            if (pi instanceof Creature) {
+                Creature c = (Creature) pi;
+                c.getAnimation().initAllFrames(programDir);
             } else {
-                a.getInitialImage();
+                pi.getInitialImage();
             }
-            if (a instanceof Openable) {
-                Openable o = (Openable) a;
+            if (pi instanceof Openable) {
+                Openable o = (Openable) pi;
                 o.setOpenImage(null);
                 o.getOpenImage();
             }

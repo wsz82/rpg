@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
@@ -19,13 +20,14 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     private OpenableContainer openable;
 
-    public ContainerAssetStage(Stage parent, Container item, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, item, isContent, editorCanvas);
+    public ContainerAssetStage(Stage parent, Container item, boolean isContent,
+                               EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, item, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public ContainerAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public ContainerAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -56,7 +58,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     private void hookupContainerEvents() {
         itemsButton.setOnAction(e -> {
-            ItemsStage<Container> itemsStage = new ItemsStage<>(parent, item);
+            ItemsStage<Container> itemsStage = new ItemsStage<>(parent, item, editorController);
             itemsStage.show();
         });
     }
@@ -116,7 +118,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container>{
 
     @Override
     protected void addAssetToList(Container asset) {
-        ObservableAssets.get().getContainers().add(asset);
+        editorController.getObservableAssets().getContainers().add(asset);
     }
 
     @Override

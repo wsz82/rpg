@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
@@ -29,13 +30,14 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final IntegerField strengthInput = new IntegerField(isContent);
     private final Button itemsButton = new Button("Items");
 
-    public CreatureAssetStage(Stage parent, Creature asset, boolean isContent, EditorCanvas editorCanvas){
-        super(parent, asset, isContent, editorCanvas);
+    public CreatureAssetStage(Stage parent, Creature asset, boolean isContent,
+                              EditorCanvas editorCanvas, EditorController editorController){
+        super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public CreatureAssetStage(Stage parent, EditorCanvas editorCanvas){
-        super(parent, editorCanvas);
+    public CreatureAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController){
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -109,7 +111,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private void hookUpEditEvents() {
         itemsButton.setOnAction(e -> {
-            ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item);
+            ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item, editorController);
             itemsStage.show();
         });
     }
@@ -220,7 +222,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void addAssetToList(Creature asset) {
-        ObservableAssets.get().getCreatures().add(asset);
+        editorController.getObservableAssets().getCreatures().add(asset);
     }
 
     @Override

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import static io.wsz.model.item.ItemType.*;
 
 public class ObservableAssets {
-    private static ObservableAssets singleton;
     private final ObservableList<Creature> creatures = FXCollections.observableArrayList();
     private final ObservableList<Landscape> landscapes = FXCollections.observableArrayList();
     private final ObservableList<Cover> covers = FXCollections.observableArrayList();
@@ -22,17 +21,9 @@ public class ObservableAssets {
     private final ObservableList<InDoor> inDoors = FXCollections.observableArrayList();
     private final ObservableList<OutDoor> outDoors = FXCollections.observableArrayList();
 
-    public static ObservableAssets get() {
-        if (singleton == null) {
-            singleton = new ObservableAssets();
-        }
-        return singleton;
-    }
+    public ObservableAssets() {}
 
-    private ObservableAssets() {
-    }
-
-    public List<Asset> merge() {
+    public List<Asset> getMergedAssets() {
         List<Asset> assets = new ArrayList<>(0);
         assets.addAll(creatures);
         assets.addAll(landscapes);
@@ -57,6 +48,7 @@ public class ObservableAssets {
     }
 
     public void fillLists(List<Asset> assets) {
+        clearLists();
         List<Creature> tempCr = assets.stream()
                 .filter(a -> a.getType().equals(CREATURE))
                 .map(a -> (Creature) a)

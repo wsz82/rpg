@@ -1,5 +1,6 @@
 package editor.view.plugin;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.ChildStage;
@@ -29,9 +30,13 @@ public class PluginSettingsStage extends ChildStage {
     private final DoubleProperty startY = new SimpleDoubleProperty();
     private final IntegerProperty startLevel = new SimpleIntegerProperty();
     private final StackPane root = new StackPane();
+    private final EditorController editorController;
+    private final Controller controller;
 
-    public PluginSettingsStage(Stage parent){
+    public PluginSettingsStage(Stage parent, EditorController editorController){
         super(parent);
+        this.editorController = editorController;
+        controller = editorController.getController();
         initWindow();
     }
 
@@ -89,7 +94,7 @@ public class PluginSettingsStage extends ChildStage {
                 return getLocation(s);
             }
         });
-        locationChoice.setItems(Controller.get().getLocationsList());
+        locationChoice.setItems(editorController.getObservableLocations());
 
         locationChoice.disableProperty().bind(ifStartingLocation.selectedProperty().not());
         inputX.disableProperty().bind(ifStartingLocation.selectedProperty().not());
@@ -130,7 +135,7 @@ public class PluginSettingsStage extends ChildStage {
     }
 
     private Location getLocation(String s) {
-        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
+        Optional<Location> optLocation = editorController.getObservableLocations().stream()
                 .filter(l -> l.getName().equals(s))
                 .findFirst();
         return optLocation.orElse(null);

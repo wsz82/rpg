@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
@@ -14,8 +15,8 @@ import java.util.List;
 public class ContainerView extends EquipmentView {
     private Container container;
 
-    public ContainerView(Canvas canvas) {
-        super(canvas);
+    public ContainerView(Canvas canvas, GameController gameController) {
+        super(canvas, gameController);
     }
 
     @Override

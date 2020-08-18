@@ -28,17 +28,21 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private static final double MAX_WIDTH = 8000;
 
     protected final EditorCanvas editorCanvas;
+    protected final EditorController editorController;
+    protected final Controller controller;
     protected final Stage parent;
     protected final ObservableList<A> assets;
 
     private Pointer pointer;
     private ContentTableView contentTableView;
 
-    AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas) {
+    AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.parent = parent;
         this.assets = assets;
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         initTable();
         setItems(assets);
@@ -66,7 +70,6 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         setOnDragDone(e -> {
             e.consume();
             if (e.getTransferMode() == TransferMode.COPY) {
-                EditorController editorController = EditorController.get();
                 Coords dragPos = editorController.getDragPos();
                 ItemsStage itemsStage;
                 if (dragPos.x != -1) {
@@ -111,7 +114,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private boolean assetNameIsNotUnique(String newValue) {
-        return ObservableAssets.get().merge().stream()
+        return editorController.getObservableAssets().getMergedAssets().stream()
                 .anyMatch(p -> p.getName().equals(newValue));
     }
 
@@ -127,7 +130,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         addItemsToStage.setOnAction(event -> {
             Coords mark = pointer.getMark();
             Coords cloned = mark.clonePos();
-            cloned.setLocation(Controller.get().getCurrentLocation().getLocation());
+            cloned.setLocation(controller.getCurrentLocation().getLocation());
             addItemsToStage(mark);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
@@ -141,7 +144,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         for (A item : createdItems) {
             Image img = item.getImage();
             if (isImageTooBig(item, img)) continue;
-            Controller.get().getCurrentLocation().getItems().add(item);
+            controller.getCurrentLocation().getItems().add(item);
         }
     }
 
@@ -195,14 +198,14 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         List<String> assetsNames = assetsToRemove.stream()
                 .map(Asset::getName)
                 .collect(Collectors.toList());
-       Controller.get().getLocationsList().forEach(l -> {
-           List<PosItem> contentToRemove = l.getItems().get().stream()
+       editorController.getObservableLocations().forEach(l -> {
+           List<PosItem> contentToRemove = l.getItems().stream()
                     .filter(p -> {
                         String name = p.getName();
                         return assetsNames.contains(name);
                     })
                     .collect(Collectors.toList());
-           l.getItems().get().removeAll(contentToRemove);
+           l.getItems().removeAll(contentToRemove);
         });
     }
 

@@ -1,6 +1,8 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
+import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
 import io.wsz.model.location.Location;
@@ -25,13 +27,14 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private OpenableOutDoor openable;
     private CoordsEdit coordsEdit;
 
-    public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, item, isContent, editorCanvas);
+    public OutDoorAssetStage(Stage parent, OutDoor item, boolean isContent,
+                             EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, item, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public OutDoorAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public OutDoorAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -69,14 +72,14 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
                 if (s == null || s.isEmpty()) {
                     return null;
                 }
-                return getConnection(s);
+                return getConnection(s, controller);
             }
         });
     }
 
     private void setConnectionCBitems(Location exitLocation) {
         if (exitLocation == null) return;
-        List<OutDoor> outDoors = exitLocation.getItems().get().stream()
+        List<OutDoor> outDoors = exitLocation.getItems().stream()
                 .filter(i -> i instanceof OutDoor)
                 .map(i -> (OutDoor) i)
                 .collect(Collectors.toList());
@@ -85,7 +88,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         outDoorsObservable.add(null);
     }
 
-    private OutDoor getConnection(String s) {
+    private OutDoor getConnection(String s, Controller controller) {
         String[] nameAndPos = s.split("/|");
         String name = "";
         String posText = "";
@@ -96,7 +99,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
             posText = nameAndPos[1];
         }
         String outDoorName = name;
-        Coords pos = Coords.parseCoords(posText);
+        Coords pos = Coords.parseCoords(posText, controller);
         Optional<OutDoor> optConnection = connectionCB.getItems().stream()
                 .filter(o -> o.getName().equals(outDoorName))
                 .filter(o -> o.getPos().equals(pos))
@@ -111,7 +114,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         }
         openable = new OpenableOutDoor(this, item, isContent);
         openable.initOpenable(container);
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas);
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
         coordsEdit.initCoords(container);
 
         super.fillInputs();
@@ -142,7 +145,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     @Override
     protected void addAssetToList(OutDoor asset) {
-        ObservableAssets.get().getOutDoors().add(asset);
+        editorController.getObservableAssets().getOutDoors().add(asset);
     }
 
     @Override

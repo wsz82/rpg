@@ -3,7 +3,6 @@ package game.view.stage;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
-import game.view.launcher.Main;
 import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
@@ -27,6 +26,9 @@ import java.io.File;
 public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
 
+    private GameController gameController;
+    private final Controller controller;
+    private GameView gameView;
     private Node parentToReturn;
     private StackPane mainMenu;
     private StackPane gameMenu;
@@ -36,9 +38,7 @@ public class GameStage extends Stage {
     private ListView<String> loadsView;
 
     private final BorderPane root = new BorderPane();
-    private final GameView gameView = new GameView(this);
     private final Button cancel = new Button("Cancel");
-    private final GameController gameController = GameController.get();
     private final EventHandler<KeyEvent> returnEvent = e -> {
         if (e.getCode() == KeyCode.ESCAPE) {
             e.consume();
@@ -56,8 +56,11 @@ public class GameStage extends Stage {
         }
     };
 
-    public GameStage() {
+    public GameStage(GameController gameController) {
         super(StageStyle.DECORATED);
+        this.gameController = gameController;
+        this.controller = gameController.getController();
+        gameView = new GameView(this, gameController);
         gameController.setGameStage(this);
         gameController.setGameView(gameView);
     }
@@ -92,7 +95,7 @@ public class GameStage extends Stage {
     }
 
     private void openSettings() {
-        SettingsMenu settingsMenu = new SettingsMenu(this);
+        SettingsMenu settingsMenu = new SettingsMenu(this, controller);
         parentToReturn = root.getCenter();
         root.setCenter(settingsMenu);
         settingsMenu.open(root, parentToReturn);
@@ -284,19 +287,19 @@ public class GameStage extends Stage {
 
     private void loadSave() {
         String name = loadsView.getSelectionModel().getSelectedItem();
-        SaveMemento memento = gameController.loadSaveMemento(name, Main.getDir());
+        SaveMemento memento = gameController.loadSaveMemento(name, controller.getProgramDir());
         startGame(memento);
     }
 
     private void deleteSave() {
         String name = savesView.getSelectionModel().getSelectedItem();
-        gameController.deleteGameSave(name, Main.getDir());
+        gameController.deleteGameSave(name, controller.getProgramDir());
     }
 
     private void saveGame(boolean overwrite, String name) {
-        Controller controller = Controller.get();
         Coords curPos = controller.getCurPos();
-        gameController.saveGame(overwrite, name, curPos, Main.getDir());
+        File programDir = controller.getProgramDir();
+        gameController.saveGame(overwrite, name, curPos, programDir);
         gameController.resumeGame();
     }
 
@@ -318,7 +321,7 @@ public class GameStage extends Stage {
     private void storeSettings() {
         SettingMemento memento = new SettingMemento();
         memento.setFullScreen(isFullScreen());
-        gameController.saveSettings(Main.getDir(), memento);
+        gameController.saveSettings(controller.getProgramDir(), memento);
     }
 
     public void setLoaderViewToCenter(Task<String> loader) {
@@ -344,7 +347,7 @@ public class GameStage extends Stage {
         setMinHeight(300);
 
         createMainMenu();
-        File programDir = Main.getDir();
+        File programDir = controller.getProgramDir();
         initSavesList(programDir);
         restoreSettings(programDir);
         addEventHandler(KeyEvent.KEY_RELEASED, returnEvent);

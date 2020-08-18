@@ -1,12 +1,12 @@
 package editor.view.content;
 
+import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
 import editor.view.asset.*;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -24,18 +24,25 @@ import java.util.stream.Collectors;
 
 public class ContentTableView extends TableView<PosItem> {
     private final EditorCanvas editorCanvas;
+    private final EditorController editorController;
+    private final Controller controller;
+
     private Pointer pointer;
 
-    public ContentTableView(EditorCanvas editorCanvas) {
+    public ContentTableView(EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
         initTable();
     }
 
     private void initTable() {
-        setItems(CurrentLocation.get().getItems());
-        CurrentLocation.get().locationProperty().addListener((observable, oldValue, newValue) -> {
-            setItems(newValue.getItems().get());
+        ObservableList<PosItem> items = controller.getCurrentLocation().getLocation().getItems();
+        setItems(items);
+        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<PosItem> newItems = newValue.getItems();
+            setItems(newItems);
         });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -68,7 +75,7 @@ public class ContentTableView extends TableView<PosItem> {
             int level = t.getNewValue();
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
 
-            List<Integer> levels = Controller.get().getCurrentLocation().getLayers().stream()
+            List<Integer> levels = controller.getCurrentLocation().getLayers().stream()
                     .map(l -> l.getLevel())
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {
@@ -140,7 +147,7 @@ public class ContentTableView extends TableView<PosItem> {
 
     void removeContents() {
         ObservableList<PosItem> itemsToRemove = getSelectionModel().getSelectedItems();
-        CurrentLocation.get().getItems().removeAll(itemsToRemove);
+        controller.getCurrentLocation().getItems().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {
@@ -153,7 +160,7 @@ public class ContentTableView extends TableView<PosItem> {
     public void moveToPointer() {
         List<PosItem> itemsToMove = getSelectionModel().getSelectedItems();
         Coords newPos = pointer.getMark();
-        Location location = Controller.get().getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation().getLocation();
         for (PosItem pi : itemsToMove) {
             Coords pos = pi.getPos();
             pos.x = newPos.x;
@@ -180,21 +187,21 @@ public class ContentTableView extends TableView<PosItem> {
         ItemType type = pi.getType();
         AssetStage itemStage = switch (type) {
             case CREATURE -> new CreatureAssetStage(
-                    parent, (Creature) pi, true, editorCanvas);
+                    parent, (Creature) pi, true, editorCanvas, editorController);
             case TELEPORT -> new TeleportAssetStage(
-                    parent, (Teleport) pi, true, editorCanvas);
+                    parent, (Teleport) pi, true, editorCanvas, editorController);
             case LANDSCAPE -> new LandscapeAssetStage(
-                    parent, (Landscape) pi, true, editorCanvas);
+                    parent, (Landscape) pi, true, editorCanvas, editorController);
             case COVER -> new CoverAssetStage(
-                    parent, (Cover) pi, true, editorCanvas);
+                    parent, (Cover) pi, true, editorCanvas, editorController);
             case WEAPON -> new WeaponAssetStage(
-                    parent, (Weapon) pi, true, editorCanvas);
+                    parent, (Weapon) pi, true, editorCanvas, editorController);
             case CONTAINER -> new ContainerAssetStage(
-                    parent, (Container) pi, true, editorCanvas);
+                    parent, (Container) pi, true, editorCanvas, editorController);
             case INDOOR -> new InDoorAssetStage(
-                    parent, (InDoor) pi, true, editorCanvas);
+                    parent, (InDoor) pi, true, editorCanvas, editorController);
             case OUTDOOR -> new OutDoorAssetStage(
-                    parent, (OutDoor) pi, true, editorCanvas);
+                    parent, (OutDoor) pi, true, editorCanvas, editorController);
             case FOG -> null;
         };
         if (itemStage == null) return;

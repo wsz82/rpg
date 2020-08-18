@@ -1,5 +1,6 @@
 package game.view.stage;
 
+import game.model.GameController;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
@@ -11,6 +12,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +20,16 @@ import java.util.stream.Collectors;
 public abstract class CanvasView {
     protected final Canvas canvas;
     protected final GraphicsContext gc;
-    protected final Controller controller = Controller.get();
-    protected final Board board = controller.getBoard();
+    protected final GameController gameController;
+    protected final Controller controller;
+    protected final Board board;
     protected final List<Creature> visibleControllables = new ArrayList<>(0);
 
-    public CanvasView(Canvas canvas) {
+    public CanvasView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
+        this.gameController = gameController;
+        controller = gameController.getController();
+        board = controller.getBoard();
         gc = canvas.getGraphicsContext2D();
     }
 
@@ -32,7 +38,7 @@ public abstract class CanvasView {
         double bottom = top + height;
 
         items.clear();
-        location.getItems().get().stream()
+        location.getItems().stream()
                 .filter(PosItem::getVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
@@ -125,7 +131,9 @@ public abstract class CanvasView {
         x -= size.getWidth() / 2.0;
         y -= size.getHeight() / 2.0;
         CreatureBase base = CreatureBase.getCreatureBase(size, control);
-        Image img = base.getImage();
+        if (base == null) return;
+        File programDir = controller.getProgramDir();
+        Image img = base.getImage(programDir);
         gc.drawImage(img, x * meter, y * meter);
     }
 }

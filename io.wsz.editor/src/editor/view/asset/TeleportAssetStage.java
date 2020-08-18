@@ -1,7 +1,7 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.location.Location;
@@ -24,13 +24,14 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     private CoordsEdit coordsEdit;
 
-    public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, asset, isContent, editorCanvas);
+    public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent,
+                              EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public TeleportAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public TeleportAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -85,7 +86,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
                 return getLocation(s);
             }
         });
-        ObservableList<Location> locations = FXCollections.observableArrayList(Controller.get().getLocationsList());
+        ObservableList<Location> locations = FXCollections.observableArrayList(editorController.getObservableLocations());
         locationChoice.setItems(locations);
         if (isContent) {
             locations.add(null);
@@ -93,7 +94,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     private Location getLocation(String s) {
-        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
+        Optional<Location> optLocation = controller.getLocations().stream()
                 .filter(l -> l.getName().equals(s))
                 .findFirst();
         return optLocation.orElse(null);
@@ -104,7 +105,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         if (item == null) {
             item = createNewAsset();
         }
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas);
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
         coordsEdit.initCoords(container);
 
         super.fillInputs();
@@ -118,7 +119,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected void addAssetToList(Teleport asset) {
-        ObservableAssets.get().getTeleports().add(asset);
+        editorController.getObservableAssets().getTeleports().add(asset);
     }
 
     @Override

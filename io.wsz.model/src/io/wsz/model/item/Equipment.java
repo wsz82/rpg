@@ -1,6 +1,5 @@
 package io.wsz.model.item;
 
-import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -87,7 +86,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
         Coords toCoords = getInteractionCoords();
         double xTo = toCoords.x;
         double yTo = toCoords.y;
-        PosItem obstacleOnWay = Controller.get().getBoard().getObstacleOnWay(
+        PosItem obstacleOnWay = getController().getBoard().getObstacleOnWay(
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
@@ -130,7 +129,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
             Coords toCoords = getInteractionCoords();
             double xTo = toCoords.x;
             double yTo = toCoords.y;
-            obstacleOnWay = Controller.get().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);
+            obstacleOnWay = getController().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);
         }
         if (obstacle != null || outOfLocation || obstacleOnWay != null) {
             pos.x = tempX;

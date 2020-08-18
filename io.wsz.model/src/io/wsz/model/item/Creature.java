@@ -8,6 +8,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -89,7 +90,7 @@ public class Creature extends PosItem<Creature> implements Containable {
     }
 
     private void checkSurrounding() {
-        Teleport t = Controller.get().getBoard().getTeleport(getCenter(), this, this.pos.getLocation());
+        Teleport t = getController().getBoard().getTeleport(getCenter(), this, this.pos.getLocation());
         if (t != null) t.enter(this);
     }
 
@@ -166,8 +167,8 @@ public class Creature extends PosItem<Creature> implements Containable {
         return Coords.ovalsIntersect(thisCenter, thisSize, pos, width);
     }
 
-    public List<Equipment> getEquipmentWithinRange() {
-        return Controller.get().getBoard().getEquipmentWithinRange(this);
+    public List<Equipment> getEquipmentWithinRange(Controller controller) {
+        return getController().getBoard().getEquipmentWithinRange(this);
     }
 
     private void checkTask() {
@@ -379,7 +380,8 @@ public class Creature extends PosItem<Creature> implements Containable {
     public Image getImage() {
         if (this.image == null) {
             if (this.prototype == null) {
-                this.image = getAnimation().getMainIdle();
+                File programDir = getController().getProgramDir();
+                this.image = getAnimation().getMainIdle(programDir);
                 return this.image;
             } else {
                 return prototype.getImage();
@@ -395,7 +397,7 @@ public class Creature extends PosItem<Creature> implements Containable {
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (getControl() != CreatureControl.ENEMY) {
                 if (getObstacleOnWay(cr) != null) return false;
-                Controller controller = Controller.get();
+                Controller controller = getController();
                 controller.setAsking(cr);
                 controller.setAnswering(this);
                 return true;

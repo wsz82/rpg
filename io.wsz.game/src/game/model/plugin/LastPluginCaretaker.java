@@ -5,7 +5,13 @@ import java.io.*;
 public class LastPluginCaretaker {
     private static final String FILE_NAME = "last_plugin";
 
-    public void saveMemento(File programDir, String pluginName) {
+    private final File programDir;
+
+    public LastPluginCaretaker(File programDir) {
+        this.programDir = programDir;
+    }
+
+    public void saveMemento(String pluginName) {
         try (
                 ObjectOutputStream os = new ObjectOutputStream(
                         new FileOutputStream(programDir + File.separator + FILE_NAME))
@@ -16,7 +22,7 @@ public class LastPluginCaretaker {
         }
     }
 
-    public String loadMemento(File programDir) {
+    public String loadMemento() {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {

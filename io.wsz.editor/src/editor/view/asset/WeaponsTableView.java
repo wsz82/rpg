@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
@@ -17,8 +18,9 @@ import java.util.List;
 
 public class WeaponsTableView extends AssetsTableView<Weapon> {
 
-    WeaponsTableView(Stage parent, ObservableList<Weapon> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    WeaponsTableView(Stage parent, ObservableList<Weapon> assets,
+                     EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
         initWeaponsTable();
     }
 
@@ -63,13 +65,13 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
         if (w == null) {
             return;
         }
-        WeaponAssetStage as = new WeaponAssetStage(parent, w, false, editorCanvas);
+        WeaponAssetStage as = new WeaponAssetStage(parent, w, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        WeaponAssetStage as = new WeaponAssetStage(parent, editorCanvas);
+        WeaponAssetStage as = new WeaponAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -94,7 +96,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
 
     @Override
     protected void removeAssetFromList(List<Weapon> assetsToRemove) {
-        ObservableAssets.get().getWeapons().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getWeapons().removeAll(assetsToRemove);
     }
 
     @Override

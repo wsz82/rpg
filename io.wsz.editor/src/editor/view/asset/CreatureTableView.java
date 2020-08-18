@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
@@ -18,8 +19,9 @@ import java.util.List;
 
 class CreatureTableView extends AssetsTableView<Creature> {
 
-    CreatureTableView(Stage parent, ObservableList<Creature> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    CreatureTableView(Stage parent, ObservableList<Creature> assets,
+                      EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
         initCreatureTable();
     }
 
@@ -53,13 +55,13 @@ class CreatureTableView extends AssetsTableView<Creature> {
         if (cr == null) {
             return;
         }
-        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false, editorCanvas);
+        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        CreatureAssetStage as = new CreatureAssetStage(parent, editorCanvas);
+        CreatureAssetStage as = new CreatureAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -91,7 +93,7 @@ class CreatureTableView extends AssetsTableView<Creature> {
 
     @Override
     protected void removeAssetFromList(List<Creature> assetsToRemove) {
-        ObservableAssets.get().getCreatures().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getCreatures().removeAll(assetsToRemove);
     }
 
     @Override

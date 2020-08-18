@@ -9,20 +9,21 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 public class Main extends Application {
-    private static File programDir;
-
     @Override
     public void start(Stage stage) {
-        EditorController.get().initNewPlugin();
+        Controller controller = new Controller();
+        controller.initNewModel();
+        EditorController editorController = new EditorController(controller);
+        editorController.initNewPlugin();
 
-        setProgramDir();
-        Controller.setProgramDir(programDir);
+        File programDir = getProgramDir();
+        controller.setProgramDir(programDir);
 
-        MainView view = new MainView(stage);
+        MainView view = new MainView(stage, editorController);
         view.show();
     }
 
-    private void setProgramDir() {
+    private File getProgramDir() {
         String path = System.getProperty("user.home");
         try {
             path = new File(
@@ -32,14 +33,10 @@ public class Main extends Application {
             e.printStackTrace();
         }
         new File(path).mkdir();
-        programDir = new File(path);
+        return new File(path);
     }
 
     public static void main(String[] args) {
         Application.launch();
-    }
-
-    public static File getDir() {
-        return programDir;
     }
 }

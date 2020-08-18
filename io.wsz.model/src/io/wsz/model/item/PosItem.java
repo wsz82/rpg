@@ -6,10 +6,12 @@ import io.wsz.model.dialog.Dialog;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -22,6 +24,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
 
     protected final Coords center = new Coords();
 
+    protected Controller controller;
     protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
     protected final Coords pos = new Coords();
 
@@ -30,6 +33,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
     protected Coords interactionCoords;
+    protected Image image;
 
     public PosItem() {}
 
@@ -105,7 +109,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
     }
 
     public PosItem getCollision(Coords nextPos, Location nextLocation) {
-        return Controller.get().getBoard().getObstacle(nextPos, this, nextLocation);
+        return getController().getBoard().getObstacle(nextPos, this, nextLocation);
     }
 
     public double getCollisionLeft(List<List<Coords>> cp) {
@@ -294,6 +298,18 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
         this.prototype = prototype;
     }
 
+    protected Controller getController() {
+        if (prototype == null) {
+            return controller;
+        } else {
+            return prototype.getController();
+        }
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
     @Override
     public String getName() {
         if (prototype != null) {
@@ -318,13 +334,38 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
         return super.getPath();
     }
 
-    @Override
+    public final Image getInitialImage() {
+        if (image == null) {
+            String type = getType().toString().toLowerCase();
+            String path = getPath();
+            File programDir = getController().getProgramDir();
+            setImage(ResolutionImage.loadImage(programDir, type, path));
+        }
+        return image;
+    }
+
     public Image getImage() {
         if (prototype == null) {
-            return super.getImage();
+            return getInitialImage();
         } else {
             return prototype.getImage();
         }
+    }
+
+    public double getImageHeight() {
+        Image img = getImage();
+        if (img == null) return 0;
+        return img.getHeight() / Sizes.getMeter();
+    }
+
+    public double getImageWidth() {
+        Image img = getImage();
+        if (img == null) return 0;
+        return img.getWidth() / Sizes.getMeter();
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 
     @Override
@@ -344,7 +385,7 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
         Coords toCoords = getInteractionCoords();
         double xTo = toCoords.x;
         double yTo = toCoords.y;
-        return Controller.get().getBoard().getObstacleOnWay(
+        return getController().getBoard().getObstacleOnWay(
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
     }
 

@@ -1,5 +1,6 @@
 package editor.view.content;
 
+import editor.model.EditorController;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
@@ -11,12 +12,13 @@ import javafx.stage.Stage;
 
 public class ContentStage extends ChildStage {
     private static final String TITLE = "Content";
+
     private final StackPane root = new StackPane();
     private final ContentTableView table;
 
-    public ContentStage(Stage parent, EditorCanvas editorCanvas) {
+    public ContentStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
-        table = new ContentTableView(editorCanvas);
+        table = new ContentTableView(editorCanvas, editorController);
         initWindow();
     }
 

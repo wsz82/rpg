@@ -26,7 +26,7 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     public boolean enter(Creature cr) {
-        return Teleportation.teleport(cr, getExit());
+        return Teleportation.teleport(cr, getExit(), getController());
     }
 
     public Coords getIndividualExit() {

@@ -16,18 +16,19 @@ class CoordsTest {
         Coords pos = new Coords(4.36, 12.01);
 
         String posText = pos.toString();
-        Coords parsed = Coords.parseCoords(posText);
+        Coords parsed = Coords.parseCoords(posText, new Controller());
         assertEquals(pos, parsed);
     }
 
     @Test
     public void coordsWithLocationAreParsed() {
         Location loc = new Location("testLoc", 25, 30);
-        Controller.get().getLocationsList().add(loc);
+        Controller controller = new Controller();
+        controller.getLocations().add(loc);
         Coords pos = new Coords(4.36, 12.01, 1, loc);
 
         String posText = pos.toString();
-        Coords parsed = Coords.parseCoords(posText);
+        Coords parsed = Coords.parseCoords(posText, controller);
         assertEquals(pos, parsed);
     }
 

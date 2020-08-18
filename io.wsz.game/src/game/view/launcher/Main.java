@@ -1,5 +1,6 @@
 package game.view.launcher;
 
+import game.model.GameController;
 import io.wsz.model.Controller;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -8,13 +9,15 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 public class Main extends Application {
-    private static File programDir;
-
     @Override
     public void start(Stage stage) {
-        programDir = getProgramDir();
-        Controller.setProgramDir(programDir);
-        new Launcher(stage);
+        Controller controller = new Controller();
+        File programDir = getProgramDir();
+        controller.setProgramDir(programDir);
+        controller.initNewModel();
+        GameController gameController = new GameController(controller);
+        Launcher launcher = new Launcher(stage);
+        launcher.launch(gameController);
     }
 
     public static void main(String[] args) {
@@ -32,9 +35,5 @@ public class Main extends Application {
         }
         new File(path).mkdir();
         return new File(path);
-    }
-
-    public static File getDir() {
-        return programDir;
     }
 }

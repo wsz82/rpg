@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
@@ -16,8 +17,9 @@ import java.util.List;
 
 public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
-    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets,
+                     EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
         initOutDoorTable();
     }
 
@@ -51,13 +53,13 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         if (id == null) {
             return;
         }
-        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        OutDoorAssetStage as = new OutDoorAssetStage(parent, editorCanvas);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -85,7 +87,7 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
     @Override
     protected void removeAssetFromList(List<OutDoor> assetsToRemove) {
-        ObservableAssets.get().getOutDoors().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getOutDoors().removeAll(assetsToRemove);
     }
 
     @Override

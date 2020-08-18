@@ -10,7 +10,7 @@ import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
-import io.wsz.model.plugin.ActivePlugin;
+import io.wsz.model.Controller;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -25,6 +25,9 @@ import java.io.File;
 class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
+
+    private final EditorController editorController;
+    private final Controller controller;
     private final EditorCanvas editorCanvas;
     private final Stage stage;
     private final Pane center;
@@ -34,24 +37,25 @@ class MainView {
     private final LocationsStage locationsWindow;
     private final PluginSettingsStage pss;
     private final Pointer pointer;
-    private final EditorController editorController = EditorController.get();
 
-    MainView(Stage stage) {
+    public MainView(Stage stage, EditorController editorController) {
         this.stage = stage;
+        this.editorController = editorController;
+        controller = editorController.getController();
         this.center = new Pane();
-        pointer = new Pointer();
-        editorCanvas = new EditorCanvas(stage, center, pointer);
+        pointer = new Pointer(controller);
+        editorCanvas = new EditorCanvas(stage, editorController, center, pointer);
         center.getChildren().add(editorCanvas);
-        contentsWindow = new ContentStage(stage, editorCanvas);
+        contentsWindow = new ContentStage(stage, editorCanvas, editorController);
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
-        layersWindow = new LayersStage(stage, ctv, editorCanvas);
-        assetsWindow = new AssetsStage(stage, pointer, ctv, editorCanvas);
-        locationsWindow = new LocationsStage(stage, editorCanvas);
-        pss = new PluginSettingsStage(stage);
+        layersWindow = new LayersStage(stage, ctv, editorCanvas, editorController);
+        assetsWindow = new AssetsStage(stage, pointer, ctv, editorCanvas, editorController);
+        locationsWindow = new LocationsStage(stage, editorController, editorCanvas);
+        pss = new PluginSettingsStage(stage, editorController);
     }
 
-    void show() {
+    public void show() {
         final BorderPane borderPane = new BorderPane();
         final VBox topBar = new VBox();
         final VBox bottomBar = new VBox();
@@ -66,7 +70,8 @@ class MainView {
         final Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         stage.setScene(scene);
 
-        restoreSettings(Main.getDir());
+        File programDir = editorController.getController().getProgramDir();
+        restoreSettings(programDir);
 
         stage.show();
         layersWindow.show();
@@ -85,7 +90,8 @@ class MainView {
 
     private void onCloseRequest() {
         askForSave();
-        storeSettings(Main.getDir());
+        File programDir = editorController.getController().getProgramDir();
+        storeSettings(programDir);
     }
 
     private void askForSave() {
@@ -149,9 +155,9 @@ class MainView {
     private void setBottomContent(VBox bottom) {
         final HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
-        final CoordinatesBox coordinatesBox = new CoordinatesBox(center);
-        final CurrentLocationBox currentLocationBox = new CurrentLocationBox();
-        final CurrentLayerBox currentLayerBox = new CurrentLayerBox();
+        final CoordinatesBox coordinatesBox = new CoordinatesBox(center, controller);
+        final CurrentLocationBox currentLocationBox = new CurrentLocationBox(controller);
+        final CurrentLayerBox currentLayerBox = new CurrentLayerBox(controller);
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);
         bottom.getChildren().addAll(bottomHorizontalBar);
     }
@@ -191,7 +197,7 @@ class MainView {
         final Menu location = new Menu("Location");
         final MenuItem parameters = new MenuItem("Parameters");
         parameters.setOnAction(event -> {
-            LocationParametersStage locationParametersStage = new LocationParametersStage(stage);
+            LocationParametersStage locationParametersStage = new LocationParametersStage(stage, controller);
             locationParametersStage.show();
         });
         location.getItems().addAll(parameters);
@@ -209,7 +215,7 @@ class MainView {
     }
 
     private void openPluginsTable() {
-        final Stage plugins = new EditorPluginsTable(pss);
+        final Stage plugins = new EditorPluginsTable(pss, editorController);
         plugins.initOwner(stage);
         plugins.show();
     }
@@ -217,7 +223,8 @@ class MainView {
     private void saveAsFile() {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save plugin");
-        fileChooser.setInitialDirectory(Main.getDir());
+        File programDir = editorController.getController().getProgramDir();
+        fileChooser.setInitialDirectory(programDir);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
@@ -229,7 +236,7 @@ class MainView {
     }
 
     private void saveFile() {
-        if (ActivePlugin.get().getPlugin() != null) {
+        if (editorController.getController().getModel().getActivePlugin() != null) {
             editorController.saveActivePlugin(pss);
         } else {
             saveAsFile();

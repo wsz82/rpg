@@ -3,24 +3,23 @@ package game.model;
 import game.model.plugin.LastPluginCaretaker;
 import game.model.save.SaveCaretaker;
 import game.model.save.SaveMemento;
-import game.model.save.SavesList;
 import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
-import game.view.launcher.Main;
 import game.view.stage.GameStage;
 import game.view.stage.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.Model;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
-import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
@@ -30,32 +29,26 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
-    private static GameController singleton;
+    private final Controller controller;
+    private final ObservableList<String> saves = FXCollections.observableArrayList();
 
-    private final Controller controller = Controller.get();
-    private final AtomicBoolean isGame = new AtomicBoolean(false);
-    private final AtomicBoolean isDialog = new AtomicBoolean(false);
-
+    private final AtomicBoolean isGame = new AtomicBoolean();
+    private final AtomicBoolean isDialog = new AtomicBoolean();
     private GameView gameView;
     private GameStage gameStage;
     private GameRunner gameRunner;
     private Creature hoveredHero;
 
-    public static GameController get() {
-        if (singleton == null) {
-            singleton = new GameController();
-        }
-        return singleton;
+    public GameController(Controller controller) {
+        this.controller = controller;
     }
 
-    private GameController() {}
-
     public boolean startGame(SaveMemento memento) {
-        if (ActivePlugin.get().getPlugin() == null) {
+        if (controller.getModel().getActivePlugin() == null) {
             return false;
         }
         if (gameRunner == null) {
-            gameRunner = new GameRunner();
+            gameRunner = new GameRunner(this);
         }
         gameRunner.startGame(memento);
         return true;
@@ -67,18 +60,20 @@ public class GameController {
     }
 
     public void restoreLastPlugin() {
-        LastPluginCaretaker pc = new LastPluginCaretaker();
-        String lastPluginName = pc.loadMemento(Main.getDir());
-        Plugin p = controller.loadPlugin(lastPluginName);
-        if (p == null) return;
-        if (p.getLocations() != null) {
-            controller.setActivePlugin(p);
+        File programDir = controller.getProgramDir();
+        LastPluginCaretaker lpc = new LastPluginCaretaker(programDir);
+        String lastPluginName = lpc.loadMemento();
+        Plugin loadedPlugin = controller.loadPlugin(lastPluginName);
+        if (loadedPlugin == null) return;
+        if (loadedPlugin.getWorld().getLocations() != null) {
+            controller.getModel().setActivePlugin(loadedPlugin);
         }
     }
 
     public void storeLastPlugin(Plugin p) {
-        LastPluginCaretaker pc = new LastPluginCaretaker();
-        pc.saveMemento(Main.getDir(), p.getName());
+        File programDir = controller.getProgramDir();
+        LastPluginCaretaker pc = new LastPluginCaretaker(programDir);
+        pc.saveMemento(p.getName());
     }
 
 
@@ -95,11 +90,11 @@ public class GameController {
     }
 
     private void restoreAskingAndAnswering(PosItem asking, PosItem answering) {
-        List<Location> locations = controller.getLocationsList();
+        List<Location> locations = controller.getLocations();
         boolean askingSet = false;
         boolean answeringSet = false;
         for (Location l : locations) {
-            for (PosItem pi : l.getItems().get()) {
+            for (PosItem pi : l.getItems()) {
                 if (!askingSet && asking.equals(pi)) {
                     controller.setAsking(pi);
                     askingSet = true;
@@ -133,8 +128,9 @@ public class GameController {
         savedPos.setLocation(controller.getCurrentLocation().getLocation());
         savedPos.level = controller.getCurrentLayer().getLevel();
         SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes(), controller.getDialogMemento());
+        memento.setLocations(controller.getLocations());
         SaveCaretaker sc = new SaveCaretaker(programDir);
-        sc.createSave(memento);
+        sc.makeSave(memento);
     }
 
     private String createUniqueName(String name) {
@@ -146,7 +142,7 @@ public class GameController {
     }
 
     public ObservableList<String> getSavesList() {
-        return SavesList.get().getSaves();
+        return saves;
     }
 
     public void initSavesList(File programDir) {
@@ -163,9 +159,9 @@ public class GameController {
         Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
         Settings.setCenterOnPC(memento.isCenterOnPc());
         Settings.setPauseOnInventory(memento.isPauseOnInventory());
-        Settings.setResolutionWidth(memento.getResolutionWidth());
+        Settings.setResolutionWidth(memento.getResolutionWidth(), controller);
         Settings.setResolutionHeight(memento.getResolutionHeight());
-        Sizes.setResizeWithResolution(memento.isResizeWithResolution());
+        Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
         return memento;
     }
 
@@ -182,46 +178,39 @@ public class GameController {
         sc.saveMemento(memento);
     }
 
-    public void loadSaveToLists(SaveMemento m) {
-        if (controller.getAssetsList().isEmpty()) {
-            controller.loadAssetsToList();
-        }
-
-        controller.getLocationsList().clear();
-        fillLocationsList(m.getLocations(), true, m.getLastPos());
+    public void restoreMemento(SaveMemento m) {
+        List<Location> locations = m.getLocations();
+        controller.getModel().getActivePlugin().getWorld().setLocations(locations);
+        controller.restoreItemsCoords(locations);
+        restoreStartLocationAndLayer(m.getLastPos());
     }
 
-    public void loadGameActivePluginToLists() {
-        if (ActivePlugin.get().getPlugin() == null) {
+    public void restoreActivePlugin() {
+        Model model = controller.getModel();
+        Plugin activePlugin = model.getActivePlugin();
+        if (activePlugin == null) {
             return;
         }
-        controller.getLocationsList().clear();
-        controller.getAssetsList().clear();
-
-        Plugin p = ActivePlugin.get().getPlugin();
-        controller.getAssetsList().addAll(p.getAssets());
-        Coords startPos = p.getStartPos();
-        fillLocationsList(p.getLocations(), p.isStartingLocation(), startPos);
+        List<Location> locations = activePlugin.getWorld().getLocations();
+        controller.restoreItemsCoords(locations);
+        Coords startPos = activePlugin.getStartPos();
+        restoreStartLocationAndLayer(startPos);
     }
 
-    public void fillLocationsList(List<Location> serLocations, boolean isStartingLocation, Coords startPos) {
-        controller.fillLocationsList(serLocations);
+    private void restoreStartLocationAndLayer(Coords startPos) {
+        controller.restoreCoordsOfLocation(startPos);
+        Location first = startPos.getLocation();
+        controller.getCurrentLocation().setLocation(first);
 
-        if (isStartingLocation) {
-            controller.restoreCoordsLocation(startPos);
-            Location first = startPos.getLocation();
-            controller.getCurrentLocation().setLocation(first);
-
-            int serLevel = startPos.level;
-            Optional<Layer> optLayer = first.getLayers().get().stream()
-                    .filter(l -> l.getLevel() == serLevel)
-                    .findFirst();
-            Layer startLayer = optLayer.orElse(null);
-            if (startLayer == null) {
-                throw new NullPointerException("Start layer \"" + serLevel + "\" does not exist in start location");
-            }
-            controller.getCurrentLayer().setLayer(startLayer);
+        int serLevel = startPos.level;
+        Optional<Layer> optLayer = first.getLayers().stream()
+                .filter(l -> l.getLevel() == serLevel)
+                .findFirst();
+        Layer startLayer = optLayer.orElse(null);
+        if (startLayer == null) {
+            throw new NullPointerException("Start layer \"" + serLevel + "\" does not exist in start location");
         }
+        controller.getCurrentLayer().setLayer(startLayer);
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
@@ -256,12 +245,16 @@ public class GameController {
         return isGame.get();
     }
 
-    public void setGame(boolean game) {
-        isGame.set(game);
+    public void setGame(boolean isGame) {
+        this.isGame.set(isGame);
     }
 
-    public GameStage getGameStage() {
-        return gameStage;
+    public boolean isDialog() {
+        return isDialog.get();
+    }
+
+    public void setDialog(boolean isDialog) {
+        this.isDialog.set(isDialog);
     }
 
     public void setGameStage(GameStage gameStage) {
@@ -270,14 +263,6 @@ public class GameController {
 
     public GameRunner getGameRunner() {
         return gameRunner;
-    }
-
-    public boolean isDialog() {
-        return isDialog.get();
-    }
-
-    public void setDialog(boolean dialog) {
-        isDialog.set(dialog);
     }
 
     public void endDialog() {
@@ -291,5 +276,9 @@ public class GameController {
 
     public void setHoveredHero(Creature hoveredHero) {
         this.hoveredHero = hoveredHero;
+    }
+
+    public Controller getController() {
+        return controller;
     }
 }

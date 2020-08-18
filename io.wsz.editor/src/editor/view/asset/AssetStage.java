@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
@@ -24,6 +25,8 @@ import java.util.List;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final EditorCanvas editorCanvas;
+    protected final EditorController editorController;
+    protected final Controller controller;
     protected final VBox container = new VBox(5);
     protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
@@ -41,16 +44,20 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
 
-    public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas) {
+    public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
         this.item = item;
         this.isContent = isContent;
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
     }
 
-    public AssetStage(Stage parent, EditorCanvas editorCanvas) {
+    public AssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
     }
 
     protected void initWindow() {
@@ -122,7 +129,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (inputNameIsEmpty || inputFileIsEmpty) {
             return;
         }
-        List<Asset> assets = ObservableAssets.get().merge();
+        List<Asset> assets = editorController.getObservableAssets().getMergedAssets();
         boolean assetNameAlreadyExists = assets.stream()
                 .anyMatch(a -> a.getName().equals(name));
         if (assetNameAlreadyExists) {
@@ -160,7 +167,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected void setUpFileChooser(String title, Label label) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
-        fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
+        fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
         File selectedFile = fileChooser.showOpenDialog(this);
         fillLabel(label, selectedFile);
     }
@@ -168,7 +175,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected void setUpDirChooser(String title, Label label) {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
-        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType()));
+        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
         File selectedFile = dirChooser.showDialog(this);
         fillLabel(label, selectedFile);
     }
@@ -236,7 +243,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
         File required = new File(
-                Controller.getProgramDir() + Asset.getRelativeTypePath(getType()));
+                controller.getProgramDir() + Asset.getRelativeTypePath(getType()));
         String requiredPath = required.getAbsolutePath().toLowerCase();
         if (!parent.equals(required)) {
             alertWrongDirectory(actualPath, requiredPath);

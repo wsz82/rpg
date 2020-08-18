@@ -12,26 +12,23 @@ import javafx.scene.layout.Pane;
 
 class CoordinatesBox extends HBox {
     private final Coords mousePos = new Coords();
-    private final EventHandler<MouseEvent> moveEvent = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent event) {
-            if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                mousePos.x = event.getX() / Sizes.getMeter();
-                mousePos.y = event.getY() / Sizes.getMeter();
-                Controller.get();
-                Coords boardPos = Controller.get().getCurPos();
-                mousePos.add(boardPos);
-                mouseX.setText("X: " + String.format("%.2f", mousePos.x));
-                mouseY.setText("Y: " + String.format("%.2f", mousePos.y));
-            }
-        }
-    };
+    private final EventHandler<MouseEvent> moveEvent;
     private final Label mouseX = new Label();
     private final Label mouseY = new Label();
     private final Pane center;
 
-    CoordinatesBox(Pane center) {
+    CoordinatesBox(Pane center, Controller controller) {
         this.center = center;
+        moveEvent = event -> {
+            if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+                mousePos.x = event.getX() / Sizes.getMeter();
+                mousePos.y = event.getY() / Sizes.getMeter();
+                Coords boardPos = controller.getCurPos();
+                mousePos.add(boardPos);
+                mouseX.setText("X: " + String.format("%.2f", mousePos.x));
+                mouseY.setText("Y: " + String.format("%.2f", mousePos.y));
+            }
+        };
         init();
     }
 

@@ -6,6 +6,7 @@ import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -82,9 +83,10 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     private void searchOpenContainer(Creature cr) {
         if (cr.getControl() == CreatureControl.CONTROL) {
-            Controller.get().setCreatureToOpenInventory(cr);
-            Controller.get().setContainerToOpen(this);
-            Controller.get().setInventory(true);
+            Controller controller = getController();
+            controller.setCreatureToOpenInventory(cr);
+            controller.setContainerToOpen(this);
+            controller.setInventory(true);
             System.out.println(getName() + " searched by " + cr.getName());
         }
     }
@@ -194,7 +196,10 @@ public class Container extends Equipment<Container> implements Containable, Open
                 return getInitialImage();
             }
             if (openImage == null) {
-                setOpenImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getOpenImagePath()));
+                String type = getType().toString().toLowerCase();
+                String openImagePath = getOpenImagePath();
+                File programDir = getController().getProgramDir();
+                setOpenImage(ResolutionImage.loadImage(programDir, type, openImagePath));
             }
             return openImage;
         } else {

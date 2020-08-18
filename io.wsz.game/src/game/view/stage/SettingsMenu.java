@@ -19,15 +19,18 @@ import javafx.stage.Screen;
 import javafx.util.StringConverter;
 
 class SettingsMenu extends StackPane {
+    private final Controller controller;
+    private final GameStage gameStage;
+
     private StackPane graphics;
     private StackPane game;
     private Node parentToReturn;
     private BorderPane root;
-    private final GameStage gameStage;
     private StringConverter<Number> stringConverter;
 
-    public SettingsMenu(GameStage gameStage) {
+    public SettingsMenu(GameStage gameStage, Controller controller) {
         this.gameStage = gameStage;
+        this.controller = controller;
         final VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
@@ -225,7 +228,7 @@ class SettingsMenu extends StackPane {
         s.setBlockIncrement(1);
         s.setValue(Settings.getResolutionWidth());
         s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setResolutionWidth((int) s.getValue());
+            Settings.setResolutionWidth((int) s.getValue(), controller);
         });
         l.setText(String.valueOf(s.getValue()));
         l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);
@@ -234,7 +237,7 @@ class SettingsMenu extends StackPane {
     private void hookUpResizeWithResolutionEvents(CheckBox cb) {
         cb.setSelected(Sizes.isResizeWithResolution());
         cb.setOnAction(event -> {
-            Sizes.setResizeWithResolution(cb.isSelected());
+            Sizes.setResizeWithResolution(cb.isSelected(), controller);
         });
     }
 
@@ -257,7 +260,7 @@ class SettingsMenu extends StackPane {
 
     private void changeFullScreenSetting(boolean isSelected) {
         gameStage.setFullScreen(isSelected);
-        Coords current = Controller.get().getCurPos();
+        Coords current = controller.getCurPos();
         current.x = 0;
         current.y = 0;
     }

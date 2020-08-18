@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
@@ -7,13 +8,14 @@ import javafx.stage.Stage;
 
 public class LandscapeAssetStage extends AssetStage<Landscape> {
 
-    public LandscapeAssetStage(Stage parent, Landscape asset, boolean isContent, EditorCanvas editorCanvas) {
-        super(parent, asset, isContent, editorCanvas);
+    public LandscapeAssetStage(Stage parent, Landscape asset, boolean isContent,
+                               EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public LandscapeAssetStage(Stage parent, EditorCanvas editorCanvas) {
-        super(parent, editorCanvas);
+    public LandscapeAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, editorCanvas, editorController);
         initWindow();
     }
 
@@ -37,7 +39,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected void addAssetToList(Landscape asset) {
-        ObservableAssets.get().getLandscapes().add(asset);
+        editorController.getObservableAssets().getLandscapes().add(asset);
     }
 
     @Override

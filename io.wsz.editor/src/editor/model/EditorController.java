@@ -6,36 +6,34 @@ import editor.view.asset.ItemsStage;
 import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
+import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
-import io.wsz.model.location.LocationsList;
-import io.wsz.model.plugin.ActivePlugin;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EditorController {
-    private static EditorController singleton;
-    private final Controller controller = Controller.get();
+    private final Controller controller;
+    private final ObservableAssets observableAssets = new ObservableAssets();
+    private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords();
-    private ItemsStage itemsStage;
 
-    public static EditorController get() {
-        if (singleton == null) {
-            singleton = new EditorController();
-        }
-        return singleton;
-    }
+    private PosItem activeItem;
 
-    private EditorController(){}
+    private ItemsStage activeItemsStage;
 
-    public ActiveItem getActiveContent() {
-        return ActiveItem.get();
+    public EditorController(Controller controller){
+        this.controller = controller;
     }
 
     public SettingsMemento restoreSettings(File programDir) {
@@ -47,98 +45,114 @@ public class EditorController {
     }
 
     public void initNewPlugin() {
-        controller.getAssetsList().clear();
-        ObservableAssets.get().clearLists();
-        controller.getLocationsList().clear();
+        observableAssets.clearLists();
+        World newWorld = new World();
 
+        List<Location> locations = new ArrayList<>(0);
         Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
-        location.getLayers().get().add(layer);
-        controller.getLocationsList().add(location);
-        controller.getCurrentLocation().setLocation(location);
-        controller.getCurrentLayer().setLayer(layer);
-        controller.setActivePlugin(null);
+        location.getLayers().add(layer);
+        locations.add(location);
+        controller.getModel().getCurrentLocation().setLocation(location);
+        controller.getModel().getCurrentLayer().setLayer(layer);
+
+        newWorld.setLocations(locations);
+
+        List<Asset> assets = new ArrayList<>(0);
+        newWorld.setAssets(assets);
+
+        Plugin newPlugin = new Plugin();
+        newPlugin.setWorld(newWorld);
+        controller.getModel().setActivePlugin(newPlugin);
     }
 
     public void saveActivePlugin(PluginSettingsStage pss) {
-        mergeAssetsLists();
-        PluginCaretaker pc = new PluginCaretaker();
-        Plugin p = ActivePlugin.get().getPlugin();
-        setPluginsParams(p, pss);
-        pc.save(p);
+        Model model = controller.getModel();
+        Plugin activePlugin = model.getActivePlugin();
+        mergeAssets(activePlugin);
+        loadObservableLocationsToPlugin(activePlugin);
+        File programDir = controller.getProgramDir();
+        PluginCaretaker pc = new PluginCaretaker(programDir);
+        setPluginParams(activePlugin, pss);
+        pc.save(activePlugin);
     }
 
-    private void mergeAssetsLists() {
-        controller.getAssetsList().clear();
-        controller.getAssetsList().addAll(ObservableAssets.get().merge());
+    private void loadObservableLocationsToPlugin(Plugin activePlugin) {
+        List<Location> locations = new ArrayList<>(observableLocations);
+        activePlugin.getWorld().setLocations(locations);
+    }
+
+    private void mergeAssets(Plugin activePlugin) {
+        List<Asset> mergedAssets = observableAssets.getMergedAssets();
+        activePlugin.getWorld().setAssets(mergedAssets);
     }
 
     public void savePluginAs(String pluginName, PluginSettingsStage pss) {
-        mergeAssetsLists();
-        PluginCaretaker pc = new PluginCaretaker();
-        Plugin p = new Plugin();
-        p.setName(pluginName);
-        setPluginsParams(p, pss);
-        pc.saveAs(p);
-        ActivePlugin.get().setPlugin(p);
+        Plugin activePlugin = controller.getModel().getActivePlugin();
+        mergeAssets(activePlugin);
+        loadObservableLocationsToPlugin(activePlugin);
+        File programDir = controller.getProgramDir();
+        PluginCaretaker pc = new PluginCaretaker(programDir);
+        activePlugin.setName(pluginName);
+        setPluginParams(activePlugin, pss);
+        pc.saveAs(activePlugin);
     }
 
-    private void setPluginsParams(Plugin p, PluginSettingsStage pss) {
-        p.setAssets(controller.getAssetsList());
-        p.setLocations(new ArrayList<>(LocationsList.get()));
+    private void setPluginParams(Plugin activePlugin, PluginSettingsStage pss) {
         boolean isStartingLocation = pss.isStartingLocation();
-        p.setStartingLocation(isStartingLocation);
+        activePlugin.setStartingLocation(isStartingLocation);
         Coords startPos = new Coords();
         startPos.setLocation(pss.getStartLocation());
         startPos.x = pss.getStartX();
         startPos.y = pss.getStartY();
         startPos.level = pss.getStartLevel();
-        p.setStartPos(startPos);
+        activePlugin.setStartPos(startPos);
     }
 
     public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
-        PluginCaretaker pc = new PluginCaretaker();
-        Plugin p = pc.load(pluginName);
-        if (p == null) return;
-        controller.setActivePlugin(p);
-        loadEditorActivePluginToLists();
-        restorePluginSettingsStage(pss, p);
+        File programDir = controller.getProgramDir();
+        PluginCaretaker pc = new PluginCaretaker(programDir);
+        Plugin loadedPlugin = pc.load(pluginName, controller);
+        if (loadedPlugin == null) return;
+        Model model = controller.getModel();
+        model.setActivePlugin(loadedPlugin);
+        Plugin activePlugin = model.getActivePlugin();
+        World world = activePlugin.getWorld();
+        List<Location> locations = world.getLocations();
+        controller.restoreItemsCoords(locations);
+        restoreObservableAssets(activePlugin);
+        restoreObservableLocations(activePlugin);
+        restoreFirstLocationAndLayer(model, locations);
+        restorePluginSettingsStage(pss, loadedPlugin);
     }
 
-    private void restorePluginSettingsStage(PluginSettingsStage pss, Plugin p) {
-        pss.setStartingLocation(p.isStartingLocation());
-        Coords startPos = p.getStartPos();
-        controller.restoreCoordsLocation(startPos);
+    private void restoreObservableLocations(Plugin activePlugin) {
+        observableLocations.clear();
+        List<Location> locations = activePlugin.getWorld().getLocations();
+        observableLocations.addAll(locations);
+    }
+
+    private void restorePluginSettingsStage(PluginSettingsStage pss, Plugin activePlugin) {
+        boolean isStartingLocation = activePlugin.isStartingLocation();
+        pss.setStartingLocation(isStartingLocation);
+        Coords startPos = activePlugin.getStartPos();
+        controller.restoreCoordsOfLocation(startPos);
         pss.setStartLocation(startPos.getLocation());
         pss.setStartX(startPos.x);
         pss.setStartY(startPos.y);
         pss.setStartLevel(startPos.level);
     }
 
-    public void loadEditorActivePluginToLists() {
-        if (ActivePlugin.get().getPlugin() == null) {
-            return;
-        }
-        controller.getAssetsList().clear();
-        ObservableAssets.get().clearLists();
-        controller.getLocationsList().clear();
-
-        Plugin p = ActivePlugin.get().getPlugin();
-
-        boolean listAreLoaded = loadLists(p);
-        if (listAreLoaded) {
-            Location first = p.getLocations().get(0);
-            controller.getCurrentLocation().setLocation(first);
-            controller.getCurrentLayer().setLayer(first.getLayers().get().get(0));
-        }
+    private void restoreObservableAssets(Plugin activePlugin) {
+        List<Asset> assets = activePlugin.getWorld().getAssets();
+        observableAssets.fillLists(assets);
     }
 
-    private boolean loadLists(Plugin p) {
-        List<Asset> assets = controller.getAssetsList();
-        assets.addAll(p.getAssets());
-        ObservableAssets.get().fillLists(assets);
-        controller.fillLocationsList(p.getLocations());
-        return true;
+    private void restoreFirstLocationAndLayer(Model model, List<Location> locations) {
+        Location firstLocation = locations.get(0);
+        model.getCurrentLocation().setLocation(firstLocation);
+        Layer firstLayer = firstLocation.getLayers().get(0);
+        model.getCurrentLayer().setLayer(firstLayer);
     }
 
     public void setDragPos(Coords pos) {
@@ -153,10 +167,30 @@ public class EditorController {
     }
 
     public ItemsStage getItemsStageToAddItems() {
-        return itemsStage;
+        return activeItemsStage;
     }
 
     public void setItemsStageToAddItems(ItemsStage itemsStage) {
-        this.itemsStage = itemsStage;
+        this.activeItemsStage = itemsStage;
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public ObservableAssets getObservableAssets() {
+        return observableAssets;
+    }
+
+    public PosItem getActiveItem() {
+        return activeItem;
+    }
+
+    public void setActiveItem(PosItem activeItem) {
+        this.activeItem = activeItem;
+    }
+
+    public ObservableList<Location> getObservableLocations() {
+        return observableLocations;
     }
 }

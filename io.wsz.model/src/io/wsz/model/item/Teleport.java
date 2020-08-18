@@ -29,7 +29,7 @@ public class Teleport extends PosItem<Teleport> {
     }
 
     public void enter(Creature cr) {
-        Teleportation.teleport(cr, getExit());
+        Teleportation.teleport(cr, getExit(), getController());
     }
 
     public Coords getIndividualExit() {

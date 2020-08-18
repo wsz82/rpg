@@ -20,21 +20,26 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class BarView {
     private static final double PORTRAIT_PART = 9.0/10;
+
     private final Canvas canvas;
+    private final GameController gameController;
+    private final Controller controller;
     private final GraphicsContext gc;
     private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
     private int hoveredPortrait;
-    private Controller controller;
 
-    public BarView(Canvas canvas) {
+    public BarView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
+        this.gameController = gameController;
+        controller = gameController.getController();
         this.gc = canvas.getGraphicsContext2D();
         hookupEvents();
     }
@@ -100,16 +105,16 @@ public class BarView {
             return;
         }
         if (!multiple) {
-            Location location = Controller.get().getCurrentLocation().getLocation();
-            Controller.get().getBoard().looseCreaturesControl(location);
+            Location location = controller.getCurrentLocation().getLocation();
+            controller.getBoard().looseCreaturesControl(location);
         }
         resolveCreatureControlAndLocation(portraits.get(i));
     }
 
     private void resolveHeroControlAndLocation(boolean multiple, int hoveredPortrait) {
         if (!multiple){
-            Location location = Controller.get().getCurrentLocation().getLocation();
-            Controller.get().getBoard().looseCreaturesControl(location);
+            Location location = controller.getCurrentLocation().getLocation();
+            controller.getBoard().looseCreaturesControl(location);
         }
         Portrait cl = portraits.get(hoveredPortrait);
         resolveCreatureControlAndLocation(cl);
@@ -124,7 +129,6 @@ public class BarView {
             return;
         }
 
-        controller = Controller.get();
         controller.setCreatureToOpenInventory(cr);
 
         CreatureControl control = cr.getControl();
@@ -157,7 +161,6 @@ public class BarView {
     }
 
     private void updateHoveredPortrait(double leftX, double padding, double portraitSize) {
-        GameController gameController = GameController.get();
         if (hoveredPortrait == -1) {
             if (gameController.getHoveredHero() != null) {
                 gameController.setHoveredHero(null);
@@ -238,19 +241,20 @@ public class BarView {
         clearPortraits(padding, portraitSize, y, portraitX);
 
         creatures.clear();
-        creatures.addAll(Controller.get().getHeroes());
+        creatures.addAll(controller.getHeroes());
         int dif = creatures.size() - portraits.size();
         if (dif > 0) {
             for (int i = 0; i < dif; i++) {
                 portraits.add(i, new Portrait(null, null, 0));
             }
         }
+        File programDir = controller.getProgramDir();
         for (int i = 0; i < creatures.size(); i++) {
             Portrait portrait = portraits.get(i);
             Creature cr = creatures.get(i);
 
             portrait.creature = cr;
-            Image animationPortrait = cr.getAnimation().getPortrait(cr);
+            Image animationPortrait = cr.getAnimation().getPortrait(cr, programDir);
             if (animationPortrait != null) {
                 portrait.image = animationPortrait;
             }

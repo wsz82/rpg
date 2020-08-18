@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
@@ -24,16 +25,20 @@ public class CoordsEdit {
     private final Coords pos;
     private final boolean isContent;
     private final EditorCanvas editorCanvas;
+    private final EditorController editorController;
+    private final Controller controller;
     private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
     private final DoubleField inputX;
     private final DoubleField inputY;
     private final IntegerField inputLayer;
     private final Button goToButton = new Button("Go to");
 
-    public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas) {
+    public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
         this.pos = pos;
         this.isContent = isContent;
         this.editorCanvas = editorCanvas;
+        this.editorController = editorController;
+        controller = editorController.getController();
         inputX = new DoubleField(0.0, isContent);
         inputY = new DoubleField(0.0, isContent);
         inputLayer = new IntegerField(isContent);
@@ -69,7 +74,6 @@ public class CoordsEdit {
     }
 
     private void goToPos() {
-        Controller controller = Controller.get();
         Board board = controller.getBoard();
         int meter = Sizes.getMeter();
         board.centerScreenOn(pos, editorCanvas.getWidth() / meter, editorCanvas.getHeight() / meter);
@@ -94,15 +98,15 @@ public class CoordsEdit {
                 return getLocation(s);
             }
         });
-        ObservableList<Location> locations = FXCollections.observableArrayList(Controller.get().getLocationsList());
-        locationChoice.setItems(locations);
+        ObservableList<Location> locations = FXCollections.observableArrayList(editorController.getObservableLocations());
+        locationChoice.setItems(editorController.getObservableLocations());
         if (isContent) {
             locations.add(null);
         }
     }
 
     private Location getLocation(String s) {
-        Optional<Location> optLocation = Controller.get().getLocationsList().stream()
+        Optional<Location> optLocation = controller.getLocations().stream()
                 .filter(l -> l.getName().equals(s))
                 .findFirst();
         return optLocation.orElse(null);

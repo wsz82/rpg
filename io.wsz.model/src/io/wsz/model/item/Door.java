@@ -5,6 +5,7 @@ import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -58,7 +59,10 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
                 return getInitialImage();
             }
             if (openImage == null) {
-                setOpenImage(ResolutionImage.loadImage(getType().toString().toLowerCase(), getOpenImagePath()));
+                String type = getType().toString().toLowerCase();
+                String openImagePath = getOpenImagePath();
+                File programDir = getController().getProgramDir();
+                setOpenImage(ResolutionImage.loadImage(programDir, type, openImagePath));
             }
             return openImage;
         } else {

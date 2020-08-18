@@ -2,7 +2,6 @@ package io.wsz.model.sizes;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Fog;
-import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 import java.io.File;
@@ -40,9 +39,9 @@ public class Sizes {
         return meter;
     }
 
-    public static void setMeter(int resWidth) {
+    public static void setMeter(int resWidth, Controller controller) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
-        Controller.get().clearResizablePictures();
+        controller.clearResizablePictures();
     }
 
     public static FontSize getFontSize() {
@@ -58,9 +57,9 @@ public class Sizes {
         return resizeWithResolution;
     }
 
-    public static void setResizeWithResolution(boolean resizeWithResolution) {
+    public static void setResizeWithResolution(boolean resizeWithResolution, Controller controller) {
         setReloadImages(true);
-        Coords screenPos = Board.get().getCurPos();
+        Coords screenPos = controller.getCurPos();
         screenPos.x = 0;
         screenPos.y = 0;
         Sizes.resizeWithResolution = resizeWithResolution;

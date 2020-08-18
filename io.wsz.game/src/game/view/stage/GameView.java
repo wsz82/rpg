@@ -3,14 +3,11 @@ package game.view.stage;
 import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
-import io.wsz.model.Controller;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
@@ -25,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -44,17 +42,16 @@ public class GameView extends CanvasView {
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
 
     private final Stage parent;
-    private final GameController gameController = GameController.get();
     private final List<PosItem> items = new ArrayList<>(0);
-    private final Coords curPos = controller.getCurPos();
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords1 = new Coords();
     private final Coords modifiedCoords2 = new Coords();
     private final Coords nextPiecePos = new Coords();
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
-    private final BarView barView = new BarView(canvas);
+    private final BarView barView;
 
+    private final Coords curPos;
     private List<Layer> layers;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
@@ -64,9 +61,11 @@ public class GameView extends CanvasView {
     private boolean inventoryStarted = true;
     private boolean selectionMode;
 
-    public GameView(Stage parent) {
-        super(new Canvas());
+    public GameView(Stage parent, GameController gameController) {
+        super(new Canvas(), gameController);
         this.parent = parent;
+        barView = new BarView(canvas, gameController);
+        curPos = controller.getCurPos();
         hookUpEvents();
         defineRemovableEvents();
         hookUpRemovableEvents();
@@ -83,7 +82,7 @@ public class GameView extends CanvasView {
                 if (dialogStarted) {
                     dialogStarted = false;
                     removeEvents();
-                    dialogView = new DialogView(canvas, OFFSET, dialogMemento);
+                    dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
                 }
                 dialogView.refresh();
                 return;
@@ -101,7 +100,7 @@ public class GameView extends CanvasView {
             if (inventoryStarted) {
                 inventoryStarted = false;
                 removeEvents();
-                inventoryView = new InventoryView(canvas);
+                inventoryView = new InventoryView(canvas, gameController);
             }
             inventoryView.refresh();
             return;
@@ -119,12 +118,12 @@ public class GameView extends CanvasView {
         clear();
         sortItems();
 
-        Location location = Controller.get().getCurrentLocation().getLocation(); //TODO pass location in refresh?
+        Location location = controller.getCurrentLocation().getLocation(); //TODO pass location in refresh?
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
         drawItems(heroes);
 
-        drawFog(heroes);
+//        drawFog(heroes);
 
         if (selectionMode) {
             drawSelection();
@@ -139,7 +138,9 @@ public class GameView extends CanvasView {
         Location loc = controller.getCurrentLocation().getLocation();
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
         int meter = Sizes.getMeter();
-        double fogSize = Sizes.FOG.getImage().getWidth() / meter;
+        File programDir = controller.getProgramDir();
+        Image image = Sizes.FOG.getImage(programDir);
+        double fogSize = image.getWidth() / meter;
         if (discoveredFog == null) {
             int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
             int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
@@ -210,7 +211,8 @@ public class GameView extends CanvasView {
         int meter = Sizes.getMeter();
         pos.x *= meter;
         pos.y *= meter;
-        gc.drawImage(Sizes.FOG.getImage(), pos.x, pos.y);
+        File programDir = controller.getProgramDir();
+        gc.drawImage(Sizes.FOG.getImage(programDir), pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {
@@ -446,15 +448,15 @@ public class GameView extends CanvasView {
             }
         });
 
-        CurrentLocation.get().locationProperty().addListener(observable -> {
+        controller.getModel().getCurrentLocation().locationProperty().addListener(observable -> {
             layers = getSortedLayers();
         });
 
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearResizablePictures();
+            controller.clearResizablePictures();
         });
         canvas.heightProperty().addListener((observable, oldValue, newValue) -> {
-            Controller.get().clearResizablePictures();
+            controller.clearResizablePictures();
         });
     }
 
@@ -549,7 +551,7 @@ public class GameView extends CanvasView {
     }
 
     private void onMapSecondaryButtonClick(Location location, double x, double y) {
-        int level = Controller.get().getCurrentLayer().getLevel();
+        int level = controller.getCurrentLayer().getLevel();
         PosItem pi = board.lookForItem(location, x, y, level, SECONDARY_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
@@ -566,7 +568,7 @@ public class GameView extends CanvasView {
     private void onMapPrimaryButtonClick(Location location, double x, double y, boolean multiple) {
         List<Creature> controlled = board.getControlledCreatures(location);
         PosItem pi;
-        int level = Controller.get().getCurrentLayer().getLevel();
+        int level = controller.getCurrentLayer().getLevel();
         if (controlled.isEmpty()) {
             pi = board.lookForItem(location, x, y, level, CREATURE_TYPE, false);
         } else {
@@ -618,7 +620,7 @@ public class GameView extends CanvasView {
 
     private void openInventory() {
         Location location = controller.getCurrentLocation().getLocation();
-        List<Creature> controlled = Board.get().getControlledCreatures(location);
+        List<Creature> controlled = board.getControlledCreatures(location);
         if (controlled.isEmpty()) {
             return;
         }

@@ -1,5 +1,6 @@
 package editor.view.asset;
 
+import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
@@ -13,8 +14,9 @@ import java.util.List;
 
 public class CoverTableView extends AssetsTableView<Cover> {
 
-    CoverTableView(Stage parent, ObservableList<Cover> assets, EditorCanvas editorCanvas) {
-        super(parent, assets, editorCanvas);
+    CoverTableView(Stage parent, ObservableList<Cover> assets,
+                   EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, assets, editorCanvas, editorController);
     }
 
     @Override
@@ -23,13 +25,13 @@ public class CoverTableView extends AssetsTableView<Cover> {
         if (c == null) {
             return;
         }
-        CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas);
+        CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas, editorController);
         as.show();
     }
 
     @Override
     protected void addAsset() {
-        CoverAssetStage as = new CoverAssetStage(parent, editorCanvas);
+        CoverAssetStage as = new CoverAssetStage(parent, editorCanvas, editorController);
         as.show();
     }
 
@@ -54,7 +56,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
 
     @Override
     protected void removeAssetFromList(List<Cover> assetsToRemove) {
-        ObservableAssets.get().getCovers().removeAll(assetsToRemove);
+        editorController.getObservableAssets().getCovers().removeAll(assetsToRemove);
     }
 
     @Override
