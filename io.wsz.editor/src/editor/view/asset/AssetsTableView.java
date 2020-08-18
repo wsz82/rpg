@@ -36,7 +36,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private Pointer pointer;
     private ContentTableView contentTableView;
 
-    AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController editorController) {
+    public AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.parent = parent;
         this.assets = assets;

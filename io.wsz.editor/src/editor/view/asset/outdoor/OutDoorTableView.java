@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.outdoor;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
-    OutDoorTableView(Stage parent, ObservableList<OutDoor> assets,
+    public OutDoorTableView(Stage parent, ObservableList<OutDoor> assets,
                      EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
         initOutDoorTable();

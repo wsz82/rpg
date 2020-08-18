@@ -1,8 +1,10 @@
-package editor.view.asset;
+package editor.view.asset.creature;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.asset.AssetStage;
+import editor.view.asset.ItemsStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;

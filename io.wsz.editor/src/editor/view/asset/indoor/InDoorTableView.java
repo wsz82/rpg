@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.indoor;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
@@ -17,7 +18,7 @@ import java.util.List;
 
 public class InDoorTableView extends AssetsTableView<InDoor> {
 
-    InDoorTableView(Stage parent, ObservableList<InDoor> assets,
+    public InDoorTableView(Stage parent, ObservableList<InDoor> assets,
                     EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
         initInDoorTable();

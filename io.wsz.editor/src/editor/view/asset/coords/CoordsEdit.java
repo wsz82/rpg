@@ -1,4 +1,4 @@
-package editor.view.asset;
+package editor.view.asset.coords;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;

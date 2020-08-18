@@ -1,6 +1,14 @@
 package editor.view.asset;
 
 import editor.model.EditorController;
+import editor.view.asset.cover.CoverTableView;
+import editor.view.asset.creature.CreatureTableView;
+import editor.view.asset.equipment.container.ContainerTableView;
+import editor.view.asset.equipment.weapon.WeaponsTableView;
+import editor.view.asset.indoor.InDoorTableView;
+import editor.view.asset.landscape.LandscapeTableView;
+import editor.view.asset.outdoor.OutDoorTableView;
+import editor.view.asset.teleport.TeleportTableView;
 import editor.view.content.ContentTableView;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;

@@ -64,9 +64,10 @@ public class Task implements Externalizable {
             setFinished(true);
             return;
         }
-        double x1 = cr.pos.x;
+        Coords pos = cr.getPos();
+        double x1 = pos.x;
         double x2 = dest.x;
-        double y1 = cr.pos.y;
+        double y1 = pos.y;
         double y2 = dest.y;
         int meter = Sizes.getMeter();
         if (x1 <= x2 + 10.0/ meter && x1 >= x2 - 10.0/ meter
@@ -74,22 +75,22 @@ public class Task implements Externalizable {
             dest.x = -1;
             return;
         }
-        double dist = Coords.getDistance(cr.pos, dest);
+        double dist = Coords.getDistance(pos, dest);
         double moveDist = cr.getSpeed();
         double x3 = x1 + (moveDist * (x2 - x1) / dist) / SECOND;
         double y3 = y1 + (moveDist * (y2 - y1) / dist) / SECOND;
 
         nextPos.x = x3;
         nextPos.y = y3;
-        nextPos.level = cr.pos.level;
+        nextPos.level = pos.level;
         PosItem pi = cr.getCollision(cr.getCenter(nextPos));
         if (pi != null) {
             dest.x = -1;
             return;
         }
-        cr.getAnimation().updateMoveAnimation(cr, cr.pos.x, cr.pos.y, dest.x, dest.y);
-        cr.pos.x = nextPos.x;
-        cr.pos.y = nextPos.y;
+        cr.getAnimation().updateMoveAnimation(cr, pos.x, pos.y, dest.x, dest.y);
+        pos.x = nextPos.x;
+        pos.y = nextPos.y;
     }
 
     public void clear() {

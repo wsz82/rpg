@@ -1,8 +1,10 @@
-package editor.view.asset;
+package editor.view.asset.equipment.container;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.asset.ItemsStage;
+import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
@@ -11,7 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-public class ContainerAssetStage extends EquipmentAssetStage<Container>{
+public class ContainerAssetStage extends EquipmentAssetStage<Container> {
     private static final String TITLE = "Container asset";
 
     private final DoubleField inputNettoWeight = new DoubleField(0.0, isContent);

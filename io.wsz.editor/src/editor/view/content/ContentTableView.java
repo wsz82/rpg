@@ -2,7 +2,15 @@ package editor.view.content;
 
 import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
-import editor.view.asset.*;
+import editor.view.asset.AssetStage;
+import editor.view.asset.cover.CoverAssetStage;
+import editor.view.asset.creature.CreatureAssetStage;
+import editor.view.asset.equipment.container.ContainerAssetStage;
+import editor.view.asset.equipment.weapon.WeaponAssetStage;
+import editor.view.asset.indoor.InDoorAssetStage;
+import editor.view.asset.landscape.LandscapeAssetStage;
+import editor.view.asset.outdoor.OutDoorAssetStage;
+import editor.view.asset.teleport.TeleportAssetStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
@@ -202,9 +210,7 @@ public class ContentTableView extends TableView<PosItem> {
                     parent, (InDoor) pi, true, editorCanvas, editorController);
             case OUTDOOR -> new OutDoorAssetStage(
                     parent, (OutDoor) pi, true, editorCanvas, editorController);
-            case FOG -> null;
         };
-        if (itemStage == null) return;
         itemStage.show();
     }
 

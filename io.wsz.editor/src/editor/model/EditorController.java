@@ -9,6 +9,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.WeaponType;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
@@ -26,6 +27,7 @@ public class EditorController {
     private final Controller controller;
     private final ObservableAssets observableAssets = new ObservableAssets();
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
+    private final ObservableList<WeaponType> observableWeaponTypes = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords();
 
     private PosItem activeItem;
@@ -48,6 +50,26 @@ public class EditorController {
         observableAssets.clearLists();
         World newWorld = new World();
 
+        initLocations(newWorld);
+        initAssets(newWorld);
+        initWeaponTypes(newWorld);
+
+        Plugin newPlugin = new Plugin();
+        newPlugin.setWorld(newWorld);
+        controller.getModel().setActivePlugin(newPlugin);
+    }
+
+    private void initWeaponTypes(World newWorld) {
+        List<WeaponType> weaponTypes = new ArrayList<>(0);
+        newWorld.setWeaponTypes(weaponTypes);
+    }
+
+    private void initAssets(World newWorld) {
+        List<Asset> assets = new ArrayList<>(0);
+        newWorld.setAssets(assets);
+    }
+
+    private void initLocations(World newWorld) {
         List<Location> locations = new ArrayList<>(0);
         Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
@@ -55,26 +77,24 @@ public class EditorController {
         locations.add(location);
         controller.getModel().getCurrentLocation().setLocation(location);
         controller.getModel().getCurrentLayer().setLayer(layer);
-
         newWorld.setLocations(locations);
-
-        List<Asset> assets = new ArrayList<>(0);
-        newWorld.setAssets(assets);
-
-        Plugin newPlugin = new Plugin();
-        newPlugin.setWorld(newWorld);
-        controller.getModel().setActivePlugin(newPlugin);
     }
 
     public void saveActivePlugin(PluginSettingsStage pss) {
         Model model = controller.getModel();
         Plugin activePlugin = model.getActivePlugin();
-        mergeAssets(activePlugin);
+        loadObservableAssetsoPlugin(activePlugin);
         loadObservableLocationsToPlugin(activePlugin);
+        loadObservableWeaponTypesToPlugin(activePlugin);
         File programDir = controller.getProgramDir();
         PluginCaretaker pc = new PluginCaretaker(programDir);
         setPluginParams(activePlugin, pss);
         pc.save(activePlugin);
+    }
+
+    private void loadObservableWeaponTypesToPlugin(Plugin activePlugin) {
+        List<WeaponType> weaponTypes = new ArrayList<>(observableWeaponTypes);
+        activePlugin.getWorld().setWeaponTypes(weaponTypes);
     }
 
     private void loadObservableLocationsToPlugin(Plugin activePlugin) {
@@ -82,14 +102,14 @@ public class EditorController {
         activePlugin.getWorld().setLocations(locations);
     }
 
-    private void mergeAssets(Plugin activePlugin) {
+    private void loadObservableAssetsoPlugin(Plugin activePlugin) {
         List<Asset> mergedAssets = observableAssets.getMergedAssets();
         activePlugin.getWorld().setAssets(mergedAssets);
     }
 
     public void savePluginAs(String pluginName, PluginSettingsStage pss) {
         Plugin activePlugin = controller.getModel().getActivePlugin();
-        mergeAssets(activePlugin);
+        loadObservableAssetsoPlugin(activePlugin);
         loadObservableLocationsToPlugin(activePlugin);
         File programDir = controller.getProgramDir();
         PluginCaretaker pc = new PluginCaretaker(programDir);
@@ -122,8 +142,15 @@ public class EditorController {
         controller.restoreItemsCoords(locations);
         restoreObservableAssets(activePlugin);
         restoreObservableLocations(activePlugin);
+        restoreObservableWeaponTypes(activePlugin);
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, loadedPlugin);
+    }
+
+    private void restoreObservableWeaponTypes(Plugin activePlugin) {
+        observableWeaponTypes.clear();
+        List<WeaponType> weaponTypes = activePlugin.getWorld().getWeaponTypes();
+        observableWeaponTypes.addAll(weaponTypes);
     }
 
     private void restoreObservableLocations(Plugin activePlugin) {
@@ -178,10 +205,6 @@ public class EditorController {
         return controller;
     }
 
-    public ObservableAssets getObservableAssets() {
-        return observableAssets;
-    }
-
     public PosItem getActiveItem() {
         return activeItem;
     }
@@ -190,7 +213,15 @@ public class EditorController {
         this.activeItem = activeItem;
     }
 
+    public ObservableAssets getObservableAssets() {
+        return observableAssets;
+    }
+
     public ObservableList<Location> getObservableLocations() {
         return observableLocations;
+    }
+
+    public ObservableList<WeaponType> getObservableWeaponTypes() {
+        return observableWeaponTypes;
     }
 }

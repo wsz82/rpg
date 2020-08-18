@@ -14,6 +14,8 @@ public class Weapon extends Equipment<Weapon> {
     protected Double range;
     protected Double speed;
 
+    private WeaponType weaponType;
+
     public Weapon() {}
 
     public Weapon(ItemType type) {
@@ -96,6 +98,25 @@ public class Weapon extends Equipment<Weapon> {
         this.speed = speed;
     }
 
+    public WeaponType getIndividualWeaponType() {
+        return weaponType;
+    }
+
+    public WeaponType getWeaponType() {
+        if (weaponType == null) {
+            if (prototype == null) {
+                return WeaponType.DEFAULT;
+            }
+            return prototype.weaponType;
+        } else {
+            return weaponType;
+        }
+    }
+
+    public void setWeaponType(WeaponType weaponType) {
+        this.weaponType = weaponType;
+    }
+
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
@@ -121,6 +142,8 @@ public class Weapon extends Equipment<Weapon> {
         out.writeObject(range);
 
         out.writeObject(speed);
+
+        out.writeObject(weaponType);
     }
 
     @Override
@@ -133,5 +156,7 @@ public class Weapon extends Equipment<Weapon> {
         range = (Double) in.readObject();
 
         speed = (Double) in.readObject();
+
+        weaponType = (WeaponType) in.readObject();
     }
 }

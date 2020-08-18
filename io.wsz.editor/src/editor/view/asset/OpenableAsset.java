@@ -1,5 +1,7 @@
 package editor.view.asset;
 
+import editor.view.asset.coords.CoordsLineEditStage;
+import editor.view.asset.coords.CoordsPolygonsEditStage;
 import io.wsz.model.item.Openable;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;

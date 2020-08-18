@@ -1,6 +1,9 @@
 package editor.view.asset;
 
 import editor.model.EditorController;
+import editor.view.asset.coords.CoordsLineEditStage;
+import editor.view.asset.coords.CoordsPointEditStage;
+import editor.view.asset.coords.CoordsPolygonsEditStage;
 import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;

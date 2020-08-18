@@ -1,8 +1,9 @@
-package editor.view.asset;
+package editor.view.asset.equipment;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
+import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Equipment;
 import javafx.scene.control.Label;

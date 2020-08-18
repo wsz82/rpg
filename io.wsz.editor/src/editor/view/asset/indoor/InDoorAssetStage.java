@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.indoor;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;

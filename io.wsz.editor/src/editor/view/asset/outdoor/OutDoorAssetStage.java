@@ -1,6 +1,8 @@
-package editor.view.asset;
+package editor.view.asset.outdoor;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetStage;
+import editor.view.asset.coords.CoordsEdit;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;

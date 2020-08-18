@@ -1,20 +1,21 @@
-package editor.view.asset;
+package editor.view.asset.cover;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
+import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.item.Landscape;
 import javafx.stage.Stage;
 
-public class LandscapeAssetStage extends AssetStage<Landscape> {
+public class CoverAssetStage extends AssetStage<Cover> {
 
-    public LandscapeAssetStage(Stage parent, Landscape asset, boolean isContent,
-                               EditorCanvas editorCanvas, EditorController editorController) {
+    public CoverAssetStage(Stage parent, Cover asset, boolean isContent,
+                           EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public LandscapeAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+    public CoverAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, editorCanvas, editorController);
         initWindow();
     }
@@ -22,6 +23,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     @Override
     protected void initWindow() {
         super.initWindow();
+
         fillInputs();
     }
 
@@ -38,17 +40,17 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     }
 
     @Override
-    protected void addAssetToList(Landscape asset) {
-        editorController.getObservableAssets().getLandscapes().add(asset);
+    protected void addAssetToList(Cover asset) {
+        editorController.getObservableAssets().getCovers().add(asset);
     }
 
     @Override
-    protected Landscape createNewAsset() {
-        return new Landscape(getType());
+    protected Cover createNewAsset() {
+        return new Cover(getType());
     }
 
     @Override
     protected ItemType getType() {
-        return ItemType.LANDSCAPE;
+        return ItemType.COVER;
     }
 }

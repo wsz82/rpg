@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.teleport;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class TeleportTableView extends AssetsTableView<Teleport> {
 
-    TeleportTableView(Stage parent, ObservableList<Teleport> assets,
+    public TeleportTableView(Stage parent, ObservableList<Teleport> assets,
                       EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
         initTeleportTable();

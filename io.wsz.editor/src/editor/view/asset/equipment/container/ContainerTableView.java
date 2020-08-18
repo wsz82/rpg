@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.equipment.container;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;

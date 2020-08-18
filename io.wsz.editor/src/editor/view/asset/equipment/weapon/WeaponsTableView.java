@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.equipment.weapon;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class WeaponsTableView extends AssetsTableView<Weapon> {
 
-    WeaponsTableView(Stage parent, ObservableList<Weapon> assets,
+    public WeaponsTableView(Stage parent, ObservableList<Weapon> assets,
                      EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
         initWeaponsTable();

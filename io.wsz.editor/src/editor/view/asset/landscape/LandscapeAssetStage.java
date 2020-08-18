@@ -1,20 +1,21 @@
-package editor.view.asset;
+package editor.view.asset.landscape;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.Landscape;
 import javafx.stage.Stage;
 
-public class CoverAssetStage extends AssetStage<Cover> {
+public class LandscapeAssetStage extends AssetStage<Landscape> {
 
-    public CoverAssetStage(Stage parent, Cover asset, boolean isContent,
-                           EditorCanvas editorCanvas, EditorController editorController) {
+    public LandscapeAssetStage(Stage parent, Landscape asset, boolean isContent,
+                               EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, asset, isContent, editorCanvas, editorController);
         initWindow();
     }
 
-    public CoverAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+    public LandscapeAssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, editorCanvas, editorController);
         initWindow();
     }
@@ -22,7 +23,6 @@ public class CoverAssetStage extends AssetStage<Cover> {
     @Override
     protected void initWindow() {
         super.initWindow();
-
         fillInputs();
     }
 
@@ -39,17 +39,17 @@ public class CoverAssetStage extends AssetStage<Cover> {
     }
 
     @Override
-    protected void addAssetToList(Cover asset) {
-        editorController.getObservableAssets().getCovers().add(asset);
+    protected void addAssetToList(Landscape asset) {
+        editorController.getObservableAssets().getLandscapes().add(asset);
     }
 
     @Override
-    protected Cover createNewAsset() {
-        return new Cover(getType());
+    protected Landscape createNewAsset() {
+        return new Landscape(getType());
     }
 
     @Override
     protected ItemType getType() {
-        return ItemType.COVER;
+        return ItemType.LANDSCAPE;
     }
 }

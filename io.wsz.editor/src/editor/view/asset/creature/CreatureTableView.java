@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.creature;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Inventory;
@@ -17,9 +18,9 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-class CreatureTableView extends AssetsTableView<Creature> {
+public class CreatureTableView extends AssetsTableView<Creature> {
 
-    CreatureTableView(Stage parent, ObservableList<Creature> assets,
+    public CreatureTableView(Stage parent, ObservableList<Creature> assets,
                       EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
         initCreatureTable();

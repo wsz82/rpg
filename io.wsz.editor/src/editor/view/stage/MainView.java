@@ -3,6 +3,7 @@ package editor.view.stage;
 import editor.model.EditorController;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.AssetsStage;
+import editor.view.asset.equipment.weapon.type.WeaponTypeStage;
 import editor.view.content.ContentStage;
 import editor.view.content.ContentTableView;
 import editor.view.layer.LayersStage;
@@ -163,6 +164,52 @@ class MainView {
     }
 
     private MenuBar getMenuBar() {
+        final Menu file = getMenuFile();
+        final Menu view = getMenuView();
+        final Menu location = getMenuLocation();
+        final Menu world = getMenuWorld();
+        return new MenuBar(file, view, location, world);
+    }
+
+    private Menu getMenuWorld() {
+        final Menu world = new Menu("World");
+        final MenuItem weaponTypes = new MenuItem("Weapon types");
+
+        weaponTypes.setOnAction(event -> {
+            WeaponTypeStage weaponTypeStage = new WeaponTypeStage(stage, editorController);
+            weaponTypeStage.show();
+        });
+        world.getItems().addAll(weaponTypes);
+        return world;
+    }
+
+    private Menu getMenuLocation() {
+        final Menu location = new Menu("Location");
+        final MenuItem parameters = new MenuItem("Parameters");
+        parameters.setOnAction(event -> {
+            LocationParametersStage locationParametersStage = new LocationParametersStage(stage, controller);
+            locationParametersStage.show();
+        });
+        location.getItems().addAll(parameters);
+        return location;
+    }
+
+    private Menu getMenuView() {
+        final Menu view = new Menu("View");
+        final CheckMenuItem contents = new CheckMenuItem("Contents");
+        final CheckMenuItem layers = new CheckMenuItem("Layers");
+        final CheckMenuItem assets = new CheckMenuItem("Assets");
+        final CheckMenuItem locations = new CheckMenuItem("Locations");
+
+        setViewItemOnAction(contentsWindow, contents);
+        setViewItemOnAction(layersWindow, layers);
+        setViewItemOnAction(assetsWindow, assets);
+        setViewItemOnAction(locationsWindow, locations);
+        view.getItems().addAll(contents, layers, assets, locations);
+        return view;
+    }
+
+    private Menu getMenuFile() {
         final Menu file = new Menu("File");
         final MenuItem newPlugin = new MenuItem("New");
         final MenuItem save = new MenuItem("Save");
@@ -181,28 +228,7 @@ class MainView {
             stage.close();
         });
         file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
-
-        final Menu view = new Menu("View");
-        final CheckMenuItem contents = new CheckMenuItem("Contents");
-        final CheckMenuItem layers = new CheckMenuItem("Layers");
-        final CheckMenuItem assets = new CheckMenuItem("Assets");
-        final CheckMenuItem locations = new CheckMenuItem("Locations");
-
-        setViewItemOnAction(contentsWindow, contents);
-        setViewItemOnAction(layersWindow, layers);
-        setViewItemOnAction(assetsWindow, assets);
-        setViewItemOnAction(locationsWindow, locations);
-        view.getItems().addAll(contents, layers, assets, locations);
-
-        final Menu location = new Menu("Location");
-        final MenuItem parameters = new MenuItem("Parameters");
-        parameters.setOnAction(event -> {
-            LocationParametersStage locationParametersStage = new LocationParametersStage(stage, controller);
-            locationParametersStage.show();
-        });
-        location.getItems().addAll(parameters);
-
-        return new MenuBar(file, view, location);
+        return file;
     }
 
     private void openPluginSettings() {

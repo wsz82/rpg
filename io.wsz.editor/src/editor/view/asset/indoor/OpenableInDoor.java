@@ -1,12 +1,14 @@
-package editor.view.asset;
+package editor.view.asset.indoor;
 
+import editor.view.asset.AssetStage;
+import editor.view.asset.OpenableAsset;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 
 import java.util.List;
 
-public class OpenableInDoor extends OpenableAsset<InDoor>{
+public class OpenableInDoor extends OpenableAsset<InDoor> {
 
     public OpenableInDoor(AssetStage<InDoor> assetStage, InDoor item, boolean isContent) {
         super(assetStage, item, isContent);

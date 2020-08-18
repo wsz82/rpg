@@ -1,4 +1,4 @@
-package editor.view.asset;
+package editor.view.asset.coords;
 
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;

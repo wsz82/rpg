@@ -1,4 +1,4 @@
-package editor.view.asset;
+package editor.view.asset.coords;
 
 import editor.view.DoubleField;
 import editor.view.stage.ChildStage;

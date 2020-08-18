@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.cover;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class CoverTableView extends AssetsTableView<Cover> {
 
-    CoverTableView(Stage parent, ObservableList<Cover> assets,
+    public CoverTableView(Stage parent, ObservableList<Cover> assets,
                    EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
     }

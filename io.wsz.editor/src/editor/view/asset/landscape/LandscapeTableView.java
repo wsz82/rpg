@@ -1,6 +1,7 @@
-package editor.view.asset;
+package editor.view.asset.landscape;
 
 import editor.model.EditorController;
+import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
@@ -12,9 +13,9 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-class LandscapeTableView extends AssetsTableView<Landscape> {
+public class LandscapeTableView extends AssetsTableView<Landscape> {
 
-    LandscapeTableView(Stage parent, ObservableList<Landscape> assets,
+    public LandscapeTableView(Stage parent, ObservableList<Landscape> assets,
                        EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
     }

@@ -1,14 +1,16 @@
-package editor.view.asset;
+package editor.view.asset.equipment.container;
 
-import io.wsz.model.item.OutDoor;
+import editor.view.asset.AssetStage;
+import editor.view.asset.OpenableAsset;
+import io.wsz.model.item.Container;
 import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 
 import java.util.List;
 
-public class OpenableOutDoor extends OpenableAsset<OutDoor>{
+public class OpenableContainer extends OpenableAsset<Container> {
 
-    public OpenableOutDoor(AssetStage<OutDoor> assetStage, OutDoor item, boolean isContent) {
+    public OpenableContainer(AssetStage<Container> assetStage, Container item, boolean isContent) {
         super(assetStage, item, isContent);
     }
 
@@ -19,12 +21,12 @@ public class OpenableOutDoor extends OpenableAsset<OutDoor>{
 
     @Override
     protected List<Coords> getOpenCoverLine() {
-        return item.getOpenDoorCoverLine();
+        return item.getOpenContainerCoverLine();
     }
 
     @Override
     protected List<List<Coords>> getOpenCollisionPolygons() {
-        return item.getOpenDoorCollisionPolygons();
+        return item.getOpenContainerCollisionPolygons();
     }
 
     @Override

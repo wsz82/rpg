@@ -1,17 +1,27 @@
-package editor.view.asset;
+package editor.view.asset.equipment.weapon;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
+import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
+import io.wsz.model.item.WeaponType;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+
+import java.util.Optional;
 
 public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private static final String TITLE = "Weapon asset";
+
+    private final ChoiceBox<WeaponType> typeCB = new ChoiceBox<>();
     private final DoubleField inputDamage = new DoubleField(0.0, isContent);
     private final DoubleField inputRange = new DoubleField(0.0, isContent);
     private final DoubleField inputSpeed = new DoubleField(0.0, isContent);
@@ -32,24 +42,53 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
         super.initWindow();
         setTitle(TITLE);
 
-        final HBox damage = new HBox(10);
-        damage.setAlignment(Pos.CENTER_LEFT);
+        final HBox typeBox = new HBox(10);
+        typeBox.setAlignment(Pos.CENTER_LEFT);
+        final Label typeLabel = new Label("Weapon type");
+        typeBox.getChildren().addAll(typeLabel, typeCB);
+
+        final HBox damageBox = new HBox(10);
+        damageBox.setAlignment(Pos.CENTER_LEFT);
         final Label damageLabel = new Label("Damage");
-        damage.getChildren().addAll(damageLabel, inputDamage);
+        damageBox.getChildren().addAll(damageLabel, inputDamage);
 
-        final HBox range = new HBox(10);
-        range.setAlignment(Pos.CENTER_LEFT);
+        final HBox rangeBox = new HBox(10);
+        rangeBox.setAlignment(Pos.CENTER_LEFT);
         final Label rangeLabel = new Label("Range");
-        range.getChildren().addAll(rangeLabel, inputRange);
+        rangeBox.getChildren().addAll(rangeLabel, inputRange);
 
-        final HBox speed = new HBox(10);
-        speed.setAlignment(Pos.CENTER_LEFT);
+        final HBox speedBox = new HBox(10);
+        speedBox.setAlignment(Pos.CENTER_LEFT);
         final Label speedLabel = new Label("Speed");
-        speed.getChildren().addAll(speedLabel, inputSpeed);
+        speedBox.getChildren().addAll(speedLabel, inputSpeed);
 
-        container.getChildren().addAll(damage, range, speed);
+        container.getChildren().addAll(damageBox, rangeBox, speedBox, typeBox);
 
         fillInputs();
+
+        hookUpWeaponsEvents();
+    }
+
+    private void hookUpWeaponsEvents() {
+        ObservableList<WeaponType> weaponTypes = editorController.getObservableWeaponTypes();
+        ObservableList<WeaponType> weaponTypesWithNull = FXCollections.observableArrayList(weaponTypes);
+        weaponTypesWithNull.add(null);
+        typeCB.setItems(weaponTypesWithNull);
+        typeCB.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(WeaponType weaponType) {
+                if (weaponType == null) return null;
+                return weaponType.getName();
+            }
+
+            @Override
+            public WeaponType fromString(String name) {
+                Optional<WeaponType> optType = editorController.getObservableWeaponTypes().stream()
+                        .filter(t -> t.getName().equals(name))
+                        .findFirst();
+                return optType.orElse(null);
+            }
+        });
     }
 
     @Override
@@ -59,6 +98,9 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
         }
 
         super.fillInputs();
+
+        WeaponType weaponType = item.getIndividualWeaponType();
+        typeCB.setValue(weaponType);
 
         Double damage = item.getIndividualDamage();
         if (damage == null) {
@@ -85,6 +127,9 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     @Override
     protected void defineAsset() {
         super.defineAsset();
+
+        WeaponType weaponType = typeCB.getValue();
+        item.setWeaponType(weaponType);
 
         String damage = inputDamage.getText();
         if (damage.isEmpty()) {
