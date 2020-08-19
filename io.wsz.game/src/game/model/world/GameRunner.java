@@ -1,6 +1,7 @@
 package game.model.world;
 
 import game.model.GameController;
+import game.model.logger.Logger;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
@@ -25,6 +26,7 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 public class GameRunner {
     private static final ArrayDeque<Runnable> laterRunBuffer = new ArrayDeque<>(0);
 
+    private final Logger logger = new Logger();
     private final GameController gameController;
     private final Controller controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
@@ -74,14 +76,9 @@ public class GameRunner {
 
     private void runGameThread() {
         gameThread = new Thread(() -> {
-            long startGameLoop = System.currentTimeMillis();
             while (true) {
-                long startGameLoopNext = System.currentTimeMillis();
-                long loopDif = startGameLoopNext - startGameLoop;
-                if (loopDif > 20) {
-                    System.out.println("Loop dif: " + loopDif);
-                }
-                startGameLoop = startGameLoopNext;
+                long modelStart = System.currentTimeMillis();
+                logger.logTimeBetweenModelStarts(modelStart);
 
                 if (!gameController.isGame()) {
                     continue;
@@ -92,32 +89,19 @@ public class GameRunner {
 
                 Platform.runLater(() -> {
                     synchronized (this) {
-                        long startNext = System.currentTimeMillis();
-                        long viewLoopDif = startNext - viewStart[0];
-                        if (viewLoopDif > 30) {
-                            System.out.println("View loop dif: " + viewLoopDif);
-                        }
-                        viewStart[0] = startNext;
-
+                        logger.logTimeBetweenViewStarts();
                         updateView();
-
-                        long end = System.currentTimeMillis();
-                        long dif = end - viewStart[0];
-                        if (dif > 20) {
-                            System.out.println("View: " + dif);
-                        }
+                        logger.logTimeOfViewLoopDuration();
                     }
                 });
 
-                long endGameLoop = System.currentTimeMillis();
-                long dif = endGameLoop - startGameLoop;
-                if (dif > 20) {
-                    System.out.println("Game loop: " + dif);
-                }
+                long modelEnd = System.currentTimeMillis();
+                long modelDif = modelEnd - modelStart;
+                logger.logTimeOfModelLoopDuration(modelDif);
 
-                if (dif < TURN_DURATION_MILLIS) {
+                if (modelDif < TURN_DURATION_MILLIS) {
                     try {
-                        Thread.sleep(TURN_DURATION_MILLIS - dif);
+                        Thread.sleep(TURN_DURATION_MILLIS - modelDif);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
