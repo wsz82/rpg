@@ -2,6 +2,7 @@ package io.wsz.model.asset;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -42,7 +43,7 @@ public abstract class Asset implements Externalizable {
     }
 
     public static String getRelativeTypePath(ItemType type) {
-        return Sizes.ASSETS_DIR + File.separator + type.toString().toLowerCase();
+        return Paths.ASSETS_DIR + File.separator + type.toString().toLowerCase();
     }
 
     public static String convertToRelativePath(String path) {

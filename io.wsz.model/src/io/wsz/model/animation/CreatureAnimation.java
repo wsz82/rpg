@@ -10,25 +10,9 @@ import java.io.FileFilter;
 import java.util.*;
 
 import static io.wsz.model.animation.MoveSide.*;
+import static io.wsz.model.sizes.Paths.*;
 
 public class CreatureAnimation {
-    private static final String WALK_N = "walk_N";
-    private static final String WALK_NE = "walk_NE";
-    private static final String WALK_E = "walk_E";
-    private static final String WALK_SE = "walk_SE";
-    private static final String WALK_S = "walk_S";
-    private static final String WALK_SW = "walk_SW";
-    private static final String WALK_W = "walk_W";
-    private static final String WALK_NW = "walk_NW";
-    private static final String[] walks = new String[] {WALK_N, WALK_NE, WALK_E, WALK_SE,
-            WALK_S, WALK_SW, WALK_W, WALK_NW};
-    private static final String IDLE = "idle";
-    private static final String IDLE_PATH = File.separator + IDLE;
-    private static final String PORTRAIT = "portrait";
-    private static final String PORTRAIT_PATH = File.separator + PORTRAIT;
-    private static final String INVENTORY = "inventory";
-    private static final String INVENTORY_PATH = File.separator + INVENTORY;
-    private static final String INVENTORY_EMPTY = "empty";
     private static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     private static final int MIN_PORTRAIT_UPDATE_TIME_SEC = 1;
     private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;

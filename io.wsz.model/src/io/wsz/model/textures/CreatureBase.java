@@ -2,7 +2,7 @@ package io.wsz.model.textures;
 
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;
-import io.wsz.model.sizes.Sizes;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
@@ -69,7 +69,7 @@ public class CreatureBase {
 
     public Image getImage(File programDir) {
         if (img == null) {
-            String path = programDir + Sizes.TEXTURES_DIR + File.separator + BASE + File.separator + fileName;
+            String path = programDir + Paths.TEXTURES_DIR + File.separator + BASE + File.separator + fileName;
             setImg(ResolutionImage.loadImage(path));
         }
         return img;

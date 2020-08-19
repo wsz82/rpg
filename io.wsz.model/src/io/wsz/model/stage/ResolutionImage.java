@@ -1,5 +1,6 @@
 package io.wsz.model.stage;
 
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -68,7 +69,7 @@ public class ResolutionImage {
     }
 
     private static String getRelativeTypePath(String type) {
-        return Sizes.ASSETS_DIR + File.separator + type;
+        return Paths.ASSETS_DIR + File.separator + type;
     }
 
     public static Image getResizedImage(String url, Dimension d, Dimension rd) {

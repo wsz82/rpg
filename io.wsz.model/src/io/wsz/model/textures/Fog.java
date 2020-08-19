@@ -1,6 +1,6 @@
 package io.wsz.model.textures;
 
-import io.wsz.model.sizes.Sizes;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
@@ -17,7 +17,7 @@ public class Fog {
 
     public final Image getImage(File programDir) {
         if (image == null) {
-            String path = programDir + Sizes.TEXTURES_DIR + FOG_DIR + FOG_BASE_NAME_DIR;
+            String path = programDir + Paths.TEXTURES_DIR + FOG_DIR + FOG_BASE_NAME_DIR;
             setImage(ResolutionImage.loadImage(path));
         }
         return image;

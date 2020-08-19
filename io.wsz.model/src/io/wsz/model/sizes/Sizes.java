@@ -3,8 +3,6 @@ package io.wsz.model.sizes;
 import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 
-import java.io.File;
-
 public class Sizes {
     public static final long VERSION = 1L;
     public static final int MIN_RESOLUTION_WIDTH = 100;
@@ -15,8 +13,6 @@ public class Sizes {
     public static final int TURN_DURATION_MILLIS = 1000/FPS;
     public static final double SECOND = 1000.0/TURN_DURATION_MILLIS;
     public static final double COVER_OPACITY = 0.4;
-    public static final String ASSETS_DIR = File.separator + "assets";
-    public static final String TEXTURES_DIR = File.separator + "textures";
 
     private static int meter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
