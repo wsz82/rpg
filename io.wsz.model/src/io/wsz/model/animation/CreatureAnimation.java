@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
 
-import static io.wsz.model.animation.MoveSide.*;
+import static io.wsz.model.animation.MoveDirection.*;
 import static io.wsz.model.sizes.Paths.*;
 
 public class CreatureAnimation {
@@ -52,9 +52,9 @@ public class CreatureAnimation {
         for (File framesDir : animationsDirs) {
             String fileName = framesDir.getName();
 
-            CreatureMoveAnimationFrames moveFrames = getMoveAnimationFrames(fileName);
-            if (moveFrames != null) {
-                initFrames(framesDir, moveFrames);
+            CreatureMoveAnimationFrames walkFrames = getMoveAnimationFrames(fileName);
+            if (walkFrames != null) {
+                initWalkFrames(framesDir, walkFrames);
             } else {
                 switch (fileName) {
                     case IDLE -> initIdleFrames(framesDir, idles);
@@ -89,15 +89,15 @@ public class CreatureAnimation {
         return emptyInventoryImage;
     }
 
-    private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveSide moveSide) {
-        if (moveSide == null) return null;
-        int ordinal = moveSide.ordinal();
+    private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveDirection moveDirection) {
+        if (moveDirection == null) return null;
+        int ordinal = moveDirection.ordinal();
         String walk = walks[ordinal];
         return getMoveAnimationFrames(walk);
     }
 
-    private CreatureMoveAnimationFrames getMoveAnimationFrames(String moveSideString) {
-        return switch (moveSideString) {
+    private CreatureMoveAnimationFrames getMoveAnimationFrames(String moveDirection) {
+        return switch (moveDirection) {
             case WALK_N -> moveUp;
             case WALK_NE -> moveUpRight;
             case WALK_E -> moveRight;
@@ -151,18 +151,28 @@ public class CreatureAnimation {
         }
     }
 
-    private void initFrames(File framesDir, CreatureMoveAnimationFrames frames) {
-        List<Image> moveFrames = frames.getMoveFrames();
-        moveFrames.clear();
-        File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
+    private void initWalkFrames(File framesDir, CreatureMoveAnimationFrames frames) {
+        initWalkEmptyFrames(framesDir, frames);
+    }
+
+    private void initWalkEmptyFrames(File framesDir, CreatureMoveAnimationFrames frames) {
+        String walkEmptyPath = framesDir + INVENTORY_EMPTY_DIR;
+        File walkEmptyDir = new File(walkEmptyPath);
+        List<Image> walkEmptyFrames = frames.getWalkEmptyFrames();
+        initWalkFrames(frames, walkEmptyDir, walkEmptyFrames);
+    }
+
+    private void initWalkFrames(CreatureMoveAnimationFrames frames, File walkDir, List<Image> walkFrames) {
+        walkFrames.clear();
+        File[] imagesFiles = walkDir.listFiles(PNG_FILE_FILTER);
         if (imagesFiles == null || imagesFiles.length == 0) return;
         for (File imageFile : imagesFiles) {
             Image loadedFrame = ResolutionImage.loadImage(imageFile);
             boolean isStopFrame = imageFile.getName().equals("stop.png");
             if (isStopFrame) {
-                frames.setStop(loadedFrame);
+                frames.setEmptyStop(loadedFrame);
             } else {
-                moveFrames.add(loadedFrame);
+                walkFrames.add(loadedFrame);
             }
         }
     }
@@ -250,10 +260,10 @@ public class CreatureAnimation {
         long timeToPlayIdleAfterStop = curTime + randomTimeToStartIdleMillis;
         animationPos.setTimeToStartPlayIdleAfterStop(timeToPlayIdleAfterStop);
 
-        MoveSide moveSide = animationPos.getMoveSide();
-        if (moveSide == null) return;
-        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveSide);
-        Image stop = animationFrames.getStop();
+        MoveDirection moveDirection = animationPos.getMoveSide();
+        if (moveDirection == null) return;
+        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
+        Image stop = animationFrames.getEmptyStop();
         if (stop == null) return;
         cr.setImage(stop);
     }
@@ -267,51 +277,51 @@ public class CreatureAnimation {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
         if (curTime < animationPos.getNextMoveUpdate()) return;
-        MoveSide nextMoveSide = getMoveSide(xFrom, yFrom, xTo, yTo);
-        if (nextMoveSide == null) return;
-        animationPos.setMoveSide(nextMoveSide);
+        MoveDirection nextMoveDirection = getMoveSide(xFrom, yFrom, xTo, yTo);
+        if (nextMoveDirection == null) return;
+        animationPos.setMoveSide(nextMoveDirection);
         Image nextFrame = getNextMoveFrame(cr.getSpeed(), animationPos);
         if (nextFrame == null) return;
         cr.setImage(nextFrame);
     }
 
-    public MoveSide getMoveSide(double xFrom, double yFrom, double xTo, double yTo) {
+    public MoveDirection getMoveSide(double xFrom, double yFrom, double xTo, double yTo) {
         xTo -= xFrom;
         yTo -= yFrom;
         yTo = -yTo;
         double moveRadian = Math.atan2(yTo, xTo);
-        MoveSide nextMoveSide;
+        MoveDirection nextMoveDirection;
         double one8 = Math.PI / 4;
         double one16 = Math.PI / 8;
         double nextRadian = one16;
 
         if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveSide = UP_RIGHT;
+            nextMoveDirection = UP_RIGHT;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveSide = UP;
+            nextMoveDirection = UP;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveSide = UP_LEFT;
+            nextMoveDirection = UP_LEFT;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian + one8)) {
-            nextMoveSide = LEFT;
+            nextMoveDirection = LEFT;
         } else if (moveRadian <= (nextRadian = -one16) && moveRadian > (nextRadian -= one8)) {
-            nextMoveSide = DOWN_RIGHT;
+            nextMoveDirection = DOWN_RIGHT;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian -= one8)) {
-            nextMoveSide = DOWN;
+            nextMoveDirection = DOWN;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian -= one8)) {
-            nextMoveSide = DOWN_LEFT;
+            nextMoveDirection = DOWN_LEFT;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian - one8)) {
-            nextMoveSide = LEFT;
+            nextMoveDirection = LEFT;
         } else {
-            nextMoveSide = RIGHT;
+            nextMoveDirection = RIGHT;
         }
-        return nextMoveSide;
+        return nextMoveDirection;
     }
 
     private Image getNextMoveFrame(double speed, CreatureAnimationPos animationPos) {
         int frameNumber = animationPos.getMoveFrame();
-        MoveSide moveSide = animationPos.getMoveSide();
-        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveSide);
-        List<Image> frames = animationFrames.getMoveFrames();
+        MoveDirection moveDirection = animationPos.getMoveSide();
+        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
+        List<Image> frames = animationFrames.getWalkEmptyFrames();
 
         if (frames == null) return null;
         int framesSize = frames.size();
@@ -335,7 +345,7 @@ public class CreatureAnimation {
 
     public Image getMainIdle(File programDir) {
         if (idles.getMain() == null) {
-            String path = programDir + animationDir + IDLE_PATH;
+            String path = programDir + animationDir + IDLE_DIR;
             File idleDir = new File(path);
             File[] imagesFiles = idleDir.listFiles(PNG_FILE_FILTER);
             if (imagesFiles == null || imagesFiles.length == 0) return null;
@@ -348,7 +358,7 @@ public class CreatureAnimation {
 
     public List<Image> getPortraits(File programDir) {
         if (portraits.isEmpty()) {
-            String path = programDir + animationDir + PORTRAIT_PATH;
+            String path = programDir + animationDir + PORTRAIT_DIR;
             File file = new File(path);
             if (file.exists()) {
                 initPortraitFrames(file, portraits);

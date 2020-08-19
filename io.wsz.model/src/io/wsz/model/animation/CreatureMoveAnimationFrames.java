@@ -6,20 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreatureMoveAnimationFrames {
-    private final List<Image> moveFrames = new ArrayList<>(0);
-    private Image stop;
+    private final List<Image> walkEmptyFrames = new ArrayList<>(0);
+    private Image emptyStop;
 
     public CreatureMoveAnimationFrames() {}
 
-    public List<Image> getMoveFrames() {
-        return moveFrames;
+    public List<Image> getWalkEmptyFrames() {
+        return walkEmptyFrames;
     }
 
-    public Image getStop() {
-        return stop;
+    public Image getEmptyStop() {
+        return emptyStop;
     }
 
-    public void setStop(Image stop) {
-        this.stop = stop;
+    public void setEmptyStop(Image emptyStop) {
+        this.emptyStop = emptyStop;
     }
 }

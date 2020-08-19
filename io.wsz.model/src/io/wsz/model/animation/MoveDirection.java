@@ -1,6 +1,6 @@
 package io.wsz.model.animation;
 
-public enum MoveSide {
+public enum MoveDirection {
     UP,
     UP_RIGHT,
     RIGHT,

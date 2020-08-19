@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 import java.util.List;
 
 public class CreatureAnimationPos {
-    private MoveSide moveSide;
+    private MoveDirection moveDirection;
     private int moveFrame = -1;
     private long nextMoveUpdate;
     private long nextPortraitUpdate;
@@ -17,12 +17,12 @@ public class CreatureAnimationPos {
 
     public CreatureAnimationPos() {}
 
-    public MoveSide getMoveSide() {
-        return moveSide;
+    public MoveDirection getMoveSide() {
+        return moveDirection;
     }
 
-    public void setMoveSide(MoveSide moveSide) {
-        this.moveSide = moveSide;
+    public void setMoveSide(MoveDirection moveDirection) {
+        this.moveDirection = moveDirection;
     }
 
     public int getMoveFrame() {
