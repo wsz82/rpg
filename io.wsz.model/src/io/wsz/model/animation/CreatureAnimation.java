@@ -113,11 +113,21 @@ public class CreatureAnimation {
     private void initIdleFrames(File framesDir, CreatureIdleAnimationFrames idles) {
         List<List<Image>> idleSequences = idles.getIdleSequences();
         idleSequences.clear();
-        File[] idleSequencesFiles = framesDir.listFiles();
+        initEmptyIdle(framesDir, idles, idleSequences);
+    }
+
+    private void initEmptyIdle(File framesDir, CreatureIdleAnimationFrames idles, List<List<Image>> idleSequences) {
+        String idleEmptyPath = framesDir + INVENTORY_EMPTY_DIR;
+        File idleEmptyDir = new File(idleEmptyPath);
+        initSequencesAnimationSet(idles, idleSequences, idleEmptyDir);
+    }
+
+    private void initSequencesAnimationSet(CreatureIdleAnimationFrames idles, List<List<Image>> idleSequences, File idleDir) {
+        File[] idleSequencesFiles = idleDir.listFiles();
         if (idleSequencesFiles == null || idleSequencesFiles.length == 0) return;
         for (File idleSequenceFile : idleSequencesFiles) {
             if (idleSequenceFile.getName().endsWith(".png")) {
-                Image loadedFrame = ResolutionImage.loadImage(idleSequenceFile);
+                Image loadedFrame = ResolutionImage.loadImage(idleSequenceFile); //TODO animation
                 idles.setMain(loadedFrame);
                 continue;
             }
