@@ -116,4 +116,29 @@ public class ResolutionImage {
         }
         return null;
     }
+
+    public static Image loadDefinedDimensionImage(File file, int width, int height) {
+        String url = null;
+        try {
+            url = file.toURI().toURL().toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (url == null) {
+            return null;
+        }
+
+
+        if (width == 0 || height == 0) {
+            return null;
+        }
+
+        if (Sizes.getTrueMeter() == CONSTANT_METER) {
+            return new Image(url, width, height, false, false, false);
+        } else {
+            Dimension d = new Dimension(width, height);
+            Dimension rd = getRequestedDimension(d);
+            return getResizedImage(url, d, rd);
+        }
+    }
 }

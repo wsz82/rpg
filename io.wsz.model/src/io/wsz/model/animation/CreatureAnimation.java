@@ -5,17 +5,23 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
-import java.net.MalformedURLException;
-import java.util.List;
 import java.util.*;
 
 import static io.wsz.model.animation.MoveSide.*;
-import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class CreatureAnimation {
+    private static final String WALK_N = "walk_N";
+    private static final String WALK_NE = "walk_NE";
+    private static final String WALK_E = "walk_E";
+    private static final String WALK_SE = "walk_SE";
+    private static final String WALK_S = "walk_S";
+    private static final String WALK_SW = "walk_SW";
+    private static final String WALK_W = "walk_W";
+    private static final String WALK_NW = "walk_NW";
+    private static final String[] walks = new String[] {WALK_N, WALK_NE, WALK_E, WALK_SE,
+            WALK_S, WALK_SW, WALK_W, WALK_NW};
     private static final String IDLE = "idle";
     private static final String IDLE_PATH = File.separator + IDLE;
     private static final String PORTRAIT = "portrait";
@@ -92,7 +98,7 @@ public class CreatureAnimation {
         if (emptyInventoryImage == null) {
             File emptyInventoryFile = creatureInventoryFiles.get(INVENTORY_EMPTY);
             if (emptyInventoryFile != null && emptyInventoryFile.exists()) {
-                emptyInventoryImage = loadDefinedDimensionImage(emptyInventoryFile, width, height);
+                emptyInventoryImage = ResolutionImage.loadDefinedDimensionImage(emptyInventoryFile, width, height);
                 creatureInventoryPictures.put(INVENTORY_EMPTY, emptyInventoryImage);
             }
         }
@@ -101,20 +107,21 @@ public class CreatureAnimation {
 
     private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveSide moveSide) {
         if (moveSide == null) return null;
-        String moveSideString = String.valueOf(moveSide.ordinal() + 1);
-        return getMoveAnimationFrames(moveSideString);
+        int ordinal = moveSide.ordinal();
+        String walk = walks[ordinal];
+        return getMoveAnimationFrames(walk);
     }
 
     private CreatureMoveAnimationFrames getMoveAnimationFrames(String moveSideString) {
         return switch (moveSideString) {
-            case "1" -> moveUp;
-            case "2" -> moveUpRight;
-            case "3" -> moveRight;
-            case "4" -> moveDownRight;
-            case "5" -> moveDown;
-            case "6" -> moveDownLeft;
-            case "7" -> moveLeft;
-            case "8" -> moveUpLeft;
+            case WALK_N -> moveUp;
+            case WALK_NE -> moveUpRight;
+            case WALK_E -> moveRight;
+            case WALK_SE -> moveDownRight;
+            case WALK_S -> moveDown;
+            case WALK_SW -> moveDownLeft;
+            case WALK_W -> moveLeft;
+            case WALK_NW -> moveUpLeft;
             default -> null;
         };
     }
@@ -155,7 +162,7 @@ public class CreatureAnimation {
         if (imagesFiles == null || imagesFiles.length == 0) return;
         for (File imageFile : imagesFiles) {
             int portraitSize = Sizes.getPortraitSize();
-            Image loadedFrame = loadDefinedDimensionImage(imageFile, portraitSize, portraitSize);
+            Image loadedFrame = ResolutionImage.loadDefinedDimensionImage(imageFile, portraitSize, portraitSize);
             portrait.add(loadedFrame);
         }
     }
@@ -173,31 +180,6 @@ public class CreatureAnimation {
             } else {
                 moveFrames.add(loadedFrame);
             }
-        }
-    }
-
-    private Image loadDefinedDimensionImage(File file, int width, int height) {
-        String url = null;
-        try {
-            url = file.toURI().toURL().toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        if (url == null) {
-            return null;
-        }
-
-
-        if (width == 0 || height == 0) {
-            return null;
-        }
-
-        if (Sizes.getTrueMeter() == CONSTANT_METER) {
-            return new Image(url, width, height, false, false, false);
-        } else {
-            Dimension d = new Dimension(width, height);
-            Dimension rd = ResolutionImage.getRequestedDimension(d);
-            return ResolutionImage.getResizedImage(url, d, rd);
         }
     }
 
