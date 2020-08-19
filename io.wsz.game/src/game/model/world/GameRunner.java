@@ -119,7 +119,7 @@ public class GameRunner {
 
         updateControls();
 
-        for (Location l : controller.getLocations()) {
+        for (Location l : controller.getLocations()) { //TODO update only locations of a current locations group
             addItems(l);
             removeItems(l);
         }
@@ -145,14 +145,14 @@ public class GameRunner {
                 .collect(Collectors.toCollection(() -> heroesLocations));
         heroesLocations.remove(currentLocation);
 
-        for (Location l : heroesLocations) {
+        for (Location l : heroesLocations) { //TODO update locations of a current locations group
             if (l == null) continue;
             for (PosItem pi : l.getItems()) {
                 pi.update();
             }
         }
 
-        updateLocation();
+        updateCurrentLocation();
         tryToStartDialog();
     }
 
@@ -219,7 +219,7 @@ public class GameRunner {
         itemsToRemove.clear();
     }
 
-    private void updateLocation() {
+    private void updateCurrentLocation() {
         Location locationToUpdate = controller.getLocationToUpdate();
         if (locationToUpdate != null) {
             controller.setLocationToUpdate(null);
