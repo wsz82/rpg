@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.CreatureAnimationType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
@@ -19,7 +20,7 @@ public class Task implements Externalizable {
     private final Coords dest = new Coords(-1, -1);
 
     private PosItem item;
-    private boolean finished;
+    private boolean isFinished = true;
 
     public Task() {}
 
@@ -30,8 +31,8 @@ public class Task implements Externalizable {
     }
 
     public void doTask(Creature cr) {
-        if (isFinished()) {
-            cr.getAnimation().updateIdleAnimation(cr);
+        if (isFinished) {
+            cr.getAnimationPos().setCurAnimation(CreatureAnimationType.IDLE);
             return;
         }
 
@@ -42,9 +43,11 @@ public class Task implements Externalizable {
                 dest.x = -1;
             }
         }
-        if (dest.x == -1 && item == null) {
-            cr.getAnimation().updateStopAnimation(cr);
-            finished = true;
+        if (dest.x == -1) {
+            cr.getAnimationPos().setCurAnimation(CreatureAnimationType.STOP);
+            if (item == null){
+                isFinished = true;
+            }
         }
     }
 
@@ -88,7 +91,7 @@ public class Task implements Externalizable {
             dest.x = -1;
             return;
         }
-        cr.getAnimation().updateMoveAnimation(cr, pos.x, pos.y, dest.x, dest.y);
+        cr.getAnimationPos().setCurAnimation(CreatureAnimationType.MOVE);
         pos.x = nextPos.x;
         pos.y = nextPos.y;
     }
@@ -136,11 +139,11 @@ public class Task implements Externalizable {
     }
 
     public boolean isFinished() {
-        return finished;
+        return isFinished;
     }
 
     public void setFinished(boolean finished) {
-        this.finished = finished;
+        this.isFinished = finished;
     }
 
     @Override
@@ -148,7 +151,7 @@ public class Task implements Externalizable {
         return "Task{" +
                 ", item=" + item +
                 ", dest=" + dest +
-                ", finished=" + finished +
+                ", finished=" + isFinished +
                 '}';
     }
 
@@ -175,7 +178,7 @@ public class Task implements Externalizable {
 
         out.writeObject(item);
 
-        out.writeBoolean(finished);
+        out.writeBoolean(isFinished);
     }
 
     @Override
@@ -188,6 +191,6 @@ public class Task implements Externalizable {
 
         item = (PosItem) in.readObject();
 
-        finished = in.readBoolean();
+        isFinished = in.readBoolean();
     }
 }

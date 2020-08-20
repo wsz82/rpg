@@ -14,6 +14,7 @@ public class Paths {
     public static final String[] walks = new String[] {WALK_N, WALK_NE, WALK_E, WALK_SE,
             WALK_S, WALK_SW, WALK_W, WALK_NW};
     public static final String IDLE = "idle";
+    public static final String MAIN = "main";
     public static final String IDLE_DIR = File.separator + IDLE;
     public static final String PORTRAIT = "portrait";
     public static final String PORTRAIT_DIR = File.separator + PORTRAIT;

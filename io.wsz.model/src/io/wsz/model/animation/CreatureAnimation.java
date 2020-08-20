@@ -2,6 +2,7 @@ package io.wsz.model.animation;
 
 import io.wsz.model.item.Creature;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
@@ -16,10 +17,10 @@ public class CreatureAnimation {
     private static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     private static final int MIN_PORTRAIT_UPDATE_TIME_SEC = 1;
     private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;
-    private static final int MIN_STOP_WAIT_TIME_SEC = 3;
-    private static final int MAX_STOP_WAIT_TIME_SEC = 6;
-    private static final int MIN_IDLE_UPDATE_TIME_SEC = 7;
-    private static final int MAX_IDLE_UPDATE_TIME_SEC = 21;
+    private static final int MIN_STOP_WAIT_TIME_SEC = 2;
+    private static final int MAX_STOP_WAIT_TIME_SEC = 3;
+    private static final int MIN_IDLE_UPDATE_TIME_SEC = 2;
+    private static final int MAX_IDLE_UPDATE_TIME_SEC = 4;
     private static final Random RANDOM = new Random();
 
     private final String animationDir;
@@ -41,6 +42,16 @@ public class CreatureAnimation {
             throw new IllegalArgumentException("Animation path is empty");
         }
         this.animationDir = animationDir;
+    }
+
+    public void play(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
+        CreatureAnimationType curCreatureAnimationType = animationPos.getCurAnimation();
+        switch (curCreatureAnimationType) {
+            case IDLE -> playIdle(cr);
+            case MOVE -> playMove(cr);
+            case STOP -> playStop(cr);
+        }
     }
 
     public void initAllFrames(File programDir) {
@@ -113,41 +124,43 @@ public class CreatureAnimation {
     private void initIdleFrames(File framesDir, CreatureIdleAnimationFrames idles) {
         List<List<Image>> idleSequences = idles.getIdleSequences();
         idleSequences.clear();
+        idles.getMain().clear();
         initEmptyIdle(framesDir, idles, idleSequences);
     }
 
     private void initEmptyIdle(File framesDir, CreatureIdleAnimationFrames idles, List<List<Image>> idleSequences) {
         String idleEmptyPath = framesDir + INVENTORY_EMPTY_DIR;
         File idleEmptyDir = new File(idleEmptyPath);
-        initSequencesAnimationSet(idles, idleSequences, idleEmptyDir);
+        initIdleSequencesAnimationSet(idles, idleSequences, idleEmptyDir);
     }
 
-    private void initSequencesAnimationSet(CreatureIdleAnimationFrames idles, List<List<Image>> idleSequences, File idleDir) {
+    private void initIdleSequencesAnimationSet(CreatureIdleAnimationFrames idles, List<List<Image>> idleSequences, File idleDir) {
         File[] idleSequencesFiles = idleDir.listFiles();
         if (idleSequencesFiles == null || idleSequencesFiles.length == 0) return;
         for (File idleSequenceFile : idleSequencesFiles) {
-            if (idleSequenceFile.getName().endsWith(".png")) {
-                Image loadedFrame = ResolutionImage.loadImage(idleSequenceFile); //TODO animation
-                idles.setMain(loadedFrame);
+            boolean isNotDirectory = !idleSequenceFile.isDirectory();
+            if (isNotDirectory) continue;
+            if (idleSequenceFile.getName().equals(MAIN)) {
+                List<Image> main = getIdleSequence(idleSequenceFile);
+                if (main == null || main.isEmpty()) continue;
+                idles.getMain().addAll(main);
                 continue;
             }
-            if (idleSequenceFile.isDirectory()) {
-                List<Image> sequence = new ArrayList<>(0);
-                initIdleSequence(idleSequenceFile, sequence);
-                if (!sequence.isEmpty()) {
-                    idleSequences.add(sequence);
-                }
-            }
+            List<Image> sequence = getIdleSequence(idleSequenceFile);
+            if (sequence == null || sequence.isEmpty()) continue;
+            idleSequences.add(sequence);
         }
     }
 
-    private void initIdleSequence(File framesDir, List<Image> sequence) {
+    private List<Image> getIdleSequence(File framesDir) {
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
-        if (imagesFiles == null || imagesFiles.length == 0) return;
+        if (imagesFiles == null || imagesFiles.length == 0) return null;
+        List<Image> sequence = new ArrayList<>(0);
         for (File imageFile : imagesFiles) {
             Image loadedFrame = ResolutionImage.loadImage(imageFile);
             sequence.add(loadedFrame);
         }
+        return sequence;
     }
 
     private void initPortraitFrames(File framesDir, List<Image> portrait) {
@@ -201,68 +214,115 @@ public class CreatureAnimation {
         return portraits.get(randomIndex);
     }
 
-    public void updateIdleAnimation(Creature cr) {
+    private void playIdle(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
 
         long timeToStartPlayIdleAfterStop = animationPos.getTimeToStartPlayIdleAfterStop();
         if (curTime < timeToStartPlayIdleAfterStop) return;
 
-        long nextIdleUpdate = animationPos.getNextIdleUpdate();
         List<Image> idleSequence = animationPos.getIdleSequence();
-        if (curTime < nextIdleUpdate) {
-            cr.setImage(idles.getMain());
-        } else if (idleSequence == null) {
-            int randomTimeToStartIdleMillis = getRandomMillis(MAX_IDLE_UPDATE_TIME_SEC, MIN_IDLE_UPDATE_TIME_SEC);
-            nextIdleUpdate = curTime + randomTimeToStartIdleMillis;
-            animationPos.setNextIdleUpdate(nextIdleUpdate);
+        if (idleSequence == null) {
+            chooseRandomIdleSequence(animationPos, curTime);
+        }
 
-            List<List<Image>> idleSequences = idles.getIdleSequences();
-            int idleSequencesSize = idleSequences.size();
-            int randomIndex = RANDOM.nextInt(idleSequencesSize);
-            List<Image> sequence = idleSequences.get(randomIndex);
-            animationPos.setIdleSequence(sequence);
+        long nearestIdleUpdate = animationPos.getNextIdleUpdate();
+        boolean isTimeToPlayTemporaryIdle = curTime > nearestIdleUpdate;
+        boolean isTemporaryIdle = animationPos.isTemporaryIdle();
+        if (isTimeToPlayTemporaryIdle && isTemporaryIdle) {
+            playTemporaryIdle(cr);
         } else {
-            playIdleSequence(cr, animationPos);
+            playConstantIdle(cr);
         }
     }
 
-    private void playIdleSequence(Creature cr, CreatureAnimationPos animationPos) {
+    private void chooseRandomIdleSequence(CreatureAnimationPos animationPos, long curTime) {
+        int randomTimeToStartIdleMillis = getRandomMillis(MAX_IDLE_UPDATE_TIME_SEC, MIN_IDLE_UPDATE_TIME_SEC);
+        long nextIdleUpdate = curTime + randomTimeToStartIdleMillis;
+        animationPos.setNextIdleUpdate(nextIdleUpdate);
+
+        List<List<Image>> idleSequences = idles.getIdleSequences();
+        int idleSequencesSize = idleSequences.size();
+        int randomIndex = RANDOM.nextInt(idleSequencesSize);
+        List<Image> sequence = idleSequences.get(randomIndex);
+        animationPos.setIdleSequence(sequence);
+    }
+
+    private void playTemporaryIdle(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
-        if (curTime < animationPos.getNextIdleFrameUpdate()) return;
-        Image nextFrame = getNextIdleFrame(cr, animationPos);
+        if (curTime < animationPos.getNextFrameUpdate()) return;
+        playTemporaryIdle(cr, animationPos);
+    }
+
+    private void playTemporaryIdle(Creature cr, CreatureAnimationPos animationPos) {
+        List<Image> frames = animationPos.getIdleSequence();
+
+        if (frames == null) return;
+        int framesSize = frames.size();
+        if (framesSize == 0) return;
+
+        long nextUpdate = getNextUpdate(framesSize, cr.getSpeed());
+        animationPos.setNextFrameUpdate(nextUpdate);
+        int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
+        if (animationPos.isCycleFinished()) {
+            playConstantIdleAfterTemporary(cr, animationPos);
+            return;
+        }
+        Image nextFrame = frames.get(nextFrameNumber);
         if (nextFrame == null) return;
         cr.setImage(nextFrame);
     }
 
-    private Image getNextIdleFrame(Creature cr, CreatureAnimationPos animationPos) {
-        int frameNumber = animationPos.getIdleFrame();
-        List<Image> frames = animationPos.getIdleSequence();
-
-        if (frames == null) return null;
-        int framesSize = frames.size();
-        if (framesSize == 0) return null;
-
-        long frameDif = getFrameDif(cr.getSpeed(), framesSize);
-        long nextUpdate = System.currentTimeMillis() + frameDif;
-        animationPos.setNextIdleFrameUpdate(nextUpdate);
-
-        int nextFrameNumber = frameNumber + 1;
-        if (nextFrameNumber >= framesSize) {
-            resetIdlePlay(animationPos);
-            cr.setImage(idles.getMain());
-            return null;
-        }
-        animationPos.setIdleFrame(nextFrameNumber);
-        return frames.get(nextFrameNumber);
-    }
-
-    private void resetIdlePlay(CreatureAnimationPos animationPos) {
+    private void playConstantIdleAfterTemporary(Creature cr, CreatureAnimationPos animationPos) {
         animationPos.setIdleSequence(null);
-        animationPos.setIdleFrame(-1);
+        animationPos.setTemporaryIdle(false);
+        animationPos.setFrameNumber(0);
+        playConstantIdle(cr, animationPos);
     }
 
-    public void updateStopAnimation(Creature cr) {
+    private void playConstantIdle(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
+        long curTime = System.currentTimeMillis();
+        if (curTime < animationPos.getNextFrameUpdate()) return;
+        playConstantIdle(cr, animationPos);
+    }
+
+    private void playConstantIdle(Creature cr, CreatureAnimationPos animationPos) {
+        List<Image> frames = idles.getMain();
+
+        if (frames == null) return;
+        int framesSize = frames.size();
+        if (framesSize == 0) return;
+
+        long nextUpdate = getNextUpdate(framesSize, cr.getSpeed());
+        animationPos.setNextFrameUpdate(nextUpdate);
+
+        int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
+        if (animationPos.isCycleFinished()) {
+            long curTime = System.currentTimeMillis();
+            if (curTime >= animationPos.getNextIdleUpdate()) {
+                playTemporaryIdleAfterConstant(cr, animationPos);
+                return;
+            }
+        }
+        Image nextFrame = frames.get(nextFrameNumber);
+        if (nextFrame == null) return;
+        cr.setImage(nextFrame);
+    }
+
+    private void playTemporaryIdleAfterConstant(Creature cr, CreatureAnimationPos animationPos) {
+        animationPos.setTemporaryIdle(true);
+        animationPos.setFrameNumber(0);
+        playTemporaryIdle(cr, animationPos);
+    }
+
+    private long getNextUpdate(int framesSize, Double speed) {
+        long frameDif = getFrameDuration(speed, framesSize);
+        return System.currentTimeMillis() + frameDif;
+    }
+
+    private void playStop(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
 
         int randomTimeToStartIdleMillis = getRandomMillis(MAX_STOP_WAIT_TIME_SEC, MIN_STOP_WAIT_TIME_SEC);
@@ -283,19 +343,44 @@ public class CreatureAnimation {
                 (maxIdleUpdateTimeSec - minIdleUpdateTimeSec + 1) + minIdleUpdateTimeSec) * 1000;
     }
 
-    public void updateMoveAnimation(Creature cr, double xFrom, double yFrom, double xTo, double yTo) {
+    private void playMove(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
-        if (curTime < animationPos.getNextMoveUpdate()) return;
-        MoveDirection nextMoveDirection = getMoveSide(xFrom, yFrom, xTo, yTo);
+        if (curTime < animationPos.getNextFrameUpdate()) return;
+
+        MoveDirection nextMoveDirection = getMoveDirection(cr);
         if (nextMoveDirection == null) return;
         animationPos.setMoveSide(nextMoveDirection);
-        Image nextFrame = getNextMoveFrame(cr.getSpeed(), animationPos);
+
+        MoveDirection moveDirection = animationPos.getMoveSide();
+        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
+        List<Image> frames = animationFrames.getWalkEmptyFrames();
+
+        if (frames == null) return;
+        int framesSize = frames.size();
+        if (framesSize == 0) return;
+
+        long nextUpdate = getNextUpdate(framesSize, cr.getSpeed());
+        animationPos.setNextFrameUpdate(nextUpdate);
+        int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
+        Image nextFrame = frames.get(nextFrameNumber);
+
         if (nextFrame == null) return;
         cr.setImage(nextFrame);
     }
 
-    public MoveDirection getMoveSide(double xFrom, double yFrom, double xTo, double yTo) {
+    public MoveDirection getMoveDirection(Creature cr) {
+        Coords pos = cr.getPos();
+        double xFrom = pos.x;
+        double yFrom = pos.y;
+        Coords dest = cr.getTask().getDest();
+        double xTo = dest.x;
+        double yTo = dest.y;
+
+        return getMoveDirection(xFrom, yFrom, xTo, yTo);
+    }
+
+    public MoveDirection getMoveDirection(double xFrom, double yFrom, double xTo, double yTo) {
         xTo -= xFrom;
         yTo -= yFrom;
         yTo = -yTo;
@@ -327,43 +412,22 @@ public class CreatureAnimation {
         return nextMoveDirection;
     }
 
-    private Image getNextMoveFrame(double speed, CreatureAnimationPos animationPos) {
-        int frameNumber = animationPos.getMoveFrame();
-        MoveDirection moveDirection = animationPos.getMoveSide();
-        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
-        List<Image> frames = animationFrames.getWalkEmptyFrames();
-
-        if (frames == null) return null;
-        int framesSize = frames.size();
-        if (framesSize == 0) return null;
-
-        long frameDif = getFrameDif(speed, framesSize);
-        long nextUpdate = System.currentTimeMillis() + frameDif;
-        animationPos.setNextMoveUpdate(nextUpdate);
-
-        int nextFrameNumber = frameNumber + 1;
-        if (nextFrameNumber >= framesSize) {
-            nextFrameNumber = 0;
-        }
-        animationPos.setMoveFrame(nextFrameNumber);
-        return frames.get(nextFrameNumber);
-    }
-
-    private long getFrameDif(double speed, int framesSize) {
+    private long getFrameDuration(double speed, int framesSize) {
         return (long) (1 / speed * 1000 / framesSize);
     }
 
     public Image getMainIdle(File programDir) {
-        if (idles.getMain() == null) {
+        List<Image> main = idles.getMain();
+        if (main.isEmpty()) {
             String path = programDir + animationDir + IDLE_DIR;
             File idleDir = new File(path);
             File[] imagesFiles = idleDir.listFiles(PNG_FILE_FILTER);
             if (imagesFiles == null || imagesFiles.length == 0) return null;
             File firstImageFile = imagesFiles[0];
             Image loadedImage = ResolutionImage.loadImage(firstImageFile);
-            idles.setMain(loadedImage);
+            main.add(loadedImage);
         }
-        return idles.getMain();
+        return main.get(0);
     }
 
     public List<Image> getPortraits(File programDir) {

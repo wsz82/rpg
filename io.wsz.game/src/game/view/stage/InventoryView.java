@@ -164,6 +164,7 @@ public class InventoryView {
 
     private void openContainer() {
         EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+        if (ev == null) return;
         if (ev instanceof ContainerView) return;
         origin = ev;
         translateScreenCoordsToCoords(mousePos, ev.getCurPos(), ev.getViewPos());

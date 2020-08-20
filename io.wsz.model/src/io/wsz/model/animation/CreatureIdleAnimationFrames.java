@@ -7,17 +7,16 @@ import java.util.List;
 
 public class CreatureIdleAnimationFrames {
     private final List<List<Image>> idleSequences = new ArrayList<>(0);
-    private Image main;
+    private final List<Image> main = new ArrayList<>(0);
+
+    public CreatureIdleAnimationFrames() {
+    }
 
     public List<List<Image>> getIdleSequences() {
         return idleSequences;
     }
 
-    public Image getMain() {
+    public List<Image> getMain() {
         return main;
-    }
-
-    public void setMain(Image main) {
-        this.main = main;
     }
 }

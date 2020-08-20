@@ -3,6 +3,7 @@ package game.view.stage;
 import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
+import io.wsz.model.animation.CreatureAnimation;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
@@ -229,7 +230,10 @@ public class GameView extends CanvasView {
             double y = translatedPos.y * meter;
 
             if (pi instanceof Creature) {
-                drawCreatureBase((Creature) pi);
+                Creature cr = (Creature) pi;
+                drawCreatureBase(cr);
+                CreatureAnimation animation = cr.getAnimation();
+                animation.play(cr);
             }
             Image img = pi.getImage();
 
