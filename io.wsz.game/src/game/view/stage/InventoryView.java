@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class InventoryView {
-    protected static final double SCROLL_BUTTON_PART = 1.0/80;
+    private static final double SCROLL_BUTTON_PART = 1.0/80;
     private static final double CREATURE_X_POS = 0.05;
     private static final double CREATURE_Y_POS = 0.1;
     private static final double CREATURE_WIDTH = 0.2;
