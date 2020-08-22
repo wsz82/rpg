@@ -39,13 +39,15 @@ public class InventoryView {
     private final GraphicsContext gc;
     private final Coords mousePos = new Coords();
     private final Coords modifiedCoords = new Coords();
-    private final Coords draggedEquipmentCoords = new Coords();
+    private final Coords draggedCoords = new Coords();
     private final List<Equipment> lookedEquipment = new ArrayList<>(0);
     private final List<EquipmentView> equipmentViews = new ArrayList<>(0);
     private final HoldView holdView;
     private final DropView dropView;
     private final ContainerView containerView;
 
+    private double draggedInitWidth;
+    private double draggedInitHeight;
     private Equipment dragged;
     private EventHandler<MouseEvent> onClick;
     private EventHandler<MouseEvent> dragStop;
@@ -195,6 +197,8 @@ public class InventoryView {
         if (eq != null) {
             if (ev.remove(eq, controller.getCreatureToOpenInventory())) {
                 dragged = eq.cloneEquipment();
+                draggedInitWidth = dragged.getImageWidth();
+                draggedInitHeight = dragged.getImageHeight();
             }
         }
     }
@@ -204,7 +208,7 @@ public class InventoryView {
         dragged.getAnimationPos().setNextFrameUpdate(0);
         Creature hoveredHero = gameController.getHoveredHero();
         if (!moveToHero(hoveredHero)) {
-            moveEquipmentWithinInventory(mouseX, mouseY);
+            moveEquipmentWithinInventoryAndDropView(mouseX, mouseY);
         }
         dragged = null;
     }
@@ -224,18 +228,34 @@ public class InventoryView {
         return false;
     }
 
-    private void moveEquipmentWithinInventory(double mouseX, double mouseY) {
+    private void moveEquipmentWithinInventoryAndDropView(double mouseX, double mouseY) {
         EquipmentView ev = getEquipmentView(mouseX, mouseY);
         Creature cr = controller.getCreatureToOpenInventory();
         if (ev == null) {
-            Coords extreme = origin.getExtremePos(mousePos, draggedEquipmentCoords, dragged);
+            Coords extreme = origin.getExtremePos(mousePos, draggedCoords, dragged);
             origin.add(dragged, cr, extreme.x, extreme.y);
         } else {
             Coords local = ev.getLocalCoords(mousePos);
-            local.subtract(draggedEquipmentCoords);
+            Coords resizedImageCorrection =
+                    adjustCoordsForResizedImage(draggedInitWidth, draggedInitHeight, draggedCoords, dragged);
+            local.subtract(resizedImageCorrection);
             checkFit(ev, dragged, local);
             ev.add(dragged, cr, local.x, local.y);
         }
+    }
+
+    private Coords adjustCoordsForResizedImage(double draggedInitWidth, double draggedInitHeight,
+                                               Coords draggedCoords, Equipment dragged) {
+        double draggedWidth = dragged.getImageWidth();
+        double draggedInitX = draggedCoords.x;
+        double resizedX = draggedWidth * draggedInitX / draggedInitWidth;
+
+        double draggedHeight = dragged.getImageHeight();
+        double draggedInitY = draggedCoords.y;
+        double resizedY = draggedHeight * draggedInitY / draggedInitHeight;
+        draggedCoords.x = resizedX;
+        draggedCoords.y = resizedY;
+        return draggedCoords;
     }
 
     private void checkFit(EquipmentView ev, Equipment e, Coords local) {
@@ -360,22 +380,8 @@ public class InventoryView {
         Coords mousePos = getMousePos(x, y, left, top);
         int meter = Sizes.getMeter();
         if (dragged != null) {
-            EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
-            EquipmentAnimationPos animationPos = dragged.getAnimationPos();
-            if (ev instanceof DropView) {
-                if (!(lastCheckedView instanceof DropView)) {
-                    animationPos.setNextFrameUpdate(0);
-                }
-                animationPos.setCurAnimation(EquipmentAnimationType.DROP);
-            } else {
-                if (lastCheckedView instanceof DropView) {
-                    animationPos.setNextFrameUpdate(0);
-                }
-                animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
-            }
-            lastCheckedView = ev;
+            playDraggedAnimation(mousePos);
 
-            dragged.getAnimation().play(dragged);
             Image img = dragged.getImage();
             gc.drawImage(img,
                     mousePos.x*meter - img.getWidth()/2,
@@ -395,6 +401,24 @@ public class InventoryView {
             double scrollToX = mousePosX - scrolledPosX;
             scrolledHor.setScrollPosX(scrollToX);
         }
+    }
+
+    private void playDraggedAnimation(Coords mousePos) {
+        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+        EquipmentAnimationPos animationPos = dragged.getAnimationPos();
+        if (ev instanceof DropView) {
+            if (!(lastCheckedView instanceof DropView)) {
+                animationPos.setNextFrameUpdate(0);
+            }
+            animationPos.setCurAnimation(EquipmentAnimationType.DROP);
+        } else {
+            if (lastCheckedView instanceof DropView) {
+                animationPos.setNextFrameUpdate(0);
+            }
+            animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
+        }
+        lastCheckedView = ev;
+        dragged.getAnimation().play(dragged);
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
@@ -546,8 +570,8 @@ public class InventoryView {
             }
             boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
             if (isPixelTransparent) continue;
-            draggedEquipmentCoords.x = (double) imgX / meter;
-            draggedEquipmentCoords.y = (double) imgY / meter;
+            draggedCoords.x = (double) imgX / meter;
+            draggedCoords.y = (double) imgY / meter;
             return eq;
         }
         return null;
