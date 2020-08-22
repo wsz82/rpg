@@ -23,7 +23,6 @@ import java.util.Arrays;
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
 
-    private final Button animationDirButton = new Button("Animation");
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
     private final DoubleField speedInput = new DoubleField(isContent);
@@ -48,13 +47,9 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         super.initWindow();
         setTitle(TITLE);
 
-        container.getChildren().remove(imageBox);
         container.getChildren().remove(interactionButton);
         container.getChildren().remove(coverButton);
         container.getChildren().remove(collisionButton);
-
-        final HBox animationBox = new HBox(10);
-        animationBox.getChildren().addAll(animationDirButton, pathLabel);
 
         final HBox sizeBox = new HBox(10);
         final Label sizeLabel = new Label("Size");
@@ -92,7 +87,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             controls.add(null);
         }
 
-        container.getChildren().addAll(animationBox, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
+        container.getChildren().addAll(sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
 
         if (item != null) {
             container.getChildren().add(itemsButton);
@@ -100,15 +95,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         }
 
         fillInputs();
-
-        hookUpEvents();
-    }
-
-    private void hookUpEvents() {
-        animationDirButton.setOnAction(e -> {
-            String title = "Choose animation for asset";
-            setUpDirChooser(title, pathLabel);
-        });
     }
 
     private void hookUpEditEvents() {

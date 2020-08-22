@@ -64,6 +64,7 @@ public class HoldView extends EquipmentView {
             int meter = Sizes.getMeter();
             double x = corrected.x * meter;
             double y = corrected.y * meter;
+            playInventoryAnimation(e);
             Image img = e.getImage();
             double viewX = viewPos.x * meter;
             double viewY = viewPos.y * meter;

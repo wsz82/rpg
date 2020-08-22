@@ -8,6 +8,7 @@ import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.OpenableItem;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -70,7 +71,8 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
         if (item == null) {
             item = createNewAsset();
         }
-        openable = new OpenableContainer(this, item, isContent);
+        OpenableItem openableItem = item.getIndividualOpenableItem();
+        openable = new OpenableContainer(this, item, openableItem, isContent);
         openable.initOpenable(container);
 
         super.fillInputs();

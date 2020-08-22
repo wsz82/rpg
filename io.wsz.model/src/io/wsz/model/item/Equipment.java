@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Equipment<E extends Equipment> extends PosItem<E> implements Equippable {
+public abstract class Equipment<E extends Equipment, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Equippable {
     private static final long serialVersionUID = 1L;
 
     public static List<Equipment> cloneEquipmentList(List<Equipment> equipment) {
@@ -34,6 +35,14 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public Equipment(E prototype, Boolean visible) {
         super(prototype, visible);
     }
+
+    public Equipment(Equipment other) {
+        super(other);
+        weight = other.weight;
+        size = other.size;
+    }
+
+    public abstract Equipment cloneEquipment();
 
     public Double getIndividualWeight() {
         return weight;
@@ -60,7 +69,7 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public Integer getSize() {
         if (size == null) {
             if (prototype == null) {
-                return 1;
+                return 0;
             }
             return prototype.size;
         }
@@ -70,8 +79,6 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     public void setSize(Integer size) {
         this.size = size;
     }
-
-    public abstract E cloneEquipment();
 
     @Override
     public boolean onTake(Creature cr, double x, double y) {
@@ -154,16 +161,17 @@ public abstract class Equipment<E extends Equipment> extends PosItem<E> implemen
     }
 
     @Override
-    public void onEquip() {
+    public abstract B getAnimationPos();
 
-    }
+    @Override
+    public void onEquip() {}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Equipment)) return false;
         if (!super.equals(o)) return false;
-        Equipment<?> equipment = (Equipment<?>) o;
+        Equipment equipment = (Equipment) o;
         return Objects.equals(getWeight(), equipment.getWeight()) &&
                 Objects.equals(getSize(), equipment.getSize());
     }

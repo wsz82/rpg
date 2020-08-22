@@ -1,30 +1,28 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
-import io.wsz.model.animation.CreatureAnimation;
-import io.wsz.model.animation.CreatureAnimationPos;
+import io.wsz.model.animation.creature.CreatureAnimation;
+import io.wsz.model.animation.creature.CreatureAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.scene.image.Image;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
 
-public class Creature extends PosItem<Creature> implements Containable {
+public class Creature extends PosItem<Creature, CreatureAnimationPos> implements Containable {
     private static final long serialVersionUID = 1L;
 
     private final Coords centerBottom = new Coords();
     private final Coords reversedCenterBottom = new Coords();
-    private final CreatureAnimationPos animationPos = new CreatureAnimationPos();
-
-    private final Task task = new Task();
 
     private CreatureAnimation animation;
+
+    private final Task task = new Task();
+    private final CreatureAnimationPos animationPos;
     private Inventory inventory;
     private CreatureSize size;
     private CreatureControl control;
@@ -33,16 +31,20 @@ public class Creature extends PosItem<Creature> implements Containable {
     private Double range;
     private Integer strength;
 
-    public Creature() {}
+    public Creature() {
+        this.animationPos = new CreatureAnimationPos();
+    }
 
     public Creature(ItemType type) {
         super(type);
         this.animation = new CreatureAnimation(getDir());
+        this.animationPos = new CreatureAnimationPos();
         this.inventory = new Inventory(this);
     }
 
     public Creature(Creature prototype, Boolean visible) {
         super(prototype, visible);
+        this.animationPos = new CreatureAnimationPos();
     }
 
     @Override
@@ -227,14 +229,6 @@ public class Creature extends PosItem<Creature> implements Containable {
         return task;
     }
 
-    public CreatureAnimation getAnimation() {
-        if (prototype == null) {
-            return animation;
-        } else {
-            return prototype.getAnimation();
-        }
-    }
-
     public Inventory getIndividualInventory() {
         return inventory;
     }
@@ -372,23 +366,18 @@ public class Creature extends PosItem<Creature> implements Containable {
         pi.creatureSecondaryInteract(this);
     }
 
-    public CreatureAnimationPos getAnimationPos() {
-        return animationPos;
+    @Override
+    public CreatureAnimation getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
+        }
     }
 
     @Override
-    public Image getImage() {
-        if (this.image == null) {
-            if (this.prototype == null) {
-                File programDir = getController().getProgramDir();
-                this.image = getAnimation().getMainIdle(programDir);
-                return this.image;
-            } else {
-                return prototype.getImage();
-            }
-        } else {
-            return this.image;
-        }
+    public CreatureAnimationPos getAnimationPos() {
+        return animationPos;
     }
 
     @Override
@@ -418,6 +407,7 @@ public class Creature extends PosItem<Creature> implements Containable {
 
     @Override
     public void update() {
+        super.update();
         checkSurrounding();
         checkTask();
     }

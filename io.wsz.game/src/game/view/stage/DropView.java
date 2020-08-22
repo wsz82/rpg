@@ -102,7 +102,10 @@ public class DropView extends EquipmentView {
             int meter = Sizes.getMeter();
             double x = corrected.x * meter;
             double y = corrected.y * meter;
-
+            if (pi instanceof Equipment) {
+                Equipment e = (Equipment) pi;
+                playDropAnimation(e);
+            }
             Image img = pi.getImage();
             double viewX = viewPos.x * meter;
             double viewY = viewPos.y * meter;

@@ -1,6 +1,6 @@
 package io.wsz.model.item;
 
-import io.wsz.model.animation.CreatureAnimationType;
+import io.wsz.model.animation.creature.CreatureAnimationType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 

@@ -1,83 +1,50 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Door<I extends Door> extends PosItem<I> implements Openable {
+public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> implements Openable {
     private static final long serialVersionUID = 1L;
 
-    protected String openImagePath;
-    protected Image openImage;
-    protected boolean open;
-    protected List<Coords> openDoorCoverLine;
-    protected List<List<Coords>> openDoorCollisionPolygons;
+    private DoorAnimation animation;
 
-    public Door() {}
+    private final AnimationPos animationPos;
+    private OpenableItem openableItem;
+    protected boolean isOpen;
+
+    public Door() {
+        this.animationPos = new AnimationPos();
+    }
 
     public Door(ItemType type) {
         super(type);
-        this.openDoorCoverLine = new ArrayList<>(0);
-        this.openDoorCollisionPolygons = new ArrayList<>(0);
+        this.animation = new DoorAnimation(getDir());
+        this.animationPos = new AnimationPos();
+        openableItem = new OpenableItem();
     }
 
     public Door(I prototype, Boolean visible) {
-            super(prototype, visible);
-    }
-
-    public String getIndividualOpenImagePath() {
-        return openImagePath;
-    }
-
-    public String getOpenImagePath() {
-        if (openImagePath == null || openImagePath.isEmpty()) {
-            if (prototype == null) {
-                return "";
-            }
-            return prototype.openImagePath;
-        } else {
-            return openImagePath;
-        }
-    }
-
-    public void setOpenImagePath(String openImagePath) {
-        this.openImagePath = openImagePath;
+        super(prototype, visible);
+        this.animationPos = new AnimationPos();
     }
 
     @Override
     public Image getOpenImage() {
-        if (prototype == null) {
-            if (openImagePath.isEmpty()) {
-                return getInitialImage();
-            }
-            if (openImage == null) {
-                String type = getType().toString().toLowerCase();
-                String openImagePath = getOpenImagePath();
-                File programDir = getController().getProgramDir();
-                setOpenImage(ResolutionImage.loadAssetImage(programDir, type, openImagePath));
-            }
-            return openImage;
-        } else {
-            return prototype.getOpenImage();
-        }
+        File programDir = getController().getProgramDir();
+        return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
-    @Override
-    public void setOpenImage(Image openImage) {
-        this.openImage = openImage;
-    }
-
-    @Override
-    public Image getImage() {
-        if (open) {
+    public Image getEditorImage() {
+        if (isOpen) {
             if (prototype == null) {
                 return getOpenImage();
             } else {
@@ -93,41 +60,61 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
     }
 
     public boolean isOpen() {
-        return open;
+        return isOpen;
     }
 
     public void setOpen(boolean open) {
-        this.open = open;
+        this.isOpen = open;
     }
 
-    public List<Coords> getOpenDoorCoverLine() {
-        if (prototype != null) {
-            return prototype.openDoorCoverLine;
+    public OpenableItem getIndividualOpenableItem() {
+        return openableItem;
+    }
+
+    public OpenableItem getOpenableItem() {
+        if (prototype == null) {
+            return openableItem;
         } else {
-            return openDoorCoverLine;
+            return prototype.getOpenableItem();
         }
     }
 
-    public void setOpenDoorCoverLine(List<Coords> openDoorCoverLine) {
-        this.openDoorCoverLine = openDoorCoverLine;
+    public void setOpenableItem(OpenableItem openableItem) {
+        this.openableItem = openableItem;
     }
 
-    public List<List<Coords>> getOpenDoorCollisionPolygons() {
-        if (prototype != null) {
-            return prototype.openDoorCollisionPolygons;
+    @Override
+    public Image getImage() {
+        if (image == null) {
+            File programDir = getController().getProgramDir();
+            if (isOpen()) {
+                return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+            } else {
+                return getAnimation().getBasicMain(programDir);
+            }
         } else {
-            return openDoorCollisionPolygons;
+            return image;
         }
     }
 
-    public void setOpenDoorCollisionPolygons(List<List<Coords>> openDoorCollisionPolygons) {
-        this.openDoorCollisionPolygons = openDoorCollisionPolygons;
+    @Override
+    public DoorAnimation getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
+        }
+    }
+
+    @Override
+    public AnimationPos getAnimationPos() {
+        return animationPos;
     }
 
     @Override
     public List<Coords> getActualCoverLine() {
-        if (open) {
-            return getOpenDoorCoverLine();
+        if (isOpen) {
+            return getOpenableItem().getOpenCoverLine();
         } else {
             return super.getActualCoverLine();
         }
@@ -135,8 +122,8 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
 
     @Override
     public List<List<Coords>> getActualCollisionPolygons() {
-        if (open) {
-            return getOpenDoorCollisionPolygons();
+        if (isOpen) {
+            return getOpenableItem().getOpenCollisionPolygons();
         } else {
             return super.getActualCollisionPolygons();
         }
@@ -144,10 +131,10 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
 
     @Override
     public void open() {
-        open = true;
+        isOpen = true;
         PosItem collision = getCollision();
         if (collision != null) {
-            open = false;
+            isOpen = false;
             System.out.println(getName() + " cannot be open: collides with " + collision.getName());
         } else {
             System.out.println(getName() + " open");
@@ -156,10 +143,10 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
 
     @Override
     public void close() {
-        open = false;
+        isOpen = false;
         PosItem collision = getCollision();
         if (collision != null) {
-            open = true;
+            isOpen = true;
             System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
         } else {
             System.out.println(getName() + " closed");
@@ -171,7 +158,7 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         CreatureSize size = cr.getSize();
         if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (getObstacleOnWay(cr) != null) return false;
-            if (open) {
+            if (isOpen) {
                 close();
             } else {
                 open();
@@ -186,13 +173,9 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
-        out.writeObject(openImagePath);
+        out.writeBoolean(isOpen);
 
-        out.writeBoolean(open);
-
-        out.writeObject(openDoorCoverLine);
-
-        out.writeObject(openDoorCollisionPolygons);
+        out.writeObject(openableItem);
     }
 
     @Override
@@ -200,12 +183,12 @@ public abstract class Door<I extends Door> extends PosItem<I> implements Openabl
         super.readExternal(in);
         long ver = in.readLong();
 
-        openImagePath = (String) in.readObject();
+        if (prototype == null) {
+            animation = new DoorAnimation(getDir());
+        }
 
-        open = in.readBoolean();
+        isOpen = in.readBoolean();
 
-        openDoorCoverLine = (List<Coords>) in.readObject();
-
-        openDoorCollisionPolygons = (List<List<Coords>>) in.readObject();
+        openableItem = (OpenableItem) in.readObject();
     }
 }

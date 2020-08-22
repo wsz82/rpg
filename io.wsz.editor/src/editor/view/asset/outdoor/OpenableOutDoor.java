@@ -1,17 +1,15 @@
 package editor.view.asset.outdoor;
 
 import editor.view.asset.AssetStage;
-import editor.view.asset.OpenableAsset;
+import editor.view.asset.openable.OpenableAsset;
+import io.wsz.model.item.OpenableItem;
 import io.wsz.model.item.OutDoor;
-import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
-
-import java.util.List;
 
 public class OpenableOutDoor extends OpenableAsset<OutDoor> {
 
-    public OpenableOutDoor(AssetStage<OutDoor> assetStage, OutDoor item, boolean isContent) {
-        super(assetStage, item, isContent);
+    public OpenableOutDoor(AssetStage<OutDoor> assetStage, OutDoor item, OpenableItem openableItem, boolean isContent) {
+        super(assetStage, item, openableItem, isContent);
     }
 
     @Override
@@ -20,32 +18,12 @@ public class OpenableOutDoor extends OpenableAsset<OutDoor> {
     }
 
     @Override
-    protected List<Coords> getOpenCoverLine() {
-        return item.getOpenDoorCoverLine();
-    }
-
-    @Override
-    protected List<List<Coords>> getOpenCollisionPolygons() {
-        return item.getOpenDoorCollisionPolygons();
-    }
-
-    @Override
     protected void setOpen(boolean open) {
         item.setOpen(open);
     }
 
     @Override
-    protected void setOpenImagePath(String openImagePath) {
-        item.setOpenImagePath(openImagePath);
-    }
-
-    @Override
     protected boolean isOpen() {
         return item.isOpen();
-    }
-
-    @Override
-    protected String getOpenImagePath() {
-        return item.getOpenImagePath();
     }
 }

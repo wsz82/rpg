@@ -3,7 +3,7 @@ package editor.model;
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.ItemsStage;
-import editor.view.asset.ObservableAssets;
+import editor.view.asset.openable.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;

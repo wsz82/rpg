@@ -5,12 +5,13 @@ import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.item.OpenableItem;
 import javafx.stage.Stage;
 
 public class InDoorAssetStage extends AssetStage<InDoor> {
     private static final String TITLE = "InDoor asset";
 
-    private final OpenableInDoor openable = new OpenableInDoor(this, item, isContent);
+    private OpenableInDoor openable;
 
     public InDoorAssetStage(Stage parent, InDoor item, boolean isContent,
                             EditorCanvas editorCanvas, EditorController editorController) {
@@ -28,7 +29,6 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
         super.initWindow();
         setTitle(TITLE);
 
-        openable.initOpenable(container);
         fillInputs();
     }
 
@@ -38,8 +38,11 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
             item = createNewAsset();
         }
 
-        super.fillInputs();
+        OpenableItem openableItem = item.getOpenableItem();
+        openable = new OpenableInDoor(this, item, openableItem, isContent);
+        openable.initOpenable(container);
 
+        super.fillInputs();
         openable.fillOpenableInputs();
     }
 

@@ -1,44 +1,51 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.weapon.WeaponAnimation;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class Weapon extends Equipment<Weapon> {
+public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
-    protected Double damage;
-    protected Double range;
-    protected Double speed;
+    private WeaponAnimation animation;
 
+    private final EquipmentAnimationPos animationPos;
+    private Double damage;
+    private Double range;
+    private Double speed;
     private WeaponType weaponType;
 
-    public Weapon() {}
+    public Weapon() {
+        this.animationPos = new EquipmentAnimationPos();
+    }
 
     public Weapon(ItemType type) {
         super(type);
+        this.animation = new WeaponAnimation(getDir());
+        this.animationPos = new EquipmentAnimationPos();
     }
 
     public Weapon(Weapon prototype, Boolean visible) {
         super(prototype, visible);
+        this.animationPos = new EquipmentAnimationPos();
+    }
+
+    public Weapon(Weapon other) {
+        super(other);
+        this.animationPos = new EquipmentAnimationPos(other.getAnimationPos());
+        this.damage = other.damage;
+        this.range = other.range;
+        this.speed = other.speed;
+        this.weaponType = other.weaponType;
     }
 
     @Override
     public Weapon cloneEquipment() {
-        Weapon clone = new Weapon(prototype, visible.get());
-        clone.setCoverLine(Coords.cloneCoordsList(coverLine));
-        clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
-        clone.getPos().x = this.pos.x;
-        clone.getPos().y = this.pos.y;
-        clone.setWeight(weight);
-        clone.setSize(size);
-        clone.setDamage(damage);
-        clone.setRange(range);
-        clone.setSpeed(speed);
-        return clone;
+        return new Weapon(this);
     }
 
     public Double getIndividualDamage() {
@@ -133,6 +140,20 @@ public class Weapon extends Equipment<Weapon> {
     }
 
     @Override
+    public WeaponAnimation getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
+        }
+    }
+
+    @Override
+    public EquipmentAnimationPos getAnimationPos() {
+        return animationPos;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
@@ -150,6 +171,10 @@ public class Weapon extends Equipment<Weapon> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        if (prototype == null) {
+            animation = new WeaponAnimation(getDir());
+        }
 
         damage = (Double) in.readObject();
 

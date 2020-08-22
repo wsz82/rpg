@@ -7,10 +7,7 @@ import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -21,20 +18,6 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
     public InDoorTableView(Stage parent, ObservableList<InDoor> assets,
                     EditorCanvas editorCanvas, EditorController editorController) {
         super(parent, assets, editorCanvas, editorController);
-        initInDoorTable();
-    }
-
-    private void initInDoorTable() {
-        TableColumn<InDoor, String> openDoorPathCol = new TableColumn<>("Open door path");
-        openDoorPathCol.setCellValueFactory(p -> new ObjectBinding<>() {
-            @Override
-            protected String computeValue() {
-                return p.getValue().getOpenImagePath();
-            }
-        });
-        openDoorPathCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        openDoorPathCol.setEditable(false);
-        getColumns().add(openDoorPathCol);
     }
 
     @Override
@@ -65,13 +48,8 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
                 pos.y = pos.y - height;
             }
 
-            String name = p.getName();
-            ItemType type = p.getType();
-            String path = p.getPath();
-
             InDoor id = new InDoor(p, true);
             id.setPos(pos);
-            id.setOpenImagePath(p.getOpenImagePath());
             id.setOpen(p.isOpen());
 
             output.add(id);

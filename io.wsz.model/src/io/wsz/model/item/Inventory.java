@@ -62,15 +62,31 @@ public class Inventory implements Externalizable {
     }
 
     public int getFilledSpace() {
-        return getItems().stream()
+        return getEquippedWeaponSize() + getItems().stream()
                 .mapToInt(Equipment::getSize)
                 .sum();
     }
 
+    private int getEquippedWeaponSize() {
+        if (equippedWeapon == null) {
+            return 0;
+        } else {
+            return equippedWeapon.getSize();
+        }
+    }
+
     public double getActualWeight() {
-        return getItems().stream()
+        return getEquippedWeaponWeight() + getItems().stream()
                 .mapToDouble(Equipment::getWeight)
                 .sum();
+    }
+
+    private double getEquippedWeaponWeight() {
+        if (equippedWeapon == null) {
+            return 0;
+        } else {
+            return equippedWeapon.getWeight();
+        }
     }
 
     @Override

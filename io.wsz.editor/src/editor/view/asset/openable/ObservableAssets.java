@@ -1,4 +1,4 @@
-package editor.view.asset;
+package editor.view.asset.openable;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.*;

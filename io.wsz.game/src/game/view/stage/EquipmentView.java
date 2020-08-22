@@ -1,6 +1,8 @@
 package game.view.stage;
 
 import game.model.GameController;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
@@ -109,6 +111,17 @@ public abstract class EquipmentView extends CanvasView {
         modifiedCoords.y = pos.y;
         modifiedCoords.subtract(curPos);
         return modifiedCoords;
+    }
+
+    protected void playInventoryAnimation(Equipment e) {
+        EquipmentAnimationPos animationPos = e.getAnimationPos();
+        animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
+        e.getAnimation().play(e);
+    }
+
+    protected void playDropAnimation(Equipment e) {
+        setDropAnimationPos(e);
+        e.getAnimation().play(e);
     }
 
     protected abstract void drawBackground();

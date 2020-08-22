@@ -2,10 +2,9 @@ package game.view.stage;
 
 import game.model.GameController;
 import io.wsz.model.Controller;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.PosItem;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.EquipmentAnimationType;
+import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -139,5 +138,10 @@ public abstract class CanvasView {
         File programDir = controller.getProgramDir();
         Image img = base.getImage(programDir);
         gc.drawImage(img, x * meter, y * meter);
+    }
+
+    protected void setDropAnimationPos(Equipment e) {
+        EquipmentAnimationPos animationPos = e.getAnimationPos();
+        animationPos.setCurAnimation(EquipmentAnimationType.DROP);
     }
 }

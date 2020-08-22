@@ -20,7 +20,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -35,8 +34,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
     protected final Button dialogButton = new Button("Dialog");
-    protected final HBox imageBox = new HBox(10);
-    protected final Button imageButton = new Button("Image");
+    protected final HBox animationBox = new HBox(10);
+    protected final Button animationButton = new Button("Animation");
     protected final Label pathLabel = new Label();
 
     protected A item;
@@ -89,11 +88,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         }
 
         nameInput.setPromptText("Name");
-        imageBox.getChildren().addAll(imageButton, pathLabel);
+        animationBox.getChildren().addAll(animationButton, pathLabel);
         container.getChildren().addAll(nameInput);
 
         if (!isContent) {
-            container.getChildren().add(imageBox);
+            container.getChildren().add(animationBox);
         }
 
         if (item != null) {
@@ -111,7 +110,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (isContent) {
             nameInput.setDisable(true);
         }
-        hookupEvents();
+        hookUpAssetEvents();
     }
 
     protected void fillInputs() {
@@ -154,10 +153,10 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         defineAsset();
     }
 
-    private void hookupEvents() {
-        imageButton.setOnAction(e -> {
-            String title = "Choose image for asset";
-            setUpFileChooser(title, pathLabel);
+    private void hookUpAssetEvents() {
+        animationButton.setOnAction(e -> {
+            String title = "Choose animation for asset";
+            setUpDirChooser(title, pathLabel);
         });
         interactionButton.setOnAction(e -> openInteractionPointEdit());
         coverButton.setOnAction(e -> openCoverEdit());
@@ -167,15 +166,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         cancel.setOnAction(event -> close());
     }
 
-    protected void setUpFileChooser(String title, Label label) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(title);
-        fileChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
-        File selectedFile = fileChooser.showOpenDialog(this);
-        fillLabel(label, selectedFile);
-    }
-
-    protected void setUpDirChooser(String title, Label label) {
+    public void setUpDirChooser(String title, Label label) {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
         dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));

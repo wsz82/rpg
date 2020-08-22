@@ -1,17 +1,15 @@
 package editor.view.asset.equipment.container;
 
 import editor.view.asset.AssetStage;
-import editor.view.asset.OpenableAsset;
+import editor.view.asset.openable.OpenableAsset;
 import io.wsz.model.item.Container;
-import io.wsz.model.stage.Coords;
+import io.wsz.model.item.OpenableItem;
 import javafx.scene.image.Image;
-
-import java.util.List;
 
 public class OpenableContainer extends OpenableAsset<Container> {
 
-    public OpenableContainer(AssetStage<Container> assetStage, Container item, boolean isContent) {
-        super(assetStage, item, isContent);
+    public OpenableContainer(AssetStage<Container> assetStage, Container item, OpenableItem openableItem, boolean isContent) {
+        super(assetStage, item, openableItem, isContent);
     }
 
     @Override
@@ -20,32 +18,12 @@ public class OpenableContainer extends OpenableAsset<Container> {
     }
 
     @Override
-    protected List<Coords> getOpenCoverLine() {
-        return item.getOpenContainerCoverLine();
-    }
-
-    @Override
-    protected List<List<Coords>> getOpenCollisionPolygons() {
-        return item.getOpenContainerCollisionPolygons();
-    }
-
-    @Override
     protected void setOpen(boolean open) {
         item.setOpen(open);
     }
 
     @Override
-    protected void setOpenImagePath(String openImagePath) {
-        item.setOpenImagePath(openImagePath);
-    }
-
-    @Override
     protected boolean isOpen() {
         return item.isOpen();
-    }
-
-    @Override
-    protected String getOpenImagePath() {
-        return item.getOpenImagePath();
     }
 }

@@ -314,18 +314,7 @@ public class GameRunner {
         }
 
         private void reloadAssetImages(PosItem pi, File programDir) {
-            pi.setImage(null);
-            if (pi instanceof Creature) {
-                Creature c = (Creature) pi;
-                c.getAnimation().initAllFrames(programDir);
-            } else {
-                pi.getInitialImage();
-            }
-            if (pi instanceof Openable) {
-                Openable o = (Openable) pi;
-                o.setOpenImage(null);
-                o.getOpenImage();
-            }
+            pi.getAnimation().initAllAnimations(programDir);
         }
     }
 }

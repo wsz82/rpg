@@ -20,19 +20,29 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 public class ResolutionImage {
 
     public static Image loadAssetImage(File programDir, String type, String fileName) {
-        if (fileName.isEmpty()) {
-            return null;
+        if (fileName.isEmpty() || !fileName.endsWith(".png")) {
+            throw new IllegalArgumentException("File is not PNG");
         }
         String path = programDir + getRelativeTypePath(type) + File.separator + fileName;
         return loadImage(path);
     }
 
     public static Image loadImage(String path) {
+        if (path.isEmpty() || !path.endsWith(".png")) {
+            throw new IllegalArgumentException("File is not PNG");
+        }
         File file = new File(path);
         return loadImage(file);
     }
 
     public static Image loadImage(File file) {
+        if (file == null) {
+            throw new NullPointerException("File is null");
+        }
+        String name = file.getName();
+        if (name.isEmpty() || !name.endsWith(".png")) {
+            throw new IllegalArgumentException("File is not PNG");
+        }
         if (!file.exists()) {
             try {
                 throw new NullPointerException(file + " does not exist");

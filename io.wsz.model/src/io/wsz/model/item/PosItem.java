@@ -1,12 +1,13 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.Animation;
+import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.ResolutionImage;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
@@ -19,15 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class PosItem<A extends PosItem> extends Asset implements Updatable, Interactable {
+public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends Asset implements Updatable, Interactable, Animable {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
 
     protected Controller controller;
-    protected final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
-    protected final Coords pos = new Coords();
 
+    protected BooleanProperty visible;
+    protected Coords pos;
     protected A prototype;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
@@ -35,11 +36,15 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
     protected Coords interactionCoords;
     protected Image image;
 
-    public PosItem() {}
+    public PosItem() {
+        this.visible = new SimpleBooleanProperty(this, "visible");
+        this.pos = new Coords();
+    }
 
     public PosItem(ItemType type) {
         super(type);
-        this.visible.set(true);
+        this.visible = new SimpleBooleanProperty(this, "visible", true);
+        this.pos = new Coords();
         this.coverLine = new ArrayList<>(0);
         this.collisionPolygons = new ArrayList<>(0);
         this.dialog = new Dialog();
@@ -47,7 +52,25 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
 
     public PosItem(A prototype, Boolean visible) {
         this.prototype = prototype;
-        this.visible.set(visible);
+        this.visible = new SimpleBooleanProperty(this, "visible", visible);
+        this.pos = new Coords();
+    }
+
+    public PosItem(PosItem<A, B> other) {
+        super(other);
+        this.visible = new SimpleBooleanProperty(this, "visible", other.visible.get());
+        this.pos = other.pos.clonePos();
+        this.prototype = other.prototype;
+        this.coverLine = Coords.cloneCoordsList(other.coverLine);
+        this.collisionPolygons = Coords.cloneCoordsPolygons(other.collisionPolygons);
+        this.dialog = other.dialog;
+        Coords interactionCoords = other.interactionCoords;
+        if (interactionCoords == null) {
+            this.interactionCoords = null;
+        } else {
+            this.interactionCoords = interactionCoords.clonePos();
+        }
+        this.image = other.image;
     }
 
     public Coords getImageCenter() {
@@ -336,19 +359,23 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
 
     public final Image getInitialImage() {
         if (image == null) {
-            String type = getType().toString().toLowerCase();
-            String path = getPath();
             File programDir = getController().getProgramDir();
-            setImage(ResolutionImage.loadAssetImage(programDir, type, path));
+            image = getAnimation().getBasicMain(programDir);
         }
         return image;
     }
 
     public Image getImage() {
-        if (prototype == null) {
-            return getInitialImage();
+        if (image == null) {
+            if (prototype == null) {
+                File programDir = getController().getProgramDir();
+                image = getAnimation().getBasicMain(programDir);
+                return image;
+            } else {
+                return prototype.getImage();
+            }
         } else {
-            return prototype.getImage();
+            return image;
         }
     }
 
@@ -390,14 +417,24 @@ public abstract class PosItem<A extends PosItem> extends Asset implements Updata
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        playAnimation();
+    }
+
+    private void playAnimation() {
+        Animation animation = getAnimation();
+        if (animation == null) return;
+        animation.play(this);
+    }
+
+    public abstract B getAnimationPos();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PosItem)) return false;
         if (!super.equals(o)) return false;
-        PosItem<?> item = (PosItem<?>) o;
+        PosItem<?, ?> item = (PosItem<?, ?>) o;
         return Objects.equals(getPrototype(), item.getPrototype()) &&
                 Objects.equals(getVisible(), item.getVisible()) &&
                 Objects.equals(getPos(), item.getPos()) &&

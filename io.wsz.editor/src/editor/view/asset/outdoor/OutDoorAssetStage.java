@@ -114,7 +114,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         if (item == null) {
             item = createNewAsset();
         }
-        openable = new OpenableOutDoor(this, item, isContent);
+        openable = new OpenableOutDoor(this, item, item.getOpenableItem(), isContent);
         openable.initOpenable(container);
         coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
         coordsEdit.initCoords(container);

@@ -1,9 +1,10 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.container.ContainerAnimation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -13,47 +14,43 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container extends Equipment<Container> implements Containable, Openable {
+public class Container extends Equipment<Container, EquipmentAnimationPos> implements Containable, Openable {
     private static final long serialVersionUID = 1L;
 
-    private final List<Equipment> items = new ArrayList<>(0);
+    private ContainerAnimation animation;
+
+    private final EquipmentAnimationPos animationPos;
+    private OpenableItem openableItem;
+    private final List<Equipment> items;
     private Double nettoWeight;
     private Integer nettoSize;
-    private boolean open;
-    private Image openImage;
-    private String openImagePath;
-    private List<Coords> openContainerCoverLine;
-    private List<List<Coords>> openContainerCollisionPolygons;
+    private boolean isOpen;
 
-    public Container() {}
+    public Container() {
+        this.animationPos = new EquipmentAnimationPos();
+        this.items = new ArrayList<>(0);
+    }
 
     public Container(ItemType type) {
         super(type);
-        this.openContainerCoverLine = new ArrayList<>(0);
-        this.openContainerCollisionPolygons = new ArrayList<>(0);
+        this.animationPos = new EquipmentAnimationPos();
+        this.openableItem = new OpenableItem();
+        this.items = new ArrayList<>(0);
     }
 
     public Container(Container prototype, Boolean visible) {
         super(prototype, visible);
+        this.animationPos = new EquipmentAnimationPos();
+        this.items = new ArrayList<>(0);
     }
 
-    @Override
-    public Container cloneEquipment() {
-        Container clone = new Container(prototype, visible.get());
-        clone.setCoverLine(Coords.cloneCoordsList(coverLine));
-        clone.setCollisionPolygons(Coords.cloneCoordsPolygons(collisionPolygons));
-        clone.getPos().x = this.pos.x;
-        clone.getPos().y = this.pos.y;
-        clone.setWeight(weight);
-        clone.setSize(size);
-        clone.getItems().addAll(Equipment.cloneEquipmentList(getItems()));
-        clone.setNettoWeight(nettoWeight);
-        clone.setNettoSize(nettoSize);
-        clone.setOpen(isOpen());
-        clone.setOpenImagePath(getOpenImagePath());
-        clone.setOpenContainerCoverLine(Coords.cloneCoordsList(prototype.getOpenContainerCoverLine()));
-        clone.setOpenContainerCollisionPolygons(Coords.cloneCoordsPolygons(prototype.getOpenContainerCollisionPolygons()));
-        return clone;
+    public Container(Container other) {
+        super(other);
+        this.animationPos = new EquipmentAnimationPos(other.animationPos);
+        this.items = Equipment.cloneEquipmentList(other.items);
+        this.nettoWeight = other.weight;
+        this.nettoSize = other.nettoSize;
+        this.isOpen = other.isOpen;
     }
 
     public boolean add(Equipment e) {
@@ -71,11 +68,11 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     public void searchContainer(Creature cr) {
-        if (open) {
+        if (isOpen() || isNotOpenable()) {
             searchOpenContainer(cr);
         } else {
             open();
-            if (open) {
+            if (isOpen()) {
                 searchOpenContainer(cr);
             }
         }
@@ -135,106 +132,79 @@ public class Container extends Equipment<Container> implements Containable, Open
         this.nettoSize = nettoSize;
     }
 
-    public List<Coords> getOpenContainerCoverLine() {
-        if (openContainerCoverLine == null) {
-            if (prototype == null) {
-                return new ArrayList<>(0);
-            }
-            return prototype.openContainerCoverLine;
-        } else {
-            return openContainerCoverLine;
-        }
+    @Override
+    public Double getWeight() {
+        return getNettoWeight() + getItemsWeight();
     }
 
-    public void setOpenContainerCoverLine(List<Coords> openContainerCoverLine) {
-        this.openContainerCoverLine = openContainerCoverLine;
-    }
-
-    public List<List<Coords>> getOpenContainerCollisionPolygons() {
-        if (openContainerCollisionPolygons == null) {
-            if (prototype == null) {
-                return new ArrayList<>(0);
-            }
-            return prototype.openContainerCollisionPolygons;
-        } else {
-            return openContainerCollisionPolygons;
-        }
-    }
-
-    public void setOpenContainerCollisionPolygons(List<List<Coords>> openContainerCollisionPolygons) {
-        this.openContainerCollisionPolygons = openContainerCollisionPolygons;
+    private double getItemsWeight() {
+        if (getItems() == null) return 0;
+        return getItems().stream()
+                .mapToDouble(Equipment::getWeight)
+                .sum();
     }
 
     @Override
     public List<List<Coords>> getActualCollisionPolygons() {
-        if (open) {
-            return getOpenContainerCollisionPolygons();
+        if (isOpen) {
+            return getOpenableItem().getOpenCollisionPolygons();
         } else {
             return super.getActualCollisionPolygons();
         }
     }
 
-    public String getOpenImagePath() {
-        if (openImagePath == null || openImagePath.isEmpty()) {
-            if (prototype == null) {
-                return "";
+    @Override
+    public Image getImage() {
+        if (image == null) {
+            File programDir = getController().getProgramDir();
+            if (isOpen()) {
+                return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+            } else {
+                return getAnimation().getBasicMain(programDir);
             }
-            return prototype.openImagePath;
         } else {
-            return openImagePath;
+            return image;
         }
-    }
-
-    public void setOpenImagePath(String openImagePath) {
-        this.openImagePath = openImagePath;
     }
 
     @Override
     public Image getOpenImage() {
-        if (prototype == null) {
-            if (openImagePath.isEmpty()) {
-                return getInitialImage();
-            }
-            if (openImage == null) {
-                String type = getType().toString().toLowerCase();
-                String openImagePath = getOpenImagePath();
-                File programDir = getController().getProgramDir();
-                setOpenImage(ResolutionImage.loadAssetImage(programDir, type, openImagePath));
-            }
-            return openImage;
-        } else {
-            return prototype.getOpenImage();
-        }
-    }
-
-    @Override
-    public void setOpenImage(Image openImage) {
-        this.openImage = openImage;
-    }
-
-    @Override
-    public Image getImage() {
-        if (open) {
-            if (prototype == null) {
-                return getOpenImage();
-            } else {
-                return prototype.getOpenImage();
-            }
-        } else {
-            if (prototype == null) {
-                return getInitialImage();
-            } else {
-                return prototype.getInitialImage();
-            }
-        }
+        File programDir = getController().getProgramDir();
+        return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
     public boolean isOpen() {
-        return open;
+        return isOpen;
     }
 
     public void setOpen(boolean open) {
-        this.open = open;
+        this.isOpen = open;
+    }
+
+    public OpenableItem getIndividualOpenableItem() {
+        return openableItem;
+    }
+
+    public OpenableItem getOpenableItem() {
+        if (prototype == null) {
+            return openableItem;
+        } else {
+            return prototype.getOpenableItem();
+        }
+    }
+
+    public void setOpenableItem(OpenableItem openableItem) {
+        this.openableItem = openableItem;
+    }
+
+    @Override
+    public Container cloneEquipment() {
+        return new Container(this);
+    }
+
+    @Override
+    public List<Equipment> getItems() {
+        return items;
     }
 
     @Override
@@ -249,23 +219,31 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
-    public Double getWeight() {
-        return getNettoWeight() + getItems().stream()
-                .mapToDouble(Equipment::getWeight)
-                .sum();
+    public boolean creatureSecondaryInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
+            if (getObstacleOnWay(cr) != null) return false;
+            if (isOpen() || isNotOpenable()) {
+                close();
+            } else {
+                open();
+            }
+            return true;
+        }
+        return false;
     }
 
-    @Override
-    public List<Equipment> getItems() {
-        return items;
+    private boolean isNotOpenable() {
+        File programDir = getController().getProgramDir();
+        return getAnimation().getOpenableAnimation().isNotOpenable(programDir);
     }
 
     @Override
     public void open() {
-        open = true;
+        isOpen = true;
         PosItem collision = getCollision();
         if (collision != null) {
-            open = false;
+            isOpen = false;
             System.out.println(getName() + " cannot be open: collides with " + collision.getName());
         } else {
             System.out.println(getName() + " open");
@@ -274,10 +252,10 @@ public class Container extends Equipment<Container> implements Containable, Open
 
     @Override
     public void close() {
-        open = false;
+        isOpen = false;
         PosItem collision = getCollision();
         if (collision != null) {
-            open = true;
+            isOpen = true;
             System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
         } else {
             System.out.println(getName() + " closed");
@@ -285,18 +263,17 @@ public class Container extends Equipment<Container> implements Containable, Open
     }
 
     @Override
-    public boolean creatureSecondaryInteract(Creature cr) {
-        CreatureSize size = cr.getSize();
-        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (getObstacleOnWay(cr) != null) return false;
-            if (open) {
-                close();
-            } else {
-                open();
-            }
-            return true;
+    public ContainerAnimation getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
         }
-        return false;
+    }
+
+    @Override
+    public EquipmentAnimationPos getAnimationPos() {
+        return animationPos;
     }
 
     @Override
@@ -310,19 +287,19 @@ public class Container extends Equipment<Container> implements Containable, Open
 
         out.writeObject(nettoSize);
 
-        out.writeObject(openImagePath);
-        
-        out.writeBoolean(open);
+        out.writeBoolean(isOpen);
 
-        out.writeObject(openContainerCoverLine);
-
-        out.writeObject(openContainerCollisionPolygons);
+        out.writeObject(openableItem);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        if (prototype == null) {
+            animation = new ContainerAnimation(getDir());
+        }
 
         List<Equipment> serItems = (List<Equipment>) in.readObject();
         items.addAll(serItems);
@@ -331,13 +308,8 @@ public class Container extends Equipment<Container> implements Containable, Open
 
         nettoSize = (Integer) in.readObject();
 
-        openImagePath = (String) in.readObject();
+        isOpen = in.readBoolean();
 
-        open = in.readBoolean();
-
-        openContainerCoverLine = (List<Coords>) in.readObject();
-
-        openContainerCollisionPolygons = (List<List<Coords>>) in.readObject();
-
+        openableItem = (OpenableItem) in.readObject();
     }
 }

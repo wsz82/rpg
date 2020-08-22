@@ -1,4 +1,4 @@
-package io.wsz.model.animation;
+package io.wsz.model.animation.creature;
 
 import javafx.scene.image.Image;
 

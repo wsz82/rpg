@@ -9,6 +9,4 @@ public interface Openable {
     void close();
 
     Image getOpenImage();
-
-    void setOpenImage(Image image);
 }

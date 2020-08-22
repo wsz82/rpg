@@ -25,17 +25,6 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
     }
 
     private void initOutDoorTable() {
-        TableColumn<OutDoor, String> openDoorPathCol = new TableColumn<>("Open door path");
-        openDoorPathCol.setCellValueFactory(p -> new ObjectBinding<>() {
-            @Override
-            protected String computeValue() {
-                return p.getValue().getOpenImagePath();
-            }
-        });
-        openDoorPathCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        openDoorPathCol.setEditable(false);
-        getColumns().add(openDoorPathCol);
-
         TableColumn<OutDoor, String> exitCol = new TableColumn<>("Exit");
         exitCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
@@ -78,7 +67,6 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
             OutDoor id = new OutDoor(p, true);
             id.setPos(pos);
-            id.setOpenImagePath(p.getOpenImagePath());
             id.setOpen(p.isOpen());
 
             output.add(id);

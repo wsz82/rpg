@@ -31,6 +31,12 @@ public abstract class Asset implements Externalizable {
         this.path.set(path);
     }
 
+    public Asset(Asset other) {
+        this.name.set(other.getName());
+        this.type.set(other.getType());
+        this.path.set(other.getPath());
+    }
+
     public String getDir() {
         return getRelativeTypePath(getType()) + getPath();
     }

@@ -3,6 +3,8 @@ package game.view.stage;
 import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.*;
 import io.wsz.model.sizes.Sizes;
@@ -52,6 +54,7 @@ public class InventoryView {
     private EquipmentView origin;
     private EquipmentView scrolledVer;
     private DropView scrolledHor;
+    private EquipmentView lastCheckedView;
 
     public InventoryView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
@@ -198,6 +201,7 @@ public class InventoryView {
 
     private void stopDrag(double mouseX, double mouseY) {
         if (dragged == null) return;
+        dragged.getAnimationPos().setNextFrameUpdate(0);
         Creature hoveredHero = gameController.getHoveredHero();
         if (!moveToHero(hoveredHero)) {
             moveEquipmentWithinInventory(mouseX, mouseY);
@@ -356,6 +360,22 @@ public class InventoryView {
         Coords mousePos = getMousePos(x, y, left, top);
         int meter = Sizes.getMeter();
         if (dragged != null) {
+            EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+            EquipmentAnimationPos animationPos = dragged.getAnimationPos();
+            if (ev instanceof DropView) {
+                if (!(lastCheckedView instanceof DropView)) {
+                    animationPos.setNextFrameUpdate(0);
+                }
+                animationPos.setCurAnimation(EquipmentAnimationType.DROP);
+            } else {
+                if (lastCheckedView instanceof DropView) {
+                    animationPos.setNextFrameUpdate(0);
+                }
+                animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
+            }
+            lastCheckedView = ev;
+
+            dragged.getAnimation().play(dragged);
             Image img = dragged.getImage();
             gc.drawImage(img,
                     mousePos.x*meter - img.getWidth()/2,

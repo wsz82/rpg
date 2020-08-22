@@ -1,5 +1,7 @@
 package io.wsz.model.animation;
 
+import io.wsz.model.animation.creature.CreatureAnimation;
+import io.wsz.model.animation.creature.MoveDirection;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

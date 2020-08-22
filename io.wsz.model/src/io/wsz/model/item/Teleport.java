@@ -1,5 +1,7 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.Animation;
+import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -10,22 +12,29 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Teleport extends PosItem<Teleport> {
+public class Teleport extends PosItem<Teleport, AnimationPos> {
     private static final long serialVersionUID = 1L;
 
+    private Animation<Teleport> animation;
+
+    private final AnimationPos animationPos;
     private Coords exit;
     private List<List<Coords>> teleportCollisionPolygons;
 
-    public Teleport() {}
+    public Teleport() {
+        this.animationPos = new AnimationPos();
+    }
 
     public Teleport(ItemType type) {
         super(type);
+        this.animationPos = new AnimationPos();
         this.exit = new Coords();
         this.teleportCollisionPolygons = new ArrayList<>(0);
     }
 
     public Teleport(Teleport prototype, Boolean visible) {
         super(prototype, visible);
+        this.animationPos = new AnimationPos();
     }
 
     public void enter(Creature cr) {
@@ -67,6 +76,20 @@ public class Teleport extends PosItem<Teleport> {
     }
 
     @Override
+    public Animation<Teleport> getAnimation() {
+        if (prototype == null) {
+            return animation;
+        } else {
+            return prototype.getAnimation();
+        }
+    }
+
+    @Override
+    public AnimationPos getAnimationPos() {
+        return animationPos;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
@@ -80,6 +103,10 @@ public class Teleport extends PosItem<Teleport> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        if (prototype == null) {
+            animation = new Animation<>(getDir());
+        }
 
         exit = (Coords) in.readObject();
 
