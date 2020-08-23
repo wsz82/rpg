@@ -6,7 +6,6 @@ import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.location.Location;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -73,6 +72,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         }
         TeleportAssetStage as = new TeleportAssetStage(parent, t, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -85,17 +85,9 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
     protected List<Teleport> createItems(Coords rawPos) {
         List<Teleport> selectedAssets = getSelectionModel().getSelectedItems();
         List<Teleport> output = new ArrayList<>(1);
-        for (Teleport p
-                : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
+        for (Teleport p : selectedAssets) {
             Teleport t = new Teleport(p, true);
-            t.setPos(pos);
-
+            clonePrototypePos(rawPos, p, t);
             output.add(t);
         }
         return output;

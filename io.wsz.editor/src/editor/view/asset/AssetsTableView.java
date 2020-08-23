@@ -9,6 +9,7 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -86,6 +87,12 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     protected abstract void editAsset();
 
     protected abstract void addAsset();
+
+    protected void refreshTableOnStageHidden(Stage toHide) {
+        toHide.setOnHiding(e -> {
+            this.refresh();
+        });
+    }
 
     private void initTable() {
         TableColumn<A, String> nameCol = new TableColumn<>("Name");
@@ -190,6 +197,15 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         List<A> assetsToRemove = getSelectionModel().getSelectedItems();
         removeContent(assetsToRemove);
         removeAssetFromList(assetsToRemove);
+    }
+
+    protected void clonePrototypePos(Coords rawPos, A p, A w) {
+        Coords pos = rawPos.clonePos();
+        if (!pos.is0()) {
+            double height = p.getImage().getHeight() / Sizes.getMeter();
+            pos.y = pos.y - height;
+        }
+        w.setPos(pos);
     }
 
     protected abstract void removeAssetFromList(List<A> assetsToRemove);

@@ -46,7 +46,7 @@ public class Animation<A extends PosItem> {
             if (fileName.equals(IDLE)) {
                 initIdles(animationDir, idles);
             }
-            initOtherAnimation(animationDir, fileName); //TODO move out of loop without IDLE?
+            initOtherAnimation(animationDir, fileName);
         }
     }
 

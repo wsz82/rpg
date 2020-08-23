@@ -24,7 +24,7 @@ public class Task implements Externalizable {
 
     public Task() {}
 
-    public void clone(Creature cr) {
+    public void cloneTo(Creature cr) {
         Task task = cr.getTask();
         task.setItem(cr, this.item);
         task.setDest(this.dest);

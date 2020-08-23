@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OutDoor;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -45,6 +44,7 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         }
         OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -57,19 +57,12 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
     protected List<OutDoor> createItems(Coords rawPos) {
         List<OutDoor> selectedAssets = getSelectionModel().getSelectedItems();
         List<OutDoor> output = new ArrayList<>(1);
-        for (OutDoor p
-                : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
+        for (OutDoor p : selectedAssets) {
+            OutDoor od = new OutDoor(p, true);
+            clonePrototypePos(rawPos, p, od);
+            od.setOpen(p.isOpen());
 
-            OutDoor id = new OutDoor(p, true);
-            id.setPos(pos);
-            id.setOpen(p.isOpen());
-
-            output.add(id);
+            output.add(od);
         }
         return output;
     }

@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -46,6 +45,7 @@ public class ContainerTableView extends AssetsTableView<Container> {
         }
         ContainerAssetStage as = new ContainerAssetStage(parent, c, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -60,14 +60,8 @@ public class ContainerTableView extends AssetsTableView<Container> {
         List<Container> output = new ArrayList<>(1);
         for (Container p
                 : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
             Container c = new Container(p, true);
-            c.setPos(pos);
+            clonePrototypePos(rawPos, p, c);
             c.getItems().addAll(p.getItems());
             c.setOpen(p.isOpen());
 

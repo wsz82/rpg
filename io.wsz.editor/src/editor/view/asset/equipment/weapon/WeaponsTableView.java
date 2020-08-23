@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -68,6 +67,7 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
         }
         WeaponAssetStage as = new WeaponAssetStage(parent, w, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -82,14 +82,8 @@ public class WeaponsTableView extends AssetsTableView<Weapon> {
         List<Weapon> output = new ArrayList<>(1);
         for (Weapon p
                 : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
             Weapon w = new Weapon(p, true);
-            w.setPos(pos);
+            clonePrototypePos(rawPos, p, w);
             output.add(w);
         }
         return output;

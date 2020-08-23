@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -28,6 +27,7 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
         }
         LandscapeAssetStage as = new LandscapeAssetStage(parent, l, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -42,14 +42,8 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
         List<Landscape> output = new ArrayList<>(1);
         for (Landscape p
                 : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
             Landscape l = new Landscape(p, true);
-            l.setPos(pos);
+            clonePrototypePos(rawPos, p, l);
             output.add(l);
         }
         return output;

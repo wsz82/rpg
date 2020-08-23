@@ -7,6 +7,7 @@ import editor.view.asset.equipment.container.ContainerTableView;
 import editor.view.asset.equipment.weapon.WeaponsTableView;
 import editor.view.asset.indoor.InDoorTableView;
 import editor.view.asset.landscape.LandscapeTableView;
+import editor.view.asset.openable.ObservableAssets;
 import editor.view.asset.outdoor.OutDoorTableView;
 import editor.view.asset.teleport.TeleportTableView;
 import editor.view.content.ContentTableView;
@@ -56,41 +57,41 @@ public class AssetsStage extends ChildStage {
         for (ItemType type:
              itemTypes) {
             AssetsTableView table = null;
+            ObservableAssets observableAssets = editorController.getObservableAssets();
             switch (type) {
                 case CREATURE -> {
-                    ObservableList<Creature> creatures = editorController.getObservableAssets().getCreatures();
+                    ObservableList<Creature> creatures = observableAssets.getCreatures();
                     table = new CreatureTableView(this, creatures, editorCanvas, editorController);
                 }
                 case COVER -> {
-                    ObservableList<Cover> covers = editorController.getObservableAssets().getCovers();
+                    ObservableList<Cover> covers = observableAssets.getCovers();
                     table = new CoverTableView(this, covers, editorCanvas, editorController);
                 }
                 case LANDSCAPE -> {
-                    ObservableList<Landscape> landscapes = editorController.getObservableAssets().getLandscapes();
+                    ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
                     table = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
                 }
                 case TELEPORT -> {
-                    ObservableList<Teleport> teleports = editorController.getObservableAssets().getTeleports();
+                    ObservableList<Teleport> teleports = observableAssets.getTeleports();
                     table = new TeleportTableView(this, teleports, editorCanvas, editorController);
                 }
                 case WEAPON -> {
-                    ObservableList<Weapon> weapons = editorController.getObservableAssets().getWeapons();
+                    ObservableList<Weapon> weapons = observableAssets.getWeapons();
                     table = new WeaponsTableView(this, weapons, editorCanvas, editorController);
                 }
                 case CONTAINER -> {
-                    ObservableList<Container> containers = editorController.getObservableAssets().getContainers();
+                    ObservableList<Container> containers = observableAssets.getContainers();
                     table = new ContainerTableView(this, containers, editorCanvas, editorController);
                 }
                 case INDOOR -> {
-                    ObservableList<InDoor> inDoors = editorController.getObservableAssets().getInDoors();
+                    ObservableList<InDoor> inDoors = observableAssets.getInDoors();
                     table = new InDoorTableView(this, inDoors, editorCanvas, editorController);
                 }
                 case OUTDOOR -> {
-                    ObservableList<OutDoor> outDoors = editorController.getObservableAssets().getOutDoors();
+                    ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
                     table = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
                 }
             }
-            if (table == null) continue;
             table.setPointer(pointer);
             table.setContentTableView(contentTableView);
             String tabName = type.toString();

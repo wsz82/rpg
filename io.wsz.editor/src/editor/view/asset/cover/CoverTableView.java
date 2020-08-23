@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -28,6 +27,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
         }
         CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -42,14 +42,8 @@ public class CoverTableView extends AssetsTableView<Cover> {
         List<Cover> output = new ArrayList<>(1);
         for (Cover p
                 : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
             Cover cover = new Cover(p, true);
-            cover.setPos(pos);
+            clonePrototypePos(rawPos, p, cover);
             output.add(cover);
         }
         return output;

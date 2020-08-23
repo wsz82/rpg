@@ -37,7 +37,7 @@ class CreatureTest {
 
         Creature b = new Creature(p, true);
 
-        a.getTask().clone(b);
+        a.getTask().cloneTo(b);
 
         Inventory inventoryB = new Inventory(b);
         b.setInventory(inventoryB);

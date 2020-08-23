@@ -5,7 +5,6 @@ import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -28,6 +27,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         }
         InDoorAssetStage as = new InDoorAssetStage(parent, id, false, editorCanvas, editorController);
         as.show();
+        refreshTableOnStageHidden(as);
     }
 
     @Override
@@ -42,14 +42,8 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         List<InDoor> output = new ArrayList<>(1);
         for (InDoor p
                 : selectedAssets) {
-            Coords pos = rawPos.clonePos();
-            if (!pos.is0()) {
-                double height = p.getImage().getHeight() / Sizes.getMeter();
-                pos.y = pos.y - height;
-            }
-
             InDoor id = new InDoor(p, true);
-            id.setPos(pos);
+            clonePrototypePos(rawPos, p, id);
             id.setOpen(p.isOpen());
 
             output.add(id);
