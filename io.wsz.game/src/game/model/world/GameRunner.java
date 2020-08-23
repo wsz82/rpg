@@ -5,6 +5,7 @@ import game.model.logger.Logger;
 import game.model.save.SaveMemento;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -190,6 +191,14 @@ public class GameRunner {
         if (answering == null) {
             return;
         }
+        Dialog dialog = answering.getDialog();
+        if (dialog == null || dialog.getGreeting() == null) {
+            controller.setAsking(null);
+            controller.setAnswering(null);
+            logger.logNoAnsweringResponse(answering);
+            return;
+        }
+
         gameController.setDialog(true);
     }
 

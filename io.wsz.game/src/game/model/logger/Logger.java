@@ -1,5 +1,7 @@
 package game.model.logger;
 
+import io.wsz.model.item.PosItem;
+
 public class Logger {
     private long viewStart;
     private long modelStart;
@@ -39,5 +41,9 @@ public class Logger {
                 System.out.println("View: millis loop duration: " + dif);
             }
         }
+    }
+
+    public void logNoAnsweringResponse(PosItem answering) {
+        System.out.println(answering.getName() + " does not respond");
     }
 }

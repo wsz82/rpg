@@ -99,17 +99,7 @@ public class DialogView {
         if (dialogs.isEmpty()) {
             PosItem speaker = dialogMemento.getAnswering();
             Dialog dialog = speaker.getDialog();
-            if (dialog == null) {
-                System.out.println(speaker.getName() + " does not speak");
-                endDialog();
-                return;
-            }
             Answer answer = dialog.getGreeting();
-            if (answer == null) {
-                System.out.println(speaker.getName() + " does not greet");
-                endDialog();
-                return;
-            }
             addDialogItem(speaker, answer.getText());
             dialogMemento.setLastAnswer(answer);
         }

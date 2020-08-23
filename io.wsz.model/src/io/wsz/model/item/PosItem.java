@@ -304,8 +304,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         if (dialog == null) {
             if (prototype == null) {
                 return null;
+            } else {
+                return prototype.dialog;
             }
-            return prototype.dialog;
         } else {
             return dialog;
         }
