@@ -54,52 +54,49 @@ public class AssetsStage extends ChildStage {
         ItemType[] itemTypes = ItemType.values();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        for (ItemType type:
-             itemTypes) {
-            AssetsTableView table = null;
-            ObservableAssets observableAssets = editorController.getObservableAssets();
-            switch (type) {
-                case CREATURE -> {
-                    ObservableList<Creature> creatures = observableAssets.getCreatures();
-                    table = new CreatureTableView(this, creatures, editorCanvas, editorController);
-                }
-                case COVER -> {
-                    ObservableList<Cover> covers = observableAssets.getCovers();
-                    table = new CoverTableView(this, covers, editorCanvas, editorController);
-                }
-                case LANDSCAPE -> {
-                    ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
-                    table = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
-                }
-                case TELEPORT -> {
-                    ObservableList<Teleport> teleports = observableAssets.getTeleports();
-                    table = new TeleportTableView(this, teleports, editorCanvas, editorController);
-                }
-                case WEAPON -> {
-                    ObservableList<Weapon> weapons = observableAssets.getWeapons();
-                    table = new WeaponsTableView(this, weapons, editorCanvas, editorController);
-                }
-                case CONTAINER -> {
-                    ObservableList<Container> containers = observableAssets.getContainers();
-                    table = new ContainerTableView(this, containers, editorCanvas, editorController);
-                }
-                case INDOOR -> {
-                    ObservableList<InDoor> inDoors = observableAssets.getInDoors();
-                    table = new InDoorTableView(this, inDoors, editorCanvas, editorController);
-                }
-                case OUTDOOR -> {
-                    ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
-                    table = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
-                }
-            }
-            table.setPointer(pointer);
-            table.setContentTableView(contentTableView);
-            String tabName = type.toString();
-            Tab tab = new Tab();
-            tab.setText(tabName);
-            tab.setContent(table);
-            tabPane.getTabs().add(tab);
-        }
+        ObservableAssets observableAssets = editorController.getObservableAssets();
+
+        ObservableList<Creature> creatures = observableAssets.getCreatures();
+        AssetsTableView<Creature> creatureTableView = new CreatureTableView(this, creatures, editorCanvas, editorController);
+        setUpTab(creatureTableView, "Creatures");
+
+        ObservableList<Cover> covers = observableAssets.getCovers();
+        AssetsTableView<Cover> coverTableView = new CoverTableView(this, covers, editorCanvas, editorController);
+        setUpTab(coverTableView, "Covers");
+
+        ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
+        AssetsTableView<Landscape> landscapeTableView = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
+        setUpTab(landscapeTableView, "Landscapes");
+
+        ObservableList<Teleport> teleports = observableAssets.getTeleports();
+        AssetsTableView<Teleport> teleportTableView = new TeleportTableView(this, teleports, editorCanvas, editorController);
+        setUpTab(teleportTableView, "Teleports");
+
+        ObservableList<Weapon> weapons = observableAssets.getWeapons();
+        AssetsTableView<Weapon> weaponsTableView = new WeaponsTableView(this, weapons, editorCanvas, editorController);
+        setUpTab(weaponsTableView, "Weapons");
+
+        ObservableList<Container> containers = observableAssets.getContainers();
+        AssetsTableView<Container> containerTableView = new ContainerTableView(this, containers, editorCanvas, editorController);
+        setUpTab(containerTableView, "Containers");
+
+        ObservableList<InDoor> inDoors = observableAssets.getInDoors();
+        AssetsTableView<InDoor> inDoorTableView = new InDoorTableView(this, inDoors, editorCanvas, editorController);
+        setUpTab(inDoorTableView, "Open/Closed doors");
+
+        ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
+        AssetsTableView<OutDoor> outDoorTableView = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
+        setUpTab(outDoorTableView, "Out/In doors");
+
         root.getChildren().add(tabPane);
+    }
+
+    private <A extends PosItem> void setUpTab(AssetsTableView<A> tableView, String tabName) {
+        tableView.setPointer(pointer);
+        tableView.setContentTableView(contentTableView);
+        Tab tab = new Tab();
+        tab.setText(tabName);
+        tab.setContent(tableView);
+        tabPane.getTabs().add(tab);
     }
 }
