@@ -34,6 +34,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
     protected Coords interactionCoords;
+    protected Double animationSpeed;
     protected Image image;
 
     public PosItem() {
@@ -357,6 +358,26 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         return super.getPath();
     }
 
+    public Double getIndividualAnimationSpeed() {
+        return animationSpeed;
+    }
+
+    public Double getAnimationSpeed() {
+        if (animationSpeed == null) {
+            if (prototype == null) {
+                return 1.0;
+            } else {
+                return prototype.getAnimationSpeed();
+            }
+        } else {
+            return animationSpeed;
+        }
+    }
+
+    public void setAnimationSpeed(Double animationSpeed) {
+        this.animationSpeed = animationSpeed;
+    }
+
     public final Image getInitialImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
@@ -461,6 +482,8 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
         out.writeObject(prototype);
 
+        out.writeObject(animationSpeed);
+
         out.writeBoolean(visible.get());
 
         out.writeObject(pos);
@@ -480,6 +503,8 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         long ver = in.readLong();
 
         prototype = (A) in.readObject();
+
+        animationSpeed = (Double) in.readObject();
 
         visible.set(in.readBoolean());
 

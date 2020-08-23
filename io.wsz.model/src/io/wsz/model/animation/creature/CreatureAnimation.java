@@ -192,7 +192,7 @@ public class CreatureAnimation extends Animation<Creature> {
         int framesSize = frames.size();
         if (framesSize == 0) return null;
 
-        long nextUpdate = getNextUpdate(framesSize, cr.getSpeed());
+        long nextUpdate = getNextUpdate(framesSize, cr.getAnimationSpeed());
         animationPos.setNextFrameUpdate(nextUpdate);
         int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
         return frames.get(nextFrameNumber);
@@ -243,7 +243,7 @@ public class CreatureAnimation extends Animation<Creature> {
 
     protected Image getIdle(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
-        return getNextIdle(animationPos, cr.getSpeed());
+        return getNextIdle(animationPos, cr.getAnimationSpeed());
     }
 
     @Override

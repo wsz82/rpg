@@ -36,6 +36,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
     }
 
     @Override

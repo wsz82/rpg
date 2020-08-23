@@ -37,6 +37,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
     }
 
     @Override

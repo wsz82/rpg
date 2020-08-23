@@ -149,6 +149,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
         CreatureSize size = sizeCB.getValue();
         if (!isContent && size == null) {
             item.setSize(CreatureSize.getDefault());

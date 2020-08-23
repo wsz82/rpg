@@ -24,7 +24,7 @@ public class DoorAnimation extends Animation<Door> {
         } else {
             playClosed(animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, 1); //TODO speed
+        Image nextIdle = getNextIdle(animationPos, d.getAnimationSpeed());
         if (nextIdle == null) return;
         d.setImage(nextIdle);
     }

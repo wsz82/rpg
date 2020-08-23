@@ -7,18 +7,12 @@ import editor.view.asset.coords.CoordsPolygonsEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
-import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.util.List;
-import java.util.Optional;
 
 public class TeleportAssetStage extends AssetStage<Teleport> {
     private static final String TITLE = "Teleport asset";
@@ -68,41 +62,6 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         collisionEdit.show();
     }
 
-    private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {
-        locationChoice.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Location l) {
-                if (l == null) {
-                    return "";
-                }
-                return l.getName();
-            }
-
-            @Override
-            public Location fromString(String s) {
-                if (s == null) {
-                    return null;
-                }
-                if (s.isEmpty()) {
-                    return null;
-                }
-                return getLocation(s);
-            }
-        });
-        ObservableList<Location> locations = FXCollections.observableArrayList(editorController.getObservableLocations());
-        locationChoice.setItems(locations);
-        if (isContent) {
-            locations.add(null);
-        }
-    }
-
-    private Location getLocation(String s) {
-        Optional<Location> optLocation = controller.getLocations().stream()
-                .filter(l -> l.getName().equals(s))
-                .findFirst();
-        return optLocation.orElse(null);
-    }
-
     @Override
     protected void fillInputs() {
         if (item == null) {
@@ -116,6 +75,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
         Coords exit = item.getIndividualExit();
         item.setExit(coordsEdit.defineCoords(exit));
     }

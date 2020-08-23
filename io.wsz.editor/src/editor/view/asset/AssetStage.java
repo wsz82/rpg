@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.model.EditorController;
+import editor.view.DoubleField;
 import editor.view.asset.coords.CoordsLineEditStage;
 import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.CoordsPolygonsEditStage;
@@ -37,6 +38,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final HBox animationBox = new HBox(10);
     protected final Button animationButton = new Button("Animation");
     protected final Label pathLabel = new Label();
+    protected final DoubleField animationSpeedInput = new DoubleField(true);
 
     protected A item;
     protected boolean isContent;
@@ -95,6 +97,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             container.getChildren().add(animationBox);
         }
 
+        final HBox animationSpeedBox = new HBox(10);
+        final Label animationSpeedLabel = new Label("Animation speed");
+        animationSpeedBox.getChildren().addAll(animationSpeedLabel, animationSpeedInput);
+
+        container.getChildren().add(animationSpeedBox);
+
         if (item != null) {
             if (!isContent) {
                 container.getChildren().addAll(interactionButton, coverButton, collisionButton);
@@ -119,9 +127,14 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         }
         nameInput.setText(item.getName());
         pathLabel.setText(item.getPath());
-    }
 
-    protected abstract void defineAsset();
+        Double animationSpeed = item.getIndividualAnimationSpeed();
+        if (animationSpeed == null) {
+            animationSpeedInput.setText("");
+        } else {
+            animationSpeedInput.setText(String.valueOf(animationSpeed));
+        }
+    }
 
     private void onCreate() {
         String name = nameInput.getText();
@@ -141,6 +154,15 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         close();
         addNewAsset();
         defineAsset();
+    }
+
+    protected void defineAsset() {
+        String animationSpeed = animationSpeedInput.getText();
+        if (animationSpeed.isEmpty()) {
+            item.setAnimationSpeed(null);
+        } else {
+            item.setAnimationSpeed(Double.parseDouble(animationSpeed));
+        }
     }
 
     private void onEdit() {

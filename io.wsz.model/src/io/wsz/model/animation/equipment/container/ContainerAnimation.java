@@ -25,7 +25,7 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
             case DROP -> playDrop(isOpen, animationPos);
             case INVENTORY -> playInventory(isOpen, animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, 1); //TODO speed
+        Image nextIdle = getNextIdle(animationPos, c.getAnimationSpeed());
         if (nextIdle == null) return;
         c.setImage(nextIdle);
     }

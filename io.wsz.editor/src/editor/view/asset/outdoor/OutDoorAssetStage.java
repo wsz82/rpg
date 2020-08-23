@@ -139,6 +139,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
         openable.defineOpenable();
         Coords exit = item.getIndividualExit();
         item.setExit(coordsEdit.defineCoords(exit));

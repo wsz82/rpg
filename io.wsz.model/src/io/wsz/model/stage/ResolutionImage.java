@@ -1,6 +1,5 @@
 package io.wsz.model.stage;
 
-import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -18,14 +17,6 @@ import java.util.Iterator;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class ResolutionImage {
-
-    public static Image loadAssetImage(File programDir, String type, String fileName) {
-        if (fileName.isEmpty() || !fileName.endsWith(".png")) {
-            throw new IllegalArgumentException("File is not PNG");
-        }
-        String path = programDir + getRelativeTypePath(type) + File.separator + fileName;
-        return loadImage(path);
-    }
 
     public static Image loadImage(String path) {
         if (path.isEmpty() || !path.endsWith(".png")) {
@@ -76,10 +67,6 @@ public class ResolutionImage {
                 return getResizedImage(url, d, rd);
             }
         }
-    }
-
-    private static String getRelativeTypePath(String type) {
-        return Paths.ASSETS_DIR + File.separator + type;
     }
 
     public static Image getResizedImage(String url, Dimension d, Dimension rd) {

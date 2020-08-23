@@ -37,6 +37,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
         if (item == null) {
             item = createNewAsset();
         }
+        super.defineAsset();
 
         OpenableItem openableItem = item.getOpenableItem();
         openable = new OpenableInDoor(this, item, openableItem, isContent);

@@ -19,7 +19,7 @@ public abstract class EquipmentAnimation<E extends Equipment> extends Animation<
             case DROP -> playDrop(animationPos);
             case INVENTORY -> playInventory(animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, 1); //TODO speed
+        Image nextIdle = getNextIdle(animationPos, e.getAnimationSpeed());
         if (nextIdle == null) return;
         e.setImage(nextIdle);
     }

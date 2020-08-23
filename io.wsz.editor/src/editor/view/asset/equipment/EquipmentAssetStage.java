@@ -63,6 +63,7 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
 
     @Override
     protected void defineAsset() {
+        super.defineAsset();
         String weight = inputWeight.getText();
         if (weight.isEmpty()) {
             if (isContent) {

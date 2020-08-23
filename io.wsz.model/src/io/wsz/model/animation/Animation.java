@@ -32,7 +32,7 @@ public class Animation<A extends PosItem> {
 
     public void play(A item) {
         AnimationPos animationPos = item.getAnimationPos();
-        Image nextIdle = getNextIdle(animationPos, 1); //TODO speed
+        Image nextIdle = getNextIdle(animationPos, item.getAnimationSpeed());
         if (nextIdle == null) return;
         item.setImage(nextIdle);
     }
