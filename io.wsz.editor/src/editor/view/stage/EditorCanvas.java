@@ -8,6 +8,7 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
@@ -68,7 +69,7 @@ public class EditorCanvas extends Canvas {
                     double piRight = pi.getRight();
                     double piTop = pi.getTop();
                     double piBottom = pi.getBottom();
-                    return Coords.doOverlap(
+                    return Geometry.doOverlap(
                     left, top, right, bottom,
                     piLeft, piTop, piRight, piBottom);
                 })

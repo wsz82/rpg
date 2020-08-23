@@ -62,7 +62,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(dist, 0);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertTrue(ovalsIntersect);
     }
 
@@ -74,7 +74,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(dist, 0);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertTrue(ovalsIntersect);
     }
 
@@ -86,7 +86,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(dist, 0);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertFalse(ovalsIntersect);
     }
 
@@ -98,7 +98,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(0, dist);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertTrue(ovalsIntersect);
     }
 
@@ -110,7 +110,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(0, dist);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertTrue(ovalsIntersect);
     }
 
@@ -122,7 +122,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(0, dist);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertFalse(ovalsIntersect);
     }
 
@@ -133,7 +133,7 @@ class CoordsTest {
         Coords a = new Coords(0, 0);
         Coords b = new Coords(0, 0);
 
-        boolean ovalsIntersect = Coords.ovalsIntersect(a, small, b, medium);
+        boolean ovalsIntersect = Geometry.ovalsIntersect(a, small, b, medium);
         assertTrue(ovalsIntersect);
     }
 
@@ -143,7 +143,7 @@ class CoordsTest {
         List<Coords> polygon = List.of(new Coords(0, 0), new Coords(1, 0), new Coords(1, 1), new Coords(0, 1));
         Coords a = new Coords(-0.2, -0.1);
 
-        boolean ovalsIntersectsPolygon = Coords.ovalIntersectsPolygon(a, small, polygon);
+        boolean ovalsIntersectsPolygon = Geometry.ovalIntersectsPolygon(a, small, polygon);
         assertTrue(ovalsIntersectsPolygon);
     }
 
@@ -153,7 +153,7 @@ class CoordsTest {
         List<Coords> polygon = List.of(new Coords(-0.71, 0), new Coords(1, -1), new Coords(1, 1));
         Coords a = new Coords(-1, 0);
 
-        boolean ovalsIntersectsPolygon = Coords.ovalIntersectsPolygon(a, small, polygon);
+        boolean ovalsIntersectsPolygon = Geometry.ovalIntersectsPolygon(a, small, polygon);
         assertTrue(ovalsIntersectsPolygon);
     }
 
@@ -163,7 +163,7 @@ class CoordsTest {
         List<Coords> polygon = List.of(new Coords(-0.71, 0), new Coords(1, -1), new Coords(1, 1));
         Coords a = new Coords(1, 1.1);
 
-        boolean ovalsIntersectsPolygon = Coords.ovalIntersectsPolygon(a, small, polygon);
+        boolean ovalsIntersectsPolygon = Geometry.ovalIntersectsPolygon(a, small, polygon);
         assertTrue(ovalsIntersectsPolygon);
     }
 
@@ -173,7 +173,7 @@ class CoordsTest {
         List<Coords> polygon = List.of(new Coords(0, 0), new Coords(1, 0), new Coords(1, 1), new Coords(0, 1));
         Coords a = new Coords(-1, -1);
 
-        boolean ovalsIntersectsPolygon = Coords.ovalIntersectsPolygon(a, small, polygon);
+        boolean ovalsIntersectsPolygon = Geometry.ovalIntersectsPolygon(a, small, polygon);
         assertFalse(ovalsIntersectsPolygon);
     }
 
@@ -183,7 +183,7 @@ class CoordsTest {
         Coords a = new Coords(1, -0.1);
         Coords b = new Coords(-1, 0.1);
 
-        double delta = Coords.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
+        double delta = Geometry.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
         assertTrue(delta > 0);
     }
 
@@ -193,7 +193,7 @@ class CoordsTest {
         Coords a = new Coords(-1, 0.3);
         Coords b = new Coords(1, 0.3);
 
-        double delta = Coords.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
+        double delta = Geometry.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
         assertTrue(delta == 0);
     }
 
@@ -203,7 +203,7 @@ class CoordsTest {
         Coords a = new Coords(-1, 0.4);
         Coords b = new Coords(1, 0.4);
 
-        double delta = Coords.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
+        double delta = Geometry.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
         assertTrue(delta < 0);
     }
 
@@ -213,7 +213,7 @@ class CoordsTest {
         Coords a = new Coords(0, 2);
         Coords b = new Coords(2, 0);
 
-        double delta = Coords.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
+        double delta = Geometry.calcOvalLineIntersection(radius, a.x, b.x, a.y, b.y);
         assertTrue(delta < 0);
     }
 
@@ -224,7 +224,7 @@ class CoordsTest {
         Coords p2 = new Coords(0, -1);
         Coords q2 = new Coords(0, 1);
 
-        boolean intersect = Coords.doIntersect(p1, q1, p2, q2);
+        boolean intersect = Geometry.doIntersect(p1, q1, p2, q2);
         assertTrue(intersect);
     }
 
@@ -235,7 +235,7 @@ class CoordsTest {
         Coords p2 = new Coords(1.1, -1);
         Coords q2 = new Coords(1.1, 1);
 
-        boolean intersect = Coords.doIntersect(p1, q1, p2, q2);
+        boolean intersect = Geometry.doIntersect(p1, q1, p2, q2);
         assertTrue(intersect);
     }
 
@@ -246,7 +246,7 @@ class CoordsTest {
         Coords p2 = new Coords(2, -1);
         Coords q2 = new Coords(2, 1);
 
-        boolean intersect = Coords.doIntersect(p1, q1, p2, q2);
+        boolean intersect = Geometry.doIntersect(p1, q1, p2, q2);
         assertFalse(intersect);
     }
 }

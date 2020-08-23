@@ -6,6 +6,7 @@ import io.wsz.model.animation.creature.CreatureAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -166,7 +167,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
         CreatureSize thisSize = getSize();
         double width = sizeWidth + 2*range;
-        return Coords.ovalsIntersect(thisCenter, thisSize, pos, width);
+        return Geometry.ovalsIntersect(thisCenter, thisSize, pos, width);
     }
 
     public List<Equipment> getEquipmentWithinRange(Controller controller) {

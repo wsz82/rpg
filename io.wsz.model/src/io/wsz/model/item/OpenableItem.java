@@ -2,6 +2,7 @@ package io.wsz.model.item;
 
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -16,8 +17,8 @@ public class OpenableItem implements Externalizable {
     public static OpenableItem clone(OpenableItem openableItem) {
         if (openableItem == null) return null;
         OpenableItem clone = new OpenableItem();
-        clone.setOpenCoverLine(Coords.cloneCoordsList(openableItem.getOpenCoverLine()));
-        clone.setOpenCollisionPolygons(Coords.cloneCoordsPolygons(openableItem.getOpenCollisionPolygons()));
+        clone.setOpenCoverLine(Geometry.cloneCoordsList(openableItem.getOpenCoverLine()));
+        clone.setOpenCollisionPolygons(Geometry.cloneCoordsPolygons(openableItem.getOpenCollisionPolygons()));
         return clone;
     }
 

@@ -211,7 +211,7 @@ public class Board {
                     double piRight = o.getCollisionRight(actualCollisionPolygons);
                     double piTop = o.getCollisionTop(actualCollisionPolygons);
                     double piBottom = o.getCollisionBottom(actualCollisionPolygons);
-                    return Coords.doOverlap(
+                    return Geometry.doOverlap(
                             left, top, right, bottom,
                             piLeft, piTop, piRight, piBottom);
                 })
@@ -296,7 +296,7 @@ public class Board {
     }
 
     private boolean getObstacleObstacleCollision(PosItem i, Coords nextPos, List iPolygons, PosItem o, Coords oPos, List oPolygons) {
-        boolean collides = Coords.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
+        boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
             System.out.println(i.getName() + " collides " + o.getName());
         }
@@ -304,7 +304,7 @@ public class Board {
     }
 
     private boolean getWayCollision(Coords oPos, List oPolygons) {
-        boolean collides = Coords.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
+        boolean collides = Geometry.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
         if (collides) {
             System.out.println("Way collision");
         }
@@ -312,7 +312,7 @@ public class Board {
     }
 
     private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
-        boolean collides = Coords.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
+        boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
         if (collides) {
             System.out.println(cr.getName() + " collides " + crO.getName());
         }
@@ -321,10 +321,10 @@ public class Board {
 
     public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem i) {
         for (List<Coords> polygon : iPolygons) {
-            List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
-            Coords.translateCoords(lostRef, nextPos.x, nextPos.y);
+            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
+            Geometry.translateCoords(lostRef, nextPos.x, nextPos.y);
 
-            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
+            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
                 System.out.println(i.getName() + " collides " + cr.getName());
                 return true;
@@ -335,11 +335,11 @@ public class Board {
 
     public boolean getCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem o) {
         for (List<Coords> polygon : oPolygons) {
-            List<Coords> lostRef = Coords.looseCoordsReferences1(polygon);
+            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
             Coords oPos = o.getPos();
-            Coords.translateCoords(lostRef, oPos.x, oPos.y);
+            Geometry.translateCoords(lostRef, oPos.x, oPos.y);
 
-            boolean ovalIntersectsPolygon = Coords.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
+            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
                 System.out.println(cr.getName() + " collides " + o.getName());
                 return true;
@@ -368,7 +368,7 @@ public class Board {
         Coords point = cr.getCenter();
         for (Equipment e : equipment) {
             Coords center = e.getImageCenter();
-            if (Coords.pointWithinOval(point, center, width, height)) {
+            if (Geometry.pointWithinOval(point, center, width, height)) {
                 equipmentResult.add(e);
             }
         }

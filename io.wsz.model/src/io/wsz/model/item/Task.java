@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.animation.creature.CreatureAnimationType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -78,7 +79,7 @@ public class Task implements Externalizable {
             dest.x = -1;
             return;
         }
-        double dist = Coords.getDistance(pos, dest);
+        double dist = Geometry.getDistance(pos, dest);
         double moveDist = cr.getSpeed();
         double x3 = x1 + (moveDist * (x2 - x1) / dist) / SECOND;
         double y3 = y1 + (moveDist * (y2 - y1) / dist) / SECOND;

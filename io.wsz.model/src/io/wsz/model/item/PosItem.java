@@ -8,6 +8,7 @@ import io.wsz.model.dialog.Dialog;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
@@ -62,8 +63,8 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.visible = new SimpleBooleanProperty(this, "visible", other.visible.get());
         this.pos = other.pos.clonePos();
         this.prototype = other.prototype;
-        this.coverLine = Coords.cloneCoordsList(other.coverLine);
-        this.collisionPolygons = Coords.cloneCoordsPolygons(other.collisionPolygons);
+        this.coverLine = Geometry.cloneCoordsList(other.coverLine);
+        this.collisionPolygons = Geometry.cloneCoordsPolygons(other.collisionPolygons);
         this.dialog = other.dialog;
         Coords interactionCoords = other.interactionCoords;
         if (interactionCoords == null) {
@@ -117,7 +118,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
-        return Coords.pointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
+        return Geometry.pointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
     public PosItem getCollision() {

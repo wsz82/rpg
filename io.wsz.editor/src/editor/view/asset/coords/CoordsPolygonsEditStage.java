@@ -3,6 +3,7 @@ package editor.view.asset.coords;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -58,7 +59,7 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
 
     @Override
     protected void fillList() {
-        List<List<Coords>> clone = Coords.cloneCoordsPolygons(itemPolygons);
+        List<List<Coords>> clone = Geometry.cloneCoordsPolygons(itemPolygons);
         polygons.addAll(clone);
     }
 

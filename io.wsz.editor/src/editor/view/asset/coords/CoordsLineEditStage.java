@@ -2,6 +2,7 @@ package editor.view.asset.coords;
 
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
@@ -30,7 +31,7 @@ public class CoordsLineEditStage extends CoordsShapeEditStage {
 
     @Override
     protected void fillList() {
-        List<Coords> clone = Coords.cloneCoordsList(line);
+        List<Coords> clone = Geometry.cloneCoordsList(line);
         coordsList.addAll(clone);
     }
 

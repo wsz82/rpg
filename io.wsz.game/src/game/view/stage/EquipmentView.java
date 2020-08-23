@@ -7,6 +7,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 
@@ -99,7 +100,7 @@ public abstract class EquipmentView extends CanvasView {
                     double eRight = e.getRight();
                     double eTop = e.getTop();
                     double eBottom = e.getBottom();
-                    return Coords.doOverlap(
+                    return Geometry.doOverlap(
                             left, top, right, bottom,
                             eLeft, eTop, eRight, eBottom);
                 })

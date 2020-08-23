@@ -39,7 +39,7 @@ public class ItemsComparator {
         double i1_right = i1.getRight();
         double i2_right = i2.getRight();
 
-        boolean doOverlap = Coords.doOverlap(
+        boolean doOverlap = Geometry.doOverlap(
                 i1_left, i1_top, i1_right, i1_bottom,
                 i2_left, i2_top, i2_right, i2_bottom);
 
@@ -147,9 +147,9 @@ public class ItemsComparator {
         leftPos.y = rightPos.y = bottom;
         poss.clear();
         if (!cl.isEmpty()) {
-            Coords.looseCoordsReferences(cl, lostRef, resultCoords);
+            Geometry.looseCoordsReferences(cl, lostRef, resultCoords);
             poss.addAll(lostRef);
-            Coords.translateCoords(poss, left, top);
+            Geometry.translateCoords(poss, left, top);
 
             addLeftAndRightCoords(poss, leftPos, rightPos);
         } else {

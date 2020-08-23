@@ -9,6 +9,7 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
@@ -179,7 +180,7 @@ public class GameView extends CanvasView {
                     Coords translatedPos = translateCoordsToScreenCoords2(cr.getCenter());
                     double visWidth = visionRange * 2;
                     double visHeight = visionRange * 2.0/3 * 2;
-                    fogWithinVision = Coords.pointWithinOval(translatedPiecePos, translatedPos, visWidth, visHeight);
+                    fogWithinVision = Geometry.pointWithinOval(translatedPiecePos, translatedPos, visWidth, visHeight);
                     if (fogWithinVision) {
                         break;
                     }
