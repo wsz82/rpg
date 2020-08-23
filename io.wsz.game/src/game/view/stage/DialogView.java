@@ -78,12 +78,8 @@ public class DialogView {
 
         List<DialogItem> dialogs = dialogMemento.getDialogs();
         if (Sizes.isReloadDialogImages()) {
-            Sizes.setReloadDialogImages(false);
-            isToRefresh = true;
-            setCurPos(0);
-            for (DialogItem di : dialogs) {
-                loadDialogItemPicture(di);
-            }
+            reloadDialogPictures(dialogs);
+            return;
         }
 
         updatePos();
@@ -97,17 +93,30 @@ public class DialogView {
         clear();
 
         if (dialogs.isEmpty()) {
-            PosItem speaker = dialogMemento.getAnswering();
-            Dialog dialog = speaker.getDialog();
-            Answer answer = dialog.getGreeting();
-            addDialogItem(speaker, answer.getText());
-            dialogMemento.setLastAnswer(answer);
+            initConversation();
         }
 
         int lastPos = drawDialogs();
         drawQuestions(lastPos);
 
         drawScrollBar(dialogTop);
+    }
+
+    private void reloadDialogPictures(List<DialogItem> dialogs) {
+        Sizes.setReloadDialogImages(false);
+        isToRefresh = true;
+        setCurPos(0);
+        for (DialogItem di : dialogs) {
+            loadDialogItemPicture(di);
+        }
+    }
+
+    private void initConversation() {
+        PosItem speaker = dialogMemento.getAnswering();
+        Dialog dialog = speaker.getDialog();
+        Answer answer = dialog.getGreeting();
+        addDialogItem(speaker, answer.getText());
+        dialogMemento.setLastAnswer(answer);
     }
 
     private void hookupEvents() {
