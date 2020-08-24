@@ -68,12 +68,12 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         this.background = background;
         this.coordsChosen = e -> {
             e.consume();
-            Coords c = coordsCB.getValue();
+            Coords point = coordsCB.getValue();
             String xVal;
             String yVal;
-            if (c != null) {
-                xVal = String.valueOf(c.x);
-                yVal = String.valueOf(c.y);
+            if (point != null) {
+                xVal = String.valueOf(point.x);
+                yVal = String.valueOf(point.y);
             } else {
                 xVal = "0.0";
                 yVal = "0.0";
@@ -162,7 +162,7 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         final Scene scene = new Scene(r);
         setScene(scene);
 
-        hookupEvents();
+        hookUpShapeEvents();
         fillList();
         restoreShape();
 
@@ -219,7 +219,7 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         });
     }
 
-    private void hookupEvents() {
+    private void hookUpShapeEvents() {
         cancel.setCancelButton(true);
         cancel.setOnAction(e -> close());
         save.setDefaultButton(true);
@@ -231,7 +231,9 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         pointsPane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                     && e.getClickCount() == 2) {
-                Coords point = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+                double x = e.getX() / Sizes.getMeter();
+                double y = e.getY() / Sizes.getMeter();
+                Coords point = new Coords(x, y);
                 addPoint(point);
             }
         });

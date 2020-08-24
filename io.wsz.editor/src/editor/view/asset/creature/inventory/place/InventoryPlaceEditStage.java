@@ -32,7 +32,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     private final Button deletePlace = new Button("Delete place");
     private VBox placeCBVBox;
     private ChoiceBox<List<Coords>> placeCB;
-    boolean isContent;
 
     private Map<InventoryPlaceType, InventoryPlace> inventoryPlaces;
 
@@ -49,7 +48,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     @Override
     public void initWindow(boolean isContent, String title) {
         super.initWindow(isContent, title);
-        this.isContent = isContent;
 
         placeCBVBox = new VBox(5);
         final Label placeCBLabel = new Label("Place");
@@ -61,10 +59,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
 
         hControls.getChildren().add(2, placeCBVBox);
         vControls.getChildren().add(deletePlace);
-
-        if (isContent) {
-            typesCB.setDisable(true);
-        }
 
         setUpPlaceCB();
         setUpTypesCB();
@@ -95,9 +89,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     private void setUpPlaceCB() {
         if (placeCB != null) {
             placeCBVBox.getChildren().remove(placeCB);
-        }
-        if (isContent) {
-            return;
         }
         placeCB = new ChoiceBox<>(places);
         InventoryPlaceType type = typesCB.getValue();
