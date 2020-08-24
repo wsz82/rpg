@@ -31,4 +31,7 @@ public class Paths {
     public static final String WALK_NW = "walk_NW";
     public static final String[] walks = new String[] {WALK_N, WALK_NE, WALK_E, WALK_SE,
             WALK_S, WALK_SW, WALK_W, WALK_NW};
+    public static final String FOG_DIR = File.separator + "fog";
+    public static final String FOG_BASE_NAME = "fog.png";
+    public static final String FOG_BASE_NAME_DIR = File.separator + FOG_BASE_NAME;
 }

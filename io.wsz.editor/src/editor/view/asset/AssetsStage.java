@@ -7,7 +7,6 @@ import editor.view.asset.equipment.container.ContainerTableView;
 import editor.view.asset.equipment.weapon.WeaponsTableView;
 import editor.view.asset.indoor.InDoorTableView;
 import editor.view.asset.landscape.LandscapeTableView;
-import editor.view.asset.openable.ObservableAssets;
 import editor.view.asset.outdoor.OutDoorTableView;
 import editor.view.asset.teleport.TeleportTableView;
 import editor.view.content.ContentTableView;

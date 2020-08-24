@@ -36,7 +36,7 @@ public class OutDoor extends Door<OutDoor> {
 
     public Coords getExit() {
         if (exit == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return null;
             }
             return prototype.exit;
@@ -55,7 +55,7 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor getConnection() {
         if (connection == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return null;
             }
             return prototype.connection;

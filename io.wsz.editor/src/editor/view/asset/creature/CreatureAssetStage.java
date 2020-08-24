@@ -5,20 +5,22 @@ import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.asset.ItemsStage;
+import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.CreatureControl;
-import io.wsz.model.item.CreatureSize;
-import io.wsz.model.item.ItemType;
+import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
     private static final String TITLE = "Creature asset";
@@ -30,6 +32,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     private final DoubleField visionRangeInput = new DoubleField(isContent);
     private final IntegerField strengthInput = new IntegerField(isContent);
     private final Button itemsButton = new Button("Items");
+    private final Button inventoryPlacesButton = new Button("Inventory places");
 
     public CreatureAssetStage(Stage parent, Creature asset, boolean isContent,
                               EditorCanvas editorCanvas, EditorController editorController){
@@ -91,13 +94,32 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
         if (item != null) {
             container.getChildren().add(itemsButton);
-            hookUpEditEvents();
+            hookUpItemsEditEvents();
+            if (!isContent) {
+                container.getChildren().add(inventoryPlacesButton);
+                hookUpInventoryPlacesEditEvents();
+            }
         }
 
         fillInputs();
     }
 
-    private void hookUpEditEvents() {
+    private void hookUpInventoryPlacesEditEvents() {
+        inventoryPlacesButton.setOnAction(e -> {
+            Map<InventoryPlaceType, InventoryPlace> inventoryPlaces = item.getInventory().getInventoryPlaces();
+            if (inventoryPlaces == null) {
+                inventoryPlaces = new HashMap<>(0);
+            }
+            File programDir = controller.getProgramDir();
+            Image basicInventory = item.getAnimation().getInventoryBasic(programDir);
+            InventoryPlaceEditStage editStage =
+                    new InventoryPlaceEditStage(editorController, parent, item, basicInventory, inventoryPlaces);
+            editStage.initWindow(isContent, "Inventory places editor");
+            editStage.show();
+        });
+    }
+
+    private void hookUpItemsEditEvents() {
         itemsButton.setOnAction(e -> {
             ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item, editorController);
             itemsStage.show();

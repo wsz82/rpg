@@ -50,7 +50,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
     public Double getWeight() {
         if (weight == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.weight;
@@ -68,7 +68,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
     public Integer getSize() {
         if (size == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0;
             }
             return prototype.size;

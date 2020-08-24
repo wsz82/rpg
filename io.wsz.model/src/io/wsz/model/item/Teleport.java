@@ -47,7 +47,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     public Coords getExit() {
         if (exit == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return new Coords(0, 0, 0, null);
             }
             return prototype.exit;
@@ -62,7 +62,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     public List<List<Coords>> getTeleportCollisionPolygons() {
         if (teleportCollisionPolygons == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return new ArrayList<>(0);
             }
             return prototype.teleportCollisionPolygons;
@@ -77,7 +77,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     @Override
     public Animation<Teleport> getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -104,7 +104,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new Animation<>(getDir());
         }
 

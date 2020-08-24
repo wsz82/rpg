@@ -5,9 +5,9 @@ import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class CoordsPointEditStage extends CoordsShapeEditStage {
+public class CoordsPointEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
 
-    public CoordsPointEditStage(Stage parent, PosItem item, Coords interactionPoint, Image background) {
+    public CoordsPointEditStage(Stage parent, A item, Coords interactionPoint, Image background) {
         super(parent, item, background);
         if (interactionPoint != null) {
             coordsList.add(interactionPoint);

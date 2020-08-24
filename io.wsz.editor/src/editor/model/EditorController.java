@@ -3,11 +3,12 @@ package editor.model;
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.ItemsStage;
-import editor.view.asset.openable.ObservableAssets;
+import editor.view.asset.ObservableAssets;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.item.WeaponType;
 import io.wsz.model.layer.Layer;
@@ -28,10 +29,10 @@ public class EditorController {
     private final ObservableAssets observableAssets = new ObservableAssets();
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<WeaponType> observableWeaponTypes = FXCollections.observableArrayList();
+    private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords();
 
     private PosItem activeItem;
-
     private ItemsStage activeItemsStage;
 
     public EditorController(Controller controller){
@@ -86,10 +87,16 @@ public class EditorController {
         loadObservableAssetsoPlugin(activePlugin);
         loadObservableLocationsToPlugin(activePlugin);
         loadObservableWeaponTypesToPlugin(activePlugin);
+        loadObservableInventoryPlaceTypesToPlugin(activePlugin);
         File programDir = controller.getProgramDir();
         PluginCaretaker pc = new PluginCaretaker(programDir);
         setPluginParams(activePlugin, pss);
         pc.save(activePlugin);
+    }
+
+    private void loadObservableInventoryPlaceTypesToPlugin(Plugin activePlugin) {
+        List<InventoryPlaceType> inventoryPlaceTypes = new ArrayList<>(observableInventoryPlaceTypes);
+        activePlugin.getWorld().setInventoryPlaces(inventoryPlaceTypes);
     }
 
     private void loadObservableWeaponTypesToPlugin(Plugin activePlugin) {
@@ -143,8 +150,15 @@ public class EditorController {
         restoreObservableAssets(activePlugin);
         restoreObservableLocations(activePlugin);
         restoreObservableWeaponTypes(activePlugin);
+        restoreObservableInventoryPlaces(activePlugin);
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, loadedPlugin);
+    }
+
+    private void restoreObservableInventoryPlaces(Plugin activePlugin) {
+        observableInventoryPlaceTypes.clear();
+        List<InventoryPlaceType> inventoryPlaceTypes = activePlugin.getWorld().getInventoryPlaces();
+        observableInventoryPlaceTypes.addAll(inventoryPlaceTypes);
     }
 
     private void restoreObservableWeaponTypes(Plugin activePlugin) {
@@ -223,5 +237,9 @@ public class EditorController {
 
     public ObservableList<WeaponType> getObservableWeaponTypes() {
         return observableWeaponTypes;
+    }
+
+    public ObservableList<InventoryPlaceType> getObservableInventoryPlacesTypes() {
+        return observableInventoryPlaceTypes;
     }
 }

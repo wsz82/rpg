@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Creature extends PosItem<Creature, CreatureAnimationPos> implements Containable {
@@ -236,10 +237,11 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public Inventory getInventory() {
         if (inventory == null) {
-            if (prototype == null) {
-                return new Inventory(this);
+            if (isThisPrototype()) {
+                return null;
+            } else {
+                return prototype.getInventory();
             }
-            return prototype.inventory;
         } else {
             return inventory;
         }
@@ -249,13 +251,30 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.inventory = inventory;
     }
 
+    public Map<InventoryPlaceType, InventoryPlace> getInventoryPlaces() {
+        if (inventory == null) {
+            if (isThisPrototype()) {
+                return null;
+            } else {
+                return prototype.getInventoryPlaces();
+            }
+        } else {
+            Map<InventoryPlaceType, InventoryPlace> inventoryPlaces = inventory.getInventoryPlaces();
+            if (inventoryPlaces == null) {
+                return prototype.getInventoryPlaces();
+            } else {
+                return inventoryPlaces;
+            }
+        }
+    }
+
     public Double getIndividualSpeed() {
         return speed;
     }
 
     public Double getSpeed() {
         if (speed == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.speed;
@@ -274,7 +293,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public Double getRange() {
         if (range == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.range;
@@ -293,7 +312,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public Double getVisionRange() {
         if (visionRange == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 1.0;
             }
             return prototype.visionRange;
@@ -312,7 +331,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public CreatureSize getSize() {
         if (size == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return CreatureSize.getDefault();
             }
             return prototype.size;
@@ -331,7 +350,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public CreatureControl getControl() {
         if (control == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return CreatureControl.getDefault();
             }
             return prototype.getControl();
@@ -350,7 +369,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public Integer getStrength() {
         if (strength == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0;
             }
             return prototype.strength;
@@ -369,7 +388,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public CreatureAnimation getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -465,7 +484,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new CreatureAnimation(getDir());
         }
 

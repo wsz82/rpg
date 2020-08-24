@@ -78,15 +78,25 @@ public class CreatureAnimation extends Animation<Creature> {
     }
 
     public Image getCreatureInventoryImage(Creature cr, int width, int height) {
-        Image emptyInventoryImage = creatureInventoryPictures.get(BASIC);
-        if (emptyInventoryImage == null) {
-            File emptyInventoryFile = creatureInventoryFiles.get(BASIC);
-            if (emptyInventoryFile != null && emptyInventoryFile.exists()) {
-                emptyInventoryImage = ResolutionImage.loadDefinedDimensionImage(emptyInventoryFile, width, height);
-                creatureInventoryPictures.put(BASIC, emptyInventoryImage);
+        Image basicInventoryImage = creatureInventoryPictures.get(BASIC);
+        if (basicInventoryImage == null) {
+            File bsicInventoryFile = creatureInventoryFiles.get(BASIC);
+            if (bsicInventoryFile != null && bsicInventoryFile.exists()) {
+                basicInventoryImage = ResolutionImage.loadDefinedDimensionImage(bsicInventoryFile, width, height);
+                creatureInventoryPictures.put(BASIC, basicInventoryImage);
             }
         }
-        return emptyInventoryImage;
+        return basicInventoryImage;
+    }
+
+    public Image getInventoryBasic(File programDir) {
+        Image basicInventoryImage = creatureInventoryPictures.get(BASIC);
+        if (basicInventoryImage == null) {
+            String path = programDir + animationDir + INVENTORY_DIR + BASIC_DIR + ".png";
+            basicInventoryImage = ResolutionImage.loadImage(path);
+            creatureInventoryPictures.put(BASIC, basicInventoryImage);
+        }
+        return basicInventoryImage;
     }
 
     private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveDirection moveDirection) {

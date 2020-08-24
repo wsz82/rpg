@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
+public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
     private final ObservableList<List<Coords>> polygons = FXCollections.observableArrayList();
     private final ChoiceBox<List<Coords>> polygonsCB = new ChoiceBox<>(polygons);
     private final List<List<Coords>> itemPolygons;
     private final MenuItem addPolygon = new MenuItem("Add polygon");
     private final Button deletePolygon = new Button("Delete polygon");
 
-    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, PosItem item, Image background) {
+    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, A item, Image background) {
         super(parent, item, background);
         this.itemPolygons = itemPolygons;
     }
@@ -75,13 +75,6 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
     }
 
     @Override
-    protected void clearShape() {
-        polygons.clear();
-        coordsList.clear();
-        refreshShape();
-    }
-
-    @Override
     protected void refreshShape() {
         super.refreshShape();
         List<Polygon> polygonsShapes = new ArrayList<>(0);
@@ -101,6 +94,13 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
                 .collect(Collectors.toList());
         pointsPane.getChildren().removeAll(pol);
         pointsPane.getChildren().addAll(polygonsShapes);
+    }
+
+    @Override
+    protected void clearShape() {
+        polygons.clear();
+        coordsList.clear();
+        refreshShape();
     }
 
     @Override
@@ -179,6 +179,7 @@ public class CoordsPolygonsEditStage extends CoordsShapeEditStage {
             polygonsCB.setValue(null);
         }
         super.deletePoint();
+        refreshShape();
     }
 
     private void addNewPolygon(Coords first) {

@@ -500,7 +500,6 @@ public class DialogView {
     private void clear() {
         gc.setFill(Color.LIGHTGREY);
         double width = canvas.getWidth();
-
         gc.fillRect(0, dialogTop, width, getViewHeight());
     }
 

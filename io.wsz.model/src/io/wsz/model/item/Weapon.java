@@ -54,7 +54,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     public Double getDamage() {
         if (damage == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.damage;
@@ -73,7 +73,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     public Double getRange() {
         if (range == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.range;
@@ -92,7 +92,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     public Double getSpeed() {
         if (speed == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.speed;
@@ -111,7 +111,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     public WeaponType getWeaponType() {
         if (weaponType == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return WeaponType.DEFAULT;
             }
             return prototype.weaponType;
@@ -141,7 +141,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     @Override
     public WeaponAnimation getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -172,7 +172,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new WeaponAnimation(getDir());
         }
 

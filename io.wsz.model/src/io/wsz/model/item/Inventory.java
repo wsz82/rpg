@@ -8,19 +8,23 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Inventory implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private List<Equipment> items = new ArrayList<>(1);
+    private final List<Equipment> items;
+    private Map<InventoryPlaceType, InventoryPlace> inventoryPlaces;
     private Creature owner;
     private Weapon equippedWeapon;
 
-    public Inventory() {}
+    public Inventory() {
+        this.items = new ArrayList<>(0);
+    }
 
     public Inventory(Creature owner) {
-        this.items = new ArrayList<>(1);
+        this.items = new ArrayList<>(0);
         this.owner = owner;
     }
 
@@ -49,18 +53,6 @@ public class Inventory implements Externalizable {
         return owner.getStrength() * 3;
     }
 
-    public Weapon getEquippedWeapon() {
-        return equippedWeapon;
-    }
-
-    public void setEquippedWeapon(Weapon equippedWeapon) {
-        this.equippedWeapon = equippedWeapon;
-    }
-
-    public List<Equipment> getItems() {
-        return items;
-    }
-
     public int getFilledSpace() {
         return getEquippedWeaponSize() + getItems().stream()
                 .mapToInt(Equipment::getSize)
@@ -87,6 +79,26 @@ public class Inventory implements Externalizable {
         } else {
             return equippedWeapon.getWeight();
         }
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    public void setEquippedWeapon(Weapon equippedWeapon) {
+        this.equippedWeapon = equippedWeapon;
+    }
+
+    public List<Equipment> getItems() {
+        return items;
+    }
+
+    public Map<InventoryPlaceType, InventoryPlace> getInventoryPlaces() {
+        return inventoryPlaces;
+    }
+
+    public void setInventoryPlaces(Map<InventoryPlaceType, InventoryPlace> inventoryPlaces) {
+        this.inventoryPlaces = inventoryPlaces;
     }
 
     @Override
@@ -118,6 +130,8 @@ public class Inventory implements Externalizable {
 
         out.writeObject(items);
 
+        out.writeObject(inventoryPlaces);
+
         out.writeObject(owner);
 
         out.writeObject(equippedWeapon);
@@ -129,6 +143,8 @@ public class Inventory implements Externalizable {
 
         List<Equipment> serItems = (List<Equipment>) in.readObject();
         items.addAll(serItems);
+
+        inventoryPlaces = (Map<InventoryPlaceType, InventoryPlace>) in.readObject();
 
         owner = (Creature) in.readObject();
 

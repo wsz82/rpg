@@ -33,7 +33,7 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
 
     @Override
     public Animation<Cover> getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -56,7 +56,7 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new Animation<>(getDir());
         }
     }

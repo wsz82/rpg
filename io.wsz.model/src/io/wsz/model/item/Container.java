@@ -100,7 +100,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     public Double getNettoWeight() {
         if (nettoWeight == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0.0;
             }
             return prototype.nettoWeight;
@@ -119,7 +119,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     public Integer getNettoSize() {
         if (nettoSize == null) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return 0;
             }
             return prototype.nettoSize;
@@ -186,7 +186,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     }
 
     public OpenableItem getOpenableItem() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return openableItem;
         } else {
             return prototype.getOpenableItem();
@@ -264,7 +264,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     @Override
     public ContainerAnimation getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -297,7 +297,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new ContainerAnimation(getDir());
         }
 

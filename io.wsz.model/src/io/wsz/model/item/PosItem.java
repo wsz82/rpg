@@ -418,6 +418,10 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.image = image;
     }
 
+    protected boolean isThisPrototype() {
+        return prototype == null;
+    }
+
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         return getObstacleOnWay(cr) == null;

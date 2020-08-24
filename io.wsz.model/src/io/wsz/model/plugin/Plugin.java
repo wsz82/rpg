@@ -87,13 +87,6 @@ public class Plugin implements Externalizable {
 
         startPos = (Coords) in.readObject();
 
-//        List<Location> locations = (List<Location>) in.readObject();
-//
-//        List<Asset> assets = (List<Asset>) in.readObject();
-
-//        world = new World();
-//        world.setLocations(locations);
-//        world.setAssets(assets);
         world = (World) in.readObject();
     }
 }

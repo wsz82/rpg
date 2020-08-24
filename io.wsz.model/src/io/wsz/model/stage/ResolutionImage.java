@@ -19,8 +19,8 @@ import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 public class ResolutionImage {
 
     public static Image loadImage(String path) {
-        if (path.isEmpty() || !path.endsWith(".png")) {
-            throw new IllegalArgumentException("File is not PNG");
+        if (path.isEmpty()) {
+            throw new IllegalArgumentException("Path is empty");
         }
         File file = new File(path);
         return loadImage(file);

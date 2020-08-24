@@ -1,6 +1,7 @@
 package io.wsz.model.world;
 
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.WeaponType;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -17,6 +18,7 @@ public class World implements Externalizable {
     private List<Location> locations;
     private List<Asset> assets;
     private List<WeaponType> weaponTypes;
+    private List<InventoryPlaceType> inventoryPlaceTypes;
 
     public World() {}
 
@@ -44,6 +46,14 @@ public class World implements Externalizable {
         this.weaponTypes = weaponTypes;
     }
 
+    public List<InventoryPlaceType> getInventoryPlaces() {
+        return inventoryPlaceTypes;
+    }
+
+    public void setInventoryPlaces(List<InventoryPlaceType> inventoryPlaceTypes) {
+        this.inventoryPlaceTypes = inventoryPlaceTypes;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
@@ -53,6 +63,8 @@ public class World implements Externalizable {
         out.writeObject(assets);
 
         out.writeObject(weaponTypes);
+
+        out.writeObject(inventoryPlaceTypes);
     }
 
     @Override
@@ -64,5 +76,7 @@ public class World implements Externalizable {
         assets = (List<Asset>) in.readObject();
 
         weaponTypes = (List<WeaponType>) in.readObject();
+
+        inventoryPlaceTypes = (List<InventoryPlaceType>) in.readObject();
     }
 }

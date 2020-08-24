@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class CoordsShapeEditStage extends ChildStage {
+public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage {
     protected final ObservableList<Coords> coordsList = FXCollections.observableArrayList();
-    protected final PosItem item;
+    protected final A item;
     protected final ScrollPane scrollPane = new ScrollPane();
     protected final Pane pointsPane = new Pane();
     protected final HBox hControls = new HBox(5);
@@ -52,48 +52,51 @@ public abstract class CoordsShapeEditStage extends ChildStage {
     private final Button cancel = new Button("Cancel");
     private final HBox coordsCBBox = new HBox(5);
     private final MenuItem addPoint = new MenuItem("Add point");
-
-    private final EventHandler<ActionEvent> coordsChosen = e -> {
-        e.consume();
-        Coords c = coordsCB.getValue();
-        String xVal;
-        String yVal;
-        if (c != null) {
-            xVal = String.valueOf(c.x);
-            yVal = String.valueOf(c.y);
-        } else {
-            xVal = "0.0";
-            yVal = "0.0";
-        }
-        xPosField.setText(xVal);
-        yPosField.setText(yVal);
-    };
-    private final ChangeListener<String> xValueListener = (observable, oldValue, newValue) -> {
-        Coords c = coordsCB.getValue();
-        if (c == null) return;
-        c.x = Double.parseDouble(newValue);
-        refreshCoordsCB();
-        coordsCB.setValue(c);
-        refreshShape();
-    };
-    private final ChangeListener<String> yValueListener = (observable, oldValue, newValue) -> {
-        Coords c = coordsCB.getValue();
-        if (c == null) return;
-        c.y = Double.parseDouble(newValue);
-        refreshCoordsCB();
-        coordsCB.setValue(c);
-        refreshShape();
-    };
+    private final EventHandler<ActionEvent> coordsChosen;
+    private final ChangeListener<String> xValueListener;
+    private final ChangeListener<String> yValueListener;
     private final Image background;
+
     private Button xLeftArrow;
     private Button xRightArrow;
     private Button yLeftArrow;
     private Button yRightArrow;
 
-    public CoordsShapeEditStage(Stage parent, PosItem item, Image background) {
+    public CoordsShapeEditStage(Stage parent, A item, Image background) {
         super(parent);
         this.item = item;
         this.background = background;
+        this.coordsChosen = e -> {
+            e.consume();
+            Coords c = coordsCB.getValue();
+            String xVal;
+            String yVal;
+            if (c != null) {
+                xVal = String.valueOf(c.x);
+                yVal = String.valueOf(c.y);
+            } else {
+                xVal = "0.0";
+                yVal = "0.0";
+            }
+            xPosField.setText(xVal);
+            yPosField.setText(yVal);
+        };
+        this.xValueListener = (observable, oldValue, newValue) -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            c.x = Double.parseDouble(newValue);
+            refreshCoordsCB();
+            coordsCB.setValue(c);
+            refreshShape();
+        };
+        this.yValueListener = (observable, oldValue, newValue) -> {
+            Coords c = coordsCB.getValue();
+            if (c == null) return;
+            c.y = Double.parseDouble(newValue);
+            refreshCoordsCB();
+            coordsCB.setValue(c);
+            refreshShape();
+        };
     }
 
     public void initWindow(boolean isContent, String title) {
@@ -221,7 +224,10 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         cancel.setOnAction(e -> close());
         save.setDefaultButton(true);
         save.setOnAction(e -> saveShape());
-        deletePoint.setOnAction(e -> deletePoint());
+        deletePoint.setOnAction(e -> {
+            deletePoint();
+            refreshShape();
+        });
         pointsPane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                     && e.getClickCount() == 2) {
@@ -283,7 +289,6 @@ public abstract class CoordsShapeEditStage extends ChildStage {
         if (!coordsList.isEmpty()) {
             coordsCB.setValue(coordsList.get(0));
         }
-        refreshShape();
     }
 
     protected void refreshCoordsCB() {

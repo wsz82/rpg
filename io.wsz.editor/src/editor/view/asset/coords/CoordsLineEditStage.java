@@ -11,11 +11,11 @@ import javafx.stage.Stage;
 import java.util.Comparator;
 import java.util.List;
 
-public class CoordsLineEditStage extends CoordsShapeEditStage {
+public class CoordsLineEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
     private final Polyline polyline = new Polyline();
     private final List<Coords> line;
 
-    public CoordsLineEditStage(Stage parent, PosItem item, List<Coords> line, Image background) {
+    public CoordsLineEditStage(Stage parent, A item, List<Coords> line, Image background) {
         super(parent, item, background);
         this.line = line;
     }

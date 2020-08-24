@@ -45,13 +45,13 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
 
     public Image getEditorImage() {
         if (isOpen) {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return getOpenImage();
             } else {
                 return prototype.getOpenImage();
             }
         } else {
-            if (prototype == null) {
+            if (isThisPrototype()) {
                 return getInitialImage();
             } else {
                 return prototype.getInitialImage();
@@ -72,7 +72,7 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     }
 
     public OpenableItem getOpenableItem() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return openableItem;
         } else {
             return prototype.getOpenableItem();
@@ -99,7 +99,7 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
 
     @Override
     public DoorAnimation getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -183,7 +183,7 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new DoorAnimation(getDir());
         }
 

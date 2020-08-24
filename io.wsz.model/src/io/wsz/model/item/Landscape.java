@@ -32,7 +32,7 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
 
     @Override
     public Animation<Landscape> getAnimation() {
-        if (prototype == null) {
+        if (isThisPrototype()) {
             return animation;
         } else {
             return prototype.getAnimation();
@@ -55,7 +55,7 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
         super.readExternal(in);
         long ver = in.readLong();
 
-        if (prototype == null) {
+        if (isThisPrototype()) {
             animation = new Animation<>(getDir());
         }
     }
