@@ -35,6 +35,7 @@ import java.util.Objects;
 public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage {
     protected final ObservableList<Coords> coordsList = FXCollections.observableArrayList();
     protected final A item;
+    protected final Image background;
     protected final ScrollPane scrollPane = new ScrollPane();
     protected final Pane pointsPane = new Pane();
     protected final HBox hControls = new HBox(5);
@@ -55,7 +56,6 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
     private final EventHandler<ActionEvent> coordsChosen;
     private final ChangeListener<String> xValueListener;
     private final ChangeListener<String> yValueListener;
-    private final Image background;
 
     private Button xLeftArrow;
     private Button xRightArrow;
@@ -176,12 +176,20 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         int size = coordsList.size() * 2;
         List<Double> doubles = new ArrayList<>(size);
         for (Coords pos : coordsList) {
-            double px = pos.x * Sizes.getMeter();
-            double py = pos.y * Sizes.getMeter();
+            double px = pos.x * getPointXRefreshFactor();
+            double py = pos.y * getPointYRefreshFactor();
             doubles.add(px);
             doubles.add(py);
         }
         return doubles;
+    }
+
+    protected double getPointXRefreshFactor() {
+        return Sizes.getMeter();
+    }
+
+    protected double getPointYRefreshFactor() {
+        return Sizes.getMeter();
     }
 
     protected abstract void fillList();
@@ -195,8 +203,8 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         if (c == null) {
             circle.setVisible(false);
         } else {
-            circle.setCenterX(c.x * Sizes.getMeter());
-            circle.setCenterY(c.y * Sizes.getMeter());
+            circle.setCenterX(c.x * getPointXRefreshFactor());
+            circle.setCenterY(c.y * getPointYRefreshFactor());
             circle.setVisible(true);
         }
     }
@@ -214,7 +222,9 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
     protected void openContextMenu(ContextMenu cm, ContextMenuEvent e) {
         cm.show(iv, e.getScreenX(), e.getScreenY());
         addPoint.setOnAction(ev -> {
-            Coords point = new Coords(e.getX() / Sizes.getMeter(), e.getY() / Sizes.getMeter());
+            double x = e.getX() / getPointXRefreshFactor();
+            double y = e.getY() / getPointYRefreshFactor();
+            Coords point = new Coords(x, y);
             addPoint(point);
         });
     }
@@ -231,8 +241,8 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         pointsPane.setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)
                     && e.getClickCount() == 2) {
-                double x = e.getX() / Sizes.getMeter();
-                double y = e.getY() / Sizes.getMeter();
+                double x = e.getX() / getPointXRefreshFactor();
+                double y = e.getY() / getPointYRefreshFactor();
                 Coords point = new Coords(x, y);
                 addPoint(point);
             }

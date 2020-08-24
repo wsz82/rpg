@@ -5,7 +5,6 @@ import editor.view.asset.coords.CoordsShapeEditStage;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlace;
 import io.wsz.model.item.InventoryPlaceType;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import javafx.collections.FXCollections;
@@ -24,12 +23,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
+    private final EditorController editorController;
     private final Map<InventoryPlaceType, InventoryPlace> initInventoryPlaces;
     private final ObservableList<List<Coords>> places = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> types = FXCollections.observableArrayList();
     private final ChoiceBox<InventoryPlaceType> typesCB;
     private final MenuItem addPlace = new MenuItem("Add place");
     private final Button deletePlace = new Button("Delete place");
+
     private VBox placeCBVBox;
     private ChoiceBox<List<Coords>> placeCB;
 
@@ -38,11 +39,17 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     public InventoryPlaceEditStage(EditorController editorController, Stage parent, Creature item, Image background,
                                    Map<InventoryPlaceType, InventoryPlace> initInventoryPlaces) {
         super(parent, item, background);
+        this.editorController = editorController;
         this.initInventoryPlaces = initInventoryPlaces;
-        this.types.addAll(editorController.getObservableInventoryPlacesTypes());
-        this.types.add(null);
-        this.types.removeAll(initInventoryPlaces.keySet());
+        restoreTypes();
         this.typesCB = new ChoiceBox<>(types);
+    }
+
+    private void restoreTypes() {
+        types.clear();
+        types.addAll(editorController.getObservableInventoryPlacesTypes());
+        types.add(null);
+        types.removeAll(initInventoryPlaces.keySet());
     }
 
     @Override
@@ -189,6 +196,16 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     }
 
     @Override
+    protected double getPointXRefreshFactor() {
+        return background.getWidth();
+    }
+
+    @Override
+    protected double getPointYRefreshFactor() {
+        return background.getHeight();
+    }
+
+    @Override
     protected void fillList() {
         inventoryPlaces = cloneInventoryPlaces(initInventoryPlaces);
 
@@ -227,6 +244,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     @Override
     protected void clearShape() {
         inventoryPlaces.clear();
+        restoreTypes();
         places.clear();
         coordsList.clear();
         refreshShape();
@@ -314,7 +332,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
         double x = e.getX();
         double y = e.getY();
         addPlace.setOnAction(ev -> {
-            Coords first = new Coords(x / Sizes.getMeter(), y / Sizes.getMeter());
+            Coords first = new Coords(x / getPointXRefreshFactor(), y / getPointYRefreshFactor());
             addNewPlace(first);
         });
     }
