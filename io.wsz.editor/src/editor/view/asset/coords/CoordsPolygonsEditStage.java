@@ -40,7 +40,6 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         final VBox polygonsCBVBox = new VBox(5);
         final Label polygonsCBLabel = new Label("Polygon");
         polygonsCBLabel.setAlignment(Pos.CENTER);
-        polygonsCB.setPrefWidth(100);
         polygonsCBVBox.getChildren().addAll(polygonsCBLabel, polygonsCB);
         hControls.getChildren().add(2, polygonsCBVBox);
         vControls.getChildren().add(deletePolygon);
@@ -54,7 +53,10 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
     }
 
     private void hookUpEvents() {
-        deletePolygon.setOnAction(e -> removePolygon());
+        deletePolygon.setOnAction(e -> {
+            removePolygon();
+            refreshShape();
+        });
     }
 
     @Override
@@ -79,12 +81,12 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         super.refreshShape();
         List<Polygon> polygonsShapes = new ArrayList<>(0);
         for (List<Coords> poss : polygons) {
-            Polygon p = new Polygon();
+            Polygon polygon = new Polygon();
             List<Double> points = coordsToPoints(poss);
-            p.getPoints().addAll(points);
+            polygon.getPoints().addAll(points);
 
-            setUpPolygon(poss.get(0), p);
-            polygonsShapes.add(p);
+            setUpPolygon(polygon);
+            polygonsShapes.add(polygon);
         }
 
         pointsPane.getChildren().addAll(polygonsShapes);
@@ -111,17 +113,19 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
     }
 
     private void setUpPolygonsCB() {
+        polygonsCB.setPrefWidth(100);
         polygonsCB.setConverter(new StringConverter<>() {
             @Override
             public String toString(List<Coords> p) {
                 Coords first = p.get(0);
-                return first.toString();
+                return first.toShortString();
             }
 
             @Override
-            public List<Coords> fromString(String s) {
+            public List<Coords> fromString(String string) {
+                Coords pos = Coords.parseShortCoords(string);
                 Optional<List<Coords>> optPolygon = polygons.stream()
-                        .filter(l -> l.toString().equals(s))
+                        .filter(l -> l.get(0).equals(pos))
                         .findFirst();
                 return optPolygon.orElse(null);
             }
@@ -141,7 +145,10 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         super.setUpContextMenu();
         final MenuItem removePolygon = new MenuItem("Remove polygon");
         contextMenu.getItems().addAll(addPolygon, removePolygon);
-        removePolygon.setOnAction(e -> removePolygon());
+        removePolygon.setOnAction(e -> {
+            removePolygon();
+            refreshShape();
+        });
     }
 
     @Override
@@ -160,7 +167,7 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         if (polygonsCB.getValue() == null) {
             addNewPolygon(point);
         } else {
-            addPointToActualList(point);
+            addPointToActualPolygon(point);
         }
         coordsCB.setValue(point);
         refreshShape();
@@ -170,13 +177,12 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
     protected void deletePoint() {
         Coords c = coordsCB.getValue();
         if (c == null) return;
-        List<Coords> list = polygonsCB.getValue();
-        if (list == null) return;
+        List<Coords> polygon = polygonsCB.getValue();
+        if (polygon == null) return;
         coordsList.remove(c);
-        list.remove(c);
-        if (list.isEmpty()) {
-            polygons.remove(list);
-            polygonsCB.setValue(null);
+        polygon.remove(c);
+        if (polygon.isEmpty()) {
+            removePolygon();
         }
         super.deletePoint();
         refreshShape();
@@ -192,7 +198,7 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         coordsCB.setValue(first);
     }
 
-    private void addPointToActualList(Coords point) {
+    private void addPointToActualPolygon(Coords point) {
         polygonsCB.getValue().add(point);
         coordsList.add(point);
     }
@@ -201,13 +207,11 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
         polygons.remove(polygonsCB.getValue());
         polygonsCB.setValue(null);
         coordsList.clear();
-        refreshShape();
     }
 
-    private void setUpPolygon(Coords first, Polygon p) {
+    private void setUpPolygon(Polygon p) {
         p.setStroke(Color.RED);
         p.setStrokeWidth(1);
         p.setOpacity(0.5);
-        p.setId(String.format("%.2f", first.x) + "; " + String.format("%.2f", first.y));
     }
 }

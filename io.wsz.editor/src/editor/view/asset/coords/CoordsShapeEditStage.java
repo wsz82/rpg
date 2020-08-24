@@ -28,6 +28,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,8 +147,6 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         final Label coordsCBLabel = new Label("Point");
         coordsCBLabel.setAlignment(Pos.CENTER);
         coordsCBVBox.getChildren().addAll(coordsCBLabel, coordsCBBox);
-        coordsCBBox.setSpacing(5);
-        coordsCBBox.setPrefWidth(100);
 
         vControls.getChildren().add(deletePoint);
         hControls.getChildren().addAll(cancel, save, coordsCBVBox, coords, vControls);
@@ -163,6 +162,7 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
         final Scene scene = new Scene(r);
         setScene(scene);
 
+        setUpCoordsCB();
         hookUpShapeEvents();
         fillList();
         restoreShape();
@@ -171,6 +171,32 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
             pointsPane.setDisable(true);
             save.setDisable(true);
         }
+    }
+
+    private void setUpCoordsCB() {
+        coordsCBBox.setSpacing(5);
+        coordsCBBox.setPrefWidth(100);
+        coordsCB.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Coords point) {
+                if (point == null) {
+                    return "";
+                } else {
+                    return point.toShortString();
+                }
+            }
+
+            @Override
+            public Coords fromString(String string) {
+                Coords parsed = Coords.parseShortCoords(string);
+                for (Coords point : coordsList) {
+                    if (point.equals(parsed)) {
+                        return point;
+                    }
+                }
+                return null;
+            }
+        });
     }
 
     protected List<Double> coordsToPoints(List<Coords> coordsList) {
@@ -307,7 +333,7 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
     protected void refreshCoordsCB() {
         coordsCBBox.getChildren().remove(coordsCB);
         coordsCB = new ChoiceBox<>(coordsList);
-        coordsCB.setMaxWidth(100);
+        setUpCoordsCB();
         coordsCBBox.getChildren().add(coordsCB);
 
         coordsCB.removeEventHandler(ActionEvent.ACTION, coordsChosen);

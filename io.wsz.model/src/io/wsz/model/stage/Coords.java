@@ -16,35 +16,47 @@ public class Coords implements Externalizable {
         Coords pos = new Coords();
         int stringEnd;
         String substring;
-        if (s.startsWith("Location")) {
-            s = s.replaceFirst("Location:", "");
-            stringEnd = s.indexOf("X");
+        if (s.startsWith("location")) {
+            s = s.replaceFirst("location:", "");
+            stringEnd = s.indexOf("x");
             substring = s.substring(0, stringEnd);
             String locName = substring;
             Location loc = new Location(locName);
             pos.setLocation(loc);
             controller.restoreCoordsOfLocation(pos);
-            s = s.replaceFirst(locName + "X:", "");
+            s = s.replaceFirst(locName + "x:", "");
         } else {
-            s = s.replaceFirst("X:", "");
+            s = s.replaceFirst("x:", "");
         }
-        stringEnd = s.indexOf("Y");
+        stringEnd = s.indexOf("y");
         substring = s.substring(0, stringEnd);
         pos.x = Double.parseDouble(substring);
 
-        s = s.replaceFirst(substring + "Y:", "");
-        stringEnd = s.indexOf("Level");
+        s = s.replaceFirst(substring + "y:", "");
+        stringEnd = s.indexOf("level");
         substring = s.substring(0, stringEnd);
         pos.y = Double.parseDouble(substring);
 
-        s = s.replaceFirst(substring + "Level:", "");
+        s = s.replaceFirst(substring + "level:", "");
         pos.level = Integer.parseInt(s);
+        return pos;
+    }
+
+    public static Coords parseShortCoords(String string) {
+        Coords pos = new Coords();
+        string.replace("x:", "");
+        int yIndex = string.indexOf("y");
+        String xString = string.substring(yIndex);
+        pos.x = Double.parseDouble(xString);
+        string.replace("y:", "");
+        pos.y = Double.parseDouble(string);
         return pos;
     }
 
     public double x;
     public double y;
     public int level;
+
     private Location location;
 
     public Coords() {}
@@ -97,14 +109,19 @@ public class Coords implements Externalizable {
         this.location = location;
     }
 
+    public String toShortString() {
+        return "x:" + x + "y:" + y;
+    }
+
     @Override
     public String toString() {
         String locationName;
+        String end = "x:" + x + "y:" + y + "level:" + level;
         if (location != null) {
             locationName = location.getName();
-            return "Location:" + locationName + "X:" + x + "Y:" + y + "Level:" + level;
+            return "location:" + locationName + end;
         } else {
-            return "X:" + x + "Y:" + y + "Level:" + level;
+            return end;
         }
     }
 
