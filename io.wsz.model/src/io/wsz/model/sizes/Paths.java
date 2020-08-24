@@ -34,4 +34,7 @@ public class Paths {
     public static final String FOG_DIR = File.separator + "fog";
     public static final String FOG_BASE_NAME = "fog.png";
     public static final String FOG_BASE_NAME_DIR = File.separator + FOG_BASE_NAME;
+    public static final String PNG = ".png";
+    public static final String ARROW_RIGHT_PNG = "arrow_right" + PNG;
+    public static final String ARROW_LEFT_PNG = "arrow_left" + PNG;
 }

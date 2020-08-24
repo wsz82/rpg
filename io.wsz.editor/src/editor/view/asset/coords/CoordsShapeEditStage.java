@@ -3,6 +3,7 @@ package editor.view.asset.coords;
 import editor.view.DoubleField;
 import editor.view.stage.ChildStage;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.value.ChangeListener;
@@ -320,10 +321,10 @@ public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage
     }
 
     private Image getRightArrow() {
-        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("arrow_right.png")));
+        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(Paths.ARROW_RIGHT_PNG)));
     }
 
     private Image getLeftArrow() {
-        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("arrow_left.png")));
+        return new Image(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(Paths.ARROW_LEFT_PNG)));
     }
 }
