@@ -131,7 +131,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
             if (getObstacleOnWay(cr) != null) return false;
             boolean fits = cr.getIndividualInventory().fitsInventory(this);
             if (fits) {
-                cr.getIndividualInventory().add(this);
+                cr.getIndividualInventory().tryAdd(this);
                 onTake(cr, 0, 0);
             }
             return true;

@@ -1,44 +1,41 @@
-package game.view.stage;
+package game.view.world.inventory;
 
 import game.model.GameController;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
-import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
-public abstract class EquipmentView extends CanvasView {
+public abstract class EquipmentViewElement extends InventoryViewElement {
     protected static final double SIZE_COLUMN_WIDTH = 0.01;
     protected static final double WEIGHT_COLUMN_WIDTH = 0.01;
 
     protected final List<Equipment> items = new ArrayList<>(0);
-    protected final Coords modifiedCoords = new Coords();
-    protected final Coords viewPos = new Coords();
     protected final Coords curPos = new Coords();
 
     protected double inventoryWidth;
-    protected double viewWidth;
-    protected double viewHeight;
     protected double scrollWidth;
     protected double yScrollPos;
     protected double yScrollButtonHeight;
     protected double maxCurPosY;
-    protected Equipment dragged;
     protected boolean yScrollVisible = true;
 
-    public EquipmentView(Canvas canvas, GameController gameController) {
+    public EquipmentViewElement(Canvas canvas, GameController gameController) {
         super(canvas, gameController);
     }
 
+    @Override
     public void refresh() {
         if (viewWidth < 0 || viewHeight < 0) {
             return;
@@ -46,6 +43,125 @@ public abstract class EquipmentView extends CanvasView {
         drawBackground();
 
         drawVerScroll();
+    }
+
+    protected abstract void drawEquipment();
+
+    protected abstract void drawBackground();
+
+    public abstract List<Equipment> getItems();
+
+    @Override
+    public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords,
+                                     Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
+        Coords local = super.getFixedDraggedPos(mousePos, draggedCoords, dragged, draggedInitWidth, draggedInitHeight);
+        Coords resizedImageCorrection =
+                adjustCoordsForResizedImage(draggedInitWidth, draggedInitHeight, draggedCoords, dragged);
+        local.subtract(resizedImageCorrection);
+
+        Coords currentPos = getCurPos();
+        if (local.x < currentPos.x) {
+            local.x = currentPos.x;
+        } else {
+            double max = currentPos.x + getViewWidth() - dragged.getImageWidth();
+            if (local.x > max) {
+                local.x = max;
+            }
+        }
+        if (local.y < currentPos.y) {
+            local.y = currentPos.y;
+        } else {
+            double max = currentPos.y + getViewHeight() - dragged.getImageHeight();
+            if (local.y > max) {
+                local.y = max;
+            }
+        }
+        return local;
+    }
+
+    private Coords adjustCoordsForResizedImage(double draggedInitWidth, double draggedInitHeight,
+                                               Coords draggedCoords, Equipment dragged) {
+        double draggedWidth = dragged.getImageWidth();
+        double draggedInitX = draggedCoords.x;
+        double resizedX = draggedWidth * draggedInitX / draggedInitWidth;
+
+        double draggedHeight = dragged.getImageHeight();
+        double draggedInitY = draggedCoords.y;
+        double resizedY = draggedHeight * draggedInitY / draggedInitHeight;
+        draggedCoords.x = resizedX;
+        draggedCoords.y = resizedY;
+        return draggedCoords;
+    }
+
+    @Override
+    public Coords getLocalCoords(Coords pos) {
+        TEMP_1.x = pos.x;
+        TEMP_1.y = pos.y;
+        TEMP_1.subtract(viewPos);
+        TEMP_1.add(curPos);
+        return TEMP_1;
+    }
+
+    @Override
+    public Equipment lookForEquipment(double x, double y, Coords draggedCoords) {
+        Coords currentPos = getCurPos();
+        if (x < currentPos.x || x > currentPos.x + getViewWidth()) return null;
+        if (y < currentPos.y || y > currentPos.y + getViewHeight()) return null;
+        lookedEquipment.clear();
+        lookedEquipment.addAll(getItems());
+        Collections.reverse(lookedEquipment);
+        for (Equipment eq : lookedEquipment) {
+            double cX = eq.getLeft();
+            double cWidth = eq.getImageWidth();
+            boolean fitX = x >= cX && x <= cX + cWidth;
+            if (!fitX) continue;
+
+            double cY = eq.getTop();
+            double cHeight = eq.getImageHeight();
+            boolean fitY = y >= cY && y <= cY + cHeight;
+            if (!fitY) continue;
+
+            Image img = eq.getImage();
+            int meter = Sizes.getMeter();
+            int imgX = (int) ((x - cX) * meter);
+            int imgY = (int) ((y - cY) * meter);
+            Color color;
+            try {
+                color = img.getPixelReader().getColor(imgX, imgY);
+            } catch (IndexOutOfBoundsException e) {
+                continue;
+            }
+            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+            if (isPixelTransparent) continue;
+            draggedCoords.x = (double) imgX / meter;
+            draggedCoords.y = (double) imgY / meter;
+            return eq;
+        }
+        return null;
+    }
+
+    public void scrollUp() {
+        Coords curPos = getCurPos();
+        double curPosY = curPos.y;
+        double minCurPosY = getMinCurPosY();
+        if (curPosY <= minCurPosY) {
+            return;
+        }
+        double newY = curPosY - getScrollSpeed();
+        newY = Math.max(newY, minCurPosY);
+        curPos.y = newY;
+    }
+
+    public void scrollDown() {
+        Coords curPos = getCurPos();
+        double y = curPos.y;
+        double maxPos = getMaxCurPosY() - getViewHeight();
+        if (y >= maxPos) {
+            return;
+        }
+        double newY = y + getScrollSpeed();
+        newY = Math.min(newY, maxPos);
+        curPos.y = newY;
     }
 
     protected void drawVerScroll() {
@@ -85,9 +201,7 @@ public abstract class EquipmentView extends CanvasView {
         gc.fillRect(x, viewPos.y * meter, scrollWidth * meter, viewHeight * meter);
     }
 
-    protected abstract void drawEquipment();
-
-    protected void selectEquipment() {
+    protected void sortEquipment() {
         double left = curPos.x;
         double right = left + viewWidth;
         double top = curPos.y;
@@ -107,13 +221,6 @@ public abstract class EquipmentView extends CanvasView {
                 .collect(Collectors.toCollection(() -> items));
     }
 
-    protected Coords currentPosCorrection(Coords pos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(curPos);
-        return modifiedCoords;
-    }
-
     protected void playInventoryAnimation(Equipment e) {
         EquipmentAnimationPos animationPos = e.getAnimationPos();
         animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
@@ -123,16 +230,6 @@ public abstract class EquipmentView extends CanvasView {
     protected void playDropAnimation(Equipment e) {
         setDropAnimationPos(e);
         e.getAnimation().play(e);
-    }
-
-    protected abstract void drawBackground();
-
-    public Coords getLocalCoords(Coords pos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(viewPos);
-        modifiedCoords.add(curPos);
-        return modifiedCoords;
     }
 
     protected void drawColumn(double filled, double max, double columnWidth, double columnHeight,
@@ -159,12 +256,7 @@ public abstract class EquipmentView extends CanvasView {
         gc.fillRect(columnX * meter, columnY * meter, columnWidth * meter, columnHeight * meter);
     }
 
-    public abstract boolean remove(Equipment e, Creature cr);
-
-    public abstract void add(Equipment e, Creature cr, double x, double y);
-
-    public abstract List<Equipment> getItems();
-
+    @Override
     public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
         if (mousePos.x < viewPos.x) {
             mousePos.x = curPos.x;
@@ -189,19 +281,6 @@ public abstract class EquipmentView extends CanvasView {
         return mousePos;
     }
 
-    public void setSize(double width, double height) {
-        this.viewWidth = width;
-        this.viewHeight = height;
-    }
-
-    public double getViewWidth() {
-        return viewWidth;
-    }
-
-    public double getViewHeight() {
-        return viewHeight;
-    }
-
     public void setCurPosY(double y) {
         y -= yScrollButtonHeight/2;
         double maxY;
@@ -218,15 +297,6 @@ public abstract class EquipmentView extends CanvasView {
         return curPos;
     }
 
-    public void setViewPos(double x, double y) {
-        viewPos.x = x;
-        viewPos.y = y;
-    }
-
-    public Coords getViewPos() {
-        return viewPos;
-    }
-
     public double getScrollWidth() {
         return scrollWidth;
     }
@@ -241,10 +311,6 @@ public abstract class EquipmentView extends CanvasView {
 
     public double getYScrollButtonHeight() {
         return yScrollButtonHeight;
-    }
-
-    public void setDragged(Equipment e) {
-        dragged = e;
     }
 
     public boolean isYScrollVisible() {
@@ -265,5 +331,12 @@ public abstract class EquipmentView extends CanvasView {
 
     public void setInventoryWidth(double inventoryWidth) {
         this.inventoryWidth = inventoryWidth;
+    }
+
+    protected Coords currentPosCorrection(Coords pos) {
+        TEMP_1.x = pos.x;
+        TEMP_1.y = pos.y;
+        TEMP_1.subtract(curPos);
+        return TEMP_1;
     }
 }

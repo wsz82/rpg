@@ -251,7 +251,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.inventory = inventory;
     }
 
-    public Map<InventoryPlaceType, InventoryPlace> getInventoryPlaces() {
+    public Map<InventoryPlaceType, List<Coords>> getInventoryPlaces() {
         if (inventory == null) {
             if (isThisPrototype()) {
                 return null;
@@ -259,7 +259,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
                 return prototype.getInventoryPlaces();
             }
         } else {
-            Map<InventoryPlaceType, InventoryPlace> inventoryPlaces = inventory.getInventoryPlaces();
+            Map<InventoryPlaceType, List<Coords>> inventoryPlaces = inventory.getInventoryPlaces();
             if (inventoryPlaces == null) {
                 return prototype.getInventoryPlaces();
             } else {
@@ -440,21 +440,24 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Creature)) return false;
         if (!super.equals(o)) return false;
         Creature creature = (Creature) o;
-        return Objects.equals(getTask(), creature.getTask()) &&
+        return Objects.equals(getAnimation(), creature.getAnimation()) &&
+                Objects.equals(getTask(), creature.getTask()) &&
+                Objects.equals(getAnimationPos(), creature.getAnimationPos()) &&
                 Objects.equals(getInventory(), creature.getInventory()) &&
                 getSize() == creature.getSize() &&
                 getControl() == creature.getControl() &&
                 Objects.equals(getSpeed(), creature.getSpeed()) &&
+                Objects.equals(getVisionRange(), creature.getVisionRange()) &&
                 Objects.equals(getRange(), creature.getRange()) &&
                 Objects.equals(getStrength(), creature.getStrength());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getTask(), getInventory(), getSize(), getControl(), getSpeed(), getRange(), getStrength());
+        return Objects.hash(super.hashCode(), getAnimation(), getTask(), getAnimationPos(), getInventory(), getSize(), getControl(), getSpeed(), getVisionRange(), getRange(), getStrength());
     }
 
     @Override

@@ -1,9 +1,9 @@
-package game.view.stage;
+package game.view.world.inventory;
 
 import game.model.GameController;
-import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
+import io.wsz.model.item.Inventory;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.scene.canvas.Canvas;
@@ -12,31 +12,39 @@ import javafx.scene.paint.Color;
 
 import java.util.List;
 
-public class ContainerView extends EquipmentView {
-    private Container container;
+public class HoldViewElement extends EquipmentViewElement {
+    private Inventory inventory;
 
-    public ContainerView(Canvas canvas, GameController gameController) {
+    public HoldViewElement(Canvas canvas, GameController gameController) {
         super(canvas, gameController);
     }
 
     @Override
     public void refresh() {
         super.refresh();
+
         drawEquipment();
+
+        drawHoldSize();
+
+        drawHoldWeight();
     }
 
-    @Override
-    protected final void drawEquipment() {
-        selectEquipment();
-
-        drawContainerEquipment();
-
-        drawContainerSize();
+    private void drawHoldWeight() {
+        double actualWeight = inventory.getActualWeight();
+        double maxWeight = inventory.getMaxWeight();
+        double columnWidth = WEIGHT_COLUMN_WIDTH * inventoryWidth;
+        double viewHeight = this.viewHeight;
+        double sizeColumnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
+        double columnX = viewPos.x - columnWidth - sizeColumnWidth;
+        double columnY = viewPos.y;
+        Color backgroundColor = Color.BLACK;
+        drawColumn(actualWeight, maxWeight, columnWidth, viewHeight, columnX, columnY, backgroundColor);
     }
 
-    private void drawContainerSize() {
-        int filledSpace = container.getFilledSpace();
-        int maxSize = container.getSize() - container.getNettoSize();
+    private void drawHoldSize() {
+        int filledSpace = inventory.getFilledSpace();
+        int maxSize = inventory.getMaxSize();
         double columnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
         double viewHeight = this.viewHeight;
         double columnX = viewPos.x - columnWidth;
@@ -45,7 +53,11 @@ public class ContainerView extends EquipmentView {
         drawColumn(filledSpace, maxSize, columnWidth, viewHeight, columnX, columnY, backgroundColor);
     }
 
-    private void drawContainerEquipment() {
+    @Override
+    protected final void drawEquipment() {
+
+        sortEquipment();
+
         for (Equipment e : items) {
             Coords pos = e.getPos();
             Coords corrected = currentPosCorrection(pos);
@@ -63,12 +75,12 @@ public class ContainerView extends EquipmentView {
         }
     }
 
-    public Container getContainer() {
-        return container;
+    public Inventory getInventory() {
+        return inventory;
     }
 
-    public void setContainer(Container container) {
-        this.container = container;
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
     @Override
@@ -79,30 +91,32 @@ public class ContainerView extends EquipmentView {
     }
 
     @Override
-    public boolean remove(Equipment e, Creature cr) {
-        getItems().remove(e);
-        System.out.println(e.getName() + " removed from " + container.getName());
+    public boolean tryRemove(Equipment e, Creature cr) {
+        inventory.remove(e);
+        System.out.println(e.getName() + " removed from " + cr.getName() + " inventory");
         return true;
     }
 
     @Override
-    public void add(Equipment e, Creature cr, double x, double y) {
-        if (!container.add(e)) {
-            System.out.println(e.getName() + " does not fit " + container.getName());
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
+        if (!inventory.tryAdd(e)) {
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
             if (!e.onDrop(cr, dropX, dropY)) {
                 cr.getItems().add(e);
             }
+            System.out.println(e.getName() + " does not fit " + cr.getName() + " inventory");
+            return false;
         } else {
             e.setPos(x, y, null);
-            System.out.println(e.getName() + " added to " + container.getName());
+            System.out.println(e.getName() + " added to " + cr.getName() + " inventory");
+            return true;
         }
     }
 
     @Override
     public List<Equipment> getItems() {
-        return container.getItems();
+        return inventory.getItems();
     }
 }

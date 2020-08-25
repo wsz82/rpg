@@ -8,6 +8,7 @@ import editor.view.asset.ItemsStage;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.*;
+import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -20,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CreatureAssetStage extends AssetStage<Creature> {
@@ -106,7 +108,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private void hookUpInventoryPlacesEditEvents() {
         inventoryPlacesButton.setOnAction(e -> {
-            Map<InventoryPlaceType, InventoryPlace> inventoryPlaces = item.getInventory().getInventoryPlaces();
+            Map<InventoryPlaceType, List<Coords>> inventoryPlaces = item.getInventory().getInventoryPlaces();
             if (inventoryPlaces == null) {
                 inventoryPlaces = new HashMap<>(0);
             }

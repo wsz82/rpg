@@ -1,4 +1,4 @@
-package game.view.stage;
+package game.view.world.inventory;
 
 import game.model.GameController;
 import game.model.setting.Settings;
@@ -19,15 +19,14 @@ import javafx.scene.paint.Color;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class InventoryView {
     private static final double SCROLL_BUTTON_PART = 1.0/80;
-    private static final double CREATURE_X_POS = 0.05;
+    private static final double CREATURE_X_POS = 0;
     private static final double CREATURE_Y_POS = 0.1;
-    private static final double CREATURE_WIDTH = 0.2;
-    private static final double CREATURE_HEIGHT = 0.4;
+    private static final double CREATURE_WIDTH = 0.35;
+    private static final double CREATURE_HEIGHT = 0.8;
     private static final double HOLD_X_POS = 0.3;
     private static final double HOLD_Y_POS = 0.6;
     private static final double HOLD_WIDTH = 0.6;
@@ -38,13 +37,12 @@ public class InventoryView {
     private final Controller controller;
     private final GraphicsContext gc;
     private final Coords mousePos = new Coords();
-    private final Coords modifiedCoords = new Coords();
     private final Coords draggedCoords = new Coords();
-    private final List<Equipment> lookedEquipment = new ArrayList<>(0);
-    private final List<EquipmentView> equipmentViews = new ArrayList<>(0);
-    private final HoldView holdView;
-    private final DropView dropView;
-    private final ContainerView containerView;
+    private final List<InventoryViewElement> equipmentViews = new ArrayList<>(0);
+    private final HoldViewElement holdView;
+    private final DropViewElement dropView;
+    private final ContainerViewElement containerView;
+    private final CreatureViewElement creatureView;
 
     private double draggedInitWidth;
     private double draggedInitHeight;
@@ -53,10 +51,10 @@ public class InventoryView {
     private EventHandler<MouseEvent> dragStop;
     private EventHandler<KeyEvent> closeEvent;
     private EventHandler<ScrollEvent> wheelScroll;
-    private EquipmentView origin;
-    private EquipmentView scrolledVer;
-    private DropView scrolledHor;
-    private EquipmentView lastCheckedView;
+    private InventoryViewElement origin;
+    private EquipmentViewElement scrolledVer;
+    private DropViewElement scrolledHor;
+    private InventoryViewElement lastCheckedView;
 
     public InventoryView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
@@ -64,12 +62,14 @@ public class InventoryView {
         controller = gameController.getController();
         gc = canvas.getGraphicsContext2D();
 
-        holdView = new HoldView(canvas, gameController);
+        holdView = new HoldViewElement(canvas, gameController);
         equipmentViews.add(holdView);
-        dropView = new DropView(canvas, gameController);
+        dropView = new DropViewElement(canvas, gameController);
         equipmentViews.add(dropView);
-        containerView = new ContainerView(canvas, gameController);
+        containerView = new ContainerViewElement(canvas, gameController);
         equipmentViews.add(containerView);
+        creatureView = new CreatureViewElement(canvas, gameController);
+        equipmentViews.add(creatureView);
 
         hookupEvents();
     }
@@ -125,55 +125,27 @@ public class InventoryView {
 
         wheelScroll = e -> {
             e.consume();
-            EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+            InventoryViewElement ev = getView(mousePos.x, mousePos.y);
             if (ev == null) {
                 return;
             }
             double dY = e.getDeltaY();
             if (dY < 0) {
-                scrollDown(ev);
+                ev.scrollDown();
             } else {
-                scrollUp(ev);
+                ev.scrollUp();
             }
         };
         canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
     }
 
-    private void scrollDown(EquipmentView ev) {
-        Coords curPos = ev.getCurPos();
-        double y = curPos.y;
-        double maxPos = ev.getMaxCurPosY() - ev.getViewHeight();
-        if (y >= maxPos) {
-            return;
-        }
-        double newY = y + getScrollSpeed();
-        newY = Math.min(newY, maxPos);
-        curPos.y = newY;
-    }
-
-    private double getScrollSpeed() {
-        return Settings.getDialogScrollSpeed();
-    }
-
-    private void scrollUp(EquipmentView ev) {
-        Coords curPos = ev.getCurPos();
-        double curPosY = curPos.y;
-        double minCurPosY = ev.getMinCurPosY();
-        if (curPosY <= minCurPosY) {
-            return;
-        }
-        double newY = curPosY - getScrollSpeed();
-        newY = Math.max(newY, minCurPosY);
-        curPos.y = newY;
-    }
-
     private void openContainer() {
-        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+        InventoryViewElement ev = getView(mousePos.x, mousePos.y);
         if (ev == null) return;
-        if (ev instanceof ContainerView) return;
+        if (ev instanceof ContainerViewElement) return;
         origin = ev;
-        translateScreenCoordsToCoords(mousePos, ev.getCurPos(), ev.getViewPos());
-        Equipment eq = lookForEquipment(modifiedCoords.x, modifiedCoords.y, ev);
+        Coords translated = ev.getLocalCoords(mousePos);
+        Equipment eq = ev.lookForEquipment(translated.x, translated.y, draggedCoords);
         if (!(eq instanceof Container)) return;
         Container toOpen = (Container) eq;
         Container openCon = controller.getContainerToOpen();
@@ -187,19 +159,20 @@ public class InventoryView {
     }
 
     private void startDrag(double mouseX, double mouseY) {
-        EquipmentView ev = getEquipmentView(mouseX, mouseY);
-        if (ev == null) return;
-        origin = ev;
-        translateScreenCoordsToCoords(mousePos, ev.getCurPos(), ev.getViewPos());
-        Equipment eq = lookForEquipment(modifiedCoords.x, modifiedCoords.y, ev);
-        Container con = controller.getContainerToOpen();
-        if (eq == con) return;
-        if (eq != null) {
-            if (ev.remove(eq, controller.getCreatureToOpenInventory())) {
-                dragged = eq.cloneEquipment();
-                draggedInitWidth = dragged.getImageWidth();
-                draggedInitHeight = dragged.getImageHeight();
-            }
+        InventoryViewElement viewElement = getView(mouseX, mouseY);
+        if (viewElement == null) return;
+        origin = viewElement;
+        Coords translated = viewElement.getLocalCoords(mousePos);
+        Equipment selected = viewElement.lookForEquipment(translated.x, translated.y, draggedCoords);
+        if (selected == null) return;
+        Container toOpen = controller.getContainerToOpen();
+        if (selected == toOpen) return;
+        Creature creature = controller.getCreatureToOpenInventory();
+        boolean canEquipmentBeRemoved = viewElement.tryRemove(selected, creature);
+        if (canEquipmentBeRemoved) {
+            dragged = selected.cloneEquipment();
+            draggedInitWidth = dragged.getImageWidth();
+            draggedInitHeight = dragged.getImageHeight();
         }
     }
 
@@ -207,18 +180,19 @@ public class InventoryView {
         if (dragged == null) return;
         dragged.getAnimationPos().setNextFrameUpdate(0);
         Creature hoveredHero = gameController.getHoveredHero();
-        if (!moveToHero(hoveredHero)) {
-            moveEquipmentWithinInventoryAndDropView(mouseX, mouseY);
+        boolean isNotMovedToHero = !tryMoveToHero(hoveredHero);
+        if (isNotMovedToHero) {
+            moveEquipmentWithinInventoryElements(mouseX, mouseY);
         }
         dragged = null;
     }
 
-    private boolean moveToHero(Creature hero) {
+    private boolean tryMoveToHero(Creature hero) {
         if (hero == null) return false;
         Creature cr = controller.getCreatureToOpenInventory();
         CreatureSize size = cr.getSize();
         if (hero.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (hero.getInventory().add(dragged)) {
+            if (hero.getInventory().tryAdd(dragged)) {
                 System.out.println(dragged.getName() + " moved to " + hero.getName() + " inventory");
                 return true;
             }
@@ -228,100 +202,80 @@ public class InventoryView {
         return false;
     }
 
-    private void moveEquipmentWithinInventoryAndDropView(double mouseX, double mouseY) {
-        EquipmentView ev = getEquipmentView(mouseX, mouseY);
+    private void moveEquipmentWithinInventoryElements(double mouseX, double mouseY) {
+        InventoryViewElement element = getView(mouseX, mouseY);
         Creature cr = controller.getCreatureToOpenInventory();
-        if (ev == null) {
-            Coords extreme = origin.getExtremePos(mousePos, draggedCoords, dragged);
-            origin.add(dragged, cr, extreme.x, extreme.y);
+        if (element == null) {
+            moveDraggedBack(cr);
         } else {
-            Coords local = ev.getLocalCoords(mousePos);
-            Coords resizedImageCorrection =
-                    adjustCoordsForResizedImage(draggedInitWidth, draggedInitHeight, draggedCoords, dragged);
-            local.subtract(resizedImageCorrection);
-            checkFit(ev, dragged, local);
-            ev.add(dragged, cr, local.x, local.y);
-        }
-    }
-
-    private Coords adjustCoordsForResizedImage(double draggedInitWidth, double draggedInitHeight,
-                                               Coords draggedCoords, Equipment dragged) {
-        double draggedWidth = dragged.getImageWidth();
-        double draggedInitX = draggedCoords.x;
-        double resizedX = draggedWidth * draggedInitX / draggedInitWidth;
-
-        double draggedHeight = dragged.getImageHeight();
-        double draggedInitY = draggedCoords.y;
-        double resizedY = draggedHeight * draggedInitY / draggedInitHeight;
-        draggedCoords.x = resizedX;
-        draggedCoords.y = resizedY;
-        return draggedCoords;
-    }
-
-    private void checkFit(EquipmentView ev, Equipment e, Coords local) {
-        Coords currentPos = ev.getCurPos();
-        if (local.x < currentPos.x) {
-            local.x = currentPos.x;
-        } else {
-            double max = currentPos.x + ev.getViewWidth() - e.getImageWidth();
-            if (local.x > max) {
-                local.x = max;
-            }
-        }
-        if (local.y < currentPos.y) {
-            local.y = currentPos.y;
-        } else {
-            double max = currentPos.y + ev.getViewHeight() - e.getImageHeight();
-            if (local.y > max) {
-                local.y = max;
+            Coords fixed = element.getFixedDraggedPos(mousePos, draggedCoords, dragged, draggedInitWidth, draggedInitHeight);
+            boolean draggedEquipmentCannotBeAdded = !element.tryAdd(dragged, cr, fixed.x, fixed.y);
+            if (draggedEquipmentCannotBeAdded) {
+                moveDraggedBack(cr);
             }
         }
     }
 
-    private EquipmentView getEquipmentView(double x, double y) {
+    private void moveDraggedBack(Creature cr) {
+        Coords extreme = origin.getExtremePos(mousePos, draggedCoords, dragged);
+        if (extreme == null) {
+            holdView.tryAdd(dragged, cr, 0, 0);
+            return;
+        }
+        origin.tryAdd(dragged, cr, extreme.x, extreme.y);
+    }
+
+    private InventoryViewElement getView(double x, double y) {
         scrolledVer = null;
         scrolledHor = null;
-        for (EquipmentView ev : equipmentViews) {
+        for (InventoryViewElement element : equipmentViews) {
 
-            double evLeft = ev.getViewPos().x;
-            double evRight = evLeft + ev.getViewWidth();
-            double evTop = ev.getViewPos().y;
-            double evBottom = evTop + ev.getViewHeight();
+            double evLeft = element.getViewPos().x;
+            double evRight = evLeft + element.getViewWidth();
+            double evTop = element.getViewPos().y;
+            double evBottom = evTop + element.getViewHeight();
 
             if (x > evLeft && x < evRight
-                    && y > evTop && y < evBottom) return ev;
-
-            double scrollWidth = ev.getScrollWidth();
-            if (ev.isYScrollVisible()) {
-                double yScrollPos = ev.getYScrollPos();
-                double yScrollButtonHeight = ev.getYScrollButtonHeight();
-                if (x > evRight && x < evRight + scrollWidth
-                        && y > evTop + yScrollPos && y < evTop + yScrollPos + yScrollButtonHeight) {
-                    scrolledVer = ev;
-                    return null;
-                }
-                if (x > evRight && x < evRight + scrollWidth
-                        && y > evTop && y < evBottom) {
-                    ev.setCurPosY(y - evTop);
-                }
+                    && y > evTop && y < evBottom) {
+                return element;
             }
 
-            if (ev instanceof DropView) {
-                DropView dv = (DropView) ev;
-                if (dv.isXScrollVisible()) {
-                    double xScrollPos = dv.getXScrollPos();
-                    double xScrollButtonHeight = dv.getXScrollButtonWidth();
-                    if (x > evLeft + xScrollPos && x < evLeft + xScrollPos + xScrollButtonHeight
-                            && y > evBottom && y < evBottom + scrollWidth) {
-                        scrolledHor = dv;
+            if (element instanceof EquipmentViewElement) {
+                EquipmentViewElement equipmentView = (EquipmentViewElement) element;
+                double scrollWidth = equipmentView.getScrollWidth();
+                if (equipmentView.isYScrollVisible()) {
+                    double yScrollPos = equipmentView.getYScrollPos();
+                    double yScrollButtonHeight = equipmentView.getYScrollButtonHeight();
+                    if (x > evRight && x < evRight + scrollWidth
+                            && y > evTop + yScrollPos && y < evTop + yScrollPos + yScrollButtonHeight) {
+                        scrolledVer = equipmentView;
                         return null;
                     }
-                    if (x > evLeft && x < evRight
-                            && y > evBottom && y < evBottom + scrollWidth) {
-                        dv.setScrollPosX(x - evLeft);
+                    if (x > evRight && x < evRight + scrollWidth
+                            && y > evTop && y < evBottom) {
+                        equipmentView.setCurPosY(y - evTop);
                     }
                 }
+                if (element instanceof DropViewElement) {
+                    DropViewElement dv = (DropViewElement) element;
+                    if (dv.isXScrollVisible()) {
+                        double xScrollPos = dv.getXScrollPos();
+                        double xScrollButtonHeight = dv.getXScrollButtonWidth();
+                        if (x > evLeft + xScrollPos && x < evLeft + xScrollPos + xScrollButtonHeight
+                                && y > evBottom && y < evBottom + scrollWidth) {
+                            scrolledHor = dv;
+                            return null;
+                        }
+                        if (x > evLeft && x < evRight
+                                && y > evBottom && y < evBottom + scrollWidth) {
+                            dv.setScrollPosX(x - evLeft);
+                        }
+                    }
+                }
+            } else {
+
             }
+
         }
         return null;
     }
@@ -329,7 +283,7 @@ public class InventoryView {
     private void closeInventory() {
         if (dragged != null) {
             Creature cr = controller.getCreatureToOpenInventory();
-            holdView.add(dragged, cr, 0, 0);
+            holdView.tryAdd(dragged, cr, 0, 0);
             dragged = null;
         }
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
@@ -404,15 +358,15 @@ public class InventoryView {
     }
 
     private void playDraggedAnimation(Coords mousePos) {
-        EquipmentView ev = getEquipmentView(mousePos.x, mousePos.y);
+        InventoryViewElement ev = getView(mousePos.x, mousePos.y);
         EquipmentAnimationPos animationPos = dragged.getAnimationPos();
-        if (ev instanceof DropView) {
-            if (!(lastCheckedView instanceof DropView)) {
+        if (ev instanceof DropViewElement) {
+            if (!(lastCheckedView instanceof DropViewElement)) {
                 animationPos.setNextFrameUpdate(0);
             }
             animationPos.setCurAnimation(EquipmentAnimationType.DROP);
         } else {
-            if (lastCheckedView instanceof DropView) {
+            if (lastCheckedView instanceof DropViewElement) {
                 animationPos.setNextFrameUpdate(0);
             }
             animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
@@ -525,62 +479,20 @@ public class InventoryView {
 
     private void drawCreature(double inventoryWidth, Creature cr) {
         int meter = Sizes.getMeter();
-        double meterFactor = inventoryWidth * meter;
-        double x = CREATURE_X_POS * meterFactor;
-        double pictureWidth = CREATURE_WIDTH * meterFactor;
-        double y = CREATURE_Y_POS * canvas.getHeight();
-        double pictureHeight = CREATURE_HEIGHT * meterFactor;
+        double creatureViewWidth = CREATURE_WIDTH * inventoryWidth;
+        double creatureViewHeight = CREATURE_HEIGHT * canvas.getHeight() / meter;
+        double x = CREATURE_X_POS * inventoryWidth;
+        double y = CREATURE_Y_POS * canvas.getHeight() / meter;
 
-        Image img = cr.getAnimation().getCreatureInventoryImage(cr, (int) pictureWidth, (int) pictureHeight);
-        gc.drawImage(img, x, y);
+        creatureView.setDrawnCreature(cr);
+        creatureView.setDragged(dragged);
+        creatureView.setViewPos(x, y);
+        creatureView.setSize(creatureViewWidth, creatureViewHeight);
+        creatureView.refresh();
     }
 
     private void drawBackground(double inventoryWidth) {
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(0, 0, inventoryWidth * Sizes.getMeter(), canvas.getHeight());
-    }
-
-    public Equipment lookForEquipment(double x, double y, EquipmentView ev) {
-        Coords currentPos = ev.getCurPos();
-        if (x < currentPos.x || x > currentPos.x + ev.getViewWidth()) return null;
-        if (y < currentPos.y || y > currentPos.y + ev.getViewHeight()) return null;
-        lookedEquipment.clear();
-        lookedEquipment.addAll(ev.getItems());
-        Collections.reverse(lookedEquipment);
-        for (Equipment eq : lookedEquipment) {
-            double cX = eq.getLeft();
-            double cWidth = eq.getImageWidth();
-            boolean fitX = x >= cX && x <= cX + cWidth;
-            if (!fitX) continue;
-
-            double cY = eq.getTop();
-            double cHeight = eq.getImageHeight();
-            boolean fitY = y >= cY && y <= cY + cHeight;
-            if (!fitY) continue;
-
-            Image img = eq.getImage();
-            int meter = Sizes.getMeter();
-            int imgX = (int) ((x - cX) * meter);
-            int imgY = (int) ((y - cY) * meter);
-            Color color;
-            try {
-                color = img.getPixelReader().getColor(imgX, imgY);
-            } catch (IndexOutOfBoundsException e) {
-                continue;
-            }
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) continue;
-            draggedCoords.x = (double) imgX / meter;
-            draggedCoords.y = (double) imgY / meter;
-            return eq;
-        }
-        return null;
-    }
-
-    private void translateScreenCoordsToCoords(Coords pos, Coords currentPos, Coords viewPos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.add(currentPos);
-        modifiedCoords.subtract(viewPos);
     }
 }

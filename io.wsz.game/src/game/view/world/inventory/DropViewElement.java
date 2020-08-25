@@ -1,4 +1,4 @@
-package game.view.stage;
+package game.view.world.inventory;
 
 import game.model.GameController;
 import io.wsz.model.item.*;
@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DropView extends EquipmentView {
+public class DropViewElement extends EquipmentViewElement {
     private final List<PosItem> allItmes = new ArrayList<>(0);
     private final Coords creaturePos = new Coords();
 
@@ -26,7 +26,7 @@ public class DropView extends EquipmentView {
     private double xScrollButtonWidth;
     private boolean xScrollVisible;
 
-    public DropView(Canvas canvas, GameController gameController) {
+    public DropViewElement(Canvas canvas, GameController gameController) {
         super(canvas, gameController);
     }
 
@@ -172,7 +172,7 @@ public class DropView extends EquipmentView {
     }
 
     @Override
-    public boolean remove(Equipment e, Creature cr) {
+    public boolean tryRemove(Equipment e, Creature cr) {
         if (e.onTake(cr, 0, 0)) {
             droppedEquipment.remove(e);
             return true;
@@ -181,10 +181,13 @@ public class DropView extends EquipmentView {
     }
 
     @Override
-    public void add(Equipment e, Creature cr, double x, double y) {
-        if (!e.onDrop(cr, x, y)) {
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
+        boolean cannotBeDropped = !e.onDrop(cr, x, y);
+        if (cannotBeDropped) {
             cr.getItems().add(e);
+            return false;
         }
+        return true;
     }
 
     @Override

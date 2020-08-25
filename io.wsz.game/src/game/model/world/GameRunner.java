@@ -293,9 +293,11 @@ public class GameRunner {
         }
 
         private Set<PosItem> getAssets(List<PosItem> items) {
-            Set<PosItem> prototypes = items.stream()
-                    .map(pi -> pi.getPrototype())
-                    .collect(Collectors.toSet());
+            Set<PosItem> prototypes = new HashSet<>();
+            for (PosItem item : items) {
+                PosItem prototype = item.getPrototype();
+                prototypes.add(prototype);
+            }
 
             List<Containable> locationContainers = items.stream()
                     .filter(pi -> pi instanceof Containable)

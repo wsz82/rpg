@@ -461,24 +461,21 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         if (this == o) return true;
         if (!(o instanceof PosItem)) return false;
         if (!super.equals(o)) return false;
-        PosItem<?, ?> item = (PosItem<?, ?>) o;
-        return Objects.equals(getPrototype(), item.getPrototype()) &&
-                Objects.equals(getVisible(), item.getVisible()) &&
-                Objects.equals(getPos(), item.getPos()) &&
-                Objects.equals(getCoverLine(), item.getCoverLine()) &&
-                Objects.equals(getCollisionPolygons(), item.getCollisionPolygons()) &&
-                Objects.equals(getDialog(), item.getDialog());
+        PosItem<?, ?> posItem = (PosItem<?, ?>) o;
+        return Objects.equals(getVisible(), posItem.getVisible()) &&
+                Objects.equals(getPos(), posItem.getPos()) &&
+                Objects.equals(getPrototype(), posItem.getPrototype()) &&
+                Objects.equals(getCoverLine(), posItem.getCoverLine()) &&
+                Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
+                Objects.equals(getDialog(), posItem.getDialog()) &&
+                Objects.equals(getInteractionCoords(), posItem.getInteractionCoords()) &&
+                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed()) &&
+                Objects.equals(getImage(), posItem.getImage());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getPrototype(), getVisible(), getPos(),
-                getCoverLine(), getCollisionPolygons(), getDialog());
-    }
-
-    @Override
-    public String toString() {
-        return getName();
+        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionCoords(), getAnimationSpeed(), getImage());
     }
 
     @Override

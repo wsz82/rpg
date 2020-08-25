@@ -130,13 +130,12 @@ public class Coords implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Coords)) return false;
         Coords pos = (Coords) o;
-        Location loc = getLocation();
         Location posLoc = pos.getLocation();
         boolean locsEquals;
-        if (loc == null && posLoc == null) {
+        if (location == null && posLoc == null) {
             locsEquals = true;
-        } else if (loc != null && posLoc != null) {
-            locsEquals = Objects.equals(loc.getName(), posLoc.getName());
+        } else if (location != null && posLoc != null) {
+            locsEquals = Objects.equals(location.getName(), posLoc.getName());
         } else {
             locsEquals = false;
         }

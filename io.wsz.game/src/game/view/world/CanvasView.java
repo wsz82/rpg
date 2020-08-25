@@ -1,4 +1,4 @@
-package game.view.stage;
+package game.view.world;
 
 import game.model.GameController;
 import io.wsz.model.Controller;

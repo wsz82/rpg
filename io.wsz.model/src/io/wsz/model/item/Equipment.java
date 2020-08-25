@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Equipment<E extends Equipment, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Equippable {
+public abstract class Equipment<E extends Equipment, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Takeable {
     private static final long serialVersionUID = 1L;
 
     public static List<Equipment> cloneEquipmentList(List<Equipment> equipment) {
@@ -23,6 +23,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         return clone;
     }
 
+    protected InventoryPlaceType occupiedPlace;
     protected Double weight;
     protected Integer size;
 
@@ -38,11 +39,24 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
     public Equipment(Equipment other) {
         super(other);
-        weight = other.weight;
-        size = other.size;
+        this.occupiedPlace = other.occupiedPlace;
+        this.weight = other.weight;
+        this.size = other.size;
     }
 
     public abstract Equipment cloneEquipment();
+
+    public InventoryPlaceType getOccupiedPlace() {
+        if (prototype == null) {
+            return occupiedPlace;
+        } else {
+            return prototype.getOccupiedPlace();
+        }
+    }
+
+    public void setOccupiedPlace(InventoryPlaceType occupiedPlace) {
+        this.occupiedPlace = occupiedPlace;
+    }
 
     public Double getIndividualWeight() {
         return weight;
@@ -163,8 +177,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     @Override
     public abstract B getAnimationPos();
 
-    @Override
-    public void onEquip() {}
+
 
     @Override
     public boolean equals(Object o) {
@@ -186,6 +199,8 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(occupiedPlace);
+
         out.writeObject(weight);
 
         out.writeObject(size);
@@ -196,6 +211,8 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         super.readExternal(in);
         long ver = in.readLong();
 
+        occupiedPlace = (InventoryPlaceType) in.readObject();
+        
         weight = (Double) in.readObject();
 
         size = (Integer) in.readObject();

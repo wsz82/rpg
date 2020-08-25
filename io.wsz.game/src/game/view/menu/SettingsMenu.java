@@ -1,4 +1,4 @@
-package game.view.stage;
+package game.view.menu;
 
 import game.model.setting.Settings;
 import io.wsz.model.Controller;

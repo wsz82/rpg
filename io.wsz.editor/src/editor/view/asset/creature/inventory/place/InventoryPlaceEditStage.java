@@ -3,7 +3,6 @@ package editor.view.asset.creature.inventory.place;
 import editor.model.EditorController;
 import editor.view.asset.coords.CoordsShapeEditStage;
 import io.wsz.model.item.Creature;
-import io.wsz.model.item.InventoryPlace;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     private final EditorController editorController;
-    private final Map<InventoryPlaceType, InventoryPlace> initInventoryPlaces;
+    private final Map<InventoryPlaceType, List<Coords>> initInventoryPlaces;
     private final ObservableList<List<Coords>> places = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> types = FXCollections.observableArrayList();
     private final ChoiceBox<InventoryPlaceType> typesCB;
@@ -34,10 +33,10 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     private VBox placeCBVBox;
     private ChoiceBox<List<Coords>> placeCB;
 
-    private Map<InventoryPlaceType, InventoryPlace> inventoryPlaces;
+    private Map<InventoryPlaceType, List<Coords>> inventoryPlaces;
 
     public InventoryPlaceEditStage(EditorController editorController, Stage parent, Creature item, Image background,
-                                   Map<InventoryPlaceType, InventoryPlace> initInventoryPlaces) {
+                                   Map<InventoryPlaceType, List<Coords>> initInventoryPlaces) {
         super(parent, item, background);
         this.editorController = editorController;
         this.initInventoryPlaces = initInventoryPlaces;
@@ -162,8 +161,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
                 types.add(actualType);
             }
             inventoryPlaces.remove(actualType);
-            InventoryPlace newValue = new InventoryPlace(place);
-            inventoryPlaces.put(selectedType, newValue);
+            inventoryPlaces.put(selectedType, place);
             setUpPlaceCB();
         });
     }
@@ -179,7 +177,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
         for (InventoryPlaceType type : inventoryPlaces.keySet()) {
             String typeName = type.getName();
             if (name.equals(typeName)) {
-                return inventoryPlaces.get(type).getPolygon();
+                return inventoryPlaces.get(type);
             }
         }
         return null;
@@ -187,7 +185,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
 
     private InventoryPlaceType getInventoryPlaceType(List<Coords> place) {
         for (InventoryPlaceType type : inventoryPlaces.keySet()) {
-            List<Coords> compared = inventoryPlaces.get(type).getPolygon();
+            List<Coords> compared = inventoryPlaces.get(type);
             if (place.equals(compared)) {
                 return type;
             }
@@ -211,21 +209,17 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
 
         int size = inventoryPlaces.size();
         List<List<Coords>> initPlaces = new ArrayList<>(size);
-        inventoryPlaces.values().stream()
-                .map(InventoryPlace::getPolygon)
-                .forEach(initPlaces::add);
+        initPlaces.addAll(inventoryPlaces.values());
         places.addAll(initPlaces);
     }
 
-    private Map<InventoryPlaceType, InventoryPlace> cloneInventoryPlaces(Map<InventoryPlaceType, InventoryPlace> other) {
-        Map<InventoryPlaceType, InventoryPlace> clone = new HashMap<>(0);
+    private Map<InventoryPlaceType, List<Coords>> cloneInventoryPlaces(Map<InventoryPlaceType, List<Coords>> other) {
+        Map<InventoryPlaceType, List<Coords>> clone = new HashMap<>(0);
         for (InventoryPlaceType type : other.keySet()) {
             InventoryPlaceType clonedType = new InventoryPlaceType(type.getName());
-            InventoryPlace otherPlace = other.get(type);
-            List<Coords> otherPolygon = otherPlace.getPolygon();
+            List<Coords> otherPolygon = other.get(type);
             List<Coords> clonedPolygon = Geometry.cloneCoordsList(otherPolygon);
-            InventoryPlace clonedPlace = new InventoryPlace(clonedPolygon);
-            clone.put(clonedType, clonedPlace);
+            clone.put(clonedType, clonedPolygon);
         }
         return clone;
     }
@@ -344,8 +338,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
         List<Coords> actualPlace = placeCB.getValue();
         if (type != null && actualPlace == null) {
             types.remove(type);
-            InventoryPlace newInventoryPlace = new InventoryPlace(newPlace);
-            inventoryPlaces.put(type, newInventoryPlace);
+            inventoryPlaces.put(type, newPlace);
         }
         places.add(newPlace);
         placeCB.setValue(newPlace);

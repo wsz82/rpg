@@ -1,7 +1,7 @@
 package game.view.launcher;
 
 import game.model.GameController;
-import game.view.stage.GameStage;
+import game.view.menu.GameStage;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

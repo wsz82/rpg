@@ -6,11 +6,16 @@ import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Equipment;
+import io.wsz.model.item.InventoryPlaceType;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStage<A> {
+    protected final ChoiceBox<InventoryPlaceType> occupiedPlaceCB = new ChoiceBox<>();
     protected final DoubleField inputWeight = new DoubleField(0.0, isContent);
     protected final IntegerField inputSize = new IntegerField(0, isContent);
 
@@ -28,6 +33,14 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
     protected void initWindow() {
         super.initWindow();
 
+        if (!isContent) {
+            final HBox occupiedPlaceBox = new HBox(10);
+            final Label occupiedPlaceLabel = new Label("Inventory place");
+            occupiedPlaceBox.getChildren().addAll(occupiedPlaceLabel, occupiedPlaceCB);
+            container.getChildren().add(occupiedPlaceBox);
+            setUpOccupiedPlaceCB();
+        }
+
         weightBox = new HBox(10);
         final Label weightLabel = new Label("Weight");
         weightBox.getChildren().addAll(weightLabel, inputWeight);
@@ -39,11 +52,24 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
         container.getChildren().addAll(weightBox, sizeBox);
     }
 
+    private void setUpOccupiedPlaceCB() {
+        occupiedPlaceCB.setPrefWidth(100);
+        ObservableList<InventoryPlaceType> origin = editorController.getObservableInventoryPlacesTypes();
+        ObservableList<InventoryPlaceType> types = FXCollections.observableArrayList(origin);
+        types.add(null);
+        occupiedPlaceCB.setItems(types);
+    }
+
     @Override
     protected void fillInputs() {
         super.fillInputs();
         if (item == null) {
             return;
+        }
+
+        if (!isContent) {
+            InventoryPlaceType occupiedPlace = item.getOccupiedPlace();
+            occupiedPlaceCB.setValue(occupiedPlace);
         }
 
         Double weight = item.getIndividualWeight();
@@ -64,6 +90,12 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
     @Override
     protected void defineAsset() {
         super.defineAsset();
+
+        if (!isContent) {
+            InventoryPlaceType occupiedPlace = occupiedPlaceCB.getValue();
+            item.setOccupiedPlace(occupiedPlace);
+        }
+
         String weight = inputWeight.getText();
         if (weight.isEmpty()) {
             if (isContent) {

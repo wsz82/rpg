@@ -1,8 +1,11 @@
-package game.view.stage;
+package game.view.world.board;
 
 import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
+import game.view.world.CanvasView;
+import game.view.world.dialog.DialogView;
+import game.view.world.inventory.InventoryView;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;

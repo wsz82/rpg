@@ -1,4 +1,4 @@
-package game.view.stage;
+package game.view.world.board;
 
 import game.model.GameController;
 import game.model.setting.Settings;

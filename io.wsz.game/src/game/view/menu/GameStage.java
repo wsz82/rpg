@@ -1,8 +1,9 @@
-package game.view.stage;
+package game.view.menu;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
+import game.view.world.board.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
