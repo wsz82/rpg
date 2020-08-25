@@ -22,12 +22,11 @@ public class DropViewElement extends EquipmentViewElement {
     private double minCurPosY;
     private double minCurPosX;
     private double maxCurPosX;
-    private double xScrollPos;
     private double xScrollButtonWidth;
-    private boolean xScrollVisible;
+    private boolean isXScrollVisible;
 
-    public DropViewElement(Canvas canvas, GameController gameController) {
-        super(canvas, gameController);
+    public DropViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
+        super(canvas, gameController, mousePos);
     }
 
     @Override
@@ -53,9 +52,17 @@ public class DropViewElement extends EquipmentViewElement {
         gc.restore();
     }
 
+    @Override
+    protected void scrollScrollBar() {
+        super.scrollScrollBar();
+        if (!isXScrollVisible || isViewNotVisible()) return;
+        double scrollToX = mousePos.x - viewPos.x;
+        setCurPosX(scrollToX);
+    }
+
     private void drawHorScroll() {
-        xScrollVisible = !(visionWidthDiameter <= viewWidth);
-        if (!xScrollVisible) {
+        isXScrollVisible = !(visionWidthDiameter <= viewWidth);
+        if (!isXScrollVisible) {
             return;
         }
         int meter = Sizes.getMeter();
@@ -68,7 +75,7 @@ public class DropViewElement extends EquipmentViewElement {
     private void drawHorScrollButton(double y) {
         minCurPosX = creaturePos.x - visionWidthDiameter/2;
         maxCurPosX = creaturePos.x + visionWidthDiameter/2;
-        xScrollPos = (curPos.x - minCurPosX) * viewWidth / visionWidthDiameter;
+        double xScrollPos = (curPos.x - minCurPosX) * viewWidth / visionWidthDiameter;
         double x = viewPos.x + xScrollPos;
         xScrollButtonWidth = viewWidth * viewWidth / visionWidthDiameter;
 
@@ -119,8 +126,8 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected void drawVerScroll() {
-        yScrollVisible = !(visionHeightDiameter <= viewHeight);
-        if (!yScrollVisible) {
+        isYScrollVisible = !(visionHeightDiameter <= viewHeight);
+        if (!isYScrollVisible) {
             return;
         }
         int meter = Sizes.getMeter();
@@ -173,7 +180,7 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     public boolean tryRemove(Equipment e, Creature cr) {
-        if (e.onTake(cr, 0, 0)) {
+        if (e.tryTake(cr)) {
             droppedEquipment.remove(e);
             return true;
         }
@@ -182,12 +189,39 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
-        boolean cannotBeDropped = !e.onDrop(cr, x, y);
-        if (cannotBeDropped) {
-            cr.getItems().add(e);
-            return false;
+        return e.tryDrop(cr, x, y);
+    }
+
+    @Override
+    public boolean tryStartDragScroll(double x, double y) {
+        if (super.tryStartDragScroll(x, y)) {
+            return true;
         }
-        return true;
+        double left = viewPos.x;
+        double right = left + viewWidth;
+        double top = viewPos.y;
+        double bottom = top + viewHeight;
+
+        if (isXScrollVisible) {
+            boolean isPointWithinScrollBar = x > left && x < right
+                    && y > bottom && y < bottom + scrollWidth;
+            if (isPointWithinScrollBar) {
+                setCurPosX(x - left);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
+        return e.getPos();
+    }
+
+    @Override
+    public void setMovedToHeroEquipmentPos(Coords pos) {
+        pos.x = 0;
+        pos.y = 0;
     }
 
     @Override
@@ -227,15 +261,7 @@ public class DropViewElement extends EquipmentViewElement {
         }
     }
 
-    public double getXScrollPos() {
-        return xScrollPos;
-    }
-
-    public double getXScrollButtonWidth() {
-        return xScrollButtonWidth;
-    }
-
-    public void setScrollPosX(double x) {
+    public void setCurPosX(double x) {
         x -= xScrollButtonWidth/2;
         double maxX;
         if (x < 0) {
@@ -245,10 +271,6 @@ public class DropViewElement extends EquipmentViewElement {
         } else {
             curPos.x = x * ((maxCurPosX - minCurPosX) / viewWidth) + minCurPosX;
         }
-    }
-
-    public boolean isXScrollVisible() {
-        return xScrollVisible;
     }
 
     public double getMinCurPosY() {

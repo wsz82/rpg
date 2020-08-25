@@ -15,8 +15,8 @@ import java.util.List;
 public class HoldViewElement extends EquipmentViewElement {
     private Inventory inventory;
 
-    public HoldViewElement(Canvas canvas, GameController gameController) {
-        super(canvas, gameController);
+    public HoldViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
+        super(canvas, gameController, mousePos);
     }
 
     @Override
@@ -75,10 +75,6 @@ public class HoldViewElement extends EquipmentViewElement {
         }
     }
 
-    public Inventory getInventory() {
-        return inventory;
-    }
-
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
@@ -103,7 +99,7 @@ public class HoldViewElement extends EquipmentViewElement {
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
-            if (!e.onDrop(cr, dropX, dropY)) {
+            if (!e.tryDrop(cr, dropX, dropY)) {
                 cr.getItems().add(e);
             }
             System.out.println(e.getName() + " does not fit " + cr.getName() + " inventory");

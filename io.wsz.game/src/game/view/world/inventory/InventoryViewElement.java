@@ -18,15 +18,29 @@ public abstract class InventoryViewElement extends CanvasView {
     protected final List<Equipment> lookedEquipment = new ArrayList<>(0);
     protected final Coords viewPos = new Coords();
 
+    protected Coords mousePos;
     protected double viewWidth;
     protected double viewHeight;
+    protected boolean isScrollDragged;
     protected Equipment dragged;
 
-    public InventoryViewElement(Canvas canvas, GameController gameController) {
+    public InventoryViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
         super(canvas, gameController);
+        this.mousePos = mousePos;
     }
 
-    public abstract void refresh();
+    public void refresh() {
+        if (isViewNotVisible()) return;
+        if (isScrollDragged) {
+            scrollScrollBar();
+        }
+    }
+
+    protected boolean isViewNotVisible() {
+        return viewWidth < 0 || viewHeight < 0;
+    }
+
+    protected abstract void scrollScrollBar();
 
     public abstract boolean tryRemove(Equipment e, Creature cr);
 
@@ -51,6 +65,11 @@ public abstract class InventoryViewElement extends CanvasView {
     public abstract void scrollUp();
 
     public abstract void scrollDown();
+
+    public abstract boolean tryStartDragScroll(double x, double y);
+
+    public void setMovedToHeroEquipmentPos(Coords pos) {
+    }
 
     protected double getScrollSpeed() {
         return Settings.getDialogScrollSpeed();
@@ -80,5 +99,9 @@ public abstract class InventoryViewElement extends CanvasView {
 
     public void setDragged(Equipment e) {
         dragged = e;
+    }
+
+    public void setIsScrollDragged(boolean isScrollDragged) {
+        this.isScrollDragged = isScrollDragged;
     }
 }

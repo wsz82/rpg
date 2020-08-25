@@ -29,17 +29,15 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     protected double yScrollPos;
     protected double yScrollButtonHeight;
     protected double maxCurPosY;
-    protected boolean yScrollVisible = true;
+    protected boolean isYScrollVisible = true;
 
-    public EquipmentViewElement(Canvas canvas, GameController gameController) {
-        super(canvas, gameController);
+    public EquipmentViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
+        super(canvas, gameController, mousePos);
     }
 
     @Override
     public void refresh() {
-        if (viewWidth < 0 || viewHeight < 0) {
-            return;
-        }
+        super.refresh();
         drawBackground();
 
         drawVerScroll();
@@ -50,6 +48,13 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     protected abstract void drawBackground();
 
     public abstract List<Equipment> getItems();
+
+    @Override
+    protected void scrollScrollBar() {
+        if (!isScrollDragged || isViewNotVisible()) return;
+        double scrollToY = mousePos.y - viewPos.y;
+        setCurPosY(scrollToY);
+    }
 
     @Override
     public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords,
@@ -165,11 +170,13 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     protected void drawVerScroll() {
-        int meter = Sizes.getMeter();
-        double x = (viewPos.x + viewWidth) * meter;
+        if (isYScrollVisible) {
+            int meter = Sizes.getMeter();
+            double x = (viewPos.x + viewWidth) * meter;
 
-        clearVerScroll(x);
-        drawVerScrollButton(x);
+            clearVerScroll(x);
+            drawVerScrollButton(x);
+        }
     }
 
     protected void drawVerScrollButton(double x) {
@@ -257,6 +264,24 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
+    public boolean tryStartDragScroll(double x, double y) {
+        double left = viewPos.x;
+        double right = left + viewWidth;
+        double top = viewPos.y;
+        double bottom = top + viewHeight;
+
+        if (!isYScrollVisible) return false;
+
+        boolean isPointWithinScrollBar = x > right && x < right + scrollWidth && y > top && y < bottom;
+        if (isPointWithinScrollBar) {
+            setCurPosY(y - top);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
         if (mousePos.x < viewPos.x) {
             mousePos.x = curPos.x;
@@ -297,24 +322,8 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         return curPos;
     }
 
-    public double getScrollWidth() {
-        return scrollWidth;
-    }
-
     public void setScrollWidth(double scrollWidth) {
         this.scrollWidth = scrollWidth;
-    }
-
-    public double getYScrollPos() {
-        return yScrollPos;
-    }
-
-    public double getYScrollButtonHeight() {
-        return yScrollButtonHeight;
-    }
-
-    public boolean isYScrollVisible() {
-        return yScrollVisible;
     }
 
     public double getMaxCurPosY() {
@@ -323,10 +332,6 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
 
     public double getMinCurPosY() {
         return 0;
-    }
-
-    public double getInventoryWidth() {
-        return inventoryWidth;
     }
 
     public void setInventoryWidth(double inventoryWidth) {

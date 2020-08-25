@@ -15,8 +15,8 @@ import java.util.List;
 public class ContainerViewElement extends EquipmentViewElement {
     private Container container;
 
-    public ContainerViewElement(Canvas canvas, GameController gameController) {
-        super(canvas, gameController);
+    public ContainerViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
+        super(canvas, gameController, mousePos);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ContainerViewElement extends EquipmentViewElement {
             Coords bottom = cr.getCenter();
             double dropX = bottom.x - e.getImageWidth()/2;
             double dropY = bottom.y - e.getImageHeight()/2;
-            if (!e.onDrop(cr, dropX, dropY)) {
+            if (!e.tryDrop(cr, dropX, dropY)) {
                 cr.getItems().add(e);
             }
             return false;

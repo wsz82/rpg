@@ -132,7 +132,10 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
             boolean fits = cr.getIndividualInventory().fitsInventory(this);
             if (fits) {
                 cr.getIndividualInventory().tryAdd(this);
-                onTake(cr, 0, 0);
+                if (tryTake(cr)) {
+                    pos.x = 0;
+                    pos.y = 0;
+                }
             }
             return true;
         }

@@ -95,9 +95,9 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     }
 
     @Override
-    public boolean onTake(Creature cr, double x, double y) {
-        boolean notFitsInventory = !cr.getInventory().fitsInventory(this);
-        if (notFitsInventory) {
+    public boolean tryTake(Creature cr) {
+        boolean doesFitInventory = !cr.getInventory().fitsInventory(this);
+        if (doesFitInventory) {
             System.out.println(getName() + " does not fit " + cr.getName() + " inventory");
             return false;
         }
@@ -115,9 +115,6 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
             System.out.println(message);
             return false;
         } else {
-            pos.x = x;
-            pos.y = y;
-            pos.level = 0;
             setVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
             System.out.println(getName() + " taken");
@@ -126,7 +123,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     }
 
     @Override
-    public boolean onDrop(Creature cr, double x, double y) {
+    public boolean tryDrop(Creature cr, double x, double y) {
         double tempX = pos.x;
         double tempY = pos.y;
         int tempLevel = pos.level;

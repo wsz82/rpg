@@ -16,17 +16,23 @@ import java.util.Map;
 public class CreatureViewElement extends InventoryViewElement {
     private Creature drawnCreature;
 
-    public CreatureViewElement(Canvas canvas, GameController gameController) {
-        super(canvas, gameController);
+    public CreatureViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
+        super(canvas, gameController, mousePos);
     }
 
     @Override
     public void refresh() {
+        super.refresh();
         int meter = Sizes.getMeter();
         int width = (int) viewWidth * meter;
         int height = (int) viewHeight * meter;
         Image img = drawnCreature.getAnimation().getCreatureInventoryImage(drawnCreature, width, height);
         gc.drawImage(img, viewPos.x * meter, viewPos.y * meter);
+    }
+
+    @Override
+    protected void scrollScrollBar() {
+
     }
 
     @Override
@@ -81,8 +87,15 @@ public class CreatureViewElement extends InventoryViewElement {
 
     }
 
-    public Creature getDrawnCreature() {
-        return drawnCreature;
+    @Override
+    public boolean tryStartDragScroll(double x, double y) {
+        return false;
+    }
+
+    @Override
+    public void setMovedToHeroEquipmentPos(Coords pos) {
+        pos.x = 0;
+        pos.y = 0;
     }
 
     public void setDrawnCreature(Creature drawnCreature) {
