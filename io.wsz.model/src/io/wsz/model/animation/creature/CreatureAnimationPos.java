@@ -24,7 +24,10 @@ public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
 
     public void setCurAnimation(CreatureAnimationType curCreatureAnimationType) {
         if (curCreatureAnimationType == this.curCreatureAnimationType) return;
-        setFrameNumber(0);
+        frameNumber = 0;
+        if (curCreatureAnimationType == CreatureAnimationType.MOVE) {
+            nextFrameUpdate = 0;
+        }
         this.curCreatureAnimationType = curCreatureAnimationType;
     }
 
