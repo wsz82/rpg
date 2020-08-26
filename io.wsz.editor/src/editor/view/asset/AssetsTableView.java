@@ -25,14 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
-    private static final double MAX_HEIGHT = 8000;
-    private static final double MAX_WIDTH = 8000;
-
     protected final EditorCanvas editorCanvas;
     protected final EditorController editorController;
     protected final Controller controller;
     protected final Stage parent;
-    protected final ObservableList<A> assets;
 
     private Pointer pointer;
     private ContentTableView contentTableView;
@@ -40,12 +36,11 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     public AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.parent = parent;
-        this.assets = assets;
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
         controller = editorController.getController();
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        initTable();
+        initAssetsTable();
         setItems(assets);
         setUpContextMenu();
         setEditable(true);
@@ -94,7 +89,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         });
     }
 
-    private void initTable() {
+    private void initAssetsTable() {
         TableColumn<A, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         nameCol.setEditable(true);
@@ -171,7 +166,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private boolean isImageTooBig(A item, Image img) {
         double width = img.getWidth();
         double height = img.getHeight();
-        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        if (width > Sizes.MAX_IMAGE_WIDTH || height > Sizes.MAX_IMAGE_HEIGHT) {
             alertTooBigImage(width, height, item.getName());
             return true;
         }
@@ -183,7 +178,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
                 "Image of asset \"" + itemName + "\" is too big: " + "\n"
                 + "Width: " + width + "\n"
                 + "Height: " + height + "\n"
-                + "when maximum is: " + MAX_WIDTH;
+                + "when maximum is: " + Sizes.MAX_IMAGE_WIDTH;
         final Alert alert = new Alert(
                 Alert.AlertType.ERROR, message, ButtonType.CLOSE);
         alert.showAndWait()

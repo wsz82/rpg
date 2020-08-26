@@ -1,7 +1,7 @@
 package editor.view.asset.equipment.container;
 
 import editor.model.EditorController;
-import editor.view.asset.AssetsTableView;
+import editor.view.asset.equipment.EquipmentTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.ItemType;
@@ -16,7 +16,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerTableView extends AssetsTableView<Container> {
+public class ContainerTableView extends EquipmentTableView<Container> {
 
     public ContainerTableView(Stage parent, ObservableList<Container> assets,
                               EditorCanvas editorCanvas, EditorController editorController) {

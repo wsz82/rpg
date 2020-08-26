@@ -1,7 +1,7 @@
 package editor.view.asset.equipment.weapon;
 
 import editor.model.EditorController;
-import editor.view.asset.AssetsTableView;
+import editor.view.asset.equipment.EquipmentTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
@@ -16,7 +16,7 @@ import javafx.util.converter.DoubleStringConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeaponsTableView extends AssetsTableView<Weapon> {
+public class WeaponsTableView extends EquipmentTableView<Weapon> {
 
     public WeaponsTableView(Stage parent, ObservableList<Weapon> assets,
                      EditorCanvas editorCanvas, EditorController editorController) {

@@ -13,6 +13,8 @@ public class Sizes {
     public static final int TURN_DURATION_MILLIS = 1000/FPS;
     public static final double SECOND = 1000.0/TURN_DURATION_MILLIS;
     public static final double COVER_OPACITY = 0.4;
+    public static final double MAX_IMAGE_HEIGHT = 8000;
+    public static final double MAX_IMAGE_WIDTH = 8000;
 
     private static int meter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
