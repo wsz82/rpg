@@ -53,13 +53,21 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         this.isOpen = other.isOpen;
     }
 
-    public boolean add(Equipment e) {
-        double size = e.getSize();
-        if (getFilledSpace() + size > getSize() - getNettoSize()) {
+    public boolean tryAdd(Equipment equipment) {
+        if (!fitsContainer(equipment)) {
             return false;
         }
-        items.add(e);
+        items.add(equipment);
         return true;
+    }
+
+    private boolean fitsContainer(Equipment equipment) {
+        double size = equipment.getSize();
+        return getFilledSpace() + size < getMaxSize();
+    }
+
+    private double getMaxSize() {
+        return getSize() - getNettoSize();
     }
 
     public void remove(Equipment e) {

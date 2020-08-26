@@ -21,6 +21,7 @@ public class EquipmentAnimationPos extends AnimationPos {
     public void setCurAnimation(EquipmentAnimationType curAnimation) {
         if (this.curAnimation == curAnimation) return;
         frameNumber = 0;
+        nextFrameUpdate = 0;
         this.curAnimation = curAnimation;
     }
 }

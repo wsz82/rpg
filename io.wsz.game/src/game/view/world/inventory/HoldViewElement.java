@@ -96,12 +96,6 @@ public class HoldViewElement extends EquipmentViewElement {
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
         if (!inventory.tryAdd(e)) {
-            Coords bottom = cr.getCenter();
-            double dropX = bottom.x - e.getImageWidth()/2;
-            double dropY = bottom.y - e.getImageHeight()/2;
-            if (!e.tryDrop(cr, dropX, dropY)) {
-                cr.getItems().add(e);
-            }
             System.out.println(e.getName() + " does not fit " + cr.getName() + " inventory");
             return false;
         } else {

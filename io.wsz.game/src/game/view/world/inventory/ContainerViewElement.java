@@ -87,14 +87,8 @@ public class ContainerViewElement extends EquipmentViewElement {
 
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
-        if (!container.add(e)) {
+        if (!container.tryAdd(e)) {
             System.out.println(e.getName() + " does not fit " + container.getName());
-            Coords bottom = cr.getCenter();
-            double dropX = bottom.x - e.getImageWidth()/2;
-            double dropY = bottom.y - e.getImageHeight()/2;
-            if (!e.tryDrop(cr, dropX, dropY)) {
-                cr.getItems().add(e);
-            }
             return false;
         } else {
             e.setPos(x, y, null);
