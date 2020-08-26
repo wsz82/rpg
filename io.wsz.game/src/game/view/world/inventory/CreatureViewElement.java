@@ -1,10 +1,12 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
+import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.Inventory;
 import io.wsz.model.item.InventoryPlaceType;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.scene.canvas.Canvas;
@@ -26,8 +28,28 @@ public class CreatureViewElement extends InventoryViewElement {
         int meter = Sizes.getMeter();
         int width = (int) viewWidth * meter;
         int height = (int) viewHeight * meter;
-        Image img = drawnCreature.getAnimation().getCreatureInventoryImage(drawnCreature, width, height);
+        CreatureAnimation animation = drawnCreature.getAnimation();
+
+        drawCreatureBasicImage(meter, width, height, animation);
+
+        drawEquippedItems(meter, width, height, animation);
+    }
+
+    private void drawCreatureBasicImage(int meter, int width, int height, CreatureAnimation animation) {
+        Image img = animation.getCreatureInventoryImage(Paths.BASIC, width, height);
         gc.drawImage(img, viewPos.x * meter, viewPos.y * meter);
+    }
+
+    private void drawEquippedItems(int meter, int width, int height, CreatureAnimation animation) {
+        Map<InventoryPlaceType, Equipment> equippedItems = drawnCreature.getInventory().getEquippedItems();
+        for (InventoryPlaceType type : equippedItems.keySet()) {
+            Equipment equipment = equippedItems.get(type);
+            if (equipment == null) continue;
+            String equipmentTypeName = equipment.getEquipmentType().getName();
+            Image inventoryEquipmentImage = animation.getCreatureInventoryImage(equipmentTypeName, width, height);
+            if (inventoryEquipmentImage == null) continue;
+            gc.drawImage(inventoryEquipmentImage, viewPos.x * meter, viewPos.y * meter);
+        }
     }
 
     @Override

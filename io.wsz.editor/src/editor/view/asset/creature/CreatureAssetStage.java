@@ -113,7 +113,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 inventoryPlaces = new HashMap<>(0);
             }
             File programDir = controller.getProgramDir();
-            Image basicInventory = item.getAnimation().getInventoryBasic(programDir);
+            Image basicInventory = item.getAnimation().getInventoryBasicForEditor(programDir);
             InventoryPlaceEditStage editStage =
                     new InventoryPlaceEditStage(editorController, parent, item, basicInventory, inventoryPlaces);
             editStage.initWindow(isContent, "Inventory places editor");

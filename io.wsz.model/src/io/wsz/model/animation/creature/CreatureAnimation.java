@@ -3,16 +3,15 @@ package io.wsz.model.animation.creature;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.Equipment;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.image.Image;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.wsz.model.animation.creature.MoveDirection.*;
 import static io.wsz.model.sizes.Paths.*;
@@ -22,6 +21,8 @@ public class CreatureAnimation extends Animation<Creature> {
     private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;
     private static final int MIN_STOP_WAIT_TIME_SEC = 2;
     private static final int MAX_STOP_WAIT_TIME_SEC = 3;
+    private static final List<String> EQUIPPED_ITEMS_NAMES = new ArrayList<>(0);
+    private static final StringBuilder BUILD_ANIMATION_NAME = new StringBuilder();
 
     private final CreatureMoveAnimationFrames moveUp = new CreatureMoveAnimationFrames();
     private final CreatureMoveAnimationFrames moveUpRight = new CreatureMoveAnimationFrames();
@@ -43,6 +44,9 @@ public class CreatureAnimation extends Animation<Creature> {
     public void play(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         CreatureAnimationType curCreatureAnimationType = animationPos.getCurAnimation();
+
+        resolveEquippedItemsAnimationName(cr, animationPos);
+
         Image nextFrame = switch (curCreatureAnimationType) {
             case IDLE -> getIdle(cr);
             case MOVE -> getMove(cr);
@@ -50,6 +54,27 @@ public class CreatureAnimation extends Animation<Creature> {
         };
         if (nextFrame == null) return;
         cr.setImage(nextFrame);
+    }
+
+    private void resolveEquippedItemsAnimationName(Creature cr, CreatureAnimationPos animationPos) {
+        String animationToPlay = BASIC;
+        Map<InventoryPlaceType, Equipment> equippedItems = cr.getInventory().getEquippedItems();
+        if (!equippedItems.isEmpty()) {
+            EQUIPPED_ITEMS_NAMES.clear();
+            equippedItems.values().stream()
+                    .forEach(e -> EQUIPPED_ITEMS_NAMES.add(e.getEquipmentType().getName()));
+            EQUIPPED_ITEMS_NAMES.sort(Comparator.naturalOrder());
+            BUILD_ANIMATION_NAME.delete(0, BUILD_ANIMATION_NAME.length());
+            for (int i = 0; i < EQUIPPED_ITEMS_NAMES.size(); i++) {
+                String subName = EQUIPPED_ITEMS_NAMES.get(i);
+                if (i != 0) {
+                    BUILD_ANIMATION_NAME.append("_");
+                }
+                BUILD_ANIMATION_NAME.append(subName);
+            }
+            animationToPlay = BUILD_ANIMATION_NAME.toString();
+        }
+        animationPos.setCurIdleAnimation(animationToPlay);
     }
 
     @Override
@@ -77,19 +102,19 @@ public class CreatureAnimation extends Animation<Creature> {
         }
     }
 
-    public Image getCreatureInventoryImage(Creature cr, int width, int height) {
-        Image basicInventoryImage = creatureInventoryPictures.get(BASIC);
-        if (basicInventoryImage == null) {
-            File bsicInventoryFile = creatureInventoryFiles.get(BASIC);
-            if (bsicInventoryFile != null && bsicInventoryFile.exists()) {
-                basicInventoryImage = ResolutionImage.loadDefinedDimensionImage(bsicInventoryFile, width, height);
-                creatureInventoryPictures.put(BASIC, basicInventoryImage);
+    public Image getCreatureInventoryImage(String name, int width, int height) {
+        Image inventoryImage = creatureInventoryPictures.get(name);
+        if (inventoryImage == null) {
+            File inventoryFile = creatureInventoryFiles.get(name);
+            if (inventoryFile != null && inventoryFile.exists()) {
+                inventoryImage = ResolutionImage.loadDefinedDimensionImage(inventoryFile, width, height);
+                creatureInventoryPictures.put(name, inventoryImage);
             }
         }
-        return basicInventoryImage;
+        return inventoryImage;
     }
 
-    public Image getInventoryBasic(File programDir) {
+    public Image getInventoryBasicForEditor(File programDir) {
         Image basicInventoryImage = creatureInventoryPictures.get(BASIC);
         if (basicInventoryImage == null) {
             String path = programDir + animationDir + INVENTORY_DIR + BASIC_DIR + ".png";

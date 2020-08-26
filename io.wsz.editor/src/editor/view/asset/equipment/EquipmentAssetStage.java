@@ -6,16 +6,22 @@ import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Equipment;
+import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+
+import java.util.Optional;
 
 public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStage<A> {
     protected final ChoiceBox<InventoryPlaceType> occupiedPlaceCB = new ChoiceBox<>();
+    protected final ChoiceBox<EquipmentType> typeCB = new ChoiceBox<>();
     protected final DoubleField inputWeight = new DoubleField(0.0, isContent);
     protected final IntegerField inputSize = new IntegerField(0, isContent);
 
@@ -37,9 +43,16 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
             final HBox occupiedPlaceBox = new HBox(10);
             final Label occupiedPlaceLabel = new Label("Inventory place");
             occupiedPlaceBox.getChildren().addAll(occupiedPlaceLabel, occupiedPlaceCB);
-            container.getChildren().add(occupiedPlaceBox);
             setUpOccupiedPlaceCB();
+
+            final HBox typeBox = new HBox(10);
+            typeBox.setAlignment(Pos.CENTER_LEFT);
+            final Label typeLabel = new Label("Equipment type");
+            typeBox.getChildren().addAll(typeLabel, typeCB);
+            container.getChildren().addAll(occupiedPlaceBox, typeBox);
+            setUpTypeCB();
         }
+
 
         weightBox = new HBox(10);
         final Label weightLabel = new Label("Weight");
@@ -60,6 +73,28 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
         occupiedPlaceCB.setItems(types);
     }
 
+    private void setUpTypeCB() {
+        ObservableList<EquipmentType> equipmentTypes = editorController.getObservableEquipmentTypes();
+        ObservableList<EquipmentType> equipmentTypesWithNull = FXCollections.observableArrayList(equipmentTypes);
+        equipmentTypesWithNull.add(null);
+        typeCB.setItems(equipmentTypesWithNull);
+        typeCB.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(EquipmentType equipmentType) {
+                if (equipmentType == null) return null;
+                return equipmentType.getName();
+            }
+
+            @Override
+            public EquipmentType fromString(String name) {
+                Optional<EquipmentType> optType = editorController.getObservableEquipmentTypes().stream()
+                        .filter(t -> t.getName().equals(name))
+                        .findFirst();
+                return optType.orElse(null);
+            }
+        });
+    }
+
     @Override
     protected void fillInputs() {
         super.fillInputs();
@@ -70,6 +105,9 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
         if (!isContent) {
             InventoryPlaceType occupiedPlace = item.getOccupiedPlace();
             occupiedPlaceCB.setValue(occupiedPlace);
+
+            EquipmentType equipmentType = item.getIndividualWeaponType();
+            typeCB.setValue(equipmentType);
         }
 
         Double weight = item.getIndividualWeight();
@@ -94,6 +132,9 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
         if (!isContent) {
             InventoryPlaceType occupiedPlace = occupiedPlaceCB.getValue();
             item.setOccupiedPlace(occupiedPlace);
+
+            EquipmentType equipmentType = typeCB.getValue();
+            item.setEquipmentType(equipmentType);
         }
 
         String weight = inputWeight.getText();

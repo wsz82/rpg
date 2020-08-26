@@ -7,16 +7,16 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class WeaponType implements Externalizable {
+public class EquipmentType implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    public static final WeaponType DEFAULT = new WeaponType("default");
+    public static final EquipmentType DEFAULT = new EquipmentType("default");
 
     private String name;
 
-    public WeaponType() {}
+    public EquipmentType() {}
 
-    public WeaponType(String name) {
+    public EquipmentType(String name) {
         this.name = name;
     }
 

@@ -4,7 +4,7 @@ import editor.model.EditorController;
 import editor.model.settings.SettingsMemento;
 import editor.view.asset.AssetsStage;
 import editor.view.asset.creature.inventory.place.InventoryPlaceTypeStage;
-import editor.view.asset.equipment.weapon.type.WeaponTypeStage;
+import editor.view.asset.equipment.type.EquipmentTypeStage;
 import editor.view.content.ContentStage;
 import editor.view.content.ContentTableView;
 import editor.view.layer.LayersStage;
@@ -175,7 +175,7 @@ class MainView {
     private Menu getMenuWorld() {
         final Menu world = new Menu("World");
 
-        final MenuItem weaponTypes = getWeaponTypesMenuItem();
+        final MenuItem weaponTypes = getEquipmentTypesMenuItem();
         final MenuItem inventoryPlaces = getInventoryPlacesMenuItem();
 
         world.getItems().addAll(weaponTypes, inventoryPlaces);
@@ -191,13 +191,13 @@ class MainView {
         return inventoryPlaces;
     }
 
-    private MenuItem getWeaponTypesMenuItem() {
-        final MenuItem weaponTypes = new MenuItem("Weapon types");
-        weaponTypes.setOnAction(event -> {
-            WeaponTypeStage weaponTypeStage = new WeaponTypeStage(stage, editorController);
-            weaponTypeStage.show();
+    private MenuItem getEquipmentTypesMenuItem() {
+        final MenuItem equipmentTypes = new MenuItem("Equipment types");
+        equipmentTypes.setOnAction(event -> {
+            EquipmentTypeStage equipmentTypeStage = new EquipmentTypeStage(stage, editorController);
+            equipmentTypeStage.show();
         });
-        return weaponTypes;
+        return equipmentTypes;
     }
 
     private Menu getMenuLocation() {

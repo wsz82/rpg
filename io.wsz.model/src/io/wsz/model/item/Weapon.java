@@ -17,7 +17,6 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     private Double damage;
     private Double range;
     private Double speed;
-    private WeaponType weaponType;
 
     public Weapon() {
         this.animationPos = new EquipmentAnimationPos();
@@ -40,7 +39,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         this.damage = other.damage;
         this.range = other.range;
         this.speed = other.speed;
-        this.weaponType = other.weaponType;
+        this.equipmentType = other.equipmentType;
     }
 
     @Override
@@ -105,25 +104,6 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         this.speed = speed;
     }
 
-    public WeaponType getIndividualWeaponType() {
-        return weaponType;
-    }
-
-    public WeaponType getWeaponType() {
-        if (weaponType == null) {
-            if (isThisPrototype()) {
-                return WeaponType.DEFAULT;
-            }
-            return prototype.weaponType;
-        } else {
-            return weaponType;
-        }
-    }
-
-    public void setWeaponType(WeaponType weaponType) {
-        this.weaponType = weaponType;
-    }
-
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
@@ -166,8 +146,6 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         out.writeObject(range);
 
         out.writeObject(speed);
-
-        out.writeObject(weaponType);
     }
 
     @Override
@@ -184,7 +162,5 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         range = (Double) in.readObject();
 
         speed = (Double) in.readObject();
-
-        weaponType = (WeaponType) in.readObject();
     }
 }

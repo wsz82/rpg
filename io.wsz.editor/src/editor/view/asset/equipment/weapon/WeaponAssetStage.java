@@ -6,22 +6,14 @@ import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
-import io.wsz.model.item.WeaponType;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
-import java.util.Optional;
 
 public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     private static final String TITLE = "Weapon asset";
 
-    private final ChoiceBox<WeaponType> typeCB = new ChoiceBox<>();
     private final DoubleField inputDamage = new DoubleField(0.0, isContent);
     private final DoubleField inputRange = new DoubleField(0.0, isContent);
     private final DoubleField inputSpeed = new DoubleField(0.0, isContent);
@@ -42,11 +34,6 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
         super.initWindow();
         setTitle(TITLE);
 
-        final HBox typeBox = new HBox(10);
-        typeBox.setAlignment(Pos.CENTER_LEFT);
-        final Label typeLabel = new Label("Weapon type");
-        typeBox.getChildren().addAll(typeLabel, typeCB);
-
         final HBox damageBox = new HBox(10);
         damageBox.setAlignment(Pos.CENTER_LEFT);
         final Label damageLabel = new Label("Damage");
@@ -62,33 +49,9 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
         final Label speedLabel = new Label("Speed");
         speedBox.getChildren().addAll(speedLabel, inputSpeed);
 
-        container.getChildren().addAll(damageBox, rangeBox, speedBox, typeBox);
+        container.getChildren().addAll(damageBox, rangeBox, speedBox);
 
         fillInputs();
-
-        hookUpWeaponsEvents();
-    }
-
-    private void hookUpWeaponsEvents() {
-        ObservableList<WeaponType> weaponTypes = editorController.getObservableWeaponTypes();
-        ObservableList<WeaponType> weaponTypesWithNull = FXCollections.observableArrayList(weaponTypes);
-        weaponTypesWithNull.add(null);
-        typeCB.setItems(weaponTypesWithNull);
-        typeCB.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(WeaponType weaponType) {
-                if (weaponType == null) return null;
-                return weaponType.getName();
-            }
-
-            @Override
-            public WeaponType fromString(String name) {
-                Optional<WeaponType> optType = editorController.getObservableWeaponTypes().stream()
-                        .filter(t -> t.getName().equals(name))
-                        .findFirst();
-                return optType.orElse(null);
-            }
-        });
     }
 
     @Override
@@ -96,11 +59,7 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
         if (item == null) {
             item = createNewAsset();
         }
-
         super.fillInputs();
-
-        WeaponType weaponType = item.getIndividualWeaponType();
-        typeCB.setValue(weaponType);
 
         Double damage = item.getIndividualDamage();
         if (damage == null) {
@@ -127,9 +86,6 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     @Override
     protected void defineAsset() {
         super.defineAsset();
-
-        WeaponType weaponType = typeCB.getValue();
-        item.setWeaponType(weaponType);
 
         String damage = inputDamage.getText();
         if (damage.isEmpty()) {

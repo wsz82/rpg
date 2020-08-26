@@ -24,6 +24,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     }
 
     protected InventoryPlaceType occupiedPlace;
+    protected EquipmentType equipmentType;
     protected Double weight;
     protected Integer size;
 
@@ -57,6 +58,26 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     public void setOccupiedPlace(InventoryPlaceType occupiedPlace) {
         this.occupiedPlace = occupiedPlace;
     }
+
+    public EquipmentType getIndividualWeaponType() {
+        return equipmentType;
+    }
+
+    public EquipmentType getEquipmentType() {
+        if (equipmentType == null) {
+            if (isThisPrototype()) {
+                return EquipmentType.DEFAULT;
+            }
+            return prototype.getEquipmentType();
+        } else {
+            return equipmentType;
+        }
+    }
+
+    public void setEquipmentType(EquipmentType equipmentType) {
+        this.equipmentType = equipmentType;
+    }
+
 
     public Double getIndividualWeight() {
         return weight;
@@ -198,6 +219,8 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
         out.writeObject(occupiedPlace);
 
+        out.writeObject(equipmentType);
+
         out.writeObject(weight);
 
         out.writeObject(size);
@@ -209,7 +232,9 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         long ver = in.readLong();
 
         occupiedPlace = (InventoryPlaceType) in.readObject();
-        
+
+        equipmentType = (EquipmentType) in.readObject();
+
         weight = (Double) in.readObject();
 
         size = (Integer) in.readObject();

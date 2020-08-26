@@ -86,7 +86,7 @@ public class Inventory implements Externalizable {
 
     public boolean fitsPlace(double x, double y, Creature owner, Coords temp, List<Coords> place) {
         File programDir = owner.getController().getProgramDir();
-        Image background = owner.getAnimation().getInventoryBasic(programDir);
+        Image background = owner.getAnimation().getInventoryBasicForEditor(programDir);
         double width = background.getWidth() / Sizes.getMeter();
         double height = background.getHeight() / Sizes.getMeter();
         double relX = x / width;

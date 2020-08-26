@@ -37,4 +37,5 @@ public class Paths {
     public static final String PNG = ".png";
     public static final String ARROW_RIGHT_PNG = "arrow_right" + PNG;
     public static final String ARROW_LEFT_PNG = "arrow_left" + PNG;
+    public static final String DIVIDER = "_";
 }

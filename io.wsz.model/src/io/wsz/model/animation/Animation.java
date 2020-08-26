@@ -14,14 +14,14 @@ public class Animation<A extends PosItem> {
     protected static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     protected static final Random RANDOM = new Random();
 
+    private static final Map<String, List<Image>> IDLES_WITHOUT_MAIN = new HashMap<>(0);
+    private static final List<List<Image>> IDLES_FOR_RANDOM = new ArrayList<>(0);
     private static final int MIN_IDLE_UPDATE_TIME_SEC = 2;
     private static final int MAX_IDLE_UPDATE_TIME_SEC = 4;
 
     protected final Map<String, Map<String, List<Image>>> idles = new HashMap<>(0);
     protected final String animationDir;
 
-    private final Map<String, List<Image>> idlesWithoutMain = new HashMap<>(0);
-    private final List<List<Image>> idlesForRandom = new ArrayList<>(0);
 
     public Animation(String animationDir) {
         if (animationDir.isEmpty()) {
@@ -232,14 +232,14 @@ public class Animation<A extends PosItem> {
     }
 
     protected List<Image> getRandomIdleSequence(Map<String, List<Image>> idles) {
-        idlesWithoutMain.clear();
-        idlesWithoutMain.putAll(idles);
-        idlesWithoutMain.remove(MAIN);
-        idlesForRandom.clear();
-        idlesForRandom.addAll(idlesWithoutMain.values());
-        int idlesSize = idlesForRandom.size();
+        IDLES_WITHOUT_MAIN.clear();
+        IDLES_WITHOUT_MAIN.putAll(idles);
+        IDLES_WITHOUT_MAIN.remove(MAIN);
+        IDLES_FOR_RANDOM.clear();
+        IDLES_FOR_RANDOM.addAll(IDLES_WITHOUT_MAIN.values());
+        int idlesSize = IDLES_FOR_RANDOM.size();
         int randomIndex = RANDOM.nextInt(idlesSize);
-        return idlesForRandom.get(randomIndex);
+        return IDLES_FOR_RANDOM.get(randomIndex);
     }
 
     public Image getBasicMain(File programDir) {
