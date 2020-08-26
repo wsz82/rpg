@@ -3,6 +3,7 @@ package io.wsz.model.sizes;
 import java.io.File;
 
 public class Paths {
+    public static final String DIVIDER = "_";
     public static final String ASSETS_DIR = File.separator + "assets";
     public static final String TEXTURES_DIR = File.separator + "textures";
     public static final String IDLE = "idle";
@@ -12,11 +13,11 @@ public class Paths {
     public static final String MAIN = "main";
     public static final String MAIN_DIR = File.separator + MAIN;
     public static final String OPEN = "open";
-    public static final String BASIC_OPEN = BASIC + "_" + OPEN;
+    public static final String BASIC_OPEN = BASIC + DIVIDER + OPEN;
     public static final String BASIC_OPEN_DIR = File.separator + BASIC_OPEN;
     public static final String INVENTORY = "inventory";
     public static final String INVENTORY_DIR = File.separator + INVENTORY;
-    public static final String INVENTORY_OPEN = INVENTORY + "_" + OPEN;
+    public static final String INVENTORY_OPEN = INVENTORY + DIVIDER + OPEN;
     public static final String PORTRAIT = "portrait";
     public static final String PORTRAIT_DIR = File.separator + PORTRAIT;
     public static final String WALK_N = "walk_N";

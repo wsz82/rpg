@@ -146,6 +146,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     public void scrollUp() {
+        if (!isYScrollVisible) return;
         Coords curPos = getCurPos();
         double curPosY = curPos.y;
         double minCurPosY = getMinCurPosY();
@@ -158,6 +159,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     public void scrollDown() {
+        if (!isYScrollVisible) return;
         Coords curPos = getCurPos();
         double y = curPos.y;
         double maxPos = getMaxCurPosY() - getViewHeight();
