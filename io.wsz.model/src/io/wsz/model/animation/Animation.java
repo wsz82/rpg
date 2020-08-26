@@ -22,7 +22,6 @@ public class Animation<A extends PosItem> {
     protected final Map<String, Map<String, List<Image>>> idles = new HashMap<>(0);
     protected final String animationDir;
 
-
     public Animation(String animationDir) {
         if (animationDir.isEmpty()) {
             throw new IllegalArgumentException("Animation path is empty");
@@ -44,26 +43,26 @@ public class Animation<A extends PosItem> {
         for (File animationDir : animationsDirs) {
             String fileName = animationDir.getName();
             if (fileName.equals(IDLE)) {
-                initIdles(animationDir, idles);
+                initAnimations(animationDir, idles);
             }
-            initOtherAnimation(animationDir, fileName);
+            initOtherAnimations(animationDir, fileName);
         }
     }
 
-    protected void initOtherAnimation(File framesDir, String fileName) {}
+    protected void initOtherAnimations(File framesDir, String fileName) {}
 
-    private void initIdles(File animationDir, Map<String, Map<String, List<Image>>> idles) {
+    public void initAnimations(File animationDir, Map<String, Map<String, List<Image>>> animations) {
         File[] animationFiles = animationDir.listFiles();
         if (animationFiles == null || animationFiles.length == 0) return;
 
         for (File subAnimationFile : animationFiles) {
             String name = subAnimationFile.getName();
-            Map<String, List<Image>> animation = getIdleAnimation(subAnimationFile);
-            idles.put(name, animation);
+            Map<String, List<Image>> animation = getAnimation(subAnimationFile);
+            animations.put(name, animation);
         }
     }
 
-    private Map<String, List<Image>> getIdleAnimation(File animationFile) {
+    private Map<String, List<Image>> getAnimation(File animationFile) {
         Map<String, List<Image>> animation = new HashMap<>(0);
         File[] sequencesFiles = animationFile.listFiles();
         if (sequencesFiles == null || sequencesFiles.length == 0) return null;
@@ -71,7 +70,7 @@ public class Animation<A extends PosItem> {
         for (File sequenceFile : sequencesFiles) {
             boolean isNotDirectory = !sequenceFile.isDirectory();
             if (isNotDirectory) continue;
-            List<Image> sequence = getIdleSequence(sequenceFile);
+            List<Image> sequence = getSequence(sequenceFile);
             if (sequence == null || sequence.isEmpty()) continue;
             String sequenceName = sequenceFile.getName();
             animation.put(sequenceName, sequence);
@@ -79,7 +78,7 @@ public class Animation<A extends PosItem> {
         return animation;
     }
 
-    private List<Image> getIdleSequence(File framesDir) {
+    private List<Image> getSequence(File framesDir) {
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
         if (imagesFiles == null || imagesFiles.length == 0) return null;
         List<Image> sequence = new ArrayList<>(0);
@@ -92,8 +91,7 @@ public class Animation<A extends PosItem> {
 
     protected long getNextIdleUpdate(long curTime) {
         int randomTimeToStartIdleMillis = getRandomMillis(MAX_IDLE_UPDATE_TIME_SEC, MIN_IDLE_UPDATE_TIME_SEC);
-        long nextIdleUpdate = curTime + randomTimeToStartIdleMillis;
-        return nextIdleUpdate;
+        return curTime + randomTimeToStartIdleMillis;
     }
 
     protected long getNextUpdate(int framesSize, Double speed) {

@@ -1,18 +1,23 @@
 package io.wsz.model.animation.creature;
 
+import io.wsz.model.sizes.Paths;
+
 public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
     private CreatureAnimationType curCreatureAnimationType;
-    private MoveDirection moveDirection;
+    private String curMoveAnimation;
+    private String moveDirection;
     private long nextPortraitUpdate;
     private long timeToStartPlayIdleAfterStop;
 
     public CreatureAnimationPos() {
         this.curCreatureAnimationType = CreatureAnimationType.IDLE;
+        this.curMoveAnimation = Paths.BASIC;
     }
 
     public CreatureAnimationPos(CreatureAnimationPos other) {
         super(other);
         this.curCreatureAnimationType = other.curCreatureAnimationType;
+        this.curMoveAnimation = other.curMoveAnimation;
         this.moveDirection = other.moveDirection;
         this.nextPortraitUpdate = other.nextPortraitUpdate;
         this.timeToStartPlayIdleAfterStop = other.timeToStartPlayIdleAfterStop;
@@ -31,11 +36,19 @@ public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
         this.curCreatureAnimationType = curCreatureAnimationType;
     }
 
-    public MoveDirection getMoveSide() {
+    public String getCurMoveAnimation() {
+        return curMoveAnimation;
+    }
+
+    public void setCurMoveAnimation(String curMoveAnimation) {
+        this.curMoveAnimation = curMoveAnimation;
+    }
+
+    public String getMoveDirection() {
         return moveDirection;
     }
 
-    public void setMoveSide(MoveDirection moveDirection) {
+    public void setMoveDirection(String moveDirection) {
         this.moveDirection = moveDirection;
     }
 

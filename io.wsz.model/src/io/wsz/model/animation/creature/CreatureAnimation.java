@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import java.io.File;
 import java.util.*;
 
-import static io.wsz.model.animation.creature.MoveDirection.*;
 import static io.wsz.model.sizes.Paths.*;
 
 public class CreatureAnimation extends Animation<Creature> {
@@ -24,14 +23,7 @@ public class CreatureAnimation extends Animation<Creature> {
     private static final List<String> EQUIPPED_ITEMS_NAMES = new ArrayList<>(0);
     private static final StringBuilder BUILD_ANIMATION_NAME = new StringBuilder();
 
-    private final CreatureMoveAnimationFrames moveUp = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveUpRight = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveRight = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveDownRight = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveDown = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveDownLeft = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveLeft = new CreatureMoveAnimationFrames();
-    private final CreatureMoveAnimationFrames moveUpLeft = new CreatureMoveAnimationFrames();
+    private final Map<String, Map<String, List<Image>>> walk = new HashMap<>(0);
     private final List<Image> portraits = new ArrayList<>(0);
     private final Map<String, File> creatureInventoryFiles = new HashMap<>(0);
     private final Map<String, Image> creatureInventoryPictures = new HashMap<>(0);
@@ -75,18 +67,15 @@ public class CreatureAnimation extends Animation<Creature> {
             animationToPlay = BUILD_ANIMATION_NAME.toString();
         }
         animationPos.setCurIdleAnimation(animationToPlay);
+        animationPos.setCurMoveAnimation(animationToPlay);
     }
 
     @Override
-    protected void initOtherAnimation(File framesDir, String fileName) {
-        CreatureMoveAnimationFrames walkFrames = getMoveAnimationFrames(fileName);
-        if (walkFrames != null) {
-            initWalkFrames(framesDir, walkFrames);
-        } else {
-            switch (fileName) {
-                case PORTRAIT -> initPortraitFrames(framesDir, portraits);
-                case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
-            }
+    protected void initOtherAnimations(File framesDir, String fileName) {
+        switch (fileName) {
+            case PORTRAIT -> initPortraitFrames(framesDir, portraits);
+            case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
+            case WALK -> initAnimations(framesDir, walk);
         }
     }
 
@@ -124,27 +113,6 @@ public class CreatureAnimation extends Animation<Creature> {
         return basicInventoryImage;
     }
 
-    private CreatureMoveAnimationFrames getMoveAnimationFrames(MoveDirection moveDirection) {
-        if (moveDirection == null) return null;
-        int ordinal = moveDirection.ordinal();
-        String walk = walks[ordinal];
-        return getMoveAnimationFrames(walk);
-    }
-
-    private CreatureMoveAnimationFrames getMoveAnimationFrames(String moveDirection) {
-        return switch (moveDirection) {
-            case WALK_N -> moveUp;
-            case WALK_NE -> moveUpRight;
-            case WALK_E -> moveRight;
-            case WALK_SE -> moveDownRight;
-            case WALK_S -> moveDown;
-            case WALK_SW -> moveDownLeft;
-            case WALK_W -> moveLeft;
-            case WALK_NW -> moveUpLeft;
-            default -> null;
-        };
-    }
-
     private void initPortraitFrames(File framesDir, List<Image> portrait) {
         portrait.clear();
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
@@ -153,32 +121,6 @@ public class CreatureAnimation extends Animation<Creature> {
             int portraitSize = Sizes.getPortraitSize();
             Image loadedFrame = ResolutionImage.loadDefinedDimensionImage(imageFile, portraitSize, portraitSize);
             portrait.add(loadedFrame);
-        }
-    }
-
-    private void initWalkFrames(File framesDir, CreatureMoveAnimationFrames frames) {
-        initWalkEmptyFrames(framesDir, frames);
-    }
-
-    private void initWalkEmptyFrames(File framesDir, CreatureMoveAnimationFrames frames) {
-        String walkEmptyPath = framesDir + BASIC_DIR;
-        File walkEmptyDir = new File(walkEmptyPath);
-        List<Image> walkEmptyFrames = frames.getWalkEmptyFrames();
-        initWalkFrames(frames, walkEmptyDir, walkEmptyFrames);
-    }
-
-    private void initWalkFrames(CreatureMoveAnimationFrames frames, File walkDir, List<Image> walkFrames) {
-        walkFrames.clear();
-        File[] imagesFiles = walkDir.listFiles(PNG_FILE_FILTER);
-        if (imagesFiles == null || imagesFiles.length == 0) return;
-        for (File imageFile : imagesFiles) {
-            Image loadedFrame = ResolutionImage.loadImage(imageFile);
-            boolean isStopFrame = imageFile.getName().equals("stop.png");
-            if (isStopFrame) {
-                frames.setEmptyStop(loadedFrame);
-            } else {
-                walkFrames.add(loadedFrame);
-            }
         }
     }
 
@@ -204,26 +146,18 @@ public class CreatureAnimation extends Animation<Creature> {
         long timeToPlayIdleAfterStop = curTime + randomTimeToStartIdleMillis;
         animationPos.setTimeToStartPlayIdleAfterStop(timeToPlayIdleAfterStop);
 
-        MoveDirection moveDirection = animationPos.getMoveSide();
-        if (moveDirection == null) return null;
-        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
-        return animationFrames.getEmptyStop();
-    }
+        String curMoveAnimation = animationPos.getCurMoveAnimation();
+        String moveDirection = animationPos.getMoveDirection();
+        String stopPath = moveDirection + DIVIDER + STOP;
+        List<Image> frames = walk.get(curMoveAnimation).get(stopPath);
 
-    private Image getMove(Creature cr) {
-        CreatureAnimationPos animationPos = cr.getAnimationPos();
-        long curTime = System.currentTimeMillis();
-        if (curTime < animationPos.getNextFrameUpdate()) return null;
+        if (frames == null) {
+            frames = walk.get(BASIC).get(stopPath);
+            if (frames == null) {
+                return null;
+            }
+        }
 
-        MoveDirection nextMoveDirection = getMoveDirection(cr);
-        if (nextMoveDirection == null) return null;
-        animationPos.setMoveSide(nextMoveDirection);
-
-        MoveDirection moveDirection = animationPos.getMoveSide();
-        CreatureMoveAnimationFrames animationFrames = getMoveAnimationFrames(moveDirection);
-        List<Image> frames = animationFrames.getWalkEmptyFrames();
-
-        if (frames == null) return null;
         int framesSize = frames.size();
         if (framesSize == 0) return null;
 
@@ -233,7 +167,33 @@ public class CreatureAnimation extends Animation<Creature> {
         return frames.get(nextFrameNumber);
     }
 
-    public MoveDirection getMoveDirection(Creature cr) {
+    private Image getMove(Creature cr) {
+        CreatureAnimationPos animationPos = cr.getAnimationPos();
+        long curTime = System.currentTimeMillis();
+        if (curTime < animationPos.getNextFrameUpdate()) return null;
+
+        String nextMoveDirection = getMoveDirection(cr);
+        animationPos.setMoveDirection(nextMoveDirection);
+
+        String curMoveAnimation = animationPos.getCurMoveAnimation();
+        List<Image> frames = walk.get(curMoveAnimation).get(nextMoveDirection);
+
+        if (frames == null) {
+            frames = walk.get(BASIC).get(nextMoveDirection);
+            if (frames == null) {
+                return null;
+            }
+        }
+        int framesSize = frames.size();
+        if (framesSize == 0) return null;
+
+        long nextUpdate = getNextUpdate(framesSize, cr.getAnimationSpeed());
+        animationPos.setNextFrameUpdate(nextUpdate);
+        int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
+        return frames.get(nextFrameNumber);
+    }
+
+    public String getMoveDirection(Creature cr) {
         Coords pos = cr.getPos();
         double xFrom = pos.x;
         double yFrom = pos.y;
@@ -244,34 +204,34 @@ public class CreatureAnimation extends Animation<Creature> {
         return getMoveDirection(xFrom, yFrom, xTo, yTo);
     }
 
-    public MoveDirection getMoveDirection(double xFrom, double yFrom, double xTo, double yTo) {
+    public String getMoveDirection(double xFrom, double yFrom, double xTo, double yTo) {
         xTo -= xFrom;
         yTo -= yFrom;
         yTo = -yTo;
         double moveRadian = Math.atan2(yTo, xTo);
-        MoveDirection nextMoveDirection;
+        String nextMoveDirection;
         double one8 = Math.PI / 4;
         double one16 = Math.PI / 8;
         double nextRadian = one16;
 
         if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveDirection = UP_RIGHT;
+            nextMoveDirection = NE;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveDirection = UP;
+            nextMoveDirection = N;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian += one8)) {
-            nextMoveDirection = UP_LEFT;
+            nextMoveDirection = NW;
         } else if (moveRadian >= nextRadian && moveRadian < (nextRadian + one8)) {
-            nextMoveDirection = LEFT;
+            nextMoveDirection = W;
         } else if (moveRadian <= (nextRadian = -one16) && moveRadian > (nextRadian -= one8)) {
-            nextMoveDirection = DOWN_RIGHT;
+            nextMoveDirection = SE;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian -= one8)) {
-            nextMoveDirection = DOWN;
+            nextMoveDirection = S;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian -= one8)) {
-            nextMoveDirection = DOWN_LEFT;
+            nextMoveDirection = SW;
         } else if (moveRadian <= nextRadian && moveRadian > (nextRadian - one8)) {
-            nextMoveDirection = LEFT;
+            nextMoveDirection = W;
         } else {
-            nextMoveDirection = RIGHT;
+            nextMoveDirection = E;
         }
         return nextMoveDirection;
     }

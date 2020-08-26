@@ -20,16 +20,17 @@ public class Paths {
     public static final String INVENTORY_OPEN = INVENTORY + DIVIDER + OPEN;
     public static final String PORTRAIT = "portrait";
     public static final String PORTRAIT_DIR = File.separator + PORTRAIT;
-    public static final String WALK_N = "walk_N";
-    public static final String WALK_NE = "walk_NE";
-    public static final String WALK_E = "walk_E";
-    public static final String WALK_SE = "walk_SE";
-    public static final String WALK_S = "walk_S";
-    public static final String WALK_SW = "walk_SW";
-    public static final String WALK_W = "walk_W";
-    public static final String WALK_NW = "walk_NW";
-    public static final String[] walks = new String[] {WALK_N, WALK_NE, WALK_E, WALK_SE,
-            WALK_S, WALK_SW, WALK_W, WALK_NW};
+    public static final String WALK = "walk";
+    public static final String STOP = "stop";
+    public static final String N = "N";
+    public static final String NE = "NE";
+    public static final String E = "E";
+    public static final String SE = "SE";
+    public static final String S = "S";
+    public static final String SW = "SW";
+    public static final String W = "W";
+    public static final String NW = "NW";
+    public static final String[] walks = new String[] {N, NE, E, SE, S, SW, W, NW};
     public static final String FOG_DIR = File.separator + "fog";
     public static final String FOG_BASE_NAME = "fog.png";
     public static final String FOG_BASE_NAME_DIR = File.separator + FOG_BASE_NAME;
