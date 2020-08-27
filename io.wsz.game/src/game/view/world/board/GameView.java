@@ -42,9 +42,9 @@ public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
     private static final ItemType[] PRIMARY_TYPES =
             new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
-    private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
+    private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
 
     private final Stage parent;
     private final List<PosItem> items = new ArrayList<>(0);
@@ -92,7 +92,7 @@ public class GameView extends CanvasView {
         clear();
         sortItems();
 
-        Location location = controller.getCurrentLocation().getLocation(); //TODO pass location in refresh?
+        Location location = controller.getCurrentLocation().getLocation();
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
         drawItems(heroes);
@@ -595,7 +595,7 @@ public class GameView extends CanvasView {
             pi = board.lookForItem(location, x, y, level, PRIMARY_TYPES, false);
         }
         if (pi == null) {
-            commandControllableGoTo(x, y);
+            commandControlledGoTo(x, y);
         } else {
             boolean creatureSelected = false;
             if (pi instanceof Creature) {
@@ -603,7 +603,7 @@ public class GameView extends CanvasView {
                 creatureSelected = chooseCreatures(selected, multiple);
             }
             if (!creatureSelected) {
-                commandControllableFirstAction(pi);
+                commandControlledFirstAction(pi);
             }
         }
     }
@@ -646,13 +646,13 @@ public class GameView extends CanvasView {
         controller.setInventory(true);
     }
 
-    private void commandControllableFirstAction(PosItem pi) {
+    private void commandControlledFirstAction(PosItem pi) {
         Location location = controller.getCurrentLocation().getLocation();
         board.getControlledCreatures(location)
                 .forEach(c -> c.onFirstAction(pi));
     }
 
-    private void commandControllableGoTo(double x, double y) {
+    private void commandControlledGoTo(double x, double y) {
         Location location = controller.getCurrentLocation().getLocation();
         board.getControlledCreatures(location)
                 .forEach(c -> c.goTo(x, y));

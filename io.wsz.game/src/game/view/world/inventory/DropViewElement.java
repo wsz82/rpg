@@ -24,6 +24,7 @@ public class DropViewElement extends EquipmentViewElement {
     private double maxCurPosX;
     private double xScrollButtonWidth;
     private boolean isXScrollVisible;
+    private boolean isNotHorizontallyScrolled;
 
     public DropViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
         super(canvas, gameController, mousePos);
@@ -54,10 +55,13 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected void scrollScrollBar() {
-        super.scrollScrollBar();
-        if (!isXScrollVisible || isViewNotVisible()) return;
-        double scrollToX = mousePos.x - viewPos.x;
-        setCurPosX(scrollToX);
+        if (isNotHorizontallyScrolled) {
+            super.scrollScrollBar();
+        } else {
+            if (!isXScrollVisible || isViewNotVisible()) return;
+            double scrollToX = mousePos.x - viewPos.x;
+            setCurPosX(scrollToX);
+        }
     }
 
     private void drawHorScroll() {
@@ -92,7 +96,6 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected final void drawEquipment() {
-
         sortItems();
 
         for (PosItem pi : allItmes) {
@@ -195,6 +198,7 @@ public class DropViewElement extends EquipmentViewElement {
     @Override
     public boolean tryStartDragScroll(double x, double y) {
         if (super.tryStartDragScroll(x, y)) {
+            isNotHorizontallyScrolled = true;
             return true;
         }
         double left = viewPos.x;
@@ -207,6 +211,7 @@ public class DropViewElement extends EquipmentViewElement {
                     && y > bottom && y < bottom + scrollWidth;
             if (isPointWithinScrollBar) {
                 setCurPosX(x - left);
+                isNotHorizontallyScrolled = false;
                 return true;
             }
         }

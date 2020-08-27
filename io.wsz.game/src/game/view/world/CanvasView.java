@@ -65,29 +65,28 @@ public abstract class CanvasView {
     }
 
     protected void adjustCoverOpacity(List<Creature> visibleControllables, PosItem pi) {
-        if (!pi.getActualCoverLine().isEmpty()) {
-            for (Creature cr : visibleControllables) {
-                if (pi.getPos().level != cr.getPos().level) {
-                    continue;
-                }
-                double crLeft = cr.getLeft();
-                double crRight = cr.getRight();
-                double crTop = cr.getTop();
-                double crBottom = cr.getBottom();
+        if (pi.getActualCoverLine().isEmpty()) return;
+        for (Creature cr : visibleControllables) {
+            if (pi.getPos().level != cr.getPos().level) {
+                continue;
+            }
+            double crLeft = cr.getLeft();
+            double crRight = cr.getRight();
+            double crTop = cr.getTop();
+            double crBottom = cr.getBottom();
 
-                double piLeft = pi.getLeft();
-                double piRight = pi.getRight();
-                double piTop = pi.getTop();
-                double piBottom = pi.getBottom();
-                boolean overlap = Geometry.doOverlap(
-                        crLeft, crTop, crRight, crBottom,
-                        piLeft, piTop, piRight, piBottom);
-                if (!overlap) continue;
-                ItemsComparator.Comparison comparison = ItemsComparator.isCovered(cr, pi);
-                if (comparison == ItemsComparator.Comparison.LESS) {
-                    gc.setGlobalAlpha(Sizes.COVER_OPACITY);
-                    break;
-                }
+            double piLeft = pi.getLeft();
+            double piRight = pi.getRight();
+            double piTop = pi.getTop();
+            double piBottom = pi.getBottom();
+            boolean overlap = Geometry.doOverlap(
+                    crLeft, crTop, crRight, crBottom,
+                    piLeft, piTop, piRight, piBottom);
+            if (!overlap) continue;
+            ItemsComparator.Comparison comparison = ItemsComparator.isCovered(cr, pi);
+            if (comparison == ItemsComparator.Comparison.LESS) {
+                gc.setGlobalAlpha(Sizes.COVER_OPACITY);
+                break;
             }
         }
     }
