@@ -190,15 +190,15 @@ public class Geometry {
         return false;
     }
 
-    public static boolean pointWithinOval(Coords point, Coords ovalCenter, double width, double height) {
-        return pointWithinOval(point.x, point.y, ovalCenter, width, height);
+    public static boolean isPointWithinOval(Coords point, Coords ovalCenter, double width, double height) {
+        return isPointWithinOval(point.x, point.y, ovalCenter, width, height);
     }
 
-    public static boolean pointWithinOval(double x, double y, Coords ovalCenter, double width, double height) {
-        return pointWithinOval(x, y, ovalCenter.x, ovalCenter.y, width, height);
+    public static boolean isPointWithinOval(double x, double y, Coords ovalCenter, double width, double height) {
+        return isPointWithinOval(x, y, ovalCenter.x, ovalCenter.y, width, height);
     }
 
-    public static boolean pointWithinOval(double x, double y, double h, double k, double width, double height) {
+    public static boolean isPointWithinOval(double x, double y, double h, double k, double width, double height) {
         double rx = width /2;
         double ry = height /2;
 

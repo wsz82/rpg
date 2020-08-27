@@ -369,7 +369,7 @@ public class Board {
         Coords point = cr.getCenter();
         for (Equipment e : equipment) {
             Coords center = e.getImageCenter();
-            if (Geometry.pointWithinOval(point, center, width, height)) {
+            if (Geometry.isPointWithinOval(point, center, width, height)) {
                 equipmentResult.add(e);
             }
         }

@@ -6,7 +6,6 @@ import io.wsz.model.stage.ResolutionImage;
 import java.io.File;
 
 public class Fog {
-
     private ResolutionImage image;
 
     public Fog() {}

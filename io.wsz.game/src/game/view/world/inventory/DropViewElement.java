@@ -1,6 +1,7 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
+import game.view.world.FoggableDelegate;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -15,6 +16,7 @@ import java.util.List;
 public class DropViewElement extends EquipmentViewElement {
     private final List<PosItem> allItmes = new ArrayList<>(0);
     private final Coords creaturePos = new Coords();
+    private final FoggableDelegate foggableDelegate;
 
     private List<Equipment> droppedEquipment;
     private double visionWidthDiameter;
@@ -28,6 +30,7 @@ public class DropViewElement extends EquipmentViewElement {
 
     public DropViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
         super(canvas, gameController, mousePos);
+        this.foggableDelegate = new FoggableDelegate(gameController, canvas, curPos, viewPos);
     }
 
     @Override
@@ -50,6 +53,9 @@ public class DropViewElement extends EquipmentViewElement {
         gc.clip();
 
         drawEquipment();
+        Location location = controller.getCurrentLocation().getLocation();
+        List<Creature> heroes = board.getControlledAndControllableCreatures(location);
+        foggableDelegate.drawFog(heroes, viewWidth, viewHeight);
         gc.restore();
     }
 

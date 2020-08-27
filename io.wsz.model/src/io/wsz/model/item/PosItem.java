@@ -118,7 +118,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
-        return Geometry.pointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
+        return Geometry.isPointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
     public PosItem getCollision() {
