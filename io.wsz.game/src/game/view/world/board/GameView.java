@@ -13,6 +13,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.textures.Fog;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
@@ -143,7 +144,8 @@ public class GameView extends CanvasView {
         List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
         int meter = Sizes.getMeter();
         File programDir = controller.getProgramDir();
-        Image image = gameController.getFog().getImage(programDir);
+        Fog fog = gameController.getFog();
+        Image image = fog.getImage(programDir).getFxImage();
         double fogSize = image.getWidth() / meter;
         if (discoveredFog == null) {
             int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
@@ -216,8 +218,9 @@ public class GameView extends CanvasView {
         pos.x *= meter;
         pos.y *= meter;
         File programDir = controller.getProgramDir();
-        Image fog = gameController.getFog().getImage(programDir);
-        gc.drawImage(fog, pos.x, pos.y);
+        Fog fog = gameController.getFog();
+        Image image = fog.getImage(programDir).getFxImage();
+        gc.drawImage(image, pos.x, pos.y);
     }
 
     private void drawItems(List<Creature> heroes) {
@@ -239,7 +242,7 @@ public class GameView extends CanvasView {
                 Equipment e = (Equipment) pi;
                 setDropAnimationPos(e);
             }
-            Image img = pi.getImage();
+            Image img = pi.getImage().getFxImage();
 
             cutImageAndDraw(x, y, img, 0, 0, canvas.getWidth(), canvas.getHeight());
 

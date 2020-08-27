@@ -4,7 +4,6 @@ import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.stage.ResolutionImage;
-import javafx.scene.image.Image;
 
 import java.io.File;
 
@@ -34,7 +33,7 @@ public class CreatureBase {
     private static final CreatureBase[] bases = new CreatureBase[]{XS_C, XS_E, XS_N, S_C, S_E, S_N, M_C, M_E, M_N,
             L_C, L_E, L_N, XL_C, XL_E, XL_N};
 
-    private Image img;
+    private ResolutionImage img;
     private String fileName;
 
     public CreatureBase(String fileName) {
@@ -67,15 +66,15 @@ public class CreatureBase {
         return bases;
     }
 
-    public Image getImage(File programDir) {
+    public ResolutionImage getImage(File programDir) {
         if (img == null) {
             String path = programDir + Paths.TEXTURES_DIR + File.separator + BASE + File.separator + fileName;
-            setImg(ResolutionImage.loadImage(path));
+            setImg(new ResolutionImage(path));
         }
         return img;
     }
 
-    public void setImg(Image img) {
+    public void setImg(ResolutionImage img) {
         this.img = img;
     }
 

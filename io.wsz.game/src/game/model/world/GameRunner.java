@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
-    private static final ArrayDeque<Runnable> laterRunBuffer = new ArrayDeque<>(0);
+    private static final ArrayDeque<Runnable> LATER_RUN_BUFFER = new ArrayDeque<>(0);
 
     private final Logger logger = new Logger();
     private final GameController gameController;
@@ -34,10 +34,8 @@ public class GameRunner {
 
     private Thread gameThread;
 
-    private final long[] viewStart = new long[1];
-
     public static void runLater(Runnable laterRunner) {
-        laterRunBuffer.addLast(laterRunner);
+        LATER_RUN_BUFFER.addLast(laterRunner);
     }
 
     public GameRunner(GameController gameController) {
@@ -125,8 +123,8 @@ public class GameRunner {
             removeItems(l);
         }
 
-        if (!laterRunBuffer.isEmpty()) {
-            laterRunBuffer.pop().run();
+        if (!LATER_RUN_BUFFER.isEmpty()) {
+            LATER_RUN_BUFFER.pop().run();
         }
 
         if (controller.isInventory() && Settings.isPauseOnInventory()) {

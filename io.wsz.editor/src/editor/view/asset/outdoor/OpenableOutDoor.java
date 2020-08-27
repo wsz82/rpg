@@ -14,7 +14,7 @@ public class OpenableOutDoor extends OpenableAsset<OutDoor> {
 
     @Override
     protected Image getOpenImage() {
-        return item.getOpenImage();
+        return item.getOpenImage().getFxImage();
     }
 
     @Override

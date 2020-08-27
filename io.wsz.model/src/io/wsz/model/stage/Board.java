@@ -117,7 +117,8 @@ public class Board {
                 continue;
             }
 
-            Image img = pi.getImage();
+            ResolutionImage resolutionImage = pi.getImage();
+            Image img = resolutionImage.getFxImage();
             int imgX = pixelX - cX;
             int imgY = pixelY - cY;
             Color color;

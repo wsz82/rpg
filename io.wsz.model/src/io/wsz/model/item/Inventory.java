@@ -3,7 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 import java.io.*;
 import java.util.*;
@@ -86,7 +86,7 @@ public class Inventory implements Externalizable {
 
     public boolean fitsPlace(double x, double y, Creature owner, Coords temp, List<Coords> place) {
         File programDir = owner.getController().getProgramDir();
-        Image background = owner.getAnimation().getInventoryBasicForEditor(programDir);
+        ResolutionImage background = owner.getAnimation().getInventoryBasicForEditor(programDir);
         double width = background.getWidth() / Sizes.getMeter();
         double height = background.getHeight() / Sizes.getMeter();
         double relX = x / width;

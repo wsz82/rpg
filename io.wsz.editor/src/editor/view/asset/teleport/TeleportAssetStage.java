@@ -52,7 +52,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     private void openTeleportAreaEdit() {
-        Image background = item.getImage();
+        Image background = item.getImage().getFxImage();
         if (background == null) {
             return;
         }

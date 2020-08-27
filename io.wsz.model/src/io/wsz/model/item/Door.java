@@ -4,7 +4,7 @@ import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,12 +38,12 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     }
 
     @Override
-    public Image getOpenImage() {
+    public ResolutionImage getOpenImage() {
         File programDir = getController().getProgramDir();
         return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
-    public Image getEditorImage() {
+    public ResolutionImage getEditorImage() {
         if (isOpen) {
             if (isThisPrototype()) {
                 return getOpenImage();
@@ -84,7 +84,7 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     }
 
     @Override
-    public Image getImage() {
+    public ResolutionImage getImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
             if (isOpen()) {

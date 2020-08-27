@@ -5,7 +5,7 @@ import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.animation.openable.OpenableAnimation;
 import io.wsz.model.item.Container;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 import static io.wsz.model.sizes.Paths.*;
 
@@ -25,7 +25,7 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
             case DROP -> playDrop(isOpen, animationPos);
             case INVENTORY -> playInventory(isOpen, animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, c.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextIdle(animationPos, c.getAnimationSpeed());
         if (nextIdle == null) return;
         c.setImage(nextIdle);
     }

@@ -59,7 +59,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
             Dragboard db = startDragAndDrop(TransferMode.COPY);
 
             ClipboardContent content = new ClipboardContent();
-            content.putImage(firstAsset.getImage());
+            content.putImage(firstAsset.getImage().getFxImage());
             db.setContent(content);
         });
 
@@ -144,7 +144,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     private void addItemsToStage(Coords pos) {
         List<A> createdItems = createItems(pos);
         for (A item : createdItems) {
-            Image img = item.getImage();
+            Image img = item.getImage().getFxImage();
             if (isImageTooBig(item, img)) continue;
             controller.getCurrentLocation().getItems().add(item);
         }
@@ -155,7 +155,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         List<A> createdItems = createItems(pos);
         for (A item : createdItems) {
             if (item instanceof Equipment) {
-                Image img = item.getImage();
+                Image img = item.getImage().getFxImage();
                 if (isImageTooBig(item, img)) continue;
                 Equipment e = (Equipment) item;
                 itemsStage.addEquipment(e);

@@ -4,7 +4,7 @@ import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimation;
 import io.wsz.model.item.Door;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 import static io.wsz.model.sizes.Paths.BASIC;
 import static io.wsz.model.sizes.Paths.BASIC_OPEN;
@@ -24,7 +24,7 @@ public class DoorAnimation extends Animation<Door> {
         } else {
             playClosed(animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, d.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextIdle(animationPos, d.getAnimationSpeed());
         if (nextIdle == null) return;
         d.setImage(nextIdle);
     }

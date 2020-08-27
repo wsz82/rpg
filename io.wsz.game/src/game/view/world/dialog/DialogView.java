@@ -297,8 +297,7 @@ public class DialogView {
         Group s = new Group(tf);
         SnapshotParameters sp = new SnapshotParameters();
         sp.setFill(Color.TRANSPARENT);
-        Image snapshot = s.snapshot(sp, null);
-//        Image resized = ResolutionImage.getDecreasedQualityWithResolutionImage(snapshot); //TODO readable decreased quality pictures
+        Image snapshot = s.snapshot(sp, null); //TODO readable decreased quality pictures
         return snapshot;
     }
 

@@ -14,7 +14,7 @@ public class OpenableContainer extends OpenableAsset<Container> {
 
     @Override
     protected Image getOpenImage() {
-        return item.getOpenImage();
+        return item.getOpenImage().getFxImage();
     }
 
     @Override

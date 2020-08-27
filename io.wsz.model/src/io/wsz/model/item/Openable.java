@@ -1,6 +1,6 @@
 package io.wsz.model.item;
 
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 public interface Openable {
 
@@ -8,5 +8,5 @@ public interface Openable {
 
     void close();
 
-    Image getOpenImage();
+    ResolutionImage getOpenImage();
 }

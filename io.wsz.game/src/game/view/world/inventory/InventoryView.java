@@ -330,7 +330,7 @@ public class InventoryView {
         if (dragged != null) {
             playDraggedAnimation(mousePos);
 
-            Image img = dragged.getImage();
+            Image img = dragged.getImage().getFxImage();
             gc.drawImage(img,
                     mousePos.x*meter - img.getWidth()/2,
                     mousePos.y*meter - img.getHeight());

@@ -9,6 +9,7 @@ import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 
@@ -36,7 +37,8 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     private void drawCreatureBasicImage(int meter, int width, int height, CreatureAnimation animation) {
-        Image img = animation.getCreatureInventoryImage(Paths.BASIC, width, height);
+        ResolutionImage creatureInventoryImage = animation.getCreatureInventoryImage(Paths.BASIC, width, height);
+        Image img = creatureInventoryImage.getFxImage();
         gc.drawImage(img, viewPos.x * meter, viewPos.y * meter);
     }
 
@@ -46,9 +48,11 @@ public class CreatureViewElement extends InventoryViewElement {
             Equipment equipment = equippedItems.get(type);
             if (equipment == null) continue;
             String equipmentTypeName = equipment.getEquipmentType().getName();
-            Image inventoryEquipmentImage = animation.getCreatureInventoryImage(equipmentTypeName, width, height);
-            if (inventoryEquipmentImage == null) continue;
-            gc.drawImage(inventoryEquipmentImage, viewPos.x * meter, viewPos.y * meter);
+            ResolutionImage creatureInventoryImage = animation.getCreatureInventoryImage(equipmentTypeName, width, height);
+            if (creatureInventoryImage == null) continue;
+            Image creatureInventoryFxImage = creatureInventoryImage.getFxImage();
+            if (creatureInventoryFxImage == null) continue;
+            gc.drawImage(creatureInventoryFxImage, viewPos.x * meter, viewPos.y * meter);
         }
     }
 

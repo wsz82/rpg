@@ -136,7 +136,7 @@ public abstract class CanvasView {
         CreatureBase base = CreatureBase.getCreatureBase(size, control);
         if (base == null) return;
         File programDir = controller.getProgramDir();
-        Image img = base.getImage(programDir);
+        Image img = base.getImage(programDir).getFxImage();
         gc.drawImage(img, x * meter, y * meter);
     }
 

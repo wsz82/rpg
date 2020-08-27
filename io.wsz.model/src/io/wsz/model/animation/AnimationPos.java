@@ -1,14 +1,14 @@
 package io.wsz.model.animation;
 
 import io.wsz.model.sizes.Paths;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AnimationPos {
     protected String curIdleAnimation;
-    protected List<Image> curIdleSequence;
+    protected List<ResolutionImage> curIdleSequence;
     protected int frameNumber;
     protected boolean isCycleFinished;
     protected long nextFrameUpdate;
@@ -21,7 +21,7 @@ public class AnimationPos {
 
     public AnimationPos(AnimationPos other) {
         this.curIdleAnimation = other.curIdleAnimation;
-        List<Image> curIdleSequence = other.curIdleSequence;
+        List<ResolutionImage> curIdleSequence = other.curIdleSequence;
         if (curIdleSequence == null) {
             this.curIdleSequence = null;
         } else {
@@ -45,11 +45,11 @@ public class AnimationPos {
         this.curIdleAnimation = curIdleAnimation;
     }
 
-    public List<Image> getCurIdleSequence() {
+    public List<ResolutionImage> getCurIdleSequence() {
         return curIdleSequence;
     }
 
-    public void setCurIdleSequence(List<Image> curIdleSequence) {
+    public void setCurIdleSequence(List<ResolutionImage> curIdleSequence) {
         this.curIdleSequence = curIdleSequence;
     }
 

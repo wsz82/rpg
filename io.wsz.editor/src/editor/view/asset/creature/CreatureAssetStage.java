@@ -9,6 +9,7 @@ import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.*;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -113,7 +114,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 inventoryPlaces = new HashMap<>(0);
             }
             File programDir = controller.getProgramDir();
-            Image basicInventory = item.getAnimation().getInventoryBasicForEditor(programDir);
+            ResolutionImage inventoryBasicForEditor = item.getAnimation().getInventoryBasicForEditor(programDir);
+            Image basicInventory = inventoryBasicForEditor.getFxImage();
             InventoryPlaceEditStage editStage =
                     new InventoryPlaceEditStage(editorController, parent, item, basicInventory, inventoryPlaces);
             editStage.initWindow(isContent, "Inventory places editor");

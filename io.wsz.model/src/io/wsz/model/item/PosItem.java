@@ -9,9 +9,9 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     protected Dialog dialog;
     protected Coords interactionCoords;
     protected Double animationSpeed;
-    protected Image image;
+    protected ResolutionImage image;
 
     public PosItem() {
         this.visible = new SimpleBooleanProperty(this, "visible");
@@ -380,7 +380,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.animationSpeed = animationSpeed;
     }
 
-    public final Image getInitialImage() {
+    public final ResolutionImage getInitialImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
             image = getAnimation().getBasicMain(programDir);
@@ -388,7 +388,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         return image;
     }
 
-    public Image getImage() {
+    public ResolutionImage getImage() {
         if (image == null) {
             if (prototype == null) {
                 File programDir = getController().getProgramDir();
@@ -403,18 +403,18 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     }
 
     public double getImageHeight() {
-        Image img = getImage();
+        ResolutionImage img = getImage();
         if (img == null) return 0;
         return img.getHeight() / Sizes.getMeter();
     }
 
     public double getImageWidth() {
-        Image img = getImage();
+        ResolutionImage img = getImage();
         if (img == null) return 0;
         return img.getWidth() / Sizes.getMeter();
     }
 
-    public void setImage(Image image) {
+    public void setImage(ResolutionImage image) {
         this.image = image;
     }
 

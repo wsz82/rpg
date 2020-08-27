@@ -13,6 +13,7 @@ import io.wsz.model.asset.Asset;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -216,7 +217,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     protected void openInteractionPointEdit() {
-        Image background = item.getInitialImage();
+        ResolutionImage initialImage = item.getInitialImage();
+        if (initialImage == null) {
+            return;
+        }
+        Image background = initialImage.getFxImage();
         if (background == null) {
             return;
         }
@@ -227,7 +232,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void openCoverEdit() {
-        Image background = item.getInitialImage();
+        ResolutionImage initialImage = item.getInitialImage();
+        if (initialImage == null) {
+            return;
+        }
+        Image background = initialImage.getFxImage();
         if (background == null) {
             return;
         }
@@ -238,7 +247,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void openCollisionEdit() {
-        Image background = item.getInitialImage();
+        ResolutionImage initialImage = item.getInitialImage();
+        if (initialImage == null) {
+            return;
+        }
+        Image background = initialImage.getFxImage();
         if (background == null) {
             return;
         }

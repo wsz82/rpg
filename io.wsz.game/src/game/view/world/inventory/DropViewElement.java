@@ -113,7 +113,7 @@ public class DropViewElement extends EquipmentViewElement {
                 Equipment e = (Equipment) pi;
                 playDropAnimation(e);
             }
-            Image img = pi.getImage();
+            Image img = pi.getImage().getFxImage();
             double viewX = viewPos.x * meter;
             double viewY = viewPos.y * meter;
             double viewWidth = this.viewWidth * meter;

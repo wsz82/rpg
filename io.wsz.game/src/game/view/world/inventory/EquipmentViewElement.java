@@ -126,7 +126,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
             boolean fitY = y >= cY && y <= cY + cHeight;
             if (!fitY) continue;
 
-            Image img = eq.getImage();
+            Image img = eq.getImage().getFxImage();
             int meter = Sizes.getMeter();
             int imgX = (int) ((x - cX) * meter);
             int imgY = (int) ((y - cY) * meter);

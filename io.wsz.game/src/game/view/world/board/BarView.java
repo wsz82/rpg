@@ -8,6 +8,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
@@ -254,9 +255,12 @@ public class BarView {
             Creature cr = creatures.get(i);
 
             portrait.creature = cr;
-            Image animationPortrait = cr.getAnimation().getPortrait(cr, programDir);
+            ResolutionImage animationPortrait = cr.getAnimation().getPortrait(cr, programDir);
             if (animationPortrait != null) {
-                portrait.image = animationPortrait;
+                Image fxImage = animationPortrait.getFxImage();
+                if (fxImage != null) {
+                    portrait.image = fxImage;
+                }
             }
             portrait.y = y;
             gc.drawImage(portrait.image, portraitX, y);

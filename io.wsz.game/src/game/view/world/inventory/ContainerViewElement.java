@@ -53,7 +53,7 @@ public class ContainerViewElement extends EquipmentViewElement {
             double x = corrected.x * meter;
             double y = corrected.y * meter;
             playInventoryAnimation(e);
-            Image img = e.getImage();
+            Image img = e.getImage().getFxImage();
             double viewX = viewPos.x * meter;
             double viewY = viewPos.y * meter;
             double viewWidth = this.viewWidth * meter;

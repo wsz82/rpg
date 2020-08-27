@@ -9,6 +9,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
@@ -100,9 +101,9 @@ public class EditorCanvas extends Canvas {
             double x = (translated.x * meter);
             double y = (translated.y * meter);
 
-            Image img = pi.getImage();
-            double width = img.getWidth();
-            double height = img.getHeight();
+            ResolutionImage resolutionImage = pi.getImage();
+            double width = resolutionImage.getWidth();
+            double height = resolutionImage.getHeight();
 
             double startX = 0;
             if (x < 0) {
@@ -134,6 +135,7 @@ public class EditorCanvas extends Canvas {
             if (y > 0) {
                 destY = y;
             }
+            Image img = resolutionImage.getFxImage();
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
             if (!activeContentMarked
@@ -275,7 +277,7 @@ public class EditorCanvas extends Canvas {
                 Dragboard db = startDragAndDrop(TransferMode.MOVE);
 
                 ClipboardContent content = new ClipboardContent();
-                content.putImage(selectedItem.getImage());
+                content.putImage(selectedItem.getImage().getFxImage());
                 db.setContent(content);
             }
         });

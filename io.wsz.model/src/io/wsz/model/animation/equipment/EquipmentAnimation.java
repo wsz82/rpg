@@ -3,7 +3,7 @@ package io.wsz.model.animation.equipment;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Paths;
-import javafx.scene.image.Image;
+import io.wsz.model.stage.ResolutionImage;
 
 public abstract class EquipmentAnimation<E extends Equipment> extends Animation<E> {
 
@@ -19,7 +19,7 @@ public abstract class EquipmentAnimation<E extends Equipment> extends Animation<
             case DROP -> playDrop(animationPos);
             case INVENTORY -> playInventory(animationPos);
         }
-        Image nextIdle = getNextIdle(animationPos, e.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextIdle(animationPos, e.getAnimationSpeed());
         if (nextIdle == null) return;
         e.setImage(nextIdle);
     }
