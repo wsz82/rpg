@@ -62,9 +62,10 @@ public class GameView extends CanvasView {
     private EventHandler<KeyEvent> keyboardEvent;
     private DialogView dialogView;
     private InventoryView inventoryView;
-    private boolean dialogStarted = true;
-    private boolean inventoryStarted = true;
-    private boolean selectionMode;
+    private boolean canStartDialog = true;
+    private boolean canOpenInventory = true;
+    private boolean isRefreshedOnce;
+    private boolean isSelectionMode;
 
     public GameView(Stage parent, GameController gameController) {
         super(new Canvas(), gameController);
@@ -80,45 +81,13 @@ public class GameView extends CanvasView {
         if (parent.isIconified()) {
             return;
         }
-
-        if (gameController.isDialog()) {
-            DialogMemento dialogMemento = controller.getDialogMemento();
-            if (!dialogMemento.isRefreshGameViewOnce()) {
-                if (dialogStarted) {
-                    dialogStarted = false;
-                    removeEvents();
-                    dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
-                }
-                dialogView.refresh();
-                return;
-            } else {
-                dialogMemento.setRefreshGameViewOnce(false);
-            }
-        }
-        if (!dialogStarted) {
-            dialogStarted = true;
-            hookUpRemovableEvents();
-        }
-
-        if (controller.isInventory()) {
-            barView.refresh();
-            if (inventoryStarted) {
-                inventoryStarted = false;
-                removeEvents();
-                inventoryView = new InventoryView(canvas, gameController);
-            }
-            inventoryView.refresh();
-            return;
-        }
-        if (!inventoryStarted) {
-            inventoryStarted = true;
-            hookUpRemovableEvents();
-        }
-
         setSize();
         if (canvas.getWidth() == 0) {
             return;
         }
+
+        if (tryStartDialog()) return;
+        if (tryOpenInventory()) return;
         updatePos();
         clear();
         sortItems();
@@ -127,16 +96,55 @@ public class GameView extends CanvasView {
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
         drawItems(heroes);
-
         drawFog(heroes);
 
-        if (selectionMode) {
+        if (isSelectionMode) {
             drawSelection();
         }
-
         if (Settings.isShowBar()) {
             barView.refresh();
         }
+    }
+
+    boolean tryOpenInventory() {
+        if (controller.isInventory()) {
+            barView.refresh();
+            if (canOpenInventory) {
+                canOpenInventory = false;
+                removeRemovableEvents();
+                inventoryView = new InventoryView(canvas, gameController);
+            }
+            inventoryView.refresh();
+            return true;
+        }
+        if (!canOpenInventory) {
+            canOpenInventory = true;
+            hookUpRemovableEvents();
+        }
+        return false;
+    }
+
+    private boolean tryStartDialog() {
+        if (gameController.isDialog()) {
+            if (isRefreshedOnce) {
+                if (canStartDialog) {
+                    canStartDialog = false;
+                    removeRemovableEvents();
+                    DialogMemento dialogMemento = controller.getDialogMemento();
+                    dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
+                }
+                dialogView.refresh();
+                return true;
+            } else {
+                isRefreshedOnce = true;
+            }
+        }
+        if (!canStartDialog) {
+            canStartDialog = true;
+            isRefreshedOnce = false;
+            hookUpRemovableEvents();
+        }
+        return false;
     }
 
     private void drawFog(List<Creature> heroes) {
@@ -329,7 +337,7 @@ public class GameView extends CanvasView {
             return;
         }
 
-        if (selectionMode) {
+        if (isSelectionMode) {
             Coords pos = getMousePos(x, y, left, top);
             modifiedCoords1.x = pos.x;
             modifiedCoords1.y = pos.y;
@@ -438,7 +446,7 @@ public class GameView extends CanvasView {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.MIDDLE)) {
                 e.consume();
-                selectionMode = true;
+                isSelectionMode = true;
             }
         });
 
@@ -446,7 +454,7 @@ public class GameView extends CanvasView {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.MIDDLE)) {
                 e.consume();
-                selectionMode = false;
+                isSelectionMode = false;
                 boolean multiple = e.isShiftDown();
                 double left = selFirst.x;
                 double top = selFirst.y;
@@ -605,7 +613,7 @@ public class GameView extends CanvasView {
         canvas.addEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }
 
-    private void removeEvents() {
+    private void removeRemovableEvents() {
         canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, keyboardEvent);
     }

@@ -20,7 +20,6 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     private Answer lastAnswer;
     private boolean finished;
     private int curPos;
-    private boolean refreshGameViewOnce;
 
     public DialogMemento() {}
 
@@ -68,14 +67,6 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
         this.curPos = curPos;
     }
 
-    public boolean isRefreshGameViewOnce() {
-        return refreshGameViewOnce;
-    }
-
-    public void setRefreshGameViewOnce(boolean refreshGameViewOnce) {
-        this.refreshGameViewOnce = refreshGameViewOnce;
-    }
-
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
@@ -109,7 +100,5 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
         finished = in.readBoolean();
 
         curPos = in.readInt();
-
-        refreshGameViewOnce = true;
     }
 }

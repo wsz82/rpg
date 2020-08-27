@@ -52,14 +52,14 @@ public class GameRunner {
             loadSave(memento);
         }
 
-        loadImages();
+        reloadImages();
     }
 
     public void resumeGame() {
         gameController.setGame(true);
     }
 
-    private void loadImages() {
+    private void reloadImages() {
         Sizes.setReloadImages(false);
         gameController.setGame(false);
         Task<String> loader = new Loader();
@@ -157,7 +157,7 @@ public class GameRunner {
 
     private void updateView() {
         if (Sizes.isReloadImages()) {
-            loadImages();
+            reloadImages();
             Sizes.setReloadImages(false);
         }
         refreshGame();
