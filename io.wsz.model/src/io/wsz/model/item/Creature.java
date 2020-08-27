@@ -403,16 +403,15 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         CreatureSize size = cr.getSize();
-        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (getControl() != CreatureControl.ENEMY) {
-                if (getObstacleOnWay(cr) != null) return false;
-                Controller controller = getController();
-                controller.setAsking(cr);
-                controller.setAnswering(this);
-                return true;
-            }
-        }
-        return false;
+        boolean outOfRange = !withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
+        if (outOfRange) return false;
+        if (getControl() == CreatureControl.ENEMY) return false;
+        if (getObstacleOnWay(cr) != null) return false;
+        if (cr == this) return false;
+        Controller controller = getController();
+        controller.setAsking(cr);
+        controller.setAnswering(this);
+        return true;
     }
 
     @Override

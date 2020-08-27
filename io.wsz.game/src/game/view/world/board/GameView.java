@@ -612,14 +612,11 @@ public class GameView extends CanvasView {
 
     private boolean chooseCreatures(Creature cr, boolean multiple) {
         CreatureControl control = cr.getControl();
-        if (control == CONTROL) {
-            cr.setControl(CONTROLLABLE);
-            return true;
-        } else if (control == CONTROLLABLE) {
+        if (control == CONTROLLABLE || control == CONTROL) {
             if (!multiple) {
                 board.looseCreaturesControl(cr.getPos().getLocation());
             }
-            cr.setControl(CONTROL);
+            controller.getCreaturesToControl().add(cr);
             return true;
         }
         return false;

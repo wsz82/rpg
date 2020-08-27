@@ -282,7 +282,12 @@ public class GameRunner {
             }
 
             for (PosItem pi : assets) {
-                reloadAssetImages(pi, programDir);
+                try {
+                    reloadAssetImages(pi, programDir);
+                } catch (Exception e) {
+                    System.out.println("Error with " + pi.getName());
+                    continue;
+                }
                 updateProgress(i, total);
                 i++;
             }
