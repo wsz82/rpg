@@ -106,7 +106,7 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
             InventoryPlaceType occupiedPlace = item.getOccupiedPlace();
             occupiedPlaceCB.setValue(occupiedPlace);
 
-            EquipmentType equipmentType = item.getIndividualWeaponType();
+            EquipmentType equipmentType = item.getIndividualEquipmentType();
             typeCB.setValue(equipmentType);
         }
 

@@ -8,6 +8,7 @@ import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
@@ -23,6 +24,8 @@ import javafx.collections.ObservableList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class EditorController {
     private final Controller controller;
@@ -146,13 +149,13 @@ public class EditorController {
         Plugin activePlugin = model.getActivePlugin();
         World world = activePlugin.getWorld();
         List<Location> locations = world.getLocations();
-        controller.restoreItemsCoords(locations);
         restoreObservableAssets(activePlugin);
         restoreObservableLocations(activePlugin);
         restoreObservableEquipmentTypes(activePlugin);
         restoreObservableInventoryPlaces(activePlugin);
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, loadedPlugin);
+        controller.restoreItemsReferences(locations);
     }
 
     private void restoreObservableInventoryPlaces(Plugin activePlugin) {
@@ -194,6 +197,23 @@ public class EditorController {
         model.getCurrentLocation().setLocation(firstLocation);
         Layer firstLayer = firstLocation.getLayers().get(0);
         model.getCurrentLayer().setLayer(firstLayer);
+    }
+
+    public void updateCreaturesInventoryPlacesNames(String oldName, String newName) {
+        List<Creature> creatures = getObservableAssets().getCreatures();
+        for (Creature cr : creatures) {
+            Map<InventoryPlaceType, List<Coords>> inventoryPlaces = cr.getInventory().getInventoryPlaces();
+            if (inventoryPlaces.isEmpty()) continue;
+            Optional<InventoryPlaceType> optType = inventoryPlaces.keySet().stream()
+                    .filter(t -> t.getName().equals(oldName))
+                    .findFirst();
+            InventoryPlaceType type = optType.orElse(null);
+            if (type == null) continue;
+            InventoryPlaceType newType = new InventoryPlaceType(newName);
+            List<Coords> polygon = inventoryPlaces.get(type);
+            inventoryPlaces.remove(type);
+            inventoryPlaces.put(newType, polygon);
+        }
     }
 
     public void setDragPos(Coords pos) {

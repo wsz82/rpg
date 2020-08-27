@@ -20,6 +20,7 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.textures.Fog;
+import io.wsz.model.world.World;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -182,9 +183,10 @@ public class GameController {
 
     public void restoreMemento(SaveMemento m) {
         List<Location> locations = m.getLocations();
-        controller.getModel().getActivePlugin().getWorld().setLocations(locations);
-        controller.restoreItemsCoords(locations);
+        World world = controller.getModel().getActivePlugin().getWorld();
+        world.setLocations(locations);
         restoreStartLocationAndLayer(m.getLastPos());
+        controller.restoreItemsReferences(locations);
     }
 
     public void restoreActivePlugin() {
@@ -193,10 +195,11 @@ public class GameController {
         if (activePlugin == null) {
             return;
         }
-        List<Location> locations = activePlugin.getWorld().getLocations();
-        controller.restoreItemsCoords(locations);
+        World world = activePlugin.getWorld();
+        List<Location> locations = world.getLocations();
         Coords startPos = activePlugin.getStartPos();
         restoreStartLocationAndLayer(startPos);
+        controller.restoreItemsReferences(locations);
     }
 
     private void restoreStartLocationAndLayer(Coords startPos) {

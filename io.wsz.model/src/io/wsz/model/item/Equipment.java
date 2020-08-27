@@ -47,6 +47,10 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
     public abstract Equipment cloneEquipment();
 
+    public InventoryPlaceType getIndividualOccupiedPlace() {
+        return occupiedPlace;
+    }
+
     public InventoryPlaceType getOccupiedPlace() {
         if (prototype == null) {
             return occupiedPlace;
@@ -59,7 +63,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         this.occupiedPlace = occupiedPlace;
     }
 
-    public EquipmentType getIndividualWeaponType() {
+    public EquipmentType getIndividualEquipmentType() {
         return equipmentType;
     }
 

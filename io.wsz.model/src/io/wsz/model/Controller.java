@@ -10,12 +10,10 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
@@ -51,26 +49,85 @@ public class Controller {
         return pc.load(pluginName, this);
     }
 
-    public void restoreItemsCoords(List<Location> locations) {
+    public void restoreItemsReferences(List<Location> locations) {
+        World world = getModel().getActivePlugin().getWorld();
+        List<InventoryPlaceType> places = world.getInventoryPlaces();
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
                 Coords pos = pi.getPos();
                 restoreCoordsOfLocation(pos);
 
+                if (pi instanceof Creature) {
+                    Creature cr = (Creature) pi;
+                    restoreCreatureEquippedItemsPlaces(cr, places);
+                }
                 if (pi instanceof Teleport) {
                     Teleport t = (Teleport) pi;
                     Coords exit = t.getExit();
                     restoreCoordsOfLocation(exit);
                 }
-
                 if (pi instanceof OutDoor) {
                     OutDoor od = (OutDoor) pi;
                     Coords exit = od.getExit();
                     restoreCoordsOfLocation(exit);
                     restoreOutDoorConnection(od);
                 }
+                if (pi instanceof Equipment) {
+                    Equipment e = (Equipment) pi;
+                    restoreEquipmentType(e, world);
+                    restoreOccupiedPlace(e, world);
+                }
             }
         }
+    }
+
+    private void restoreCreatureEquippedItemsPlaces(Creature cr, List<InventoryPlaceType> places) {
+        Inventory inventory = cr.getInventory();
+        Map<InventoryPlaceType, Equipment> equippedItems = inventory.getEquippedItems();
+        Map<InventoryPlaceType,Equipment> restored = new HashMap<>(equippedItems.size());
+        for (InventoryPlaceType serType : equippedItems.keySet()) {
+            InventoryPlaceType typeWithRef = getReferencedPlaceType(places, serType);
+            restored.put(typeWithRef, equippedItems.get(serType));
+        }
+        inventory.setEquippedItems(restored);
+    }
+
+    private void restoreOccupiedPlace(Equipment e, World world) {
+        List<InventoryPlaceType> places = world.getInventoryPlaces();
+        InventoryPlaceType serOccupiedPlace = e.getIndividualOccupiedPlace();
+        InventoryPlaceType place = getReferencedPlaceType(places, serOccupiedPlace);
+        if (place == null) return;
+        e.setOccupiedPlace(place);
+    }
+
+    private InventoryPlaceType getReferencedPlaceType(List<InventoryPlaceType> places, InventoryPlaceType serType) {
+        if (serType == null) {
+            return null;
+        }
+        Optional<InventoryPlaceType> optType = places.stream()
+                .filter(t -> t.getName().equals(serType.getName()))
+                .findFirst();
+        InventoryPlaceType place = optType.orElse(null);
+        if (place == null) {
+            throw new NullPointerException("Inventory place \"" + serType.getName() + "\" should be in list of inventory places");
+        }
+        return place;
+    }
+
+    private void restoreEquipmentType(Equipment e, World world) {
+        List<EquipmentType> types = world.getEquipmentTypes();
+        EquipmentType serEquipmentType = e.getIndividualEquipmentType();
+        if (serEquipmentType == null) {
+            return;
+        }
+        Optional<EquipmentType> optType = types.stream()
+                .filter(t -> t.getName().equals(serEquipmentType.getName()))
+                .findFirst();
+        EquipmentType equipmentType = optType.orElse(null);
+        if (equipmentType == null) {
+            throw new NullPointerException("Equipment type \"" + serEquipmentType.getName() + "\" should be in list of equipment types");
+        }
+        e.setEquipmentType(equipmentType);
     }
 
     private void restoreOutDoorConnection(OutDoor od) {

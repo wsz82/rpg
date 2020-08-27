@@ -5,7 +5,6 @@ import editor.view.asset.coords.CoordsShapeEditStage;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.Geometry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -18,7 +17,10 @@ import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
@@ -205,23 +207,12 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
 
     @Override
     protected void fillList() {
-        inventoryPlaces = cloneInventoryPlaces(initInventoryPlaces);
+        inventoryPlaces = InventoryPlaceType.cloneInventoryPlacesKeysWithValues(initInventoryPlaces);
 
         int size = inventoryPlaces.size();
         List<List<Coords>> initPlaces = new ArrayList<>(size);
         initPlaces.addAll(inventoryPlaces.values());
         places.addAll(initPlaces);
-    }
-
-    private Map<InventoryPlaceType, List<Coords>> cloneInventoryPlaces(Map<InventoryPlaceType, List<Coords>> other) {
-        Map<InventoryPlaceType, List<Coords>> clone = new HashMap<>(0);
-        for (InventoryPlaceType type : other.keySet()) {
-            InventoryPlaceType clonedType = new InventoryPlaceType(type.getName());
-            List<Coords> otherPolygon = other.get(type);
-            List<Coords> clonedPolygon = Geometry.cloneCoordsList(otherPolygon);
-            clone.put(clonedType, clonedPolygon);
-        }
-        return clone;
     }
 
     @Override

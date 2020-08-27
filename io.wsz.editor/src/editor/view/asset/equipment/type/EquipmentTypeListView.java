@@ -16,14 +16,23 @@ public class EquipmentTypeListView extends TypeListView<EquipmentType> {
     protected void setTypeItems() {
         ObservableList<EquipmentType> items = editorController.getObservableEquipmentTypes();
         setItems(items);
+        setOnEditCommit(e -> {
+            String name = e.getNewValue().getName();
+            EquipmentType type = getSelectionModel().getSelectedItem();
+            type.setName(name);
+        });
     }
 
     @Override
     protected StringConverter<EquipmentType> getStringConverter() {
         StringConverter<EquipmentType> stringConverter = new StringConverter<>() {
             @Override
-            public String toString(EquipmentType weaponType) {
-                return weaponType.getName();
+            public String toString(EquipmentType type) {
+                if (type == null) {
+                    return "";
+                } else {
+                    return type.getName();
+                }
             }
 
             @Override

@@ -1,15 +1,31 @@
 package io.wsz.model.item;
 
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class InventoryPlaceType implements Externalizable {
     private static final long serialVersionUID = 1L;
+
+    public static Map<InventoryPlaceType, List<Coords>> cloneInventoryPlacesKeysWithValues(Map<InventoryPlaceType, List<Coords>> other) {
+        Map<InventoryPlaceType, List<Coords>> clone = new HashMap<>(0);
+        for (InventoryPlaceType type : other.keySet()) {
+            InventoryPlaceType clonedType = new InventoryPlaceType(type.getName());
+            List<Coords> otherPolygon = other.get(type);
+            List<Coords> clonedPolygon = Geometry.cloneCoordsList(otherPolygon);
+            clone.put(clonedType, clonedPolygon);
+        }
+        return clone;
+    }
 
     private String name;
 

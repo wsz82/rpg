@@ -10,6 +10,15 @@ public class InventoryPlaceTypeListView extends TypeListView<InventoryPlaceType>
 
     public InventoryPlaceTypeListView(EditorController editorController) {
         super(editorController);
+        setOnEditCommit(e -> {
+            String name = e.getNewValue().getName();
+            InventoryPlaceType type = getSelectionModel().getSelectedItem();
+            String oldName = type.getName();
+
+            editorController.updateCreaturesInventoryPlacesNames(oldName, name);
+
+            type.setName(name);
+        });
     }
 
     @Override
@@ -22,8 +31,12 @@ public class InventoryPlaceTypeListView extends TypeListView<InventoryPlaceType>
     protected StringConverter<InventoryPlaceType> getStringConverter() {
         return new StringConverter<>() {
             @Override
-            public String toString(InventoryPlaceType inventoryPlaceType) {
-                return inventoryPlaceType.getName();
+            public String toString(InventoryPlaceType type) {
+                if (type == null) {
+                    return "";
+                } else {
+                    return type.getName();
+                }
             }
 
             @Override
