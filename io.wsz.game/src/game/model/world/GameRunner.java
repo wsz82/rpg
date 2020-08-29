@@ -118,7 +118,7 @@ public class GameRunner {
             return;
         }
 
-        updateControls();
+        updateCreaturesControls();
 
         for (Location l : controller.getLocations()) { //TODO update only locations of a current locations group
             addItems(l);
@@ -170,7 +170,7 @@ public class GameRunner {
         refreshGame();
     }
 
-    private void updateControls() {
+    private void updateCreaturesControls() {
         List<Creature> creaturesToLooseControl = controller.getCreaturesToLooseControl();
         if (!creaturesToLooseControl.isEmpty()) {
             for (Creature cr : creaturesToLooseControl) {

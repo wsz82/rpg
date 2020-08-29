@@ -107,7 +107,9 @@ public class GameView extends CanvasView {
 
     void drawFog() {
         int meter = Sizes.getMeter();
-        foggableDelegate.drawFog(canvas.getWidth() / meter, canvas.getHeight() / meter);
+        double width = canvas.getWidth() / meter;
+        double height = canvas.getHeight() / meter;
+        foggableDelegate.drawFog(width, height);
     }
 
     boolean tryOpenInventory() {
