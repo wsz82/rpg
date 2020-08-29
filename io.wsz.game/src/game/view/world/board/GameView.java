@@ -95,8 +95,7 @@ public class GameView extends CanvasView {
 
         drawItems(heroes);
 
-        int meter = Sizes.getMeter();
-        foggableDelegate.drawFog(heroes, canvas.getWidth() / meter, canvas.getHeight() / meter);
+        drawFog();
 
         if (isSelectionMode) {
             drawSelection();
@@ -104,6 +103,11 @@ public class GameView extends CanvasView {
         if (Settings.isShowBar()) {
             barView.refresh();
         }
+    }
+
+    void drawFog() {
+        int meter = Sizes.getMeter();
+        foggableDelegate.drawFog(canvas.getWidth() / meter, canvas.getHeight() / meter);
     }
 
     boolean tryOpenInventory() {

@@ -3,10 +3,12 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.animation.creature.CreatureAnimationPos;
+import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.textures.Fog;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -15,8 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.wsz.model.location.FogStatus.CLEAR;
+
 public class Creature extends PosItem<Creature, CreatureAnimationPos> implements Containable {
     private static final long serialVersionUID = 1L;
+
+    private static final Coords TEMP = new Coords();
 
     private final Coords centerBottom = new Coords();
     private final Coords reversedCenterBottom = new Coords();
@@ -428,8 +434,52 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public void update() {
         super.update();
+        updateFogVisibility();
         checkSurrounding();
         checkTask();
+    }
+
+    private void updateFogVisibility() {
+        CreatureControl control = getControl();
+        if (control != CreatureControl.CONTROL && control != CreatureControl.CONTROLLABLE) {
+            return;
+        }
+        Location creatureLocation = this.pos.getLocation();
+        List<List<FogStatusWithImage>> discoveredFog = creatureLocation.getDiscoveredFog();
+        if (discoveredFog == null) return;
+        double heightPieces = discoveredFog.size();
+        double widthPieces = discoveredFog.get(0).size();
+        double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
+        double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
+        Coords nextPieceCenterPos = TEMP;
+        Fog fog = getController().getFog();
+        double fogSize = fog.getFogSize();
+        double half = fog.getHalfFogSize();
+        double y = -fogSize;
+        for (int i = 0; i < heightPieces; i++) {
+            if (i != 0) {
+                y += half;
+            }
+            double x = -fogSize;
+            List<FogStatusWithImage> horStatuses = discoveredFog.get(i);
+            for (int j = 0; j < widthPieces; j++) {
+                if (j != 0) {
+                    x += half;
+                }
+                nextPieceCenterPos.x = x + half;
+                nextPieceCenterPos.y = y + half;
+
+                double visionRange = getVisionRange();
+                double visWidth = visionRange * horizontalVisionRangeFactor;
+                double visHeight = visionRange * verticalVisionRangeFactor;
+                boolean isPieceWithinHeroView = Geometry.isPointWithinOval(nextPieceCenterPos, getCenter(), visWidth, visHeight);
+
+                FogStatusWithImage statusWithImage = horStatuses.get(j);
+                if (isPieceWithinHeroView) {
+                    statusWithImage.setStatus(CLEAR);
+                }
+            }
+        }
     }
 
     @Override

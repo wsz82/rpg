@@ -10,6 +10,7 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.textures.Fog;
 import io.wsz.model.world.World;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
     private final Board board = new Board(this);
+    private final Fog fog = new Fog();
     private final LinkedList<Creature> heroes = new LinkedList<>();
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
@@ -331,5 +333,9 @@ public class Controller {
         model = new Model();
         model.setCurrentLocation(new CurrentLocation());
         model.setCurrentLayer(new CurrentLayer());
+    }
+
+    public Fog getFog() {
+        return fog;
     }
 }

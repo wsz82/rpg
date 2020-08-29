@@ -3,6 +3,8 @@ package io.wsz.model.location;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.ResolutionImage;
+import io.wsz.model.textures.Fog;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +16,8 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static io.wsz.model.location.FogStatus.UNVISITED;
 
 public class Location implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -94,6 +98,37 @@ public class Location implements Externalizable {
 
     public List<List<FogStatusWithImage>> getDiscoveredFog() {
         return discoveredFog;
+    }
+    private void initFogPiecesImages(List<List<FogStatusWithImage>> discoveredFog, Fog fog, int widthPieces) {
+        for (List<FogStatusWithImage> fogStatusesWithImages : discoveredFog) {
+            for (int j = 0; j < widthPieces; j++) {
+                ResolutionImage randomFog = fog.getRandomFog();
+                fogStatusesWithImages.get(j).setImage(randomFog);
+            }
+        }
+    }
+
+    public void initDiscoveredFog(Fog fog, double halfFogSize) {
+        if (discoveredFog == null) {
+            int maxPiecesHeight = (int) Math.ceil(getHeight() / halfFogSize) + 2;
+            int maxPiecesWidth = (int) Math.ceil(getWidth() / halfFogSize) + 2;
+            List<List<FogStatusWithImage>> discoveredFog = new ArrayList<>(maxPiecesHeight);
+            for (int i = 0; i < maxPiecesHeight; i++) {
+                ArrayList<FogStatusWithImage> horList = new ArrayList<>(maxPiecesWidth);
+                for (int j = 0; j < maxPiecesWidth; j++) {
+                    ResolutionImage randomFog = fog.getRandomFog();
+                    FogStatusWithImage statusWithImage = new FogStatusWithImage(UNVISITED, randomFog);
+                    horList.add(statusWithImage);
+                }
+                discoveredFog.add(i, horList);
+            }
+            this.discoveredFog = discoveredFog;
+        }
+        List<FogStatusWithImage> firstRow = discoveredFog.get(0);
+        int widthPieces = firstRow.size();
+        if (firstRow.get(0).getImage() == null) {
+            initFogPiecesImages(discoveredFog, fog, widthPieces);
+        }
     }
 
     public void setDiscoveredFog(List<List<FogStatusWithImage>> discoveredFog) {

@@ -81,9 +81,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     private void drawFog() {
-        Location location = controller.getCurrentLocation().getLocation();
-        List<Creature> heroes = board.getControlledAndControllableCreatures(location);
-        foggableDelegate.drawFog(heroes, viewWidth, viewHeight);
+        foggableDelegate.drawFog(viewWidth, viewHeight);
     }
 
     @Override

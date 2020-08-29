@@ -1,5 +1,6 @@
 package io.wsz.model.textures;
 
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 
 import java.io.File;
@@ -13,6 +14,7 @@ public class Fog {
     private static final Random RANDOM = new Random();
 
     private List<ResolutionImage> fogs;
+    private double fogSize;
 
     public Fog() {}
 
@@ -34,8 +36,19 @@ public class Fog {
         List<ResolutionImage> images = new ArrayList<>(0);
         for (File imageFile : imagesFiles) {
             ResolutionImage loadedFrame = new ResolutionImage(imageFile);
+            if (fogSize == 0) {
+                fogSize = loadedFrame.getWidth() / Sizes.getMeter();
+            }
             images.add(loadedFrame);
         }
         return images;
+    }
+
+    public double getFogSize() {
+        return fogSize;
+    }
+
+    public double getHalfFogSize() {
+        return fogSize/2;
     }
 }

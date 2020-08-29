@@ -8,6 +8,8 @@ import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.FogStatus;
+import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.textures.CreatureBase;
@@ -131,18 +133,23 @@ public class GameRunner {
             return;
         }
 
-        Location currentLocation = controller.getCurrentLocation().getLocation();
-        List<PosItem> items = currentLocation.getItems();
-
-        for (PosItem pi : items) {
-            pi.update();
-        }
-
         heroesLocations.clear();
         controller.getHeroes().stream()
                 .map(h -> h.getPos().getLocation())
                 .collect(Collectors.toCollection(() -> heroesLocations));
-        heroesLocations.remove(currentLocation);
+        Location currentLocation = controller.getCurrentLocation().getLocation();
+        heroesLocations.add(currentLocation);
+
+        for (Location l : heroesLocations) {
+            if (l == null) continue;
+            List<List<FogStatusWithImage>> discoveredFog = l.getDiscoveredFog();
+            if (discoveredFog == null) continue;
+            discoveredFog.forEach(r -> r.forEach(f -> {
+                            if (f.getStatus() == FogStatus.CLEAR) {
+                                f.setStatus(FogStatus.VISITED);
+                            }
+                        }));
+        }
 
         for (Location l : heroesLocations) { //TODO update locations of a current locations group
             if (l == null) continue;
@@ -260,18 +267,24 @@ public class GameRunner {
     private class Loader extends Task<String> {
         @Override
         protected String call() throws Exception {
-            List<PosItem> items = controller.getCurrentLocation().getItems();
+            CurrentLocation currentLocation = controller.getCurrentLocation();
+            List<PosItem> items = currentLocation.getItems();
             Set<PosItem> assets = getAssets(items);
+
             CreatureBase[] bases = CreatureBase.getBases();
             int total = assets.size() + bases.length;
             int i = 0;
             updateProgress(0, total);
 
-            Fog fog = gameController.getFog();
+            Fog fog = controller.getFog();
             File programDir = controller.getProgramDir();
+
             fog.initAllFogs(programDir);
             i++;
             updateProgress(i, total);
+
+            Location location = currentLocation.getLocation();
+            location.initDiscoveredFog(fog, fog.getHalfFogSize());
 
             for (CreatureBase base : bases) {
                 base.setImg(null);

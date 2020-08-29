@@ -19,7 +19,6 @@ import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.textures.Fog;
 import io.wsz.model.world.World;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
     private final Controller controller;
-    private final Fog fog = new Fog();
     private final ObservableList<String> saves = FXCollections.observableArrayList();
     private final AtomicBoolean isGame = new AtomicBoolean();
     private final AtomicBoolean isDialog = new AtomicBoolean();
@@ -285,9 +283,5 @@ public class GameController {
 
     public Controller getController() {
         return controller;
-    }
-
-    public Fog getFog() {
-        return fog;
     }
 }
