@@ -26,7 +26,7 @@ public class Location implements Externalizable {
     private final List<PosItem> itemsToRemove = new ArrayList<>(0);
     private final List<PosItem> itemsToAdd = new ArrayList<>(0);
 
-    private List<List<Boolean>> discoveredFog;
+    private List<List<FogStatusWithImage>> discoveredFog;
 
     public Location() {}
 
@@ -92,11 +92,11 @@ public class Location implements Externalizable {
         return itemsToAdd;
     }
 
-    public List<List<Boolean>> getDiscoveredFog() {
+    public List<List<FogStatusWithImage>> getDiscoveredFog() {
         return discoveredFog;
     }
 
-    public void setDiscoveredFog(List<List<Boolean>> discoveredFog) {
+    public void setDiscoveredFog(List<List<FogStatusWithImage>> discoveredFog) {
         this.discoveredFog = discoveredFog;
     }
 
@@ -161,6 +161,6 @@ public class Location implements Externalizable {
 
         itemsToAdd.addAll((List<PosItem>) in.readObject());
 
-        discoveredFog = (List<List<Boolean>>) in.readObject();
+        discoveredFog = (List<List<FogStatusWithImage>>) in.readObject();
     }
 }

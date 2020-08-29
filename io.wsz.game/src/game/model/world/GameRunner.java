@@ -268,9 +268,8 @@ public class GameRunner {
             updateProgress(0, total);
 
             Fog fog = gameController.getFog();
-            fog.setImage(null);
             File programDir = controller.getProgramDir();
-            fog.getImage(programDir);
+            fog.initAllFogs(programDir);
             i++;
             updateProgress(i, total);
 

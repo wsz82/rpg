@@ -87,7 +87,7 @@ public class GameView extends CanvasView {
         if (tryStartDialog()) return;
         if (tryOpenInventory()) return;
         updatePos();
-        clear();
+        clearBackground();
         sortItems();
 
         Location location = controller.getCurrentLocation().getLocation();
@@ -606,8 +606,8 @@ public class GameView extends CanvasView {
         }
     }
 
-    private void clear() {
-        gc.setFill(Color.LIGHTGREY);
+    private void clearBackground() {
+        gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 

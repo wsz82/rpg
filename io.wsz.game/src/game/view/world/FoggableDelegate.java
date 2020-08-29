@@ -3,26 +3,29 @@ package game.view.world;
 import game.model.GameController;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
+import io.wsz.model.location.FogStatus;
+import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.Fog;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.wsz.model.location.FogStatus.*;
 
 public class FoggableDelegate implements Foggable{
     private final GameController gameController;
     private final Controller controller;
-    private final Canvas canvas;
     private final GraphicsContext gc;
     private final Coords curPos;
-    private final Coords nextPiecePos = new Coords();
+    private final Coords nextPieceCenterPos = new Coords();
     private final Coords temp1 = new Coords();
     private final Coords temp2 = new Coords();
 
@@ -31,7 +34,6 @@ public class FoggableDelegate implements Foggable{
     public FoggableDelegate(GameController gameController, Canvas canvas, Coords curPos) {
         this.gameController = gameController;
         this.controller = gameController.getController();
-        this.canvas = canvas;
         this.gc = canvas.getGraphicsContext2D();
         this.curPos = curPos;
         this.viewPos = new Coords(0, 0);
@@ -44,58 +46,71 @@ public class FoggableDelegate implements Foggable{
 
     public void drawFog(List<Creature> heroes, double width, double height) {
         Location loc = controller.getCurrentLocation().getLocation();
-        List<List<Boolean>> discoveredFog = loc.getDiscoveredFog();
+        List<List<FogStatusWithImage>> discoveredFog = loc.getDiscoveredFog();
         int meter = Sizes.getMeter();
-        Image piece = getFogImage();
+        Fog fog = gameController.getFog();
+        ResolutionImage piece = fog.getRandomFog();
         double fogSize = piece.getWidth() / meter;
+        double half = fogSize / 2;
         if (discoveredFog == null) {
-            discoveredFog = initFogPiecesList(loc, fogSize);
+            discoveredFog = initFogPiecesList(loc, fog, half);
         }
-
-        gc.setImageSmoothing(false);
-
+        List<FogStatusWithImage> firstRow = discoveredFog.get(0);
+        int widthPieces = firstRow.size();
         int heightPieces = discoveredFog.size();
-        int widthPieces = discoveredFog.get(0).size();
+
+        if (firstRow.get(0).getImage() == null) {
+            initFogPiecesImages(discoveredFog, fog, widthPieces);
+        }
+        gc.setImageSmoothing(false);
 
         double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
         double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
-        double y = 0;
+        double y = -fogSize;
         for (int i = 0; i < heightPieces; i++) {
             if (i != 0) {
-                y += fogSize;
+                y += half;
             }
-            double x = 0;
+            double x = -fogSize;
+            List<FogStatusWithImage> horStatuses = discoveredFog.get(i);
             for (int j = 0; j < widthPieces; j++) {
                 if (j != 0) {
-                    x += fogSize;
+                    x += half;
                 }
-                nextPiecePos.x = x;
-                nextPiecePos.y = y;
-                Coords translatedPiecePos = translateCoordsToScreenCoords1(nextPiecePos);
+                nextPieceCenterPos.x = x + half;
+                nextPieceCenterPos.y = y + half;
+                Coords translatedPieceCenterPos = translateCoordsToScreenCoords1(nextPieceCenterPos);
                 boolean isPieceWithinHeroView = false;
                 for (Creature cr : heroes) {
                     double visionRange = cr.getVisionRange();
                     Coords translatedHeroCenterPos = translateCoordsToScreenCoords2(cr.getCenter());
                     double visWidth = visionRange * horizontalVisionRangeFactor;
                     double visHeight = visionRange * verticalVisionRangeFactor;
-                    isPieceWithinHeroView = Geometry.isPointWithinOval(translatedPiecePos, translatedHeroCenterPos, visWidth, visHeight);
+                    isPieceWithinHeroView = Geometry.isPointWithinOval(translatedPieceCenterPos, translatedHeroCenterPos, visWidth, visHeight);
                     if (isPieceWithinHeroView) break;
                 }
+                FogStatusWithImage statusWithImage = horStatuses.get(j);
+                FogStatus status = statusWithImage.getStatus();
                 if (isPieceWithinHeroView) {
-                    discoveredFog.get(i).set(j, true);
-                } else {
-                    boolean isPieceWithinView =
-                            nextPiecePos.x + fogSize >= curPos.x && nextPiecePos.y + fogSize >= curPos.y
-                                    && nextPiecePos.x <= curPos.x + width && nextPiecePos.y <= curPos.y + height;
-                    if (isPieceWithinView) {
-                        boolean isPieceDiscovered = discoveredFog.get(i).get(j);
-                        if (isPieceDiscovered) {
-                            gc.setGlobalAlpha(0.3);
-                            drawFogPiece(translatedPiecePos, piece);
-                            gc.setGlobalAlpha(1);
-                        } else {
-                            drawFogPiece(translatedPiecePos, piece);
-                        }
+                    statusWithImage.setStatus(CLEAR);
+                } else if (status == CLEAR) {
+                    statusWithImage.setStatus(VISITED);
+                }
+
+                boolean isPieceWithinView = nextPieceCenterPos.x >= curPos.x - fogSize
+                                && nextPieceCenterPos.y >= curPos.y - fogSize
+                                && nextPieceCenterPos.x <= curPos.x + width + fogSize
+                                && nextPieceCenterPos.y <= curPos.y + height + fogSize;
+                if (isPieceWithinView) {
+                    Image fxImage = statusWithImage.getImage().getFxImage();
+                    if (status == VISITED) {
+                        gc.setGlobalAlpha(0.3);
+                    }
+                    if (status != CLEAR) {
+                        drawFogPiece(translatedPieceCenterPos, half, fxImage);
+                    }
+                    if (status == VISITED) {
+                        gc.setGlobalAlpha(1);
                     }
                 }
             }
@@ -103,33 +118,38 @@ public class FoggableDelegate implements Foggable{
         gc.setImageSmoothing(true);
     }
 
-    private Image getFogImage() {
-        File programDir = controller.getProgramDir();
-        Fog fog = gameController.getFog();
-        return fog.getImage(programDir).getFxImage();
+    void initFogPiecesImages(List<List<FogStatusWithImage>> discoveredFog, Fog fog, int widthPieces) {
+        for (List<FogStatusWithImage> fogStatusesWithImages : discoveredFog) {
+            for (int j = 0; j < widthPieces; j++) {
+                ResolutionImage randomFog = fog.getRandomFog();
+                fogStatusesWithImages.get(j).setImage(randomFog);
+            }
+        }
     }
 
-    private List<List<Boolean>> initFogPiecesList(Location loc, double fogSize) {
-        List<List<Boolean>> discoveredFog;
-        int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize);
-        int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize);
-        discoveredFog = new ArrayList<>(maxPiecesHeight);
+
+    private void drawFogPiece(Coords pos, double half, Image piece) {
+        int meter = Sizes.getMeter();
+        double x = (pos.x - half) * meter;
+        double y = (pos.y - half) * meter;
+        gc.drawImage(piece, x, y);
+    }
+
+    private List<List<FogStatusWithImage>> initFogPiecesList(Location loc, Fog fog, double fogSize) {
+        int maxPiecesHeight = (int) Math.ceil(loc.getHeight() / fogSize) + 2;
+        int maxPiecesWidth = (int) Math.ceil(loc.getWidth() / fogSize) + 2;
+        List<List<FogStatusWithImage>> discoveredFog = new ArrayList<>(maxPiecesHeight);
         for (int i = 0; i < maxPiecesHeight; i++) {
-            ArrayList<Boolean> horList = new ArrayList<>(maxPiecesWidth);
+            ArrayList<FogStatusWithImage> horList = new ArrayList<>(maxPiecesWidth);
             for (int j = 0; j < maxPiecesWidth; j++) {
-                horList.add(false);
+                ResolutionImage randomFog = fog.getRandomFog();
+                FogStatusWithImage statusWithImage = new FogStatusWithImage(UNVISITED, randomFog);
+                horList.add(statusWithImage);
             }
             discoveredFog.add(i, horList);
         }
         loc.setDiscoveredFog(discoveredFog);
         return discoveredFog;
-    }
-
-    private void drawFogPiece(Coords pos, Image fog) {
-        int meter = Sizes.getMeter();
-        pos.x *= meter;
-        pos.y *= meter;
-        gc.drawImage(fog, pos.x, pos.y);
     }
 
     private Coords translateCoordsToScreenCoords1(Coords pos) {

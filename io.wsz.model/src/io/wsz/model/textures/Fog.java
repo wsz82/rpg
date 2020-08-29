@@ -1,24 +1,41 @@
 package io.wsz.model.textures;
 
-import io.wsz.model.sizes.Paths;
 import io.wsz.model.stage.ResolutionImage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static io.wsz.model.sizes.Paths.*;
 
 public class Fog {
-    private ResolutionImage image;
+    private static final Random RANDOM = new Random();
+
+    private List<ResolutionImage> fogs;
 
     public Fog() {}
 
-    public final ResolutionImage getImage(File programDir) {
-        if (image == null) {
-            String path = programDir + Paths.TEXTURES_DIR + Paths.FOG_DIR + Paths.FOG_BASE_NAME_DIR;
-            setImage(new ResolutionImage(path));
-        }
-        return image;
+    public void initAllFogs(File programDir) {
+        String programFogDir = programDir + TEXTURES_DIR + FOG_DIR;
+        File file = new File(programFogDir);
+        fogs = getFogImages(file);
     }
 
-    public void setImage(ResolutionImage image) {
-        this.image = image;
+    public ResolutionImage getRandomFog() {
+        int idlesSize = fogs.size();
+        int randomIndex = RANDOM.nextInt(idlesSize);
+        return fogs.get(randomIndex);
+    }
+
+    private List<ResolutionImage> getFogImages(File framesDir) {
+        File[] imagesFiles = framesDir.listFiles(f -> f.getName().endsWith(PNG));
+        if (imagesFiles == null || imagesFiles.length == 0) return null;
+        List<ResolutionImage> images = new ArrayList<>(0);
+        for (File imageFile : imagesFiles) {
+            ResolutionImage loadedFrame = new ResolutionImage(imageFile);
+            images.add(loadedFrame);
+        }
+        return images;
     }
 }

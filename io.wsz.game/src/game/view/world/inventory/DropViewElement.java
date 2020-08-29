@@ -3,6 +3,7 @@ package game.view.world.inventory;
 import game.model.GameController;
 import game.view.world.FoggableDelegate;
 import io.wsz.model.item.*;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -39,8 +40,29 @@ public class DropViewElement extends EquipmentViewElement {
 
         drawHorScroll();
 
-        gc.save();
+        drawWithinOval();
 
+        updateCurPos();
+    }
+
+    private void updateCurPos() {
+        CurrentLocation currentLocation = controller.getCurrentLocation();
+        double maxCurPosX = currentLocation.getWidth() - viewWidth;
+        double maxCurPosY = currentLocation.getHeight() - viewHeight;
+        if (curPos.x < 0) {
+            curPos.x = 0;
+        } else if (curPos.x > maxCurPosX){
+            curPos.x = maxCurPosX;
+        }
+        if (curPos.y < 0) {
+            curPos.y = 0;
+        } else if (curPos.y > maxCurPosY) {
+            curPos.y = maxCurPosY;
+        }
+    }
+
+    void drawWithinOval() {
+        gc.save();
         gc.beginPath();
         double centerX = (viewPos.x + viewWidth/2) * Sizes.getMeter();
         double centerY = (viewPos.y + viewHeight/2) * Sizes.getMeter();
@@ -53,10 +75,15 @@ public class DropViewElement extends EquipmentViewElement {
         gc.clip();
 
         drawEquipment();
+        drawFog();
+
+        gc.restore();
+    }
+
+    private void drawFog() {
         Location location = controller.getCurrentLocation().getLocation();
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
         foggableDelegate.drawFog(heroes, viewWidth, viewHeight);
-        gc.restore();
     }
 
     @Override
@@ -80,18 +107,6 @@ public class DropViewElement extends EquipmentViewElement {
 
         clearHorScroll(y);
         drawHorScrollButton(y);
-    }
-
-    private void drawHorScrollButton(double y) {
-        minCurPosX = creaturePos.x - visionWidthDiameter/2;
-        maxCurPosX = creaturePos.x + visionWidthDiameter/2;
-        double xScrollPos = (curPos.x - minCurPosX) * viewWidth / visionWidthDiameter;
-        double x = viewPos.x + xScrollPos;
-        xScrollButtonWidth = viewWidth * viewWidth / visionWidthDiameter;
-
-        gc.setFill(Color.GREEN);
-        int meter = Sizes.getMeter();
-        gc.fillRect(x * meter, y, xScrollButtonWidth * meter, scrollWidth * meter);
     }
 
     private void clearHorScroll(double y) {
@@ -149,14 +164,32 @@ public class DropViewElement extends EquipmentViewElement {
     @Override
     protected void drawVerScrollButton(double x) {
         minCurPosY = creaturePos.y - visionHeightDiameter/2;
+        minCurPosY = Math.max(0, minCurPosY);
         maxCurPosY = creaturePos.y + visionHeightDiameter/2;
-        yScrollPos = (curPos.y - minCurPosY) * viewHeight / visionHeightDiameter;
+        maxCurPosY = Math.min(controller.getCurrentLocation().getHeight(), maxCurPosY);
+        double verticalDifference = maxCurPosY - minCurPosY;
+        yScrollPos = (curPos.y - minCurPosY) * viewHeight / verticalDifference;
         double y = viewPos.y + yScrollPos;
-        yScrollButtonHeight = viewHeight * viewHeight / visionHeightDiameter;
+        yScrollButtonHeight = viewHeight * viewHeight / verticalDifference;
 
         gc.setFill(Color.GREEN);
         int meter = Sizes.getMeter();
         gc.fillRect(x, y * meter, scrollWidth * meter, yScrollButtonHeight * meter);
+    }
+
+    private void drawHorScrollButton(double y) {
+        minCurPosX = creaturePos.x - visionWidthDiameter/2;
+        minCurPosX = Math.max(0, minCurPosX);
+        maxCurPosX = creaturePos.x + visionWidthDiameter/2;
+        maxCurPosX = Math.min(controller.getCurrentLocation().getWidth(), maxCurPosX);
+        double horizontalDifference = maxCurPosX - minCurPosX;
+        double xScrollPos = (curPos.x - minCurPosX) * viewWidth / horizontalDifference;
+        double x = viewPos.x + xScrollPos;
+        xScrollButtonWidth = viewWidth * viewWidth / horizontalDifference;
+
+        gc.setFill(Color.GREEN);
+        int meter = Sizes.getMeter();
+        gc.fillRect(x * meter, y, xScrollButtonWidth * meter, scrollWidth * meter);
     }
 
     private void drawCreatureBase(Creature cr) {
@@ -182,7 +215,7 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected void drawBackground() {
-        gc.setFill(Color.DARKGRAY);
+        gc.setFill(Color.BLACK);
         gc.fillOval(viewPos.x * Sizes.getMeter(), viewPos.y * Sizes.getMeter(),
                 viewWidth * Sizes.getMeter(), viewHeight * Sizes.getMeter());
     }
