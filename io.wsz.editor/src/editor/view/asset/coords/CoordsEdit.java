@@ -98,11 +98,10 @@ public class CoordsEdit {
                 return getLocation(s);
             }
         });
-        ObservableList<Location> locations = FXCollections.observableArrayList(editorController.getObservableLocations());
-        locationChoice.setItems(editorController.getObservableLocations());
-        if (isContent) {
-            locations.add(null);
-        }
+        ObservableList<Location> original = editorController.getObservableLocations();
+        ObservableList<Location> locationsWithNull = FXCollections.observableArrayList(original);
+        locationsWithNull.add(null);
+        locationChoice.setItems(locationsWithNull);
     }
 
     private Location getLocation(String s) {

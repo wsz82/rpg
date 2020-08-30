@@ -1,14 +1,6 @@
 package io.wsz.model.plugin;
 
-import io.wsz.model.Controller;
-import io.wsz.model.asset.Asset;
-import io.wsz.model.item.PosItem;
-import io.wsz.model.location.Location;
-import io.wsz.model.world.World;
-
 import java.io.*;
-import java.util.List;
-import java.util.Optional;
 
 public class PluginCaretaker {
     private final File programDir;
@@ -36,40 +28,8 @@ public class PluginCaretaker {
         }
     }
 
-    public Plugin load(String name, Controller controller) {
-        Plugin deserialized = deserializeAll(name);
-        if (deserialized == null) return null;
-        World world = deserialized.getWorld();
-        restorePrototypesReferences(world);
-        assignControllerToPrototypes(world, controller);
-        return deserialized;
-    }
-
-    private void assignControllerToPrototypes(World world, Controller controller) {
-        List<Asset> assets = world.getAssets();
-        for (Asset asset : assets) {
-            ((PosItem) asset).setController(controller);
-        }
-    }
-
-    private void restorePrototypesReferences(World world) {
-        List<Asset> assets = world.getAssets();
-        for (Location l : world.getLocations()) {
-            for (PosItem pi : l.getItems()) {
-                PosItem prototype = pi.getPrototype();
-                if (prototype != null) {
-                    String prototypeName = prototype.getName();
-                    Optional<Asset> optAsset = assets.stream()
-                            .filter(a -> a.getName().equals(prototypeName))
-                            .findFirst();
-                    Asset p = optAsset.orElse(null);
-                    if (p == null) {
-                        throw new NullPointerException(prototypeName + " reference is not found");
-                    }
-                    pi.setPrototype((PosItem) p);
-                }
-            }
-        }
+    public Plugin load(String name) {
+        return deserializeAll(name);
     }
 
     private Plugin deserializeAll(String name) {

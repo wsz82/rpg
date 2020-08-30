@@ -11,8 +11,12 @@ import game.view.menu.GameStage;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
+import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.EquipmentType;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -179,12 +183,32 @@ public class GameController {
         sc.saveMemento(memento);
     }
 
-    public void restoreMemento(SaveMemento m) {
+    public void restoreSaveMemento(SaveMemento m) {
         List<Location> locations = m.getLocations();
         World world = controller.getModel().getActivePlugin().getWorld();
         world.setLocations(locations);
-        restoreStartLocationAndLayer(m.getLastPos());
-        controller.restoreItemsReferences(locations);
+
+        Coords lastPos = m.getLastPos();
+        restorePluginReferences(world, lastPos);
+    }
+
+    void restorePluginReferences(World world, Coords lastPos) {
+        restoreStartLocationAndLayer(lastPos);
+
+        List<Asset> assets = world.getAssets();
+        List<Location> locations = world.getLocations();
+        List<InventoryPlaceType> inventoryPlaces = world.getInventoryPlaces();
+        List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
+        List<Dialog> dialogs = world.getDialogs();
+        controller.restoreItemsReferences(assets, locations, inventoryPlaces, equipmentTypes, dialogs);
+
+        assignControllerToPrototypes(controller, assets);
+    }
+
+    private void assignControllerToPrototypes(Controller controller, List<Asset> assets) {
+        for (Asset asset : assets) {
+            ((PosItem) asset).setController(controller);
+        }
     }
 
     public void restoreActivePlugin() {
@@ -194,10 +218,9 @@ public class GameController {
             return;
         }
         World world = activePlugin.getWorld();
-        List<Location> locations = world.getLocations();
         Coords startPos = activePlugin.getStartPos();
-        restoreStartLocationAndLayer(startPos);
-        controller.restoreItemsReferences(locations);
+
+        restorePluginReferences(world, startPos);
     }
 
     private void restoreStartLocationAndLayer(Coords startPos) {

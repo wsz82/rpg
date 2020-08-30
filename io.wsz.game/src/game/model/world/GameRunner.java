@@ -22,6 +22,7 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
@@ -33,6 +34,7 @@ public class GameRunner {
     private final GameController gameController;
     private final Controller controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
+    private final AtomicBoolean areImagesReloaded = new AtomicBoolean(false);
 
     private Thread gameThread;
 
@@ -165,6 +167,7 @@ public class GameRunner {
     private void updateView() {
         if (Sizes.isReloadImages()) {
             reloadImages();
+            areImagesReloaded.set(false);
             Sizes.setReloadImages(false);
         }
         refreshGame();
@@ -248,11 +251,12 @@ public class GameRunner {
     }
 
     private void refreshGame() {
+        if (!areImagesReloaded.get()) return;
         gameController.refreshGame();
     }
 
     private void loadSave(SaveMemento memento) {
-        gameController.restoreMemento(memento);
+        gameController.restoreSaveMemento(memento);
         gameController.initLoadedGameSettings(memento);
         controller.initLoadGameHeroes(memento.getHeroes());
     }
@@ -304,6 +308,7 @@ public class GameRunner {
                 i++;
             }
 
+            areImagesReloaded.set(true);
             return "Completed";
         }
 

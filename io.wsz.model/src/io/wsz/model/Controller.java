@@ -2,6 +2,7 @@ package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
+import io.wsz.model.dialog.DialogItem;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
@@ -12,7 +13,6 @@ import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.textures.Fog;
-import io.wsz.model.world.World;
 
 import java.io.File;
 import java.util.*;
@@ -49,24 +49,46 @@ public class Controller {
             return new Plugin();
         }
         PluginCaretaker pc = new PluginCaretaker(programDir);
-        return pc.load(pluginName, this);
+        return pc.load(pluginName);
     }
 
-    public void restoreItemsReferences(List<Location> locations) {
-        World world = getModel().getActivePlugin().getWorld();
-        List<Dialog> dialogs = world.getDialogs();
-        List<InventoryPlaceType> places = world.getInventoryPlaces();
+    public void restoreItemsReferences(List<Asset> assets,
+                                       List<Location> locations,
+                                       List<InventoryPlaceType> inventoryPlaces,
+                                       List<EquipmentType> equipmentTypes,
+                                       List<Dialog> dialogs) {
         for (Asset a : getAssets()) {
-            restoreItemReferences(world, dialogs, places, a);
+            restoreItemReferences(a, dialogs, equipmentTypes, inventoryPlaces);
         }
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
-                restoreItemReferences(world, dialogs, places, pi);
+                restorePrototype(assets, pi);
+
+                restoreItemReferences(pi, dialogs, equipmentTypes, inventoryPlaces);
             }
         }
     }
 
-    void restoreItemReferences(World world, List<Dialog> dialogs, List<InventoryPlaceType> places, Asset a) {
+    void restorePrototype(List<Asset> assets, PosItem pi) {
+        PosItem prototype = pi.getPrototype();
+        if (prototype != null) {
+            String prototypeName = prototype.getName();
+
+            Optional<Asset> optAsset = assets.stream()
+                    .filter(a -> a.getName().equals(prototypeName))
+                    .findFirst();
+            Asset p = optAsset.orElse(null);
+            if (p == null) {
+                throw new NullPointerException(prototypeName + " reference is not found");
+            }
+            pi.setPrototype((PosItem) p);
+        }
+    }
+
+    void restoreItemReferences(Asset a,
+                               List<Dialog> dialogs,
+                               List<EquipmentType> equipmentTypes,
+                               List<InventoryPlaceType> inventoryPlaces) {
         if (a instanceof PosItem) {
             PosItem pi = (PosItem) a;
             Coords pos = pi.getPos();
@@ -75,7 +97,7 @@ public class Controller {
         }
         if (a instanceof Creature) {
             Creature cr = (Creature) a;
-            restoreCreatureEquippedItemsPlaces(cr, places);
+            restoreCreatureEquippedItemsPlaces(cr, inventoryPlaces);
         }
         if (a instanceof Teleport) {
             Teleport t = (Teleport) a;
@@ -90,8 +112,8 @@ public class Controller {
         }
         if (a instanceof Equipment) {
             Equipment e = (Equipment) a;
-            restoreEquipmentType(e, world);
-            restoreOccupiedPlace(e, world);
+            restoreEquipmentType(e, equipmentTypes);
+            restoreOccupiedPlace(e, inventoryPlaces);
         }
     }
 
@@ -120,8 +142,7 @@ public class Controller {
         inventory.setEquippedItems(restored);
     }
 
-    private void restoreOccupiedPlace(Equipment e, World world) {
-        List<InventoryPlaceType> places = world.getInventoryPlaces();
+    private void restoreOccupiedPlace(Equipment e, List<InventoryPlaceType> places) {
         InventoryPlaceType serOccupiedPlace = e.getIndividualOccupiedPlace();
         InventoryPlaceType place = getReferencedPlaceType(places, serOccupiedPlace);
         if (place == null) return;
@@ -142,8 +163,7 @@ public class Controller {
         return place;
     }
 
-    private void restoreEquipmentType(Equipment e, World world) {
-        List<EquipmentType> types = world.getEquipmentTypes();
+    private void restoreEquipmentType(Equipment e, List<EquipmentType> types) {
         EquipmentType serEquipmentType = e.getIndividualEquipmentType();
         if (serEquipmentType == null) {
             return;
@@ -269,7 +289,8 @@ public class Controller {
 
     private void initDialogMementoIfNull() {
         if (dialogMemento == null) {
-            dialogMemento = new DialogMemento();
+            ArrayList<DialogItem> dialogs = new ArrayList<>(0);
+            dialogMemento = new DialogMemento(dialogs);
         }
     }
 

@@ -14,6 +14,9 @@ public class FogStatusWithImage implements Externalizable {
     private FogStatus status;
     private ResolutionImage image;
 
+    public FogStatusWithImage() {
+    }
+
     public FogStatusWithImage(FogStatus status, ResolutionImage image) {
         this.status = status;
         this.image = image;

@@ -11,23 +11,33 @@ import java.io.ObjectOutput;
 public class DialogItem implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private String speaker;
+    private String speakerName;
+    private SpeakerMark speakerMark;
     private String text;
     private Image picture;
 
     public DialogItem() {}
 
-    public DialogItem(String speaker, String text) {
-        this.speaker = speaker;
+    public DialogItem(SpeakerMark speakerMark, String speakerName, String text) {
+        this.speakerMark = speakerMark;
+        this.speakerName = speakerName;
         this.text = text;
     }
 
-    public String getSpeaker() {
-        return speaker;
+    public String getSpeakerName() {
+        return speakerName;
     }
 
-    public void setSpeaker(String speaker) {
-        this.speaker = speaker;
+    public void setSpeakerName(String speakerName) {
+        this.speakerName = speakerName;
+    }
+
+    public SpeakerMark getSpeakerMark() {
+        return speakerMark;
+    }
+
+    public void setSpeakerMark(SpeakerMark speakerMark) {
+        this.speakerMark = speakerMark;
     }
 
     public String getText() {
@@ -50,7 +60,9 @@ public class DialogItem implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(speaker);
+        out.writeUTF(speakerName);
+
+        out.writeObject(speakerMark);
 
         out.writeUTF(text);
     }
@@ -59,7 +71,9 @@ public class DialogItem implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        speaker = in.readUTF();
+        speakerName = in.readUTF();
+
+        speakerMark = (SpeakerMark) in.readObject();
 
         text = in.readUTF();
     }

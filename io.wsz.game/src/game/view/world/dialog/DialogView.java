@@ -150,7 +150,7 @@ public class DialogView {
         scrollBarStop = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
-                stopScrollWithButton(e.getX(), e.getY());
+                stopScrollWithButton();
             }
         };
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
@@ -202,21 +202,21 @@ public class DialogView {
         isToRefresh = true;
     }
 
-    private void stopScrollWithButton(double x, double y) {
+    private void stopScrollWithButton() {
         scrollWithButton = false;
     }
 
     private void addQuestionAndAnswer() {
-        PosItem asker = dialogMemento.getAsking();
-        addDialogItem(asker, activeQuestion.getText());
+        PosItem asking = dialogMemento.getAsking();
+        addDialogItem(asking, activeQuestion.getText());
 
-        PosItem speaker = dialogMemento.getAnswering();
+        PosItem answering = dialogMemento.getAnswering();
         Dialog dialog = dialogMemento.getAnswering().getDialog();
         String answerID = activeQuestion.getAnswerID();
         Answer answer = dialog.getAnswerByID(answerID);
 
         if (answer != null) {
-            addDialogItem(speaker, answer.getText());
+            addDialogItem(answering, answer.getText());
 
             dialogMemento.setLastAnswer(answer);
         }
@@ -273,8 +273,13 @@ public class DialogView {
         gc.fillRect(right, dialogRectangleTop, scrollWidth, scrollHeight);
     }
 
-    private void addDialogItem(PosItem pi, String s) {
-        DialogItem di = new DialogItem(pi.getName(), s);
+    private void addDialogItem(PosItem pi, String text) {
+        String speakerName = pi.getName();
+        SpeakerMark speakerMark = SpeakerMark.ANSWERING;
+        if (pi == dialogMemento.getAsking()) {
+            speakerMark = SpeakerMark.ASKING;
+        }
+        DialogItem di = new DialogItem(speakerMark, speakerName, text);
         dialogMemento.getDialogs().add(di);
     }
 
@@ -302,10 +307,15 @@ public class DialogView {
     }
 
     private TextFlow getDialogTextFlow(DialogItem di) {
-        String ownerText = di.getSpeaker() + " - ";
+        String speakerName = di.getSpeakerName();
+        String ownerText = speakerName + " - ";
         Text owner = new Text(ownerText);
         owner.setFont(new Font(fontSize));
-        owner.setFill(Color.RED);
+        Color speakerNameColor = Color.RED;
+        if (di.getSpeakerMark() == SpeakerMark.ASKING) {
+            speakerNameColor = Color.BLUE;
+        }
+        owner.setFill(speakerNameColor);
 
         String answerText = di.getText();
         Text answer = new Text();

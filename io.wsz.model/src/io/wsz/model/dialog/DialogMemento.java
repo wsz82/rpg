@@ -7,14 +7,12 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DialogMemento<A extends PosItem, B extends PosItem> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private final List<DialogItem> dialogs = new ArrayList<>(0);
-
+    private List<DialogItem> dialogs;
     private A asking;
     private B answering;
     private Answer lastAnswer;
@@ -22,6 +20,10 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     private int curPos;
 
     public DialogMemento() {}
+
+    public DialogMemento(List<DialogItem> dialogs) {
+        this.dialogs = dialogs;
+    }
 
     public List<DialogItem> getDialogs() {
         return dialogs;
@@ -88,8 +90,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        List<DialogItem> inputDialogs = (List<DialogItem>) in.readObject();
-        dialogs.addAll(inputDialogs);
+        dialogs = (List<DialogItem>) in.readObject();
 
         asking = (A) in.readObject();
 

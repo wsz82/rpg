@@ -8,6 +8,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.Fog;
 
 import java.io.IOException;
@@ -115,8 +116,10 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     public Coords getCenter(Coords pos) {
-        double width = getImage().getWidth() / Sizes.getMeter();
-        double height = getImage().getHeight() / Sizes.getMeter();
+        ResolutionImage image = getImage();
+        if (image == null) return this.pos;
+        double width = image.getWidth() / Sizes.getMeter();
+        double height = image.getHeight() / Sizes.getMeter();
         centerBottom.x = pos.x + width/2;
         centerBottom.y = pos.y + height;
         centerBottom.level = pos.level;
@@ -452,7 +455,9 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
         double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
         Coords nextPieceCenterPos = TEMP;
-        Fog fog = getController().getFog();
+        Controller controller = getController();
+        if (controller == null) return;
+        Fog fog = controller.getFog();
         double fogSize = fog.getFogSize();
         double half = fog.getHalfFogSize();
         double y = -fogSize;

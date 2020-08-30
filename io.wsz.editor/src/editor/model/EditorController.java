@@ -155,7 +155,7 @@ public class EditorController {
     public void loadAndRestorePlugin(String pluginName, PluginSettingsStage pss) {
         File programDir = controller.getProgramDir();
         PluginCaretaker pc = new PluginCaretaker(programDir);
-        Plugin loadedPlugin = pc.load(pluginName, controller);
+        Plugin loadedPlugin = pc.load(pluginName);
         if (loadedPlugin == null) return;
         Model model = controller.getModel();
         model.setActivePlugin(loadedPlugin);
@@ -165,7 +165,12 @@ public class EditorController {
         loadPluginToObservableLists(world);
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, loadedPlugin);
-        controller.restoreItemsReferences(locations);
+
+        List<Asset> assets = world.getAssets();
+        List<InventoryPlaceType> inventoryPlaces = world.getInventoryPlaces();
+        List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
+        List<Dialog> dialogs = world.getDialogs();
+        controller.restoreItemsReferences(assets, locations, inventoryPlaces, equipmentTypes, dialogs);
     }
 
     void loadPluginToObservableLists(World world) {

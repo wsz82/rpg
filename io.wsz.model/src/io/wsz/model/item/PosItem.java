@@ -390,7 +390,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     public ResolutionImage getImage() {
         if (image == null) {
             if (prototype == null) {
-                File programDir = getController().getProgramDir();
+                Controller controller = getController();
+                if (controller == null) return null;
+                File programDir = controller.getProgramDir();
                 image = getAnimation().getBasicMain(programDir);
                 return image;
             } else {
@@ -468,13 +470,12 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
                 Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), posItem.getDialog()) &&
                 Objects.equals(getInteractionCoords(), posItem.getInteractionCoords()) &&
-                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed()) &&
-                Objects.equals(getImage(), posItem.getImage());
+                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionCoords(), getAnimationSpeed(), getImage());
+        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionCoords(), getAnimationSpeed());
     }
 
     @Override
