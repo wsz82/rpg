@@ -212,8 +212,8 @@ public class DialogView {
 
         PosItem speaker = dialogMemento.getAnswering();
         Dialog dialog = dialogMemento.getAnswering().getDialog();
-        int answerIndex = activeQuestion.getAnswerIndex();
-        Answer answer = dialog.getAnswers().get(answerIndex);
+        String answerID = activeQuestion.getAnswerID();
+        Answer answer = dialog.getAnswerByID(answerID);
 
         if (answer != null) {
             addDialogItem(speaker, answer.getText());
@@ -223,7 +223,7 @@ public class DialogView {
 
         isToRefresh = true;
 
-        if (activeQuestion.isFinish()) {
+        if (activeQuestion.isFinishingDialog()) {
             dialogMemento.setFinished(true);
         }
     }
@@ -355,7 +355,20 @@ public class DialogView {
 
     private void drawQuestions(int lastPos) {
         questionsPos.clear();
-        List<Question> questions = dialogMemento.getLastAnswer().getQuestions();
+        Answer lastAnswer = dialogMemento.getLastAnswer();
+        String questionsID = lastAnswer.getQuestionsID();
+        if (questionsID == null) {
+            dialogMemento.setFinished(true);
+            return;
+        }
+        PosItem answering = dialogMemento.getAnswering();
+        Dialog dialog = answering.getDialog();
+        QuestionsList questionsList = dialog.getQuestionsListByID(questionsID);
+        if (questionsList == null) {
+            dialogMemento.setFinished(true);
+            return;
+        }
+        List<Question> questions = questionsList.getQuestions();
 
         for (int i = 0; i < questions.size(); i++) {
             Question q = questions.get(i);

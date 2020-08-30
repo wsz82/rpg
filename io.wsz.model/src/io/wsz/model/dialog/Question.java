@@ -6,15 +6,22 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Objects;
 
 public class Question implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String text;
-    private int answerIndex;
-    private boolean finish;
+    private String answerID;
+    private boolean isFinishingDialog;
 
     public Question() {}
+
+    public Question(String text, String answerID, boolean isFinishingDialog) {
+        this.text = text;
+        this.answerID = answerID;
+        this.isFinishingDialog = isFinishingDialog;
+    }
 
     public String getText() {
         return text;
@@ -24,25 +31,46 @@ public class Question implements Externalizable {
         this.text = text;
     }
 
-    public int getAnswerIndex() {
-        return answerIndex;
+    public String getAnswerID() {
+        return answerID;
     }
 
-    public void setAnswerIndex(int answerIndex) {
-        this.answerIndex = answerIndex;
+    public void setAnswerID(String answerID) {
+        this.answerID = answerID;
     }
 
-    public boolean isFinish() {
-        return finish;
+    public boolean isFinishingDialog() {
+        return isFinishingDialog;
     }
 
-    public void setFinish(boolean finish) {
-        this.finish = finish;
+    public void setFinishingDialog(boolean finishingDialog) {
+        this.isFinishingDialog = finishingDialog;
     }
 
     @Override
     public String toString() {
-        return text;
+        int max = 20;
+        if (text == null) return "";
+        if (text.length() > max) {
+            return text.substring(0, max) + "...";
+        } else {
+            return text;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Question)) return false;
+        Question question = (Question) o;
+        return isFinishingDialog() == question.isFinishingDialog() &&
+                Objects.equals(getText(), question.getText()) &&
+                Objects.equals(getAnswerID(), question.getAnswerID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getText(), getAnswerID(), isFinishingDialog());
     }
 
     @Override
@@ -51,9 +79,9 @@ public class Question implements Externalizable {
 
         out.writeUTF(text);
 
-        out.writeInt(answerIndex);
+        out.writeUTF(answerID);
 
-        out.writeBoolean(finish);
+        out.writeBoolean(isFinishingDialog);
     }
 
     @Override
@@ -62,8 +90,8 @@ public class Question implements Externalizable {
 
         text = in.readUTF();
 
-        answerIndex = in.readInt();
+        answerID = in.readUTF();
 
-        finish = in.readBoolean();
+        isFinishingDialog = in.readBoolean();
     }
 }

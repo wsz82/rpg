@@ -8,6 +8,7 @@ import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
@@ -33,6 +34,7 @@ public class EditorController {
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
+    private final ObservableList<Dialog> observableDialogs = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords();
 
     private PosItem activeItem;
@@ -84,48 +86,59 @@ public class EditorController {
         newWorld.setLocations(locations);
     }
 
+    public void savePluginAs(String pluginName, PluginSettingsStage pss) {
+        Plugin activePlugin = controller.getModel().getActivePlugin();
+        World world = activePlugin.getWorld();
+        loadObservableListToPlugin(world);
+        File programDir = controller.getProgramDir();
+        PluginCaretaker pc = new PluginCaretaker(programDir);
+        activePlugin.setName(pluginName);
+        setPluginParams(activePlugin, pss);
+        pc.saveAs(activePlugin);
+    }
+
     public void saveActivePlugin(PluginSettingsStage pss) {
         Model model = controller.getModel();
         Plugin activePlugin = model.getActivePlugin();
-        loadObservableAssetsoPlugin(activePlugin);
-        loadObservableLocationsToPlugin(activePlugin);
-        loadObservableEquipmentTypesToPlugin(activePlugin);
-        loadObservableInventoryPlaceTypesToPlugin(activePlugin);
+        World world = activePlugin.getWorld();
+        loadObservableListToPlugin(world);
         File programDir = controller.getProgramDir();
         PluginCaretaker pc = new PluginCaretaker(programDir);
         setPluginParams(activePlugin, pss);
         pc.save(activePlugin);
     }
 
-    private void loadObservableInventoryPlaceTypesToPlugin(Plugin activePlugin) {
+    private void loadObservableListToPlugin(World world) {
+        loadObservableAssetsToPlugin(world);
+        loadObservableLocationsToPlugin(world);
+        loadObservableEquipmentTypesToPlugin(world);
+        loadObservableInventoryPlaceTypesToPlugin(world);
+        loadObservableDialogsToPlugin(world);
+    }
+
+    private void loadObservableDialogsToPlugin(World world) {
+        List<Dialog> dialogs = new ArrayList<>(observableDialogs);
+        world.setDialogs(dialogs);
+    }
+
+    private void loadObservableInventoryPlaceTypesToPlugin(World world) {
         List<InventoryPlaceType> inventoryPlaceTypes = new ArrayList<>(observableInventoryPlaceTypes);
-        activePlugin.getWorld().setInventoryPlaces(inventoryPlaceTypes);
+        world.setInventoryPlaces(inventoryPlaceTypes);
     }
 
-    private void loadObservableEquipmentTypesToPlugin(Plugin activePlugin) {
+    private void loadObservableEquipmentTypesToPlugin(World world) {
         List<EquipmentType> equipmentTypes = new ArrayList<>(observableEquipmentTypes);
-        activePlugin.getWorld().setEquipmentTypes(equipmentTypes);
+        world.setEquipmentTypes(equipmentTypes);
     }
 
-    private void loadObservableLocationsToPlugin(Plugin activePlugin) {
+    private void loadObservableLocationsToPlugin(World world) {
         List<Location> locations = new ArrayList<>(observableLocations);
-        activePlugin.getWorld().setLocations(locations);
+        world.setLocations(locations);
     }
 
-    private void loadObservableAssetsoPlugin(Plugin activePlugin) {
+    private void loadObservableAssetsToPlugin(World world) {
         List<Asset> mergedAssets = observableAssets.getMergedAssets();
-        activePlugin.getWorld().setAssets(mergedAssets);
-    }
-
-    public void savePluginAs(String pluginName, PluginSettingsStage pss) {
-        Plugin activePlugin = controller.getModel().getActivePlugin();
-        loadObservableAssetsoPlugin(activePlugin);
-        loadObservableLocationsToPlugin(activePlugin);
-        File programDir = controller.getProgramDir();
-        PluginCaretaker pc = new PluginCaretaker(programDir);
-        activePlugin.setName(pluginName);
-        setPluginParams(activePlugin, pss);
-        pc.saveAs(activePlugin);
+        world.setAssets(mergedAssets);
     }
 
     private void setPluginParams(Plugin activePlugin, PluginSettingsStage pss) {
@@ -149,30 +162,41 @@ public class EditorController {
         Plugin activePlugin = model.getActivePlugin();
         World world = activePlugin.getWorld();
         List<Location> locations = world.getLocations();
-        restoreObservableAssets(activePlugin);
-        restoreObservableLocations(activePlugin);
-        restoreObservableEquipmentTypes(activePlugin);
-        restoreObservableInventoryPlaces(activePlugin);
+        loadPluginToObservableLists(world);
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, loadedPlugin);
         controller.restoreItemsReferences(locations);
     }
 
-    private void restoreObservableInventoryPlaces(Plugin activePlugin) {
+    void loadPluginToObservableLists(World world) {
+        restoreObservableAssets(world);
+        restoreObservableLocations(world);
+        restoreObservableEquipmentTypes(world);
+        restoreObservableInventoryPlaces(world);
+        restoreObservableDialogs(world);
+    }
+
+    private void restoreObservableDialogs(World world) {
+        observableDialogs.clear();
+        List<Dialog> dialogs = world.getDialogs();
+        observableDialogs.addAll(dialogs);
+    }
+
+    private void restoreObservableInventoryPlaces(World world) {
         observableInventoryPlaceTypes.clear();
-        List<InventoryPlaceType> inventoryPlaceTypes = activePlugin.getWorld().getInventoryPlaces();
+        List<InventoryPlaceType> inventoryPlaceTypes = world.getInventoryPlaces();
         observableInventoryPlaceTypes.addAll(inventoryPlaceTypes);
     }
 
-    private void restoreObservableEquipmentTypes(Plugin activePlugin) {
+    private void restoreObservableEquipmentTypes(World world) {
         observableEquipmentTypes.clear();
-        List<EquipmentType> equipmentTypes = activePlugin.getWorld().getEquipmentTypes();
+        List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
         observableEquipmentTypes.addAll(equipmentTypes);
     }
 
-    private void restoreObservableLocations(Plugin activePlugin) {
+    private void restoreObservableLocations(World world) {
         observableLocations.clear();
-        List<Location> locations = activePlugin.getWorld().getLocations();
+        List<Location> locations = world.getLocations();
         observableLocations.addAll(locations);
     }
 
@@ -187,8 +211,8 @@ public class EditorController {
         pss.setStartLevel(startPos.level);
     }
 
-    private void restoreObservableAssets(Plugin activePlugin) {
-        List<Asset> assets = activePlugin.getWorld().getAssets();
+    private void restoreObservableAssets(World world) {
+        List<Asset> assets = world.getAssets();
         observableAssets.fillLists(assets);
     }
 
@@ -261,5 +285,9 @@ public class EditorController {
 
     public ObservableList<InventoryPlaceType> getObservableInventoryPlacesTypes() {
         return observableInventoryPlaceTypes;
+    }
+
+    public ObservableList<Dialog> getObservableDialogs() {
+        return observableDialogs;
     }
 }

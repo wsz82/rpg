@@ -49,7 +49,6 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.pos = new Coords();
         this.coverLine = new ArrayList<>(0);
         this.collisionPolygons = new ArrayList<>(0);
-        this.dialog = new Dialog();
     }
 
     public PosItem(A prototype, Boolean visible) {
@@ -495,7 +494,11 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
         out.writeObject(collisionPolygons);
 
-        out.writeObject(dialog);
+        String id = "";
+        if (dialog != null) {
+            id = dialog.getID();
+        }
+        out.writeUTF(id);
 
         out.writeObject(interactionCoords);
     }
@@ -521,7 +524,10 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
         collisionPolygons = (List<List<Coords>>) in.readObject();
 
-        dialog = (Dialog) in.readObject();
+        String dialogID = in.readUTF();
+        if (!dialogID.isEmpty()) {
+            dialog = new Dialog(dialogID);
+        }
 
         interactionCoords = (Coords) in.readObject();
     }

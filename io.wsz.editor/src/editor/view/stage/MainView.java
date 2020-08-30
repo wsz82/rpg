@@ -7,6 +7,7 @@ import editor.view.asset.creature.inventory.place.InventoryPlaceTypeStage;
 import editor.view.asset.equipment.type.EquipmentTypeStage;
 import editor.view.content.ContentStage;
 import editor.view.content.ContentTableView;
+import editor.view.dialog.DialogsEditStage;
 import editor.view.layer.LayersStage;
 import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
@@ -31,7 +32,7 @@ class MainView {
     private final EditorController editorController;
     private final Controller controller;
     private final EditorCanvas editorCanvas;
-    private final Stage stage;
+    private final Stage mainStage;
     private final Pane center;
     private final ContentStage contentsWindow;
     private final LayersStage layersWindow;
@@ -40,21 +41,21 @@ class MainView {
     private final PluginSettingsStage pss;
     private final Pointer pointer;
 
-    public MainView(Stage stage, EditorController editorController) {
-        this.stage = stage;
+    public MainView(Stage mainStage, EditorController editorController) {
+        this.mainStage = mainStage;
         this.editorController = editorController;
         controller = editorController.getController();
         this.center = new Pane();
         pointer = new Pointer(controller);
-        editorCanvas = new EditorCanvas(stage, editorController, center, pointer);
+        editorCanvas = new EditorCanvas(mainStage, editorController, center, pointer);
         center.getChildren().add(editorCanvas);
-        contentsWindow = new ContentStage(stage, editorCanvas, editorController);
+        contentsWindow = new ContentStage(mainStage, editorCanvas, editorController);
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
-        layersWindow = new LayersStage(stage, ctv, editorCanvas, editorController);
-        assetsWindow = new AssetsStage(stage, pointer, ctv, editorCanvas, editorController);
-        locationsWindow = new LocationsStage(stage, editorController, editorCanvas);
-        pss = new PluginSettingsStage(stage, editorController);
+        layersWindow = new LayersStage(mainStage, ctv, editorCanvas, editorController);
+        assetsWindow = new AssetsStage(mainStage, pointer, ctv, editorCanvas, editorController);
+        locationsWindow = new LocationsStage(mainStage, editorController, editorCanvas);
+        pss = new PluginSettingsStage(mainStage, editorController);
     }
 
     public void show() {
@@ -70,12 +71,12 @@ class MainView {
         setBottomContent(bottomBar);
 
         final Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
-        stage.setScene(scene);
+        mainStage.setScene(scene);
 
         File programDir = editorController.getController().getProgramDir();
         restoreSettings(programDir);
 
-        stage.show();
+        mainStage.show();
         layersWindow.show();
         assetsWindow.show();
         contentsWindow.show();
@@ -85,7 +86,7 @@ class MainView {
     }
 
     private void hookUpEvents() {
-        stage.setOnCloseRequest(event -> {
+        mainStage.setOnCloseRequest(event -> {
             onCloseRequest();
         });
     }
@@ -109,7 +110,7 @@ class MainView {
 
     private void storeSettings(File programDir) {
         SettingsMemento memento = new SettingsMemento(
-                stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(),
+                mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight(),
                 layersWindow.getX(), layersWindow.getY(), layersWindow.getWidth(), layersWindow.getHeight(),
                 assetsWindow.getX(), assetsWindow.getY(), assetsWindow.getWidth(), assetsWindow.getHeight(),
                 contentsWindow.getX(), contentsWindow.getY(), contentsWindow.getWidth(), contentsWindow.getHeight(),
@@ -120,10 +121,10 @@ class MainView {
 
     private void restoreSettings(File programDir) {
         SettingsMemento memento = editorController.restoreSettings(programDir);
-        stage.setX(memento.getStageX());
-        stage.setY(memento.getStageY());
-        stage.setWidth(memento.getStageWidth());
-        stage.setHeight(memento.getStageHeight());
+        mainStage.setX(memento.getStageX());
+        mainStage.setY(memento.getStageY());
+        mainStage.setWidth(memento.getStageWidth());
+        mainStage.setHeight(memento.getStageHeight());
         layersWindow.setX(memento.getLayersX());
         layersWindow.setY(memento.getLayersY());
         layersWindow.setWidth(memento.getLayersWidth());
@@ -177,15 +178,26 @@ class MainView {
 
         final MenuItem weaponTypes = getEquipmentTypesMenuItem();
         final MenuItem inventoryPlaces = getInventoryPlacesMenuItem();
+        final MenuItem dialogs = getDialogsMenuItem();
 
-        world.getItems().addAll(weaponTypes, inventoryPlaces);
+        world.getItems().addAll(weaponTypes, inventoryPlaces, dialogs);
         return world;
+    }
+
+    private MenuItem getDialogsMenuItem() {
+        final MenuItem dialogs = new MenuItem("Dialogs");
+        dialogs.setOnAction(event -> {
+            DialogsEditStage dialogsEditStage = new DialogsEditStage(mainStage, editorController);
+            dialogsEditStage.initWindow();
+            dialogsEditStage.show();
+        });
+        return dialogs;
     }
 
     private MenuItem getInventoryPlacesMenuItem() {
         final MenuItem inventoryPlaces = new MenuItem("Inventory places");
         inventoryPlaces.setOnAction(event -> {
-            InventoryPlaceTypeStage inventoryPlaceTypeStage = new InventoryPlaceTypeStage(stage, editorController);
+            InventoryPlaceTypeStage inventoryPlaceTypeStage = new InventoryPlaceTypeStage(mainStage, editorController);
             inventoryPlaceTypeStage.show();
         });
         return inventoryPlaces;
@@ -194,7 +206,7 @@ class MainView {
     private MenuItem getEquipmentTypesMenuItem() {
         final MenuItem equipmentTypes = new MenuItem("Equipment types");
         equipmentTypes.setOnAction(event -> {
-            EquipmentTypeStage equipmentTypeStage = new EquipmentTypeStage(stage, editorController);
+            EquipmentTypeStage equipmentTypeStage = new EquipmentTypeStage(mainStage, editorController);
             equipmentTypeStage.show();
         });
         return equipmentTypes;
@@ -204,7 +216,7 @@ class MainView {
         final Menu location = new Menu("Location");
         final MenuItem parameters = new MenuItem("Parameters");
         parameters.setOnAction(event -> {
-            LocationParametersStage locationParametersStage = new LocationParametersStage(stage, controller);
+            LocationParametersStage locationParametersStage = new LocationParametersStage(mainStage, controller);
             locationParametersStage.show();
         });
         location.getItems().addAll(parameters);
@@ -242,7 +254,7 @@ class MainView {
         plugin.setOnAction(e -> openPluginSettings());
         exit.setOnAction(e -> {
             onCloseRequest();
-            stage.close();
+            mainStage.close();
         });
         file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
         return file;
@@ -259,7 +271,7 @@ class MainView {
 
     private void openPluginsTable() {
         final Stage plugins = new EditorPluginsTable(pss, editorController);
-        plugins.initOwner(stage);
+        plugins.initOwner(mainStage);
         plugins.show();
     }
 
@@ -271,7 +283,7 @@ class MainView {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
         );
-        final File saveFile = fileChooser.showSaveDialog(stage);
+        final File saveFile = fileChooser.showSaveDialog(mainStage);
         if (saveFile == null) {
             return;
         }

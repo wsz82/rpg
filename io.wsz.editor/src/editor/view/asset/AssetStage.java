@@ -5,15 +5,17 @@ import editor.view.DoubleField;
 import editor.view.asset.coords.CoordsLineEditStage;
 import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.CoordsPolygonsEditStage;
-import editor.view.dialog.DialogEditStage;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,9 +25,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final EditorCanvas editorCanvas;
@@ -35,11 +39,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
-    protected final Button dialogButton = new Button("Dialog");
     protected final HBox animationBox = new HBox(10);
     protected final Button animationButton = new Button("Animation");
     protected final Label pathLabel = new Label();
     protected final DoubleField animationSpeedInput = new DoubleField(true);
+    protected final ChoiceBox<Dialog> dialogsCB = new ChoiceBox<>();
 
     protected A item;
     protected boolean isContent;
@@ -110,9 +114,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             }
         }
 
-        if (!isContent) {
-            container.getChildren().add(dialogButton);
-        }
+        final HBox dialogBox = new HBox(10);
+        final Label dialogLabel = new Label("Dialog");
+        dialogBox.getChildren().addAll(dialogLabel, dialogsCB);
+        setUpDialogCB();
+        container.getChildren().add(dialogBox);
 
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
@@ -120,6 +126,31 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             nameInput.setDisable(true);
         }
         hookUpAssetEvents();
+    }
+
+    private void setUpDialogCB() {
+        ObservableList<Dialog> dialogs = editorController.getObservableDialogs();
+        ObservableList<Dialog> dialogsWithNull = FXCollections.observableArrayList(dialogs);
+        dialogsWithNull.add(null);
+        dialogsCB.setItems(dialogsWithNull);
+        dialogsCB.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Dialog dialog) {
+                if (dialog == null) {
+                    return "";
+                } else {
+                    return dialog.getID();
+                }
+            }
+
+            @Override
+            public Dialog fromString(String name) {
+                Optional<Dialog> optDialog = editorController.getObservableDialogs().stream()
+                        .filter(t -> t.getID().equals(name))
+                        .findFirst();
+                return optDialog.orElse(null);
+            }
+        });
     }
 
     protected void fillInputs() {
@@ -135,14 +166,20 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         } else {
             animationSpeedInput.setText(String.valueOf(animationSpeed));
         }
+
+        Dialog dialog = item.getIndividualDialog();
+        dialogsCB.setValue(dialog);
     }
 
     private void onCreate() {
         String name = nameInput.getText();
-        String path = pathLabel.getText();
         boolean inputNameIsEmpty = name == null || name.isEmpty();
+        if (inputNameIsEmpty) {
+            return;
+        }
+        String path = pathLabel.getText();
         boolean inputFileIsEmpty = path == null || path.isEmpty();
-        if (inputNameIsEmpty || inputFileIsEmpty) {
+        if (inputFileIsEmpty) {
             return;
         }
         List<Asset> assets = editorController.getObservableAssets().getMergedAssets();
@@ -164,6 +201,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         } else {
             item.setAnimationSpeed(Double.parseDouble(animationSpeed));
         }
+
+        Dialog dialog = dialogsCB.getValue();
+        item.setDialog(dialog);
     }
 
     private void onEdit() {
@@ -184,7 +224,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         interactionButton.setOnAction(e -> openInteractionPointEdit());
         coverButton.setOnAction(e -> openCoverEdit());
         collisionButton.setOnAction(e -> openCollisionEdit());
-        dialogButton.setOnAction(e -> openDialogEdit());
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
     }
@@ -209,11 +248,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (isPathIncorrect(selectedFilePath)) return;
         String path = Asset.convertToRelativePath(selectedFilePath);
         label.setText(path);
-    }
-
-    private void openDialogEdit() {
-        Stage dialogEditStage = new DialogEditStage(this, item.getIndividualDialog());
-        dialogEditStage.show();
     }
 
     protected void openInteractionPointEdit() {

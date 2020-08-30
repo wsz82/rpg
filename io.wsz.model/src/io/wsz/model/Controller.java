@@ -1,6 +1,7 @@
 package io.wsz.model;
 
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
@@ -53,34 +54,59 @@ public class Controller {
 
     public void restoreItemsReferences(List<Location> locations) {
         World world = getModel().getActivePlugin().getWorld();
+        List<Dialog> dialogs = world.getDialogs();
         List<InventoryPlaceType> places = world.getInventoryPlaces();
+        for (Asset a : getAssets()) {
+            restoreItemReferences(world, dialogs, places, a);
+        }
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
-                Coords pos = pi.getPos();
-                restoreCoordsOfLocation(pos);
-
-                if (pi instanceof Creature) {
-                    Creature cr = (Creature) pi;
-                    restoreCreatureEquippedItemsPlaces(cr, places);
-                }
-                if (pi instanceof Teleport) {
-                    Teleport t = (Teleport) pi;
-                    Coords exit = t.getExit();
-                    restoreCoordsOfLocation(exit);
-                }
-                if (pi instanceof OutDoor) {
-                    OutDoor od = (OutDoor) pi;
-                    Coords exit = od.getExit();
-                    restoreCoordsOfLocation(exit);
-                    restoreOutDoorConnection(od);
-                }
-                if (pi instanceof Equipment) {
-                    Equipment e = (Equipment) pi;
-                    restoreEquipmentType(e, world);
-                    restoreOccupiedPlace(e, world);
-                }
+                restoreItemReferences(world, dialogs, places, pi);
             }
         }
+    }
+
+    void restoreItemReferences(World world, List<Dialog> dialogs, List<InventoryPlaceType> places, Asset a) {
+        if (a instanceof PosItem) {
+            PosItem pi = (PosItem) a;
+            Coords pos = pi.getPos();
+            restoreCoordsOfLocation(pos);
+            restoreDialog(pi, dialogs);
+        }
+        if (a instanceof Creature) {
+            Creature cr = (Creature) a;
+            restoreCreatureEquippedItemsPlaces(cr, places);
+        }
+        if (a instanceof Teleport) {
+            Teleport t = (Teleport) a;
+            Coords exit = t.getExit();
+            restoreCoordsOfLocation(exit);
+        }
+        if (a instanceof OutDoor) {
+            OutDoor od = (OutDoor) a;
+            Coords exit = od.getExit();
+            restoreCoordsOfLocation(exit);
+            restoreOutDoorConnection(od);
+        }
+        if (a instanceof Equipment) {
+            Equipment e = (Equipment) a;
+            restoreEquipmentType(e, world);
+            restoreOccupiedPlace(e, world);
+        }
+    }
+
+    private void restoreDialog(PosItem pi, List<Dialog> dialogs) {
+        Dialog serDialog = pi.getDialog();
+        if (serDialog == null) return;
+        String serID = serDialog.getID();
+        Optional<Dialog> optDialog = dialogs.stream()
+                .filter(d -> d.getID().equals(serID))
+                .findFirst();
+        Dialog dialog = optDialog.orElse(null);
+        if (dialog == null) {
+            throw new NullPointerException(pi.getName() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
+        }
+        pi.setDialog(dialog);
     }
 
     private void restoreCreatureEquippedItemsPlaces(Creature cr, List<InventoryPlaceType> places) {

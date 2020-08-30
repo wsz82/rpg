@@ -18,7 +18,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     private A asking;
     private B answering;
     private Answer lastAnswer;
-    private boolean finished;
+    private boolean isFinished;
     private int curPos;
 
     public DialogMemento() {}
@@ -52,11 +52,11 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     }
 
     public boolean isFinished() {
-        return finished;
+        return isFinished;
     }
 
     public void setFinished(boolean finished) {
-        this.finished = finished;
+        this.isFinished = finished;
     }
 
     public int getCurPos() {
@@ -79,7 +79,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         out.writeObject(lastAnswer);
 
-        out.writeBoolean(finished);
+        out.writeBoolean(isFinished);
 
         out.writeInt(curPos);
     }
@@ -97,7 +97,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         lastAnswer = (Answer) in.readObject();
 
-        finished = in.readBoolean();
+        isFinished = in.readBoolean();
 
         curPos = in.readInt();
     }
