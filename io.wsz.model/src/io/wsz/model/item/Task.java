@@ -87,7 +87,7 @@ public class Task implements Externalizable {
         nextPos.x = x3;
         nextPos.y = y3;
         nextPos.level = pos.level;
-        PosItem pi = cr.getCollision(cr.getCenter(nextPos));
+        PosItem pi = cr.getCollision(cr.getCenterFrom(nextPos));
         if (pi != null) {
             dest.x = -1;
             return;
@@ -114,9 +114,9 @@ public class Task implements Externalizable {
         }
         Coords dest;
         if (item instanceof Creature) {
-            dest = cr.reverseCenterBottomPos(item.getCenter());
+            dest = cr.getReversedCenter(item.getCenter());
         } else {
-            dest = cr.reverseCenterBottomPos(item.getInteractionCoords());
+            dest = cr.getReversedCenter(item.getInteractionCoords());
         }
         setDest(dest);
     }

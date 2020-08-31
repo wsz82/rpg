@@ -23,15 +23,16 @@ import static io.wsz.model.location.FogStatus.CLEAR;
 public class Creature extends PosItem<Creature, CreatureAnimationPos> implements Containable {
     private static final long serialVersionUID = 1L;
 
-    private static final Coords TEMP = new Coords();
+    private static final Coords TEMP_NEXT_FOG_PIECE_CENTER_POS = new Coords();
 
-    private final Coords centerBottom = new Coords();
-    private final Coords reversedCenterBottom = new Coords();
+    private final Coords tempCenterBottom = new Coords();
+    private final Coords tempReversedCenterBottom = new Coords();
 
     private CreatureAnimation animation;
 
     private final Task task = new Task();
     private final CreatureAnimationPos animationPos;
+    private Coords middlePoint;
     private Inventory inventory;
     private CreatureSize size;
     private CreatureControl control;
@@ -46,7 +47,6 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public Creature(ItemType type) {
         super(type);
-        this.animation = new CreatureAnimation(getDir());
         this.animationPos = new CreatureAnimationPos();
         this.inventory = new Inventory(this);
     }
@@ -107,7 +107,24 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public Coords getCenter() {
-        return getCenter(pos);
+        Coords middlePoint = getTranslatedMiddlePos(pos);
+        if (middlePoint != null) {
+            return middlePoint;
+        } else {
+            return getCenterFrom(pos);
+        }
+    }
+
+    private Coords getTranslatedMiddlePos(Coords pos) {
+        Coords middlePoint = getMiddlePoint();
+        if (middlePoint == null) return null;
+        tempCenterBottom.level = pos.level;
+        tempCenterBottom.setLocation(pos.getLocation());
+        tempCenterBottom.x = 0;
+        tempCenterBottom.y = 0;
+        tempCenterBottom.add(pos);
+        tempCenterBottom.add(middlePoint);
+        return tempCenterBottom;
     }
 
     @Override
@@ -115,25 +132,55 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         return getCenter();
     }
 
-    public Coords getCenter(Coords pos) {
+    public Coords getCenterFrom(Coords pos) {
+        Coords middlePoint = getMiddlePoint();
+        if (middlePoint != null) {
+             return getTranslatedMiddlePos(pos);
+        } else {
+            return getImageBasedCenter(pos);
+        }
+    }
+
+    private Coords getImageBasedCenter(Coords pos) {
         ResolutionImage image = getImage();
         if (image == null) return this.pos;
         double width = image.getWidth() / Sizes.getMeter();
         double height = image.getHeight() / Sizes.getMeter();
-        centerBottom.x = pos.x + width/2;
-        centerBottom.y = pos.y + height;
-        centerBottom.level = pos.level;
-        return centerBottom;
+        tempCenterBottom.x = pos.x + width/2;
+        tempCenterBottom.y = pos.y + height;
+        tempCenterBottom.level = pos.level;
+        return tempCenterBottom;
     }
 
-    public Coords reverseCenterBottomPos(double x, double y, int level, Location location) {
+    public Coords getReversedCenter(double x, double y, int level, Location location) {
+        Coords middlePointBasedReversedCenterPos = getMiddlePointBasedReversedCenterPos(x, y, level, location);
+        if (middlePointBasedReversedCenterPos != null) {
+            return middlePointBasedReversedCenterPos;
+        } else {
+            return getImageBasedReversedCenterPos(x, y, level, location);
+        }
+
+    }
+
+    private Coords getMiddlePointBasedReversedCenterPos(double x, double y, int level, Location location) {
+        Coords middlePoint = getMiddlePoint();
+        if (middlePoint == null) return null;
+        tempReversedCenterBottom.x = x;
+        tempReversedCenterBottom.y = y;
+        tempReversedCenterBottom.subtract(middlePoint);
+        tempReversedCenterBottom.level = level;
+        tempReversedCenterBottom.setLocation(location);
+        return tempReversedCenterBottom;
+    }
+
+    private Coords getImageBasedReversedCenterPos(double x, double y, int level, Location location) {
         double width = getImage().getWidth() / Sizes.getMeter();
         double height = getImage().getHeight() / Sizes.getMeter();
-        reversedCenterBottom.x = x - width/2;
-        reversedCenterBottom.y = y - height;
-        reversedCenterBottom.level = level;
-        reversedCenterBottom.setLocation(location);
-        return reversedCenterBottom;
+        tempReversedCenterBottom.x = x - width/2;
+        tempReversedCenterBottom.y = y - height;
+        tempReversedCenterBottom.level = level;
+        tempReversedCenterBottom.setLocation(location);
+        return tempReversedCenterBottom;
     }
 
     public double reverseCenterBottomPosX(double x) {
@@ -148,8 +195,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         return y;
     }
 
-    public Coords reverseCenterBottomPos(Coords difPos) {
-        return reverseCenterBottomPos(difPos.x, difPos.y, difPos.level, difPos.getLocation());
+    public Coords getReversedCenter(Coords difPos) {
+        return getReversedCenter(difPos.x, difPos.y, difPos.level, difPos.getLocation());
     }
 
     public void onFirstAction(PosItem pi) {
@@ -258,6 +305,28 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    public Coords getIndividualMiddlePoint() {
+        return middlePoint;
+    }
+
+    public Coords getMiddlePoint() {
+        if (middlePoint == null) {
+            if (isThisPrototype()) {
+                return middlePoint;
+            } else if (prototype.getMiddlePoint() == null) {
+                return getCenter();
+            } else {
+                return prototype.getMiddlePoint();
+            }
+        } else {
+            return middlePoint;
+        }
+    }
+
+    public void setMiddlePoint(Coords middlePoint) {
+        this.middlePoint = middlePoint;
     }
 
     public Map<InventoryPlaceType, List<Coords>> getInventoryPlaces() {
@@ -397,11 +466,16 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public CreatureAnimation getAnimation() {
+        CreatureAnimation animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            animation = new CreatureAnimation(getDir());
+        }
+        return animation;
     }
 
     @Override
@@ -427,7 +501,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public void changeLocation(Location from, Coords exit) {
         super.changeLocation(from, exit);
-        Coords reversed = reverseCenterBottomPos(exit);
+        Coords reversed = getReversedCenter(exit);
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;
         this.pos.level = reversed.level;
@@ -454,7 +528,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         double widthPieces = discoveredFog.get(0).size();
         double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
         double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
-        Coords nextPieceCenterPos = TEMP;
+        Coords nextPieceCenterPos = TEMP_NEXT_FOG_PIECE_CENTER_POS;
         Controller controller = getController();
         if (controller == null) return;
         Fog fog = controller.getFog();
@@ -522,6 +596,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
         out.writeObject(task);
 
+        out.writeObject(middlePoint);
+
         out.writeObject(inventory);
 
         out.writeObject(size);
@@ -549,6 +625,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         Task readTask = (Task) in.readObject();
         task.setDest(readTask.getDest());
         task.setItem(this, readTask.getItem());
+
+        middlePoint = (Coords) in.readObject();
 
         inventory = (Inventory) in.readObject();
 

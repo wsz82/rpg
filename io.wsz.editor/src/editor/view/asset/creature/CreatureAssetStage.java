@@ -5,6 +5,8 @@ import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.asset.ItemsStage;
+import editor.view.asset.coords.CoordsPointEditStage;
+import editor.view.asset.coords.PointSetter;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.*;
@@ -30,6 +32,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private final ChoiceBox<CreatureSize> sizeCB = new ChoiceBox<>();
     private final ChoiceBox<CreatureControl> controlCB = new ChoiceBox<>();
+    private final Button middlePointButton = new Button("Middle point");
     private final DoubleField speedInput = new DoubleField(isContent);
     private final DoubleField rangeInput = new DoubleField(isContent);
     private final DoubleField visionRangeInput = new DoubleField(isContent);
@@ -84,6 +87,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         ObservableList<CreatureSize> sizes = FXCollections.observableArrayList();
         sizes.addAll(Arrays.asList(CreatureSize.values()));
         sizeCB.setItems(sizes);
+
         ObservableList<CreatureControl> controls = FXCollections.observableArrayList();
         controls.addAll(Arrays.asList(CreatureControl.values()));
         controlCB.setItems(controls);
@@ -93,22 +97,46 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             controls.add(null);
         }
 
-        container.getChildren().addAll(sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox);
+        container.getChildren().addAll(middlePointButton, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox, itemsButton);
 
-        if (item != null) {
-            container.getChildren().add(itemsButton);
-            hookUpItemsEditEvents();
-            if (!isContent) {
+        if (!isContent) {
+            if (item != null) {
                 container.getChildren().add(inventoryPlacesButton);
                 hookUpInventoryPlacesEditEvents();
             }
         }
 
+        hookUpMiddlePointEditEvents();
+        hookUpItemsEditEvents();
+
         fillInputs();
+    }
+
+    private void hookUpMiddlePointEditEvents() {
+        middlePointButton.setOnAction(e -> {
+            openMiddlePointEdit();
+        });
+    }
+
+    private void openMiddlePointEdit() {
+        ResolutionImage initialImage = item.getInitialImage();
+        if (initialImage == null) {
+            return;
+        }
+        Image background = initialImage.getFxImage();
+        if (background == null) {
+            return;
+        }
+        Coords middlePoint = item.getIndividualMiddlePoint();
+        PointSetter pointSetter = item::setMiddlePoint;
+        CoordsPointEditStage<Creature> middlePointEdit = new CoordsPointEditStage<>(this, item, middlePoint, background, pointSetter);
+        middlePointEdit.initWindow(false, "Middle point edit");
+        middlePointEdit.show();
     }
 
     private void hookUpInventoryPlacesEditEvents() {
         inventoryPlacesButton.setOnAction(e -> {
+            if (item.getPath() == null) return;
             Map<InventoryPlaceType, List<Coords>> inventoryPlaces = item.getInventory().getInventoryPlaces();
             if (inventoryPlaces == null) {
                 inventoryPlaces = new HashMap<>(0);

@@ -6,12 +6,12 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class CoordsPointEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
+    private final PointSetter pointSetter;
 
-    public CoordsPointEditStage(Stage parent, A item, Coords interactionPoint, Image background) {
+    public CoordsPointEditStage(Stage parent, A item, Coords point, Image background, PointSetter pointSetter) {
         super(parent, item, background);
-        if (interactionPoint != null) {
-            coordsList.add(interactionPoint);
-        }
+        this.pointSetter = pointSetter;
+        coordsList.add(point);
     }
 
     @Override
@@ -38,9 +38,10 @@ public class CoordsPointEditStage<A extends PosItem> extends CoordsShapeEditStag
     @Override
     protected void saveShape() {
         if (!coordsList.isEmpty() && coordsList.get(0) != null) {
-            item.setInteractionCoords(coordsList.get(0).clonePos());
+            Coords point = coordsList.get(0);
+            pointSetter.set(point);
         } else {
-            item.setInteractionCoords(null);
+            pointSetter.set(null);
         }
         close();
     }

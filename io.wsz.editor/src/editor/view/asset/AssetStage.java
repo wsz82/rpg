@@ -5,6 +5,7 @@ import editor.view.DoubleField;
 import editor.view.asset.coords.CoordsLineEditStage;
 import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.CoordsPolygonsEditStage;
+import editor.view.asset.coords.PointSetter;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
@@ -189,12 +190,15 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             alertOfNameExisting();
             return;
         }
-        close();
         addNewAsset();
         defineAsset();
+        close();
     }
 
     protected void defineAsset() {
+        String path = pathLabel.getText();
+        item.setPath(path);
+
         String animationSpeed = animationSpeedInput.getText();
         if (animationSpeed.isEmpty()) {
             item.setAnimationSpeed(null);
@@ -212,8 +216,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (inputFileIsEmpty) {
             return;
         }
-        editAsset();
         defineAsset();
+        close();
     }
 
     private void hookUpAssetEvents() {
@@ -260,7 +264,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         Coords interactionCoords = item.getIndividualInteractionCoords();
-        CoordsPointEditStage interactionEdit = new CoordsPointEditStage(this, item, interactionCoords, background);
+        PointSetter pointSetter = item::setInteractionCoords;
+        CoordsPointEditStage interactionEdit = new CoordsPointEditStage(this, item, interactionCoords, background, pointSetter);
         interactionEdit.initWindow(isContent, "Interaction point edit");
         interactionEdit.show();
     }
@@ -293,12 +298,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item, background);
         collisionEdit.initWindow(isContent, "Collision edit");
         collisionEdit.show();
-    }
-
-    private void editAsset() {
-        String path = pathLabel.getText();
-        item.setPath(path);
-        close();
     }
 
     protected boolean isPathIncorrect(String path) {

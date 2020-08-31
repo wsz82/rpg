@@ -102,6 +102,7 @@ public class EditorCanvas extends Canvas {
             double y = (translated.y * meter);
 
             ResolutionImage resolutionImage = pi.getImage();
+            if (resolutionImage == null) continue;
             double width = resolutionImage.getWidth();
             double height = resolutionImage.getHeight();
 
