@@ -17,9 +17,9 @@ import java.util.Iterator;
 import static io.wsz.model.sizes.Sizes.CONSTANT_METER;
 
 public class ResolutionImage {
-    private final Image fxImage;
-    private final double width;
-    private final double height;
+    private Image fxImage;
+    private double width;
+    private double height;
 
     private static File getCheckedFile(String path) {
         if (path.isEmpty()) {
@@ -148,11 +148,23 @@ public class ResolutionImage {
         return fxImage;
     }
 
+    public void setFxImage(Image fxImage) {
+        this.fxImage = fxImage;
+    }
+
     public double getWidth() {
         return width;
     }
 
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
     public double getHeight() {
         return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
     }
 }

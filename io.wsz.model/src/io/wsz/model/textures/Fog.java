@@ -21,7 +21,10 @@ public class Fog {
     public void initAllFogs(File programDir) {
         String programFogDir = programDir + TEXTURES_DIR + FOG_DIR;
         File file = new File(programFogDir);
-        fogs = getFogImages(file);
+        if (fogs == null) {
+            fogs = new ArrayList<>(0);
+        }
+        updateFogImages(file);
     }
 
     public ResolutionImage getRandomFog() {
@@ -30,18 +33,22 @@ public class Fog {
         return fogs.get(randomIndex);
     }
 
-    private List<ResolutionImage> getFogImages(File framesDir) {
+    private void updateFogImages(File framesDir) {
         File[] imagesFiles = framesDir.listFiles(f -> f.getName().endsWith(PNG));
-        if (imagesFiles == null || imagesFiles.length == 0) return null;
-        List<ResolutionImage> images = new ArrayList<>(0);
-        for (File imageFile : imagesFiles) {
+        if (imagesFiles == null || imagesFiles.length == 0) return;
+        for (int i = 0; i < imagesFiles.length; i++) {
+            File imageFile = imagesFiles[i];
             ResolutionImage loadedFrame = new ResolutionImage(imageFile);
-            if (fogSize == 0) {
-                fogSize = loadedFrame.getWidth() / Sizes.getMeter();
+            if (i < fogs.size()) {
+                ResolutionImage actualResolutionImage = fogs.get(i);
+                actualResolutionImage.setFxImage(loadedFrame.getFxImage());
+                actualResolutionImage.setWidth(loadedFrame.getWidth());
+                actualResolutionImage.setHeight(loadedFrame.getHeight());
+            } else {
+                fogs.add(loadedFrame);
             }
-            images.add(loadedFrame);
+            fogSize = loadedFrame.getWidth() / Sizes.getMeter();
         }
-        return images;
     }
 
     public double getFogSize() {
