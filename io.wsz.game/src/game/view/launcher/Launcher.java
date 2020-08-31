@@ -22,7 +22,7 @@ class Launcher {
     }
 
     private void restorePluginMemento(GameController gameController) {
-        gameController.restoreLastPlugin();
+        gameController.restoreLastPluginMetadata();
     }
 
     private void initLauncher(GameController gameController) {

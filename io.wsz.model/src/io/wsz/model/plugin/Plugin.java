@@ -12,37 +12,10 @@ import java.io.ObjectOutput;
 public class Plugin implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-    private boolean active;
-    private boolean isStartingLocation;
     private Coords startPos;
     private World world;
 
     public Plugin() {}
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isStartingLocation() {
-        return isStartingLocation;
-    }
-
-    public void setStartingLocation(boolean startingLocation) {
-        isStartingLocation = startingLocation;
-    }
 
     public Coords getStartPos() {
         return startPos;
@@ -64,12 +37,6 @@ public class Plugin implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name);
-
-        out.writeBoolean(active);
-
-        out.writeBoolean(isStartingLocation);
-
         out.writeObject(startPos);
 
         out.writeObject(world);
@@ -78,12 +45,6 @@ public class Plugin implements Externalizable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
-
-        name = in.readUTF();
-
-        active = in.readBoolean();
-
-        isStartingLocation = in.readBoolean();
 
         startPos = (Coords) in.readObject();
 

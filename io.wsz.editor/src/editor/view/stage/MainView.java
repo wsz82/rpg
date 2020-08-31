@@ -14,13 +14,14 @@ import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.Paths;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -276,22 +277,21 @@ class MainView {
     }
 
     private void saveAsFile() {
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save plugin");
-        File programDir = editorController.getController().getProgramDir();
-        fileChooser.setInitialDirectory(programDir);
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Plugin file", "*.rpg")
-        );
-        final File saveFile = fileChooser.showSaveDialog(mainStage);
+        final DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Save plugin");
+        String initPath = editorController.getController().getProgramDir() + Paths.PLUGINS_DIR;
+        File initDir = new File(initPath);
+        dirChooser.setInitialDirectory(initDir);
+        final File saveFile = dirChooser.showDialog(mainStage);
         if (saveFile == null) {
             return;
         }
-        editorController.savePluginAs(saveFile.getName(), pss);
+        String name = saveFile.getName();
+        editorController.savePluginAs(name, pss);
     }
 
     private void saveFile() {
-        if (editorController.getController().getModel().getActivePlugin() != null) {
+        if (editorController.getController().getModel().getActivePluginMetadata() != null) {
             editorController.saveActivePlugin(pss);
         } else {
             saveAsFile();

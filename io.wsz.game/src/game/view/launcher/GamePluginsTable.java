@@ -2,7 +2,7 @@ package game.view.launcher;
 
 import game.model.GameController;
 import io.wsz.model.Controller;
-import io.wsz.model.plugin.Plugin;
+import io.wsz.model.plugin.PluginMetadata;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,15 +18,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class GamePluginsTable extends Stage {
-    private final ChoiceBox<Plugin> activePluginCB = new ChoiceBox<>();
-    private final ObservableList<Plugin> pluginList = FXCollections.observableArrayList();
+    private final ChoiceBox<PluginMetadata> activePluginCB = new ChoiceBox<>();
+    private final ObservableList<PluginMetadata> metadatas = FXCollections.observableArrayList();
     private final GameController gameController;
     private final Controller controller;
 
@@ -34,7 +31,8 @@ public class GamePluginsTable extends Stage {
         super(StageStyle.UTILITY);
         this.gameController = gameController;
         controller = gameController.getController();
-        pluginList.addAll(getPlugins());
+        List<PluginMetadata> pluginMetadatas = controller.getPluginMetadatas();
+        metadatas.addAll(pluginMetadatas);
         initWindow();
     }
 
@@ -43,9 +41,9 @@ public class GamePluginsTable extends Stage {
         final VBox container = new VBox(10);
         container.setPadding(new Insets(10));
 
-        final TableView<Plugin> table = new TableView<>();
-        final TableColumn<Plugin, String> nameCol = new TableColumn<>("Name");
-        final TableColumn<Plugin, Boolean> startCol = new TableColumn<>("Starting");
+        final TableView<PluginMetadata> table = new TableView<>();
+        final TableColumn<PluginMetadata, String> nameCol = new TableColumn<>("Name");
+        final TableColumn<PluginMetadata, Boolean> startCol = new TableColumn<>("Starting");
 
         final HBox activePluginBox = new HBox(5);
         activePluginBox.setAlignment(Pos.CENTER);
@@ -75,20 +73,17 @@ public class GamePluginsTable extends Stage {
         cancel.setCancelButton(true);
         cancel.setOnAction(event -> close());
         ok.setDefaultButton(true);
-        ok.setOnAction(event -> setActivePlugin());
+        ok.setOnAction(event -> setActivePluginMetadata());
     }
 
-    private void setActivePlugin() {
-        Plugin pluginToActivate = activePluginCB.getValue();
-        if (pluginToActivate == null) {
+    private void setActivePluginMetadata() {
+        PluginMetadata pluginMetadataToActivate = activePluginCB.getValue();
+        if (pluginMetadataToActivate == null) {
             alertNoPluginToActivate();
             return;
         }
-        String pluginToActivateName = pluginToActivate.getName();
-        Plugin plugin = controller.loadPlugin(pluginToActivateName);
-        if (plugin == null) return;
-        controller.getModel().setActivePlugin(plugin);
-        gameController.storeLastPlugin(plugin);
+        controller.getModel().setActivePluginMetadata(pluginMetadataToActivate);
+        gameController.storeLastPluginName(pluginMetadataToActivate);
         close();
     }
 
@@ -100,49 +95,56 @@ public class GamePluginsTable extends Stage {
                 .ifPresent(r -> alert.close());
     }
 
-    private void setUpChoiceBox(ChoiceBox<Plugin> activePluginCB) {
-        if (pluginList.isEmpty()) {
+    private void setUpChoiceBox(ChoiceBox<PluginMetadata> activePluginMetadataCB) {
+        if (metadatas.isEmpty()) {
             return;
         }
-        FilteredList<Plugin> startingPlugins = new FilteredList<>(pluginList);
-        startingPlugins.setPredicate(p -> p.isStartingLocation());
-        activePluginCB.setItems(startingPlugins);
-        activePluginCB.setConverter(new StringConverter<>() {
+        FilteredList<PluginMetadata> startingPlugins = new FilteredList<>(metadatas);
+        startingPlugins.setPredicate(PluginMetadata::isStartingLocation);
+        activePluginMetadataCB.setItems(startingPlugins);
+        activePluginMetadataCB.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Plugin p) {
-                return p.getName();
+            public String toString(PluginMetadata metadata) {
+                if (metadata == null) {
+                    return null;
+                } else {
+                    return metadata.getPluginName();
+                }
             }
 
             @Override
-            public Plugin fromString(String s) {
-                List<Plugin> singlePlugin = pluginList.stream()
-                        .filter(p -> p.getName().equals(s))
-                        .collect(Collectors.toList());
-                return singlePlugin.get(0);
+            public PluginMetadata fromString(String s) {
+                return getPluginMetadata(s);
             }
         });
-        Plugin active = controller.getActivePlugin();
+        PluginMetadata active = controller.getModel().getActivePluginMetadata();
         if (active != null) {
-            String name = active.getName();
-            List<Plugin> singlePlugin = pluginList.stream()
-                    .filter(p -> p.getName().equals(name))
-                    .collect(Collectors.toList());
-            activePluginCB.setValue(singlePlugin.get(0));
+            String name = active.getPluginName();
+            activePluginMetadataCB.setValue(getPluginMetadata(name));
         }
     }
 
-    private void setUpTable(
-            TableView<Plugin> table, TableColumn<Plugin, String> nameCol, TableColumn<Plugin, Boolean> startCol) {
+    private PluginMetadata getPluginMetadata(String s) {
+        Optional<PluginMetadata> optMetadata = metadatas.stream()
+                .filter(p -> p.getPluginName().equals(s))
+                .findFirst();
+        return optMetadata.orElse(null);
+    }
 
-        if (pluginList.isEmpty()) {
+    private void setUpTable(
+            TableView<PluginMetadata> table,
+            TableColumn<PluginMetadata, String> nameCol,
+            TableColumn<PluginMetadata, Boolean> startCol) {
+
+        if (metadatas.isEmpty()) {
             return;
         }
-        table.setItems(pluginList);
+        table.setItems(metadatas);
 
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getName();
+                return param.getValue().getPluginName();
             }
         });
 
@@ -153,20 +155,8 @@ public class GamePluginsTable extends Stage {
             }
         });
 
-        ObservableList<TableColumn<Plugin, ?>> columns = table.getColumns();
+        ObservableList<TableColumn<PluginMetadata, ?>> columns = table.getColumns();
         columns.add(0, nameCol);
         columns.add(1, startCol);
-    }
-
-    public List<Plugin> getPlugins() {
-        File programDir = controller.getProgramDir();
-        File[] files = programDir.listFiles((dir, name) -> name.endsWith(".rpg"));
-        List<Plugin> plugins = new ArrayList<>(0);
-        for (File file : Objects.requireNonNull(files)) {
-            Plugin p = controller.loadPluginMetadata(file.getName());
-            if (p == null) continue;
-            plugins.add(p);
-        }
-        return plugins;
     }
 }

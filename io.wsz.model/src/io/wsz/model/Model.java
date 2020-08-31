@@ -3,8 +3,10 @@ package io.wsz.model;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.plugin.Plugin;
+import io.wsz.model.plugin.PluginMetadata;
 
 public class Model {
+    private PluginMetadata activePluginMetadata;
     private Plugin activePlugin;
     private CurrentLocation currentLocation;
     private CurrentLayer currentLayer;
@@ -20,6 +22,14 @@ public class Model {
 
     public void setActivePlugin(Plugin activePlugin) {
         this.activePlugin = activePlugin;
+    }
+
+    public PluginMetadata getActivePluginMetadata() {
+        return activePluginMetadata;
+    }
+
+    public void setActivePluginMetadata(PluginMetadata activePluginMetadata) {
+        this.activePluginMetadata = activePluginMetadata;
     }
 
     public CurrentLocation getCurrentLocation() {

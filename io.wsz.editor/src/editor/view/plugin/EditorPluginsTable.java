@@ -2,7 +2,7 @@ package editor.view.plugin;
 
 import editor.model.EditorController;
 import io.wsz.model.Controller;
-import io.wsz.model.plugin.Plugin;
+import io.wsz.model.plugin.PluginMetadata;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,14 +16,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class EditorPluginsTable extends Stage {
-    private final ObservableList<Plugin> pluginList = FXCollections.observableArrayList();
-    private final TableView<Plugin> table = new TableView<>();
+    private final ObservableList<PluginMetadata> metadatas = FXCollections.observableArrayList();
+    private final TableView<PluginMetadata> table = new TableView<>();
     private final PluginSettingsStage pss;
     private final EditorController editorController;
     private final Controller controller;
@@ -33,7 +30,8 @@ public class EditorPluginsTable extends Stage {
         this.pss = pss;
         this.editorController = editorController;
         controller = editorController.getController();
-        pluginList.addAll(getPlugins());
+        List<PluginMetadata> pluginMetadata = controller.getPluginMetadatas();
+        metadatas.addAll(pluginMetadata);
         initWindow();
     }
 
@@ -42,8 +40,8 @@ public class EditorPluginsTable extends Stage {
         final VBox container = new VBox(10);
         container.setPadding(new Insets(10));
 
-        final TableColumn<Plugin, String> nameCol = new TableColumn<>("Name");
-        final TableColumn<Plugin, Boolean> startCol = new TableColumn<>("Starting");
+        final TableColumn<PluginMetadata, String> nameCol = new TableColumn<>("Name");
+        final TableColumn<PluginMetadata, Boolean> startCol = new TableColumn<>("Starting");
 
         final HBox buttons = new HBox(5);
         buttons.setAlignment(Pos.CENTER);
@@ -68,9 +66,9 @@ public class EditorPluginsTable extends Stage {
     }
 
     private void setUpActivePluginText(Label activePluginName) {
-        Plugin active = controller.getActivePlugin();
+        PluginMetadata active = controller.getModel().getActivePluginMetadata();
         if (active != null) {
-            activePluginName.setText(active.getName());
+            activePluginName.setText(active.getPluginName());
         }
     }
 
@@ -82,12 +80,12 @@ public class EditorPluginsTable extends Stage {
     }
 
     private void loadPlugin() {
-        Plugin plugin = table.getSelectionModel().getSelectedItem();
-        if (plugin == null) {
+        PluginMetadata metadata = table.getSelectionModel().getSelectedItem();
+        if (metadata == null) {
             alertNoPluginChosen();
             return;
         }
-        editorController.loadAndRestorePlugin(plugin.getName(), pss);
+        editorController.loadAndRestorePlugin(metadata, pss);
         close();
     }
 
@@ -100,17 +98,19 @@ public class EditorPluginsTable extends Stage {
     }
 
     private void setUpTable(
-            TableView<Plugin> table, TableColumn<Plugin, String> nameCol, TableColumn<Plugin, Boolean> startCol) {
+            TableView<PluginMetadata> table,
+            TableColumn<PluginMetadata, String> nameCol,
+            TableColumn<PluginMetadata, Boolean> startCol) {
 
-        if (pluginList.isEmpty()) {
+        if (metadatas.isEmpty()) {
             return;
         }
-        table.setItems(pluginList);
+        table.setItems(metadatas);
 
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getName();
+                return param.getValue().getPluginName();
             }
         });
 
@@ -121,20 +121,8 @@ public class EditorPluginsTable extends Stage {
             }
         });
 
-        ObservableList<TableColumn<Plugin, ?>> columns = table.getColumns();
+        ObservableList<TableColumn<PluginMetadata, ?>> columns = table.getColumns();
         columns.add(0, nameCol);
         columns.add(1, startCol);
-    }
-
-    public List<Plugin> getPlugins() {
-        File programDir = controller.getProgramDir();
-        File[] pluginsFiles = programDir.listFiles((dir, name) -> name.endsWith(".rpg"));
-        List<Plugin> plugins = new ArrayList<>(0);
-        for (File file : Objects.requireNonNull(pluginsFiles)) {
-            Plugin p = controller.loadPluginMetadata(file.getName());
-            if (p == null) continue;
-            plugins.add(p);
-        }
-        return plugins;
     }
 }

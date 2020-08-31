@@ -21,6 +21,8 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
+import io.wsz.model.plugin.PluginCaretaker;
+import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.world.World;
@@ -49,7 +51,7 @@ public class GameController {
     }
 
     public boolean startGame(SaveMemento memento) {
-        if (controller.getModel().getActivePlugin() == null) {
+        if (controller.getModel().getActivePluginMetadata() == null) {
             return false;
         }
         if (gameRunner == null) {
@@ -64,21 +66,20 @@ public class GameController {
         gameRunner.resumeGame();
     }
 
-    public void restoreLastPlugin() {
+    public void restoreLastPluginMetadata() {
         File programDir = controller.getProgramDir();
         LastPluginCaretaker lpc = new LastPluginCaretaker(programDir);
         String lastPluginName = lpc.loadMemento();
-        Plugin loadedPlugin = controller.loadPlugin(lastPluginName);
-        if (loadedPlugin == null) return;
-        if (loadedPlugin.getWorld().getLocations() != null) {
-            controller.getModel().setActivePlugin(loadedPlugin);
-        }
+        PluginMetadata loadedMetadata = controller.loadPluginMetadata(lastPluginName);
+        if (loadedMetadata == null) return;
+        controller.getModel().setActivePluginMetadata(loadedMetadata);
     }
 
-    public void storeLastPlugin(Plugin p) {
+    public void storeLastPluginName(PluginMetadata metadata) {
         File programDir = controller.getProgramDir();
         LastPluginCaretaker pc = new LastPluginCaretaker(programDir);
-        pc.saveMemento(p.getName());
+        String pluginName = metadata.getPluginName();
+        pc.saveMemento(pluginName);
     }
 
 
@@ -185,14 +186,22 @@ public class GameController {
 
     public void restoreSaveMemento(SaveMemento m) {
         List<Location> locations = m.getLocations();
-        World world = controller.getModel().getActivePlugin().getWorld();
+
+        Model model = controller.getModel();
+        Plugin activePlugin = model.getActivePlugin();
+        if (activePlugin == null) {
+            activePlugin = getLoadedPluginFromMetadata(model);
+            model.setActivePlugin(activePlugin);
+        }
+        if (activePlugin == null) return;
+        World world = activePlugin.getWorld();
         world.setLocations(locations);
 
         Coords lastPos = m.getLastPos();
         restorePluginReferences(world, lastPos);
     }
 
-    void restorePluginReferences(World world, Coords lastPos) {
+    private void restorePluginReferences(World world, Coords lastPos) {
         restoreStartLocationAndLayer(lastPos);
 
         List<Asset> assets = world.getAssets();
@@ -201,26 +210,25 @@ public class GameController {
         List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
         List<Dialog> dialogs = world.getDialogs();
         controller.restoreItemsReferences(assets, locations, inventoryPlaces, equipmentTypes, dialogs);
-
-        assignControllerToPrototypes(controller, assets);
-    }
-
-    private void assignControllerToPrototypes(Controller controller, List<Asset> assets) {
-        for (Asset asset : assets) {
-            ((PosItem) asset).setController(controller);
-        }
     }
 
     public void restoreActivePlugin() {
         Model model = controller.getModel();
-        Plugin activePlugin = model.getActivePlugin();
-        if (activePlugin == null) {
-            return;
-        }
-        World world = activePlugin.getWorld();
-        Coords startPos = activePlugin.getStartPos();
+        Plugin plugin = getLoadedPluginFromMetadata(model);
+        if (plugin == null) return;
+        model.setActivePlugin(plugin);
+        World world = plugin.getWorld();
+        Coords startPos = plugin.getStartPos();
 
         restorePluginReferences(world, startPos);
+    }
+
+    private Plugin getLoadedPluginFromMetadata(Model model) {
+        PluginMetadata metadata = model.getActivePluginMetadata();
+        if (metadata == null) return null;
+        String pluginName = metadata.getPluginName();
+        PluginCaretaker caretaker = new PluginCaretaker(controller.getProgramDir());
+        return caretaker.deserialize(pluginName);
     }
 
     private void restoreStartLocationAndLayer(Coords startPos) {

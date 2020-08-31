@@ -229,7 +229,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     public void setUpDirChooser(String title, Label label) {
-        DirectoryChooser dirChooser = new DirectoryChooser();
+        final DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
         dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
         File selectedFile = dirChooser.showDialog(this);

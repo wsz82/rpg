@@ -9,7 +9,8 @@ import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
-import io.wsz.model.plugin.PluginCaretaker;
+import io.wsz.model.plugin.PluginMetadata;
+import io.wsz.model.plugin.PluginMetadataCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.textures.Fog;
@@ -44,12 +45,12 @@ public class Controller {
         this.programDir = programDir;
     }
 
-    public Plugin loadPlugin(String pluginName) {
+    public PluginMetadata loadPluginMetadata(String pluginName) {
         if (pluginName == null) {
-            return new Plugin();
+            return new PluginMetadata();
         }
-        PluginCaretaker pc = new PluginCaretaker(programDir);
-        return pc.load(pluginName);
+        PluginMetadataCaretaker pc = new PluginMetadataCaretaker(programDir);
+        return pc.deserialize(pluginName);
     }
 
     public void restoreItemsReferences(List<Asset> assets,
@@ -59,6 +60,11 @@ public class Controller {
                                        List<Dialog> dialogs) {
         for (Asset a : getAssets()) {
             restoreItemReferences(a, dialogs, equipmentTypes, inventoryPlaces);
+
+            if (a instanceof PosItem) {
+                PosItem pi = (PosItem) a;
+                pi.setController(this);
+            }
         }
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
@@ -69,7 +75,7 @@ public class Controller {
         }
     }
 
-    void restorePrototype(List<Asset> assets, PosItem pi) {
+    private void restorePrototype(List<Asset> assets, PosItem pi) {
         PosItem prototype = pi.getPrototype();
         if (prototype != null) {
             String prototypeName = prototype.getName();
@@ -227,9 +233,9 @@ public class Controller {
         this.posToCenter.setLocation(posToCenter.getLocation());
     }
 
-    public Plugin loadPluginMetadata(String name) {
-        PluginCaretaker pc = new PluginCaretaker(programDir);
-        return pc.getPluginMetadata(name);
+    public List<PluginMetadata> getPluginMetadatas() {
+        PluginMetadataCaretaker caretaker = new PluginMetadataCaretaker(programDir);
+        return caretaker.getMetadatas();
     }
 
 
@@ -321,7 +327,9 @@ public class Controller {
     }
 
     public void clearResizablePictures() {
-        getAssets().stream()
+        List<Asset> assets = getAssets();
+        if (assets == null || assets.isEmpty()) return;
+        assets.stream()
                 .filter(a -> a instanceof Creature)
                 .forEach(a -> ((Creature) a).getAnimation().clearResizablePictures());
     }
@@ -357,11 +365,15 @@ public class Controller {
     }
 
     public List<Location> getLocations() {
-        return model.getActivePlugin().getWorld().getLocations();
+        Plugin activePlugin = model.getActivePlugin();
+        if (activePlugin == null) return null;
+        return activePlugin.getWorld().getLocations();
     }
 
     public List<Asset> getAssets() {
-        return model.getActivePlugin().getWorld().getAssets();
+        Plugin activePlugin = model.getActivePlugin();
+        if (activePlugin == null) return null;
+        return activePlugin.getWorld().getAssets();
     }
 
     public CurrentLocation getCurrentLocation() {

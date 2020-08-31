@@ -1,5 +1,7 @@
 package io.wsz.model.plugin;
 
+import io.wsz.model.sizes.Paths;
+
 import java.io.*;
 
 public class PluginCaretaker {
@@ -9,17 +11,10 @@ public class PluginCaretaker {
         this.programDir = programDir;
     }
 
-    public void save(Plugin plugin) {
-        serializePlugin(plugin);
-    }
-
-    public void saveAs(Plugin plugin) {
-        serializePlugin(plugin);
-    }
-
-    private void serializePlugin(Plugin plugin) {
+    public void serialize(Plugin plugin, String pluginName) {
+        String pluginDir = File.separator + pluginName;
         try (
-                FileOutputStream fos = new FileOutputStream(programDir + File.separator + plugin.getName());
+                FileOutputStream fos = new FileOutputStream(programDir + Paths.PLUGINS_DIR + pluginDir + Paths.PLUGIN_DIR);
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(plugin);
@@ -28,33 +23,14 @@ public class PluginCaretaker {
         }
     }
 
-    public Plugin load(String name) {
-        return deserializeAll(name);
-    }
-
-    private Plugin deserializeAll(String name) {
+    public Plugin deserialize(String pluginName) {
+        String pluginDir = File.separator + pluginName;
         Plugin p;
         try (
-            FileInputStream fos = new FileInputStream(programDir + File.separator + name);
+            FileInputStream fos = new FileInputStream(programDir + Paths.PLUGINS_DIR + pluginDir + Paths.PLUGIN_DIR);
             ObjectInputStream oos = new ObjectInputStream(fos)
         ){
             p = (Plugin) oos.readObject();
-            p.setName(name);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return p;
-    }
-
-    public Plugin getPluginMetadata(String name) {
-        Plugin p;
-        try (
-                FileInputStream fos = new FileInputStream(programDir + File.separator + name);
-                ObjectInputStream oos = new ObjectInputStream(fos)
-        ){
-            p = (Plugin) oos.readObject();
-            p.setName(name);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

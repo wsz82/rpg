@@ -103,7 +103,7 @@ public class GameStage extends Stage {
     }
 
     private void startNewGame() {
-        gameController.restoreLastPlugin();
+        gameController.restoreLastPluginMetadata();
         startGame(null);
     }
 

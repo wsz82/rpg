@@ -3,6 +3,13 @@ package io.wsz.model.sizes;
 import java.io.File;
 
 public class Paths {
+    public static final String PLUGINS = "plugins";
+    public static final String PLUGINS_DIR = File.separator + PLUGINS;
+    public static final String PLUGIN = "plugin";
+    public static final String PLUGIN_DIR = File.separator + PLUGIN;
+    public static final String METADATA = "metadata";
+    public static final String METADATA_DIR = File.separator + METADATA;
+
     public static final String DIVIDER = "_";
     public static final String ASSETS_DIR = File.separator + "assets";
     public static final String TEXTURES_DIR = File.separator + "textures";
