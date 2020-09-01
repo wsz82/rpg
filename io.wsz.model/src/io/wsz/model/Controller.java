@@ -276,7 +276,7 @@ public class Controller {
     }
 
     public void setAsking(PosItem asking) {
-        initDialogMementoIfNull();
+        initDialogMementoIfIsNull();
         this.dialogMemento.setAsking(asking);
     }
 
@@ -289,11 +289,11 @@ public class Controller {
     }
 
     public void setAnswering(PosItem answering) {
-        initDialogMementoIfNull();
+        initDialogMementoIfIsNull();
         this.dialogMemento.setAnswering(answering);
     }
 
-    private void initDialogMementoIfNull() {
+    private void initDialogMementoIfIsNull() {
         if (dialogMemento == null) {
             ArrayList<DialogItem> dialogs = new ArrayList<>(0);
             dialogMemento = new DialogMemento(dialogs);

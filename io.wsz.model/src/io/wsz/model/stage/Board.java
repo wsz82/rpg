@@ -183,6 +183,14 @@ public class Board {
 
         for (PosItem o : items) {
             if (o == i) continue;
+            boolean isDoorAgainstLandscapeChecked = i instanceof Door && o instanceof Landscape;
+            boolean isLandscapeAgainstDoorChecked = i instanceof Landscape && o instanceof Door;
+            boolean isDoorAgainstCoverChecked = i instanceof Door && o instanceof Cover;
+            boolean isCoverAgainstDoorChecked = i instanceof Cover && o instanceof Door;
+            boolean isLandscapeAgainstLandscapeChecked = i instanceof Landscape && o instanceof Landscape;
+            if (isDoorAgainstLandscapeChecked || isLandscapeAgainstDoorChecked
+                    || isDoorAgainstCoverChecked || isCoverAgainstDoorChecked
+                    || isLandscapeAgainstLandscapeChecked) continue;
             List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
             PosItem collision = getCollision(left, right, top, bottom, nextPos, i, iPolygons, o, oPolygons);
             if (collision != null) return collision;
