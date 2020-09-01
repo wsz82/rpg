@@ -45,7 +45,6 @@ public class EditorCanvas extends Canvas {
         this.curPos = controller.getCurPos();
         this.pointer = pointer;
         this.parent = parent;
-        setSize();
         hookUpEvents();
     }
 
@@ -64,7 +63,7 @@ public class EditorCanvas extends Canvas {
 
         List<PosItem> items = controller.getCurrentLocation().getItems();
         items = items.stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
                     double piRight = pi.getRight();
@@ -80,7 +79,6 @@ public class EditorCanvas extends Canvas {
 
         boolean activeContentMarked = false;
         for (PosItem pi : items) {
-
             double itemsOpacity = EditorToolBar.getItemsOpacity();
             if (itemsOpacity != 1) {
                 if (EditorToolBar.isLayerOpacity()) {
@@ -183,42 +181,57 @@ public class EditorCanvas extends Canvas {
         hookUpLocationSizeEvents();
         hookUpClickEvents();
         hookUpItemDragEvents();
+        hookUpMoveItemWithArrowsEvent();
+    }
+
+    private void hookUpMoveItemWithArrowsEvent() {
+        arrowsEvent = e -> {
+            if (pointer.isActive()) {
+                return;
+            }
+            e.consume();
+            if (e.getCode() == KeyCode.DOWN
+                    || e.getCode() == KeyCode.UP
+                    || e.getCode() == KeyCode.RIGHT
+                    || e.getCode() == KeyCode.LEFT) {
+                PosItem active = editorController.getActiveItem();
+                moveContent(e.getCode(), active);
+                contentTableView.refresh();
+                refresh();
+            }
+        };
+        addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
     }
 
     private void hookUpClickEvents() {
-        int meter = Sizes.getMeter();
         setOnMouseClicked(e -> {
             e.consume();
             setFocusTraversable(true);
             requestFocus();
-            try {
-                if (pointer.isActive()) {
-                    attachArrowsEventToPointer();
-                }
-                PosItem pi = null;
-                if (e.getButton().equals(MouseButton.PRIMARY) || e.getButton().equals(MouseButton.SECONDARY)) {
-                    double xPos = e.getX() / meter;
-                    double yPos = e.getY() / meter;
-                    pi = getPosItem(xPos, yPos);
-                }
-                if (pi != null) {
-                    if (e.getButton().equals(MouseButton.PRIMARY)) {
-                        attachArrowsEventToContent(pi);
-                    } else if (e.getButton().equals(MouseButton.SECONDARY)) {
-                        editorController.setActiveItem(pi);
-                        openContextMenu(pi, e);
-                    }
-                } else {
-                    editorController.setActiveItem(null);
-                }
-            } finally {
-                if (((e.getButton().equals(MouseButton.SECONDARY)
-                        || editorController.getActiveItem() == null) && !pointer.isActive())) {
-                    removeArrowsEvent();
-                }
-                refresh();
-            }
+            selectActiveItem(e);
+            refresh();
         });
+    }
+
+    private void selectActiveItem(MouseEvent e) {
+        PosItem selectedItem = null;
+        MouseButton button = e.getButton();
+        boolean isPrimaryButton = button.equals(MouseButton.PRIMARY);
+        boolean isSecondaryButton = button.equals(MouseButton.SECONDARY);
+        if (isPrimaryButton || isSecondaryButton) {
+            int meter = Sizes.getMeter();
+            double xPos = e.getX() / meter;
+            double yPos = e.getY() / meter;
+            selectedItem = getPosItem(xPos, yPos);
+        }
+        if (selectedItem != null && !selectedItem.isBlocked()) {
+            editorController.setActiveItem(selectedItem);
+            if (isSecondaryButton) {
+                openContextMenu(selectedItem, e);
+            }
+        } else {
+            editorController.setActiveItem(null);
+        }
     }
 
     private void hookUpLocationSizeEvents() {
@@ -267,7 +280,7 @@ public class EditorCanvas extends Canvas {
                 double xPos = e.getX() / meter;
                 double yPos = e.getY() / meter;
                 PosItem selectedItem = getPosItem(xPos, yPos);
-                if (selectedItem == null) {
+                if (selectedItem == null || selectedItem.isBlocked()) {
                     return;
                 }
                 draggedItem = selectedItem;
@@ -374,51 +387,9 @@ public class EditorCanvas extends Canvas {
         addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressScreenDrag);
     }
 
-    private void attachArrowsEventToPointer() {
-        removeArrowsEvent();
-        arrowsEvent = e -> {
-            e.consume();
-            if (e.getCode() == KeyCode.DOWN
-                    || e.getCode() == KeyCode.UP
-                    || e.getCode() == KeyCode.RIGHT
-                    || e.getCode() == KeyCode.LEFT) {
-                movePointer(e.getCode());
-                refresh();
-            }
-        };
-        addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-    }
-
-    private void removeArrowsEvent() {
-        if (arrowsEvent != null) {
-            removeEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-        }
-    }
-
-    private void attachArrowsEventToContent(PosItem pi) {
-        editorController.setActiveItem(pi);
-        removeArrowsEvent();
-        arrowsEvent = e -> {
-            if (pointer.isActive()) {
-                return;
-            }
-            e.consume();
-            if (e.getCode() == KeyCode.DOWN
-                    || e.getCode() == KeyCode.UP
-                    || e.getCode() == KeyCode.RIGHT
-                    || e.getCode() == KeyCode.LEFT) {
-                PosItem active = editorController.getActiveItem();
-                moveContent(e.getCode(), active);
-                contentTableView.refresh();
-                refresh();
-            }
-        };
-        addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
-    }
-
     private void hookupItemsEvents(List<PosItem> addedItems) {
         for (PosItem pi : addedItems) {
-            pi.visibleProperty().addListener((observable, oldValue, newValue) -> {
+            pi.isVisibleProperty().addListener((observable, oldValue, newValue) -> {
                 refresh();
             });
         }
@@ -502,7 +473,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void setInvisible(PosItem pi) {
-        pi.setVisible(false);
+        pi.setIsVisible(false);
         refresh();
     }
 

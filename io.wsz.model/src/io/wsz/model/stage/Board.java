@@ -77,7 +77,7 @@ public class Board {
         allItems.addAll(location.getItems());
         items.clear();
         allItems.stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> {
                     for (ItemType type : types) {
                         if (type == pi.getType()) return true;
@@ -157,7 +157,7 @@ public class Board {
         items.clear();
         if (location == null) return null;
         location.getItems().stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> {
                     if (types == this.allTypes) return true;
                     ItemType piType = pi.getType();
@@ -213,7 +213,7 @@ public class Board {
 
         items.clear();
         location.getItems().stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(o -> {
                     List<List<Coords>> actualCollisionPolygons = o.getActualCollisionPolygons();
                     double piLeft = o.getCollisionLeft(actualCollisionPolygons);
@@ -242,7 +242,7 @@ public class Board {
     public Teleport getTeleport(Coords nextPos, PosItem i, Location l) {
         teleports.clear();
         l.getItems().stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> pi instanceof Teleport)
                 .map(pi -> (Teleport) pi)
                 .filter(pi -> pi.getActualCollisionPolygons() != null)
@@ -364,7 +364,7 @@ public class Board {
         items.addAll(location.getItems());
         equipment.clear();
         items.stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> pi.getPos().level == cr.getPos().level)
                 .filter(pi -> pi instanceof Equipment)
                 .map(pi -> (Equipment) pi)

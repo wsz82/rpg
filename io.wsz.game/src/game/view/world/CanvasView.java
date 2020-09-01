@@ -42,7 +42,7 @@ public abstract class CanvasView {
 
         items.clear();
         location.getItems().stream()
-                .filter(PosItem::getVisible)
+                .filter(PosItem::getIsVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
                     double piRight = pi.getRight();

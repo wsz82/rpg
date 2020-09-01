@@ -141,7 +141,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
             System.out.println(message);
             return false;
         } else {
-            setVisible(false);
+            setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
             System.out.println(getName() + " taken");
             return true;

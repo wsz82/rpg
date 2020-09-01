@@ -218,7 +218,7 @@ public class GameRunner {
         location.getItems().addAll(itemsToAdd);
         for (PosItem pi : itemsToAdd) {
             pi.getPos().setLocation(location);
-            pi.setVisible(true);
+            pi.setIsVisible(true);
         }
         itemsToAdd.clear();
     }
@@ -230,7 +230,7 @@ public class GameRunner {
         }
         location.getItems().removeAll(itemsToRemove);
         for (PosItem pi : itemsToRemove) {
-            pi.setVisible(true);
+            pi.setIsVisible(true);
         }
         itemsToRemove.clear();
     }

@@ -28,7 +28,8 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
     protected Controller controller;
 
-    protected BooleanProperty visible;
+    protected BooleanProperty isVisible;
+    protected BooleanProperty isBlocked;
     protected Coords pos;
     protected A prototype;
     protected List<Coords> coverLine;
@@ -39,28 +40,32 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     protected ResolutionImage image;
 
     public PosItem() {
-        this.visible = new SimpleBooleanProperty(this, "visible");
+        this.isVisible = new SimpleBooleanProperty(this, "isVisible");
+        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked");
         this.pos = new Coords();
     }
 
     public PosItem(ItemType type, Controller controller) {
         super(type);
-        this.visible = new SimpleBooleanProperty(this, "visible", true);
+        this.isVisible = new SimpleBooleanProperty(this, "isVisible", true);
+        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", false);
         this.pos = new Coords();
         this.controller = controller;
         this.coverLine = new ArrayList<>(0);
         this.collisionPolygons = new ArrayList<>(0);
     }
 
-    public PosItem(A prototype, Boolean visible) {
+    public PosItem(A prototype, Boolean isVisible) {
         this.prototype = prototype;
-        this.visible = new SimpleBooleanProperty(this, "visible", visible);
+        this.isVisible = new SimpleBooleanProperty(this, "isVisible", isVisible);
+        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", false);
         this.pos = new Coords();
     }
 
     public PosItem(PosItem<A, B> other) {
         super(other);
-        this.visible = new SimpleBooleanProperty(this, "visible", other.visible.get());
+        this.isVisible = new SimpleBooleanProperty(this, "isVisible", other.isVisible.get());
+        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", other.isBlocked.get());
         this.pos = other.pos.clonePos();
         this.prototype = other.prototype;
         this.coverLine = Geometry.cloneCoordsList(other.coverLine);
@@ -201,16 +206,28 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         return nextPos.y + bottom;
     }
 
-    public Boolean getVisible() {
-        return visible.get();
+    public Boolean getIsVisible() {
+        return isVisible.get();
     }
 
-    public BooleanProperty visibleProperty() {
-        return visible;
+    public BooleanProperty isVisibleProperty() {
+        return isVisible;
     }
 
-    public void setVisible(Boolean visible) {
-        this.visible.set(visible);
+    public void setIsVisible(Boolean isVisible) {
+        this.isVisible.set(isVisible);
+    }
+
+    public boolean isBlocked() {
+        return isBlocked.get();
+    }
+
+    public BooleanProperty isBlockedProperty() {
+        return isBlocked;
+    }
+
+    public void setIsBlocked(boolean isBlocked) {
+        this.isBlocked.set(isBlocked);
     }
 
     public Coords getPos() {
@@ -469,7 +486,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         if (!(o instanceof PosItem)) return false;
         if (!super.equals(o)) return false;
         PosItem<?, ?> posItem = (PosItem<?, ?>) o;
-        return Objects.equals(getVisible(), posItem.getVisible()) &&
+        return Objects.equals(getIsVisible(), posItem.getIsVisible()) &&
                 Objects.equals(getPos(), posItem.getPos()) &&
                 Objects.equals(getPrototype(), posItem.getPrototype()) &&
                 Objects.equals(getCoverLine(), posItem.getCoverLine()) &&
@@ -481,7 +498,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionPoint(), getAnimationSpeed());
+        return Objects.hash(super.hashCode(), getIsVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionPoint(), getAnimationSpeed());
     }
 
     @Override
@@ -493,7 +510,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
         out.writeObject(animationSpeed);
 
-        out.writeBoolean(visible.get());
+        out.writeBoolean(isVisible.get());
+
+        out.writeBoolean(isBlocked.get());
 
         out.writeObject(pos);
 
@@ -519,7 +538,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
 
         animationSpeed = (Double) in.readObject();
 
-        visible.set(in.readBoolean());
+        isVisible.set(in.readBoolean());
+
+        isBlocked.set(in.readBoolean());
 
         Coords pos = (Coords) in.readObject();
         this.pos.x = pos.x;

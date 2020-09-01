@@ -97,9 +97,14 @@ public class ContentTableView extends TableView<PosItem> {
         });
 
         TableColumn<PosItem, Boolean> visibilityCol = new TableColumn<>("Visibility");
-        visibilityCol.setCellValueFactory(new PropertyValueFactory<>("visible"));
+        visibilityCol.setCellValueFactory(new PropertyValueFactory<>("isVisible"));
         visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
         visibilityCol.setEditable(true);
+
+        TableColumn<PosItem, Boolean> blockedCol = new TableColumn<>("Block");
+        blockedCol.setCellValueFactory(new PropertyValueFactory<>("isBlocked"));
+        blockedCol.setCellFactory(CheckBoxTableCell.forTableColumn(blockedCol));
+        blockedCol.setEditable(true);
 
         TableColumn<PosItem, Double> posCol = new TableColumn<>("Position");
         posCol.setEditable(true);
@@ -142,7 +147,8 @@ public class ContentTableView extends TableView<PosItem> {
         columns.add(1, typeCol);
         columns.add(2, levelCol);
         columns.add(3, visibilityCol);
-        columns.add(4, posCol);
+        columns.add(4, blockedCol);
+        columns.add(5, posCol);
     }
 
     private void alertLayerNotExisting(int level) {
@@ -161,7 +167,7 @@ public class ContentTableView extends TableView<PosItem> {
     public void changeVisibility() {
         List<PosItem> itemsToChange = getSelectionModel().getSelectedItems();
         for (PosItem pi : itemsToChange) {
-            pi.setVisible(!pi.getVisible());
+            pi.setIsVisible(!pi.getIsVisible());
         }
     }
 
