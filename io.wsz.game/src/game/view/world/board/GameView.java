@@ -55,6 +55,7 @@ public class GameView extends CanvasView {
     private final FoggableDelegate foggableDelegate;
 
     private List<Layer> layers;
+    private long nextAvailableClickTime;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
     private DialogView dialogView;
@@ -405,84 +406,99 @@ public class GameView extends CanvasView {
     }
 
     private void defineRemovableEvents() {
-        clickEvent = e -> {
-            MouseButton button = e.getButton();
-            double x = e.getX();
-            double y = e.getY();
+        clickEvent = this::mouseClick;
+        keyboardEvent = this::keyClick;
+    }
 
-            Location location = controller.getCurrentLocation().getLocation();
-            modifiedCoords.x = x / Sizes.getMeter();
-            modifiedCoords.y = y / Sizes.getMeter();
-            modifiedCoords.add(curPos);
-            double finalX = modifiedCoords.x;
-            double finalY = modifiedCoords.y;
+    private void mouseClick(MouseEvent e) {
+        if (isNotTimeToLetClick()) return;
 
-            if (button.equals(MouseButton.PRIMARY)) {
-                if (Settings.isShowBar()) {
-                    double barLeft = barView.getLeft();
-                    if (x > barLeft) {
-                        return;
-                    }
+        MouseButton button = e.getButton();
+        double x = e.getX();
+        double y = e.getY();
+
+        Location location = controller.getCurrentLocation().getLocation();
+        modifiedCoords.x = x / Sizes.getMeter();
+        modifiedCoords.y = y / Sizes.getMeter();
+        modifiedCoords.add(curPos);
+        double finalX = modifiedCoords.x;
+        double finalY = modifiedCoords.y;
+
+        if (button.equals(MouseButton.PRIMARY)) {
+            if (Settings.isShowBar()) {
+                double barLeft = barView.getLeft();
+                if (x > barLeft) {
+                    return;
                 }
+            }
+            e.consume();
+            boolean multiple = e.isShiftDown();
+            GameRunner.runLater(() -> onMapPrimaryButtonClick(location, finalX, finalY, multiple));
+        } else if (button.equals(MouseButton.SECONDARY)) {
+            e.consume();
+            GameRunner.runLater(() -> onMapSecondaryButtonClick(location, finalX, finalY));
+        }
+    }
+
+    private boolean isNotTimeToLetClick() {
+        long curTime = System.currentTimeMillis();
+        if (curTime < nextAvailableClickTime) {
+            return true;
+        }
+        nextAvailableClickTime = curTime + Sizes.DIF_TIME_BETWEEN_CLICKS;
+        return false;
+    }
+
+    private void keyClick(KeyEvent e) {
+        if (isNotTimeToLetClick()) return;
+
+        KeyCode key = e.getCode();
+        List<KeyCode> barKeys = List.of(DIGIT1, DIGIT2, DIGIT3, DIGIT4, DIGIT5, DIGIT6);
+        if (barKeys.contains(key)) {
+            return;
+        }
+        switch (key) {
+            case P -> {
                 e.consume();
-                boolean multiple = e.isShiftDown();
+                Settings.setShowBar(!Settings.isShowBar());
+            }
+            case I -> {
+                e.consume();
+                GameRunner.runLater(this::openInventory);
+            }
+            case SPACE -> {
+                e.consume();
+                handlePause();
+            }
+            case PAGE_UP -> {
+                e.consume();
                 GameRunner.runLater(() -> {
-                    onMapPrimaryButtonClick(location, finalX, finalY, multiple);
+                    Layer layer = controller.getCurrentLayer().getLayer();
+                    Layer next = layer;
+                    for (int i = 0; i < layers.size() - 1; i++) {
+                        Layer current = layers.get(i);
+                        if (current == layer) {
+                            next = layers.get(i + 1);
+                        }
+                    }
+                    controller.getCurrentLayer().setLayer(next);
                 });
-            } else if (button.equals(MouseButton.SECONDARY)) {
+            }
+            case PAGE_DOWN -> {
                 e.consume();
-                GameRunner.runLater(() -> onMapSecondaryButtonClick(location, finalX, finalY));
-            }
-        };
-        keyboardEvent = e -> {
-            KeyCode key = e.getCode();
-            List<KeyCode> barKeys = List.of(DIGIT1, DIGIT2, DIGIT3, DIGIT4, DIGIT5 ,DIGIT6);
-            if (barKeys.contains(key)) {
-                return;
-            }
-            switch (key) {
-                case P -> {
-                    e.consume();
-                    Settings.setShowBar(!Settings.isShowBar());
-                }
-                case I -> {
-                    e.consume();
-                    GameRunner.runLater(this::openInventory);
-                }
-                case SPACE -> {
-                    e.consume();
-                    handlePause();
-                }
-                case PAGE_UP -> {
-                    e.consume();
-                    GameRunner.runLater(() -> {
-                        Layer layer = controller.getCurrentLayer().getLayer();
-                        Layer next = layer;
-                        for (int i = 0; i < layers.size() - 1; i++) {
-                            Layer current = layers.get(i);
-                            if (current == layer) {
-                                next = layers.get(i + 1);
-                            }
+                GameRunner.runLater(() -> {
+                    Layer layer = controller.getCurrentLayer().getLayer();
+                    Layer prev = layer;
+                    for (int i = 1; i < layers.size(); i++) {
+                        Layer current = layers.get(i);
+                        if (current == layer) {
+                            prev = layers.get(i - 1);
                         }
-                        controller.getCurrentLayer().setLayer(next);
-                    });
-                }
-                case PAGE_DOWN -> {
-                    e.consume();
-                    GameRunner.runLater(() -> {
-                        Layer layer = controller.getCurrentLayer().getLayer();
-                        Layer prev = layer;
-                        for (int i = 1; i < layers.size(); i++) {
-                            Layer current = layers.get(i);
-                            if (current == layer) {
-                                prev = layers.get(i - 1);
-                            }
-                        }
-                        controller.getCurrentLayer().setLayer(prev);
-                    });
-                }
+                    }
+                    controller.getCurrentLayer().setLayer(prev);
+                });
             }
-        };
+        }
     }
 
     private void onMapSecondaryButtonClick(Location location, double x, double y) {

@@ -17,6 +17,7 @@ public class Sizes {
     public static final double MAX_IMAGE_WIDTH = 8000;
     public static final double HORIZONTAL_VISION_RANGE_FACTOR = 2;
     public static final double VERTICAL_VISION_RANGE_FACTOR = 2.0/3 * 2;
+    public static final long DIF_TIME_BETWEEN_CLICKS = 300;
 
     private static int meter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
