@@ -4,10 +4,6 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import java.io.*;
 import java.util.Objects;
@@ -15,26 +11,26 @@ import java.util.Objects;
 public abstract class Asset implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    protected final StringProperty name = new SimpleStringProperty(this, "name");
-    protected final ObjectProperty<ItemType> type = new SimpleObjectProperty<>(this, "type");
-    protected final StringProperty path = new SimpleStringProperty(this, "path");
+    protected String name;
+    protected ItemType type;
+    protected String path;
 
     public Asset() {}
 
     public Asset(ItemType type) {
-        this.type.set(type);
+        this.type = type;
     }
 
     public Asset(String name, ItemType type, String path) {
-        this.name.set(name);
-        this.type.set(type);
-        this.path.set(path);
+        this.name = name;
+        this.type = type;
+        this.path = path;
     }
 
     public Asset(Asset other) {
-        this.name.set(other.getName());
-        this.type.set(other.getType());
-        this.path.set(other.getPath());
+        this.name = other.getName();
+        this.type = other.getType();
+        this.path = other.getPath();
     }
 
     public String getDir() {
@@ -64,27 +60,27 @@ public abstract class Asset implements Externalizable {
     }
 
     public String getName() {
-        return name.get();
+        return name;
     }
 
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
 
     public ItemType getType() {
-        return type.get();
+        return type;
     }
 
     public void setType(ItemType type) {
-        this.type.set(type);
+        this.type = type;
     }
 
     public String getPath() {
-        return path.get();
+        return path;
     }
 
     public void setPath(String path) {
-        this.path.set(path);
+        this.path = path;
     }
 
     @Override
@@ -111,25 +107,21 @@ public abstract class Asset implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        String name = this.name.get();
-        if (name == null) name = "";
-        out.writeUTF(name);
+        out.writeObject(name);
 
-        out.writeObject(type.get());
+        out.writeObject(type);
 
-        out.writeObject(path.get());
+        out.writeObject(path);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        String name = in.readUTF();
-        if (name.isEmpty()) name = null;
-        this.name.set(name);
+        name = (String) in.readObject();
 
-        type.set((ItemType) in.readObject());
+        type = (ItemType) in.readObject();
 
-        path.set((String) in.readObject());
+        path = (String) in.readObject();
     }
 }

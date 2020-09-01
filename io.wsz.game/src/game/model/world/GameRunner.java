@@ -201,8 +201,7 @@ public class GameRunner {
         }
         Dialog dialog = answering.getDialog();
         if (dialog == null || dialog.getGreeting() == null) {
-            controller.setAsking(null);
-            controller.setAnswering(null);
+            controller.setDialogMemento(null);
             logger.logNoAnsweringResponse(answering);
             return;
         }

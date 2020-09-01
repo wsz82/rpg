@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -30,8 +31,8 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
 
     public Equipment() {}
 
-    public Equipment(ItemType type) {
-        super(type);
+    public Equipment(ItemType type, Controller controller) {
+        super(type, controller);
     }
 
     public Equipment(E prototype, Boolean visible) {
@@ -129,7 +130,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
         Coords crCenter = cr.getCenter();
         double xFrom = crCenter.x;
         double yFrom = crCenter.y;
-        Coords toCoords = getInteractionCoords();
+        Coords toCoords = getInteractionPoint();
         double xTo = toCoords.x;
         double yTo = toCoords.y;
         PosItem obstacleOnWay = getController().getBoard().getObstacleOnWay(
@@ -169,7 +170,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
             Coords crCenter = cr.getCenter();
             double xFrom = crCenter.x;
             double yFrom = crCenter.y;
-            Coords toCoords = getInteractionCoords();
+            Coords toCoords = getInteractionPoint();
             double xTo = toCoords.x;
             double yTo = toCoords.y;
             obstacleOnWay = getController().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);

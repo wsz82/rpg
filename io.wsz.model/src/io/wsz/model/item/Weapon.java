@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.weapon.WeaponAnimation;
 import io.wsz.model.sizes.Sizes;
@@ -22,9 +23,8 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Weapon(ItemType type) {
-        super(type);
-        this.animation = new WeaponAnimation(getDir());
+    public Weapon(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new EquipmentAnimationPos();
     }
 
@@ -124,11 +124,17 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     @Override
     public WeaponAnimation getAnimation() {
+        WeaponAnimation animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new WeaponAnimation(getDir());
+        }
+        return animation;
     }
 
     @Override

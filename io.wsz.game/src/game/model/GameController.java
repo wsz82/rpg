@@ -258,7 +258,7 @@ public class GameController {
         Plugin p = controller.getActivePlugin();
         double startX = p.getStartPos().x;
         double startY = p.getStartPos().y;
-        Coords curPos = controller.getCurPos();
+        Coords curPos = controller.getPosToCenter();
         curPos.x = startX;
         curPos.y = startY;
     }

@@ -47,7 +47,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
 
     @Override
     protected Cover createNewAsset() {
-        return new Cover(getType());
+        return new Cover(getType(), controller);
     }
 
     @Override

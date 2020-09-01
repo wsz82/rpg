@@ -46,7 +46,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected Landscape createNewAsset() {
-        return new Landscape(getType());
+        return new Landscape(getType(), controller);
     }
 
     @Override

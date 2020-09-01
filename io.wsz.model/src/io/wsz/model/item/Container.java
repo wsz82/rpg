@@ -31,8 +31,8 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         this.items = new ArrayList<>(0);
     }
 
-    public Container(ItemType type) {
-        super(type);
+    public Container(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new EquipmentAnimationPos();
         this.openableItem = new OpenableItem();
         this.items = new ArrayList<>(0);
@@ -178,7 +178,9 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     @Override
     public ResolutionImage getOpenImage() {
         File programDir = getController().getProgramDir();
-        return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+        ContainerAnimation animation = getAnimation();
+        if (animation == null) return null;
+        return animation.getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
     public boolean isOpen() {
@@ -272,11 +274,17 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     @Override
     public ContainerAnimation getAnimation() {
+        ContainerAnimation animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new ContainerAnimation(getDir());
+        }
+        return animation;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     @Override
     protected Container createNewAsset() {
-        return new Container(getType());
+        return new Container(getType(), controller);
     }
 
     @Override

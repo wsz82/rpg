@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.sizes.Sizes;
@@ -25,9 +26,8 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
         this.animationPos = new AnimationPos();
     }
 
-    public Door(ItemType type) {
-        super(type);
-        this.animation = new DoorAnimation(getDir());
+    public Door(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new AnimationPos();
         openableItem = new OpenableItem();
     }
@@ -40,7 +40,9 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     @Override
     public ResolutionImage getOpenImage() {
         File programDir = getController().getProgramDir();
-        return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+        DoorAnimation animation = getAnimation();
+        if (animation == null) return null;
+        return animation.getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
     public ResolutionImage getEditorImage() {
@@ -99,11 +101,17 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
 
     @Override
     public DoorAnimation getAnimation() {
+        DoorAnimation animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new DoorAnimation(getDir());
+        }
+        return animation;
     }
 
     @Override

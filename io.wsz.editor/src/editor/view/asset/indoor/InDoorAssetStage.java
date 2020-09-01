@@ -59,7 +59,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected InDoor createNewAsset() {
-        return new InDoor(getType());
+        return new InDoor(getType(), controller);
     }
 
     @Override

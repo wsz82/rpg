@@ -22,6 +22,9 @@ public class Animation<A extends PosItem> {
     protected final String animationDir;
 
     public Animation(String animationDir) {
+        if (animationDir == null) {
+            throw new NullPointerException();
+        }
         if (animationDir.isEmpty()) {
             throw new IllegalArgumentException("Animation path is empty");
         }

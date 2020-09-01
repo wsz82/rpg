@@ -13,7 +13,9 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
@@ -55,18 +57,62 @@ public class EditorController {
     }
 
     public void initNewPlugin() {
-        observableAssets.clearLists();
+        clearObservableLists();
+
+        Model newModel = new Model();
+
+        CurrentLocation currentLocation = new CurrentLocation();
+        newModel.setCurrentLocation(currentLocation);
+
+        CurrentLayer currentLayer = new CurrentLayer();
+        newModel.setCurrentLayer(currentLayer);
+
         World newWorld = new World();
 
+        initWorldsList(currentLocation, currentLayer, newWorld);
+
+        Plugin newPlugin = new Plugin();
+
+        newModel.setActivePlugin(newPlugin);
+        PluginMetadata newPluginMetadata = new PluginMetadata();
+
+        newModel.setActivePluginMetadata(newPluginMetadata);
+        newPlugin.setWorld(newWorld);
+
+        controller.setModel(newModel);
+    }
+
+    private void initWorldsList(CurrentLocation currentLocation, CurrentLayer currentLayer, World newWorld) {
+        initNewLocation(currentLocation, currentLayer);
         initLocations(newWorld);
         initAssets(newWorld);
         initEquipmentTypes(newWorld);
+        initInventoryPlaceTypes(newWorld);
+        initDialogs(newWorld);
+    }
 
-        Plugin newPlugin = new Plugin();
-        PluginMetadata newPluginMetadata = new PluginMetadata();
-        newPlugin.setWorld(newWorld);
-        controller.getModel().setActivePlugin(newPlugin);
-        controller.getModel().setActivePluginMetadata(newPluginMetadata);
+    private void initLocations(World newWorld) {
+        List<Location> locations = new ArrayList<>(0);
+        newWorld.setLocations(locations);
+    }
+
+    private void initDialogs(World newWorld) {
+        List<Dialog> dialogs = new ArrayList<>(0);
+        newWorld.setDialogs(dialogs);
+    }
+
+    private void initInventoryPlaceTypes(World newWorld) {
+        List<InventoryPlaceType> inventoryPlaceTypes = new ArrayList<>(0);
+        newWorld.setInventoryPlaces(inventoryPlaceTypes);
+    }
+
+    private void clearObservableLists() {
+        observableAssets.clearLists();
+        observableLocations.clear();
+        observableEquipmentTypes.clear();
+        observableLocations.clear();
+        observableInventoryPlaceTypes.clear();
+        observableDialogs.clear();
     }
 
     private void initEquipmentTypes(World newWorld) {
@@ -79,42 +125,38 @@ public class EditorController {
         newWorld.setAssets(assets);
     }
 
-    private void initLocations(World newWorld) {
-        List<Location> locations = new ArrayList<>(0);
+    private void initNewLocation(CurrentLocation currentLocation, CurrentLayer currentLayer) {
         Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
         location.getLayers().add(layer);
-        locations.add(location);
-        controller.getModel().getCurrentLocation().setLocation(location);
-        controller.getModel().getCurrentLayer().setLayer(layer);
-        newWorld.setLocations(locations);
+
+        currentLocation.setLocation(location);
+        currentLayer.setLayer(layer);
+        observableLocations.add(location);
     }
 
-    public void savePluginAs(String pluginName, PluginSettingsStage pss) {
+    public void savePluginAs(String pluginName, Coords startPos) {
         Model model = controller.getModel();
 
-        savePlugin(pluginName, pss, model);
+        savePlugin(pluginName, startPos, model);
     }
 
-    private void savePlugin(String pluginName, PluginSettingsStage pss, Model model) {
+    private void savePlugin(String pluginName, Coords startPos, Model model) {
         Plugin activePlugin = model.getActivePlugin();
-        Coords startPos = getStartCoords(pss);
+
         activePlugin.setStartPos(startPos);
         World world = activePlugin.getWorld();
         loadObservableListsToPlugin(world);
         File programDir = controller.getProgramDir();
         PluginFileCaretaker fileCaretaker = new PluginFileCaretaker(programDir);
         PluginMetadata metadata = model.getActivePluginMetadata();
-        PluginMetadata updatedMetadata = getUpdatedPluginMetadata(metadata, pss);
-        fileCaretaker.save(activePlugin, updatedMetadata, pluginName);
+
+        fileCaretaker.save(activePlugin, metadata, pluginName);
     }
 
-    public void saveActivePlugin(PluginSettingsStage pss) {
+    public void saveActivePlugin(String pluginName, Coords startPos) {
         Model model = controller.getModel();
-        PluginMetadata metadata = model.getActivePluginMetadata();
-        String pluginName = metadata.getPluginName();
-
-        savePlugin(pluginName, pss, model);
+        savePlugin(pluginName, startPos, model);
     }
 
     private void loadObservableListsToPlugin(World world) {
@@ -148,21 +190,6 @@ public class EditorController {
     private void loadObservableAssetsToPlugin(World world) {
         List<Asset> mergedAssets = observableAssets.getMergedAssets();
         world.setAssets(mergedAssets);
-    }
-
-    private PluginMetadata getUpdatedPluginMetadata(PluginMetadata metadata, PluginSettingsStage pss) {
-        boolean isStartingLocation = pss.isStartingLocation();
-        metadata.setIsStartingLocation(isStartingLocation);
-        return metadata;
-    }
-
-    private Coords getStartCoords(PluginSettingsStage pss) {
-        Coords startPos = new Coords();
-        startPos.setLocation(pss.getStartLocation());
-        startPos.x = pss.getStartX();
-        startPos.y = pss.getStartY();
-        startPos.level = pss.getStartLevel();
-        return startPos;
     }
 
     public void loadAndRestorePlugin(PluginMetadata metadata, PluginSettingsStage pss) {

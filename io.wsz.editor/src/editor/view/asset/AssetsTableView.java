@@ -11,9 +11,10 @@ import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
+import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.input.ClipboardContent;
@@ -59,7 +60,11 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
             Dragboard db = startDragAndDrop(TransferMode.COPY);
 
             ClipboardContent content = new ClipboardContent();
-            content.putImage(firstAsset.getImage().getFxImage());
+            ResolutionImage image = firstAsset.getImage();
+            if (image == null) return;
+            Image fxImage = image.getFxImage();
+            if (fxImage == null) return;
+            content.putImage(fxImage);
             db.setContent(content);
         });
 
@@ -91,7 +96,12 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     private void initAssetsTable() {
         TableColumn<A, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getName();
+            }
+        });
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         nameCol.setOnEditCommit(t -> {
@@ -107,7 +117,12 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         });
 
         TableColumn<A, String> pathCol = new TableColumn<>("Path");
-        pathCol.setCellValueFactory(new PropertyValueFactory<>("path"));
+        pathCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getPath();
+            }
+        });
         pathCol.setEditable(false);
         pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
 

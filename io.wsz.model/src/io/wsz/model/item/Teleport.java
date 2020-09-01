@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.effect.Teleportation;
@@ -25,8 +26,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         this.animationPos = new AnimationPos();
     }
 
-    public Teleport(ItemType type) {
-        super(type);
+    public Teleport(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new AnimationPos();
         this.exit = new Coords();
         this.teleportCollisionPolygons = new ArrayList<>(0);
@@ -77,11 +78,17 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     @Override
     public Animation<Teleport> getAnimation() {
+        Animation<Teleport> animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new Animation<>(getDir());
+        }
+        return animation;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -17,8 +18,8 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor() {}
 
-    public OutDoor(ItemType type) {
-        super(type);
+    public OutDoor(ItemType type, Controller controller) {
+        super(type, controller);
         this.exit = new Coords();
     }
 

@@ -14,7 +14,10 @@ import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
+import io.wsz.model.Model;
+import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.sizes.Paths;
+import io.wsz.model.stage.Coords;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -287,15 +290,37 @@ class MainView {
             return;
         }
         String name = saveFile.getName();
-        editorController.savePluginAs(name, pss);
+        Coords startPos = getStartCoords(pss);
+        editorController.savePluginAs(name, startPos);
     }
 
     private void saveFile() {
-        if (editorController.getController().getModel().getActivePluginMetadata() != null) {
-            editorController.saveActivePlugin(pss);
-        } else {
+        Controller controller = editorController.getController();
+        Model model = controller.getModel();
+        PluginMetadata metadata = model.getActivePluginMetadata();
+        updatePluginMetadata(metadata, pss);
+        String pluginName = metadata.getPluginName();
+
+        if (pluginName == null || pluginName.isEmpty()) {
             saveAsFile();
+        } else {
+            Coords startPos = getStartCoords(pss);
+            editorController.saveActivePlugin(pluginName, startPos);
         }
+    }
+
+    private Coords getStartCoords(PluginSettingsStage pss) {
+        Coords startPos = new Coords();
+        startPos.setLocation(pss.getStartLocation());
+        startPos.x = pss.getStartX();
+        startPos.y = pss.getStartY();
+        startPos.level = pss.getStartLevel();
+        return startPos;
+    }
+
+    private void updatePluginMetadata(PluginMetadata metadata, PluginSettingsStage pss) {
+        boolean isStartingLocation = pss.isStartingLocation();
+        metadata.setIsStartingLocation(isStartingLocation);
     }
 
     private void setViewItemOnAction(Stage stage, CheckMenuItem menuItem) {

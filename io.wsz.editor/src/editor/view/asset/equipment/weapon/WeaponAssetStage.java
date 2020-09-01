@@ -128,7 +128,7 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
 
     @Override
     protected Weapon createNewAsset() {
-        return new Weapon(getType());
+        return new Weapon(getType(), controller);
     }
 
     @Override

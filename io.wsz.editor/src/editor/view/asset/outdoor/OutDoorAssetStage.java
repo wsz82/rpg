@@ -153,7 +153,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     @Override
     protected OutDoor createNewAsset() {
-        return new OutDoor(getType());
+        return new OutDoor(getType(), controller);
     }
 
     @Override

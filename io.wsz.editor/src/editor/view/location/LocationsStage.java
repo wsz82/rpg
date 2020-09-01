@@ -55,7 +55,7 @@ public class LocationsStage extends ChildStage {
 
     private void addLocation() {
         Location location = new Location("new", 20, 20);
-        List<Location> locations = editorController.getController().getLocations();
+        List<Location> locations = editorController.getObservableLocations();
         Location uniqueLocation = getUniqueLocation(location, locations);
         Layer layer = new Layer("new");
         location.getLayers().add(layer);

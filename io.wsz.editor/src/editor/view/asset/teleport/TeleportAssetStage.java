@@ -87,7 +87,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected Teleport createNewAsset() {
-        return new Teleport(getType());
+        return new Teleport(getType(), controller);
     }
 
     @Override

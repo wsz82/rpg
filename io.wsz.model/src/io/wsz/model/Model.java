@@ -11,10 +11,7 @@ public class Model {
     private CurrentLocation currentLocation;
     private CurrentLayer currentLayer;
 
-    public Model() {
-        currentLocation = new CurrentLocation();
-        currentLayer = new CurrentLayer();
-    }
+    public Model() {}
 
     public Plugin getActivePlugin() {
         return activePlugin;

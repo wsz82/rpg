@@ -107,11 +107,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         final Label animationSpeedLabel = new Label("Animation speed");
         animationSpeedBox.getChildren().addAll(animationSpeedLabel, animationSpeedInput);
 
-        container.getChildren().add(animationSpeedBox);
+        container.getChildren().addAll(animationSpeedBox, interactionButton);
 
         if (item != null) {
             if (!isContent) {
-                container.getChildren().addAll(interactionButton, coverButton, collisionButton);
+                container.getChildren().addAll(coverButton, collisionButton);
             }
         }
 
@@ -237,10 +237,10 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         dirChooser.setTitle(title);
         dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
         File selectedFile = dirChooser.showDialog(this);
-        fillLabel(label, selectedFile);
+        fillPath(label, selectedFile);
     }
 
-    private void fillLabel(Label label, File selectedFile) {
+    private void fillPath(Label label, File selectedFile) {
         if (selectedFile == null) {
             return;
         }
@@ -252,6 +252,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (isPathIncorrect(selectedFilePath)) return;
         String path = Asset.convertToRelativePath(selectedFilePath);
         label.setText(path);
+        item.setPath(path);
     }
 
     protected void openInteractionPointEdit() {
@@ -263,10 +264,10 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (background == null) {
             return;
         }
-        Coords interactionCoords = item.getIndividualInteractionCoords();
-        PointSetter pointSetter = item::setInteractionCoords;
+        Coords interactionCoords = item.getIndividualInteractionPoint();
+        PointSetter pointSetter = item::setInteractionPoint;
         CoordsPointEditStage interactionEdit = new CoordsPointEditStage(this, item, interactionCoords, background, pointSetter);
-        interactionEdit.initWindow(isContent, "Interaction point edit");
+        interactionEdit.initWindow(false, "Interaction point edit");
         interactionEdit.show();
     }
 

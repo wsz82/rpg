@@ -34,7 +34,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
-    protected Coords interactionCoords;
+    protected Coords interactionPoint;
     protected Double animationSpeed;
     protected ResolutionImage image;
 
@@ -43,10 +43,11 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.pos = new Coords();
     }
 
-    public PosItem(ItemType type) {
+    public PosItem(ItemType type, Controller controller) {
         super(type);
         this.visible = new SimpleBooleanProperty(this, "visible", true);
         this.pos = new Coords();
+        this.controller = controller;
         this.coverLine = new ArrayList<>(0);
         this.collisionPolygons = new ArrayList<>(0);
     }
@@ -65,11 +66,11 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.coverLine = Geometry.cloneCoordsList(other.coverLine);
         this.collisionPolygons = Geometry.cloneCoordsPolygons(other.collisionPolygons);
         this.dialog = other.dialog;
-        Coords interactionCoords = other.interactionCoords;
+        Coords interactionCoords = other.interactionPoint;
         if (interactionCoords == null) {
-            this.interactionCoords = null;
+            this.interactionPoint = null;
         } else {
-            this.interactionCoords = interactionCoords.clonePos();
+            this.interactionPoint = interactionCoords.clonePos();
         }
         this.image = other.image;
     }
@@ -117,7 +118,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
-        return Geometry.isPointWithinOval(getInteractionCoords(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
+        return Geometry.isPointWithinOval(getInteractionPoint(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
     public PosItem getCollision() {
@@ -229,16 +230,17 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         this.pos.setLocation(location);
     }
 
-    public Coords getIndividualInteractionCoords() {
-        return interactionCoords;
+    public Coords getIndividualInteractionPoint() {
+        return interactionPoint;
     }
 
-    public Coords getInteractionCoords() {
-        if (interactionCoords == null) {
+    public Coords getInteractionPoint() {
+        if (interactionPoint == null) {
             if (prototype != null) {
-                if (prototype.interactionCoords != null) {
-                    center.x = prototype.interactionCoords.x;
-                    center.y = prototype.interactionCoords.y;
+                Coords prototypePoint = prototype.interactionPoint;
+                if (prototypePoint != null) {
+                    center.x = prototypePoint.x;
+                    center.y = prototypePoint.y;
                 } else {
                     return getCenter();
                 }
@@ -246,15 +248,15 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
                 return getCenter();
             }
         } else {
-            center.x = interactionCoords.x;
-            center.y = interactionCoords.y;
+            center.x = interactionPoint.x;
+            center.y = interactionPoint.y;
         }
         center.add(pos);
         return center;
     }
 
-    public void setInteractionCoords(Coords interactionCoords) {
-        this.interactionCoords = interactionCoords;
+    public void setInteractionPoint(Coords interactionPoint) {
+        this.interactionPoint = interactionPoint;
     }
 
     public List<Coords> getCoverLine() {
@@ -382,7 +384,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     public final ResolutionImage getInitialImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
-            image = getAnimation().getBasicMain(programDir);
+            Animation animation = getAnimation();
+            if (animation == null) return null;
+            image = animation.getBasicMain(programDir);
         }
         return image;
     }
@@ -393,7 +397,9 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
                 Controller controller = getController();
                 if (controller == null) return null;
                 File programDir = controller.getProgramDir();
-                image = getAnimation().getBasicMain(programDir);
+                Animation animation = getAnimation();
+                if (animation == null) return null;
+                image = animation.getBasicMain(programDir);
                 return image;
             } else {
                 return prototype.getImage();
@@ -437,7 +443,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         Coords crCenter = cr.getCenter();
         double xFrom = crCenter.x;
         double yFrom = crCenter.y;
-        Coords toCoords = getInteractionCoords();
+        Coords toCoords = getInteractionPoint();
         double xTo = toCoords.x;
         double yTo = toCoords.y;
         return getController().getBoard().getObstacleOnWay(
@@ -469,13 +475,13 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
                 Objects.equals(getCoverLine(), posItem.getCoverLine()) &&
                 Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), posItem.getDialog()) &&
-                Objects.equals(getInteractionCoords(), posItem.getInteractionCoords()) &&
+                Objects.equals(getInteractionPoint(), posItem.getInteractionPoint()) &&
                 Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionCoords(), getAnimationSpeed());
+        return Objects.hash(super.hashCode(), getVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionPoint(), getAnimationSpeed());
     }
 
     @Override
@@ -501,7 +507,7 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         }
         out.writeUTF(id);
 
-        out.writeObject(interactionCoords);
+        out.writeObject(interactionPoint);
     }
 
     @Override
@@ -530,6 +536,6 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
             dialog = new Dialog(dialogID);
         }
 
-        interactionCoords = (Coords) in.readObject();
+        interactionPoint = (Coords) in.readObject();
     }
 }

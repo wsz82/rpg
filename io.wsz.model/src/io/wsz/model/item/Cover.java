@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.sizes.Sizes;
@@ -20,9 +21,8 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         this.animationPos = new AnimationPos();
     }
 
-    public Cover(ItemType type) {
-        super(type);
-        this.animation = new Animation<>(getDir());
+    public Cover(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new AnimationPos();
     }
 
@@ -33,11 +33,17 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
 
     @Override
     public Animation<Cover> getAnimation() {
+        Animation<Cover> animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new Animation<>(getDir());
+        }
+        return animation;
     }
 
     @Override

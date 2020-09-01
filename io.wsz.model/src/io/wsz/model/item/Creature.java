@@ -45,8 +45,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.animationPos = new CreatureAnimationPos();
     }
 
-    public Creature(ItemType type) {
-        super(type);
+    public Creature(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new CreatureAnimationPos();
         this.inventory = new Inventory(this);
     }
@@ -473,6 +473,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
             animation = prototype.getAnimation();
         }
         if (animation == null) {
+            if (path == null) return null;
             animation = new CreatureAnimation(getDir());
         }
         return animation;

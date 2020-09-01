@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.sizes.Sizes;
@@ -19,9 +20,8 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
         this.animationPos = new AnimationPos();
     }
 
-    public Landscape(ItemType type) {
-        super(type);
-        this.animation = new Animation<>(getDir());
+    public Landscape(ItemType type, Controller controller) {
+        super(type, controller);
         this.animationPos = new AnimationPos();
     }
 
@@ -32,11 +32,17 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
 
     @Override
     public Animation<Landscape> getAnimation() {
+        Animation<Landscape> animation;
         if (isThisPrototype()) {
-            return animation;
+            animation = this.animation;
         } else {
-            return prototype.getAnimation();
+            animation = prototype.getAnimation();
         }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = new Animation<>(getDir());
+        }
+        return animation;
     }
 
     @Override

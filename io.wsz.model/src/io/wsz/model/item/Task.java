@@ -116,7 +116,7 @@ public class Task implements Externalizable {
         if (item instanceof Creature) {
             dest = cr.getReversedCenter(item.getCenter());
         } else {
-            dest = cr.getReversedCenter(item.getInteractionCoords());
+            dest = cr.getReversedCenter(item.getInteractionPoint());
         }
         setDest(dest);
     }

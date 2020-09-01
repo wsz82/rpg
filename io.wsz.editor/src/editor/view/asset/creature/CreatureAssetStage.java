@@ -270,7 +270,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected Creature createNewAsset() {
-        return new Creature(getType());
+        return new Creature(getType(), controller);
     }
 
     @Override
