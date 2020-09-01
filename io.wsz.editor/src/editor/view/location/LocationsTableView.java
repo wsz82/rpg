@@ -5,11 +5,11 @@ import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
+import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 
@@ -36,7 +36,12 @@ public class LocationsTableView extends TableView<Location> {
         setEditable(true);
 
         TableColumn<Location, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getName();
+            }
+        });
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         nameCol.setOnEditCommit(t -> {
@@ -56,7 +61,12 @@ public class LocationsTableView extends TableView<Location> {
         nameCol.setPrefWidth(100);
 
         TableColumn<Location, Double> widthCol = new TableColumn<>("Width");
-        widthCol.setCellValueFactory(new PropertyValueFactory<>("width"));
+        widthCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected Double computeValue() {
+                return p.getValue().getWidth();
+            }
+        });
         widthCol.setEditable(true);
         widthCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         widthCol.setOnEditCommit(t -> {
@@ -71,7 +81,12 @@ public class LocationsTableView extends TableView<Location> {
         });
 
         TableColumn<Location, Double> heightCol = new TableColumn<>("Height");
-        heightCol.setCellValueFactory(new PropertyValueFactory<>("height"));
+        heightCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected Double computeValue() {
+                return p.getValue().getHeight();
+            }
+        });
         heightCol.setEditable(true);
         heightCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         heightCol.setOnEditCommit(t -> {

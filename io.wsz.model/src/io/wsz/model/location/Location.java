@@ -5,7 +5,6 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.Fog;
-import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -22,90 +21,33 @@ import static io.wsz.model.location.FogStatus.UNVISITED;
 public class Location implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private final StringProperty name = new SimpleStringProperty(this, "name");
-    private final DoubleProperty width = new SimpleDoubleProperty(this, "width");
-    private final DoubleProperty height = new SimpleDoubleProperty(this, "height");
-    private final ObjectProperty<ObservableList<Layer>> layers = new SimpleObjectProperty<>(this, "layers");
-    private final ObjectProperty<ObservableList<PosItem>> items = new SimpleObjectProperty<>(this, "contents");
-    private final List<PosItem> itemsToRemove = new ArrayList<>(0);
-    private final List<PosItem> itemsToAdd = new ArrayList<>(0);
-
+    private String name;
+    private double width;
+    private double height;
+    private ObservableList<Layer> layers;
+    private ObservableList<PosItem> items;
+    private List<PosItem> itemsToRemove;
+    private List<PosItem> itemsToAdd;
     private List<List<FogStatusWithImage>> discoveredFog;
 
     public Location() {}
 
     public Location(String name) {
-        this.name.set(name);
-        this.layers.set(FXCollections.observableArrayList());
-        this.items.set(FXCollections.observableArrayList());
+        this.name = name;
+        this.layers = FXCollections.observableArrayList();
+        this.items = FXCollections.observableArrayList();
+        this.itemsToRemove = new ArrayList<>(0);
+        this.itemsToAdd = new ArrayList<>(0);
     }
 
     public Location(String name, int width, int height) {
-        this.name.set(name);
-        this.width.set(width);
-        this.height.set(height);
-        this.layers.set(FXCollections.observableArrayList());
-        this.items.set(FXCollections.observableArrayList());
-    }
-
-    public String getName() {
-        return name.get();
-    }
-
-    public void setName(String name) {
-        this.name.set(name);
-    }
-
-    public double getWidth() {
-        return width.get();
-    }
-
-    public void setWidth(double width) {
-        this.width.set(width);
-    }
-
-    public double getHeight() {
-        return height.get();
-    }
-
-    public void setHeight(double height) {
-        this.height.set(height);
-    }
-
-    public ObservableList<Layer> getLayers() {
-        return layers.get();
-    }
-
-    public void setLayers(ObservableList<Layer> layers) {
-        this.layers.set(layers);
-    }
-
-    public ObservableList<PosItem> getItems() {
-        return items.get();
-    }
-
-    public void setItems(ObservableList<PosItem> items) {
-        this.items.set(items);
-    }
-
-    public List<PosItem> getItemsToRemove() {
-        return itemsToRemove;
-    }
-
-    public List<PosItem> getItemsToAdd() {
-        return itemsToAdd;
-    }
-
-    public List<List<FogStatusWithImage>> getDiscoveredFog() {
-        return discoveredFog;
-    }
-    private void initFogPiecesImages(List<List<FogStatusWithImage>> discoveredFog, Fog fog, int widthPieces) {
-        for (List<FogStatusWithImage> fogStatusesWithImages : discoveredFog) {
-            for (int j = 0; j < widthPieces; j++) {
-                ResolutionImage randomFog = fog.getRandomFog();
-                fogStatusesWithImages.get(j).setImage(randomFog);
-            }
-        }
+        this.name = name;
+        this.width = width;
+        this.height = height;
+        this.layers = FXCollections.observableArrayList();
+        this.items = FXCollections.observableArrayList();
+        this.itemsToRemove = new ArrayList<>(0);
+        this.itemsToAdd = new ArrayList<>(0);
     }
 
     public void initDiscoveredFog(Fog fog, double halfFogSize) {
@@ -131,8 +73,56 @@ public class Location implements Externalizable {
         }
     }
 
-    public void setDiscoveredFog(List<List<FogStatusWithImage>> discoveredFog) {
-        this.discoveredFog = discoveredFog;
+    private void initFogPiecesImages(List<List<FogStatusWithImage>> discoveredFog, Fog fog, int widthPieces) {
+        for (List<FogStatusWithImage> fogStatusesWithImages : discoveredFog) {
+            for (int j = 0; j < widthPieces; j++) {
+                ResolutionImage randomFog = fog.getRandomFog();
+                fogStatusesWithImages.get(j).setImage(randomFog);
+            }
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public ObservableList<Layer> getLayers() {
+        return layers;
+    }
+
+    public ObservableList<PosItem> getItems() {
+        return items;
+    }
+
+    public List<PosItem> getItemsToRemove() {
+        return itemsToRemove;
+    }
+
+    public List<PosItem> getItemsToAdd() {
+        return itemsToAdd;
+    }
+    public List<List<FogStatusWithImage>> getDiscoveredFog() {
+        return discoveredFog;
     }
 
     @Override
@@ -157,15 +147,15 @@ public class Location implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name.get());
+        out.writeUTF(name);
 
-        out.writeDouble(width.get());
+        out.writeDouble(width);
 
-        out.writeDouble(height.get());
+        out.writeDouble(height);
 
-        out.writeObject(new ArrayList<>(layers.get()));
+        out.writeObject(new ArrayList<>(layers));
 
-        out.writeObject(new ArrayList<>(items.get()));
+        out.writeObject(new ArrayList<>(items));
 
         out.writeObject(itemsToRemove);
 
@@ -178,23 +168,21 @@ public class Location implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name.set(in.readUTF());
+        name = in.readUTF();
 
-        width.set(in.readDouble());
+        width = in.readDouble();
 
-        height.set(in.readDouble());
+        height = in.readDouble();
 
         List<Layer> serLayers = (List<Layer>) in.readObject();
-        ObservableList<Layer> observableLayers = FXCollections.observableArrayList(serLayers);
-        layers.set(observableLayers);
+        layers = FXCollections.observableArrayList(serLayers);
 
         List<PosItem> serItems = (List<PosItem>) in.readObject();
-        ObservableList<PosItem> observableItems = FXCollections.observableArrayList(serItems);
-        items.set(observableItems);
+        items = FXCollections.observableArrayList(serItems);
 
-        itemsToRemove.addAll((List<PosItem>) in.readObject());
+        itemsToRemove = (List<PosItem>) in.readObject();
 
-        itemsToAdd.addAll((List<PosItem>) in.readObject());
+        itemsToAdd = (List<PosItem>) in.readObject();
 
         discoveredFog = (List<List<FogStatusWithImage>>) in.readObject();
     }
