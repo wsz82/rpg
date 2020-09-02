@@ -80,7 +80,7 @@ public class PluginSettingsStage extends ChildStage {
                 if (l == null) {
                     return "";
                 }
-                return l.getName();
+                return l.getId();
             }
 
             @Override
@@ -136,7 +136,7 @@ public class PluginSettingsStage extends ChildStage {
 
     private Location getLocation(String s) {
         Optional<Location> optLocation = editorController.getObservableLocations().stream()
-                .filter(l -> l.getName().equals(s))
+                .filter(l -> l.getId().equals(s))
                 .findFirst();
         return optLocation.orElse(null);
     }

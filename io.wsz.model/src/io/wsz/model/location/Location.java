@@ -21,7 +21,7 @@ import static io.wsz.model.location.FogStatus.UNVISITED;
 public class Location implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    private String id;
     private double width;
     private double height;
     private ObservableList<Layer> layers;
@@ -32,16 +32,16 @@ public class Location implements Externalizable {
 
     public Location() {}
 
-    public Location(String name) {
-        this.name = name;
+    public Location(String id) {
+        this.id = id;
         this.layers = FXCollections.observableArrayList();
         this.items = FXCollections.observableArrayList();
         this.itemsToRemove = new ArrayList<>(0);
         this.itemsToAdd = new ArrayList<>(0);
     }
 
-    public Location(String name, int width, int height) {
-        this.name = name;
+    public Location(String id, int width, int height) {
+        this.id = id;
         this.width = width;
         this.height = height;
         this.layers = FXCollections.observableArrayList();
@@ -82,12 +82,12 @@ public class Location implements Externalizable {
         }
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public double getWidth() {
@@ -127,7 +127,7 @@ public class Location implements Externalizable {
 
     @Override
     public String toString() {
-        return getName();
+        return getId();
     }
 
     @Override
@@ -135,19 +135,19 @@ public class Location implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Location)) return false;
         Location location = (Location) o;
-        return Objects.equals(getName(), location.getName());
+        return Objects.equals(getId(), location.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getId());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name);
+        out.writeUTF(id);
 
         out.writeDouble(width);
 
@@ -168,7 +168,7 @@ public class Location implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name = in.readUTF();
+        id = in.readUTF();
 
         width = in.readDouble();
 

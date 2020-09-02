@@ -7,7 +7,9 @@ import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -35,10 +37,17 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void initTable() {
-        ObservableList<Layer> layers = controller.getCurrentLocation().getLayers();
+        CurrentLocation currentLocation = controller.getCurrentLocation();
+        ObservableList<Layer> layers = currentLocation.getLayers();
         setItems(layers);
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
-            setItems(newValue.getLayers());
+        currentLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
+            ObservableList<Layer> observableLayers;
+            if (newLocation != null) {
+                observableLayers = newLocation.getLayers();
+            } else {
+                observableLayers = FXCollections.emptyObservableList();
+            }
+            setItems(observableLayers);
         });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

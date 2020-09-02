@@ -5,12 +5,14 @@ import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -265,10 +267,12 @@ public class EditorCanvas extends Canvas {
             }
             refresh();
         };
-        controller.getCurrentLocation().getItems().addListener(locationListener);
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
-            hookupItemsEvents(controller.getCurrentLocation().getItems());
-            controller.getCurrentLocation().getItems().addListener(locationListener);
+        CurrentLocation currentLocation = controller.getCurrentLocation();
+        currentLocation.getItems().addListener(locationListener);
+        currentLocation.locationProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<PosItem> items = currentLocation.getItems();
+            hookupItemsEvents(items);
+            items.addListener(locationListener);
         });
     }
 

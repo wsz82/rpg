@@ -15,10 +15,12 @@ import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.*;
+import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -46,10 +48,16 @@ public class ContentTableView extends TableView<PosItem> {
     }
 
     private void initTable() {
-        ObservableList<PosItem> items = controller.getCurrentLocation().getLocation().getItems();
+        CurrentLocation currentLocation = controller.getCurrentLocation();
+        ObservableList<PosItem> items = currentLocation.getLocation().getItems();
         setItems(items);
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<PosItem> newItems = newValue.getItems();
+        currentLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
+            ObservableList<PosItem> newItems;
+            if (newLocation != null) {
+                newItems = newLocation.getItems();
+            } else {
+                newItems = FXCollections.emptyObservableList();
+            }
             setItems(newItems);
         });
 
@@ -83,7 +91,7 @@ public class ContentTableView extends TableView<PosItem> {
             int level = t.getNewValue();
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
 
-            List<Integer> levels = controller.getCurrentLocation().getLayers().stream()
+            List<Integer> levels = currentLocation.getLayers().stream()
                     .map(l -> l.getLevel())
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {

@@ -39,7 +39,7 @@ public class LocationsTableView extends TableView<Location> {
         nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().getName();
+                return p.getValue().getId();
             }
         });
         nameCol.setEditable(true);
@@ -48,9 +48,9 @@ public class LocationsTableView extends TableView<Location> {
             Location location = getItems().get(t.getTablePosition().getRow());
             String newValue = t.getNewValue();
             if (isNameUnique(newValue)) {
-                location.setName(newValue);
+                location.setId(newValue);
             } else {
-                location.setName(t.getOldValue());
+                location.setId(t.getOldValue());
             }
             Location currentLocation = controller.getCurrentLocation().getLocation();
             if (location.equals(currentLocation)) {
@@ -108,7 +108,7 @@ public class LocationsTableView extends TableView<Location> {
 
     private boolean isNameUnique(String newValue) {
         return controller.getLocations().stream()
-                .noneMatch(layer -> layer.getName().equals(newValue));
+                .noneMatch(layer -> layer.getId().equals(newValue));
     }
 
     void removeLocations() {

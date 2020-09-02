@@ -208,11 +208,11 @@ public class Controller {
         Location serLoc = pos.getLocation();
         if (serLoc != null) {
             Optional<Location> optionalLocation = getLocations().stream()
-                    .filter(refLoc -> refLoc.getName().equals(serLoc.getName()))
+                    .filter(refLoc -> refLoc.getId().equals(serLoc.getId()))
                     .findFirst();
             Location foundLoc = optionalLocation.orElse(null);
             if (foundLoc == null) {
-                throw new NullPointerException("Location \"" + serLoc.getName() + "\" should be in locations list");
+                throw new NullPointerException("Location \"" + serLoc.getId() + "\" should be in locations list");
             }
             pos.setLocation(foundLoc);
         }
@@ -390,8 +390,6 @@ public class Controller {
 
     public void initNewModel() {
         model = new Model();
-        model.setCurrentLocation(new CurrentLocation());
-        model.setCurrentLayer(new CurrentLayer());
     }
 
     public Fog getFog() {

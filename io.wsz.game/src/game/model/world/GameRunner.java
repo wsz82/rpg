@@ -241,7 +241,7 @@ public class GameRunner {
             controller.setLocationToUpdate(null);
             CurrentLocation cl = controller.getCurrentLocation();
             Location l = cl.getLocation();
-            if (!l.getName().equals(locationToUpdate.getName())) {
+            if (!l.getId().equals(locationToUpdate.getId())) {
                 cl.setLocation(locationToUpdate);
 
                 Sizes.setReloadImages(true);

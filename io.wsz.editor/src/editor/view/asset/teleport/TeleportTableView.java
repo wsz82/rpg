@@ -33,7 +33,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
                 if (l == null) {
                     return null;
                 } else {
-                    return l.getName();
+                    return l.getId();
                 }
             }
         });

@@ -64,9 +64,9 @@ public class LocationsStage extends ChildStage {
 
     private Location getUniqueLocation(Location location, List<Location> locations) {
         boolean nameExists = locations.stream()
-                .anyMatch(l -> l.getName().equals(location.getName()));
+                .anyMatch(l -> l.getId().equals(location.getId()));
         if (nameExists) {
-            location.setName(location.getName() + "New");
+            location.setId(location.getId() + "New");
             return getUniqueLocation(location, locations);
         } else {
             return location;

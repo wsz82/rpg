@@ -8,10 +8,13 @@ import io.wsz.model.plugin.PluginMetadata;
 public class Model {
     private PluginMetadata activePluginMetadata;
     private Plugin activePlugin;
-    private CurrentLocation currentLocation;
-    private CurrentLayer currentLayer;
+    private final CurrentLocation currentLocation;
+    private final CurrentLayer currentLayer;
 
-    public Model() {}
+    public Model() {
+        this.currentLocation = new CurrentLocation();
+        this.currentLayer = new CurrentLayer();
+    }
 
     public Plugin getActivePlugin() {
         return activePlugin;
@@ -33,15 +36,7 @@ public class Model {
         return currentLocation;
     }
 
-    public void setCurrentLocation(CurrentLocation currentLocation) {
-        this.currentLocation = currentLocation;
-    }
-
     public CurrentLayer getCurrentLayer() {
         return currentLayer;
-    }
-
-    public void setCurrentLayer(CurrentLayer currentLayer) {
-        this.currentLayer = currentLayer;
     }
 }

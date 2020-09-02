@@ -21,7 +21,7 @@ public class Teleportation {
             return false;
         }
         Optional<Location> optLocation = controller.getLocations().stream()
-                .filter(l -> l.getName().equals(exit.getLocation().getName()))
+                .filter(l -> l.getId().equals(exit.getLocation().getId()))
                 .findFirst();
         Location target = optLocation.orElse(null);
         if (target == null) {

@@ -59,13 +59,10 @@ public class EditorController {
     public void initNewPlugin() {
         clearObservableLists();
 
-        Model newModel = new Model();
+        Model model = controller.getModel();
 
-        CurrentLocation currentLocation = new CurrentLocation();
-        newModel.setCurrentLocation(currentLocation);
-
-        CurrentLayer currentLayer = new CurrentLayer();
-        newModel.setCurrentLayer(currentLayer);
+        CurrentLocation currentLocation = model.getCurrentLocation();
+        CurrentLayer currentLayer = model.getCurrentLayer();
 
         World newWorld = new World();
 
@@ -73,13 +70,13 @@ public class EditorController {
 
         Plugin newPlugin = new Plugin();
 
-        newModel.setActivePlugin(newPlugin);
+        model.setActivePlugin(newPlugin);
         PluginMetadata newPluginMetadata = new PluginMetadata();
 
-        newModel.setActivePluginMetadata(newPluginMetadata);
+        model.setActivePluginMetadata(newPluginMetadata);
         newPlugin.setWorld(newWorld);
 
-        controller.setModel(newModel);
+        controller.setModel(model);
     }
 
     private void initWorldsList(CurrentLocation currentLocation, CurrentLayer currentLayer, World newWorld) {
@@ -269,7 +266,9 @@ public class EditorController {
     private void restoreFirstLocationAndLayer(Model model, List<Location> locations) {
         if (locations.isEmpty()) return;
         Location firstLocation = locations.get(0);
-        model.getCurrentLocation().setLocation(firstLocation);
+        CurrentLocation currentLocation = model.getCurrentLocation();
+        currentLocation.setLocation(null);
+        currentLocation.setLocation(firstLocation);
         Layer firstLayer = firstLocation.getLayers().get(0);
         model.getCurrentLayer().setLayer(firstLayer);
     }

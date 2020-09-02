@@ -118,7 +118,7 @@ public class Coords implements Externalizable {
         String locationName;
         String end = "x:" + x + "y:" + y + "level:" + level;
         if (location != null) {
-            locationName = location.getName();
+            locationName = location.getId();
             return "location:" + locationName + end;
         } else {
             return end;
@@ -135,7 +135,7 @@ public class Coords implements Externalizable {
         if (location == null && posLoc == null) {
             locsEquals = true;
         } else if (location != null && posLoc != null) {
-            locsEquals = Objects.equals(location.getName(), posLoc.getName());
+            locsEquals = Objects.equals(location.getId(), posLoc.getId());
         } else {
             locsEquals = false;
         }
@@ -161,7 +161,7 @@ public class Coords implements Externalizable {
         out.writeInt(level);
 
         if (location != null) {
-            out.writeUTF(location.getName());
+            out.writeUTF(location.getId());
         } else {
             out.writeUTF("");
         }

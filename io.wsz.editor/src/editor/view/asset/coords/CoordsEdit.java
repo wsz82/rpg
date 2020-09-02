@@ -88,7 +88,7 @@ public class CoordsEdit {
                 if (l == null) {
                     return "";
                 }
-                return l.getName();
+                return l.getId();
             }
 
             @Override
@@ -107,7 +107,7 @@ public class CoordsEdit {
 
     private Location getLocation(String s) {
         Optional<Location> optLocation = controller.getLocations().stream()
-                .filter(l -> l.getName().equals(s))
+                .filter(l -> l.getId().equals(s))
                 .findFirst();
         return optLocation.orElse(null);
     }

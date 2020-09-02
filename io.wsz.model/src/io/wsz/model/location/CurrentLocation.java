@@ -3,6 +3,7 @@ package io.wsz.model.location;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class CurrentLocation {
@@ -14,10 +15,17 @@ public class CurrentLocation {
     public CurrentLocation(){}
 
     public void setLocation(Location location) {
-        this.widthProperty.set(location.getWidth());
-        this.heightProperty.set(location.getHeight());
-        this.nameProperty.set(location.getName());
-        this.locationProperty.set(location);
+        if (location != null) {
+            this.widthProperty.set(location.getWidth());
+            this.heightProperty.set(location.getHeight());
+            this.nameProperty.set(location.getId());
+            this.locationProperty.set(location);
+        } else {
+            this.widthProperty.set(0);
+            this.heightProperty.set(0);
+            this.nameProperty.set(null);
+            this.locationProperty.set(null);
+        }
     }
 
     public Location getLocation() {
@@ -63,12 +71,17 @@ public class CurrentLocation {
     }
 
     public void setName(String name) {
-        this.locationProperty.get().setName(name);
+        this.locationProperty.get().setId(name);
         this.nameProperty.set(name);
     }
 
     public ObservableList<PosItem> getItems() {
-        return locationProperty.get().getItems();
+        Location location = locationProperty.get();
+        if (location != null) {
+            return location.getItems();
+        } else {
+            return FXCollections.emptyObservableList();
+        }
     }
 
     public ObservableList<Layer> getLayers() {
