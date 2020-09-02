@@ -5,7 +5,7 @@ import io.wsz.model.stage.Coords;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class CoordsPointEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
+public class CoordsPointEditStage<A extends PosItem<?,?>> extends CoordsShapeEditStage<A> {
     private final PointSetter pointSetter;
 
     public CoordsPointEditStage(Stage parent, A item, Coords point, Image background, PointSetter pointSetter) {

@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
-import io.wsz.model.item.ItemType;
 import javafx.stage.Stage;
 
 public class CoverAssetStage extends AssetStage<Cover> {
@@ -29,9 +28,6 @@ public class CoverAssetStage extends AssetStage<Cover> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
         super.fillInputs();
     }
 
@@ -46,12 +42,8 @@ public class CoverAssetStage extends AssetStage<Cover> {
     }
 
     @Override
-    protected Cover createNewAsset() {
-        return new Cover(getType(), controller);
+    protected Cover getNewAsset() {
+        return new Cover(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.COVER;
-    }
 }

@@ -10,7 +10,10 @@ import editor.view.asset.coords.PointSetter;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.animation.creature.CreatureAnimation;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.CreatureSize;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.FXCollections;
@@ -101,10 +104,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
         container.getChildren().addAll(middlePointButton, sizeBox, controlBox, speedBox, visionRangeBox, rangeBox, strengthBox, itemsButton);
 
         if (!isContent) {
-            if (item != null) {
-                container.getChildren().add(inventoryPlacesButton);
-                hookUpInventoryPlacesEditEvents();
-            }
+            container.getChildren().add(inventoryPlacesButton);
+            hookUpInventoryPlacesEditEvents();
         }
 
         hookUpMiddlePointEditEvents();
@@ -162,10 +163,6 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
-
         super.fillInputs();
 
         CreatureSize size = item.getIndividualSize();
@@ -271,12 +268,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
     }
 
     @Override
-    protected Creature createNewAsset() {
-        return new Creature(getType(), controller);
+    protected Creature getNewAsset() {
+        return new Creature(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.CREATURE;
-    }
 }

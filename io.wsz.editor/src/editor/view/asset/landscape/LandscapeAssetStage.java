@@ -3,7 +3,6 @@ package editor.view.asset.landscape;
 import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Landscape;
 import javafx.stage.Stage;
 
@@ -28,9 +27,6 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
         super.fillInputs();
     }
 
@@ -45,12 +41,8 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
     }
 
     @Override
-    protected Landscape createNewAsset() {
-        return new Landscape(getType(), controller);
+    protected Landscape getNewAsset() {
+        return new Landscape(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.LANDSCAPE;
-    }
 }

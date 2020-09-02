@@ -45,8 +45,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.animationPos = new CreatureAnimationPos();
     }
 
-    public Creature(ItemType type, Controller controller) {
-        super(type, controller);
+    public Creature(Controller controller) {
+        super(ItemType.CREATURE, controller);
         this.animationPos = new CreatureAnimationPos();
         this.inventory = new Inventory(this);
     }

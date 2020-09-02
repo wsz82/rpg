@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -56,9 +55,6 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
         super.fillInputs();
 
         Double damage = item.getIndividualDamage();
@@ -127,12 +123,8 @@ public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
     }
 
     @Override
-    protected Weapon createNewAsset() {
-        return new Weapon(getType(), controller);
+    protected Weapon getNewAsset() {
+        return new Weapon(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.WEAPON;
-    }
 }

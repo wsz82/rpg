@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
+public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<A> {
     protected final EditorCanvas editorCanvas;
     protected final EditorController editorController;
     protected final Controller controller;

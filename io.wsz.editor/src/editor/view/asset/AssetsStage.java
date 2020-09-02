@@ -90,7 +90,7 @@ public class AssetsStage extends ChildStage {
         root.getChildren().add(tabPane);
     }
 
-    private <A extends PosItem> void setUpTab(AssetsTableView<A> tableView, String tabName) {
+    private <A extends PosItem<?,?>> void setUpTab(AssetsTableView<A> tableView, String tabName) {
         tableView.setPointer(pointer);
         tableView.setContentTableView(contentTableView);
         Tab tab = new Tab();

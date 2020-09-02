@@ -7,8 +7,8 @@ public class InDoor extends Door<InDoor> {
 
     public InDoor() {}
 
-    public InDoor(ItemType type, Controller controller) {
-        super(type, controller);
+    public InDoor(Controller controller) {
+        super(ItemType.INDOOR, controller);
     }
 
     public InDoor(InDoor prototype, Boolean visible) {

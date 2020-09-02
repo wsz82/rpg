@@ -25,7 +25,7 @@ public class EquipmentTypeListView extends TypeListView<EquipmentType> {
 
     @Override
     protected StringConverter<EquipmentType> getStringConverter() {
-        StringConverter<EquipmentType> stringConverter = new StringConverter<>() {
+        return new StringConverter<>() {
             @Override
             public String toString(EquipmentType type) {
                 if (type == null) {
@@ -40,7 +40,6 @@ public class EquipmentTypeListView extends TypeListView<EquipmentType> {
                 return new EquipmentType(string);
             }
         };
-        return stringConverter;
     }
 
     @Override

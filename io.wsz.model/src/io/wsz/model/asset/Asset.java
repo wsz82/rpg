@@ -60,7 +60,11 @@ public abstract class Asset implements Externalizable {
     }
 
     public String getAssetId() {
-        return assetId;
+        if (assetId == null) {
+            return "";
+        } else {
+            return assetId;
+        }
     }
 
     public void setAssetId(String assetId) {

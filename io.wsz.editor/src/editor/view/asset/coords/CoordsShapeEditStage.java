@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class CoordsShapeEditStage<A extends PosItem> extends ChildStage {
+public abstract class CoordsShapeEditStage<A extends PosItem<?,?>> extends ChildStage {
     protected final ObservableList<Coords> coordsList = FXCollections.observableArrayList();
     protected final A item;
     protected final Image background;

@@ -31,8 +31,8 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         this.items = new ArrayList<>(0);
     }
 
-    public Container(ItemType type, Controller controller) {
-        super(type, controller);
+    public Container(Controller controller) {
+        super(ItemType.CONTAINER, controller);
         this.animationPos = new EquipmentAnimationPos();
         this.openableItem = new OpenableItem();
         this.items = new ArrayList<>(0);

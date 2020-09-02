@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OpenableItem;
 import javafx.stage.Stage;
 
@@ -34,10 +33,6 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
-
         OpenableItem openableItem = item.getOpenableItem();
         openable = new OpenableInDoor(this, item, openableItem, isContent);
         openable.initOpenable(container);
@@ -58,12 +53,8 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
     }
 
     @Override
-    protected InDoor createNewAsset() {
-        return new InDoor(getType(), controller);
+    protected InDoor getNewAsset() {
+        return new InDoor(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.INDOOR;
-    }
 }

@@ -23,7 +23,6 @@ import java.util.Optional;
 
 public class CoordsEdit {
     private final Coords pos;
-    private final boolean isContent;
     private final EditorCanvas editorCanvas;
     private final EditorController editorController;
     private final Controller controller;
@@ -35,7 +34,6 @@ public class CoordsEdit {
 
     public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
         this.pos = pos;
-        this.isContent = isContent;
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
         controller = editorController.getController();

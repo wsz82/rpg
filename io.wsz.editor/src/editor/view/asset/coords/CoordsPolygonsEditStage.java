@@ -21,16 +21,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditStage<A> {
+public class CoordsPolygonsEditStage<A extends PosItem<?,?>> extends CoordsShapeEditStage<A> {
     private final ObservableList<List<Coords>> polygons = FXCollections.observableArrayList();
     private final ChoiceBox<List<Coords>> polygonsCB = new ChoiceBox<>(polygons);
     private final List<List<Coords>> itemPolygons;
     private final MenuItem addPolygon = new MenuItem("Add polygon");
     private final Button deletePolygon = new Button("Delete polygon");
+    private final PolygonsSetter polygonsSetter;
 
-    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, A item, Image background) {
+    public CoordsPolygonsEditStage(Stage parent, List<List<Coords>> itemPolygons, A item, Image background, PolygonsSetter polygonsSetter) {
         super(parent, item, background);
+        if (itemPolygons == null) {
+            itemPolygons = new ArrayList<>(0);
+        }
         this.itemPolygons = itemPolygons;
+        this.polygonsSetter = polygonsSetter;
     }
 
     @Override
@@ -109,6 +114,7 @@ public class CoordsPolygonsEditStage<A extends PosItem> extends CoordsShapeEditS
     protected void saveShape() {
         itemPolygons.clear();
         itemPolygons.addAll(polygons);
+        polygonsSetter.set(itemPolygons);
         close();
     }
 

@@ -23,8 +23,8 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Weapon(ItemType type, Controller controller) {
-        super(type, controller);
+    public Weapon(Controller controller) {
+        super(ItemType.WEAPON, controller);
         this.animationPos = new EquipmentAnimationPos();
     }
 

@@ -2,16 +2,12 @@ package editor.view.asset;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
-import editor.view.asset.coords.CoordsLineEditStage;
-import editor.view.asset.coords.CoordsPointEditStage;
-import editor.view.asset.coords.CoordsPolygonsEditStage;
-import editor.view.asset.coords.PointSetter;
+import editor.view.asset.coords.*;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -32,7 +28,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class AssetStage<A extends PosItem> extends ChildStage {
+public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     protected final EditorCanvas editorCanvas;
     protected final EditorController editorController;
     protected final Controller controller;
@@ -40,11 +36,6 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
     protected final Button collisionButton = new Button("Collision");
-    protected final HBox animationBox = new HBox(10);
-    protected final Button animationButton = new Button("Animation");
-    protected final Label pathLabel = new Label();
-    protected final DoubleField animationSpeedInput = new DoubleField(true);
-    protected final ChoiceBox<Dialog> dialogsCB = new ChoiceBox<>();
 
     protected A item;
     protected boolean isContent;
@@ -53,6 +44,11 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
+    private final DoubleField animationSpeedInput = new DoubleField(true);
+    private final HBox animationBox = new HBox(10);
+    private final Button animationButton = new Button("Animation");
+    private final Label pathLabel = new Label();
+    private final ChoiceBox<Dialog> dialogsCB = new ChoiceBox<>();
 
     public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
@@ -67,11 +63,13 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         super(parent);
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = editorController.getController();
+        this.item = getNewAsset();
     }
 
     protected void initWindow() {
-        setTitle(getType().toString().toLowerCase() + " asset");
+        setTitle(item.getType().toString().toLowerCase() + " asset");
+
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
         containerWithButtons.setPadding(new Insets(10));
@@ -80,7 +78,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         final HBox buttons = new HBox(10);
         buttons.getChildren().add(cancel);
-        if (item == null) {
+        if (isItemBeingInitialized()) {
             buttons.getChildren().add(create);
             create.setDefaultButton(true);
             create.setOnAction(event -> {
@@ -109,10 +107,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
         container.getChildren().addAll(animationSpeedBox, interactionButton);
 
-        if (item != null) {
-            if (!isContent) {
-                container.getChildren().addAll(coverButton, collisionButton);
-            }
+        if (!isContent) {
+            container.getChildren().addAll(coverButton, collisionButton);
         }
 
         final HBox dialogBox = new HBox(10);
@@ -127,6 +123,10 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             idInput.setDisable(true);
         }
         hookUpAssetEvents();
+    }
+
+    private boolean isItemBeingInitialized() {
+        return item.getPath() == null;
     }
 
     private void setUpDialogCB() {
@@ -187,7 +187,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         boolean assetNameAlreadyExists = assets.stream()
                 .anyMatch(a -> a.getAssetId().equals(id));
         if (assetNameAlreadyExists) {
-            alertOfNameExisting();
+            alertOfIdExisting();
             return;
         }
         addNewAsset();
@@ -235,7 +235,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     public void setUpDirChooser(String title, Label label) {
         final DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
-        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(getType(), controller));
+        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(item.getType(), controller));
         File selectedFile = dirChooser.showDialog(this);
         fillPath(label, selectedFile);
     }
@@ -244,8 +244,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (selectedFile == null) {
             return;
         }
-        boolean isNotFileOrDirectory = !selectedFile.isFile() && !selectedFile.isDirectory();
-        if (isNotFileOrDirectory) {
+        boolean isNotDirectory = !selectedFile.isDirectory();
+        if (isNotDirectory) {
             return;
         }
         String selectedFilePath = selectedFile.getAbsolutePath();
@@ -264,9 +264,9 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (background == null) {
             return;
         }
-        Coords interactionCoords = item.getIndividualInteractionPoint();
+        Coords interactionPoint = item.getIndividualInteractionPoint();
         PointSetter pointSetter = item::setInteractionPoint;
-        CoordsPointEditStage interactionEdit = new CoordsPointEditStage(this, item, interactionCoords, background, pointSetter);
+        CoordsPointEditStage<A> interactionEdit = new CoordsPointEditStage<>(this, item, interactionPoint, background, pointSetter);
         interactionEdit.initWindow(false, "Interaction point edit");
         interactionEdit.show();
     }
@@ -281,7 +281,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         List<Coords> coverLine = item.getCoverLine();
-        CoordsLineEditStage coverEdit = new CoordsLineEditStage(this, item, coverLine, background);
+        CoordsLineEditStage<A> coverEdit = new CoordsLineEditStage<>(this, item, coverLine, background);
         coverEdit.initWindow(isContent, "Cover edit");
         coverEdit.show();
     }
@@ -296,7 +296,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             return;
         }
         List<List<Coords>> collisionPolygons = item.getCollisionPolygons();
-        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, collisionPolygons, item, background);
+        PolygonsSetter collisionPolygonsSetter = item::setCollisionPolygons;
+        CoordsPolygonsEditStage<A> collisionEdit = new CoordsPolygonsEditStage<>(this, collisionPolygons, item, background, collisionPolygonsSetter);
         collisionEdit.initWindow(isContent, "Collision edit");
         collisionEdit.show();
     }
@@ -306,7 +307,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
         File required = new File(
-                controller.getProgramDir() + Asset.getRelativeTypePath(getType()));
+                controller.getProgramDir() + Asset.getRelativeTypePath(item.getType()));
         String requiredPath = required.getAbsolutePath().toLowerCase();
         if (!parent.equals(required)) {
             alertWrongDirectory(actualPath, requiredPath);
@@ -317,7 +318,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
 
     private void alertWrongDirectory(String actualPath, String requiredPath) {
         final Alert alert = new Alert(
-                Alert.AlertType.ERROR, "Get image from directory: " + requiredPath
+                Alert.AlertType.ERROR, "Get animation from directory: " + requiredPath
                 + "\n" + "Actual: " + actualPath, ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
@@ -325,23 +326,21 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void addNewAsset() {
-        String name = idInput.getText();
+        String id = idInput.getText();
         String path = pathLabel.getText();
         String relativePath = Asset.convertToRelativePath(path);
-        item.setAssetId(name);
+        item.setAssetId(id);
         item.setPath(relativePath);
         addAssetToList(item);
     }
 
     protected abstract void addAssetToList(A asset);
 
-    protected abstract A createNewAsset();
+    protected abstract A getNewAsset();
 
-    protected abstract ItemType getType();
-
-    private void alertOfNameExisting() {
+    private void alertOfIdExisting() {
         final Alert alert = new Alert(
-                Alert.AlertType.INFORMATION, "This name already exists!", ButtonType.CANCEL);
+                Alert.AlertType.INFORMATION, "This ID already exists!", ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());

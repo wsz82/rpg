@@ -26,8 +26,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         this.animationPos = new AnimationPos();
     }
 
-    public Teleport(ItemType type, Controller controller) {
-        super(type, controller);
+    public Teleport(Controller controller) {
+        super(ItemType.TELEPORT, controller);
         this.animationPos = new AnimationPos();
         this.exit = new Coords();
         this.teleportCollisionPolygons = new ArrayList<>(0);
@@ -59,6 +59,10 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     public void setExit(Coords exit) {
         this.exit = exit;
+    }
+
+    public List<List<Coords>> getIndividualTeleportCollisionPolygons() {
+        return teleportCollisionPolygons;
     }
 
     public List<List<Coords>> getTeleportCollisionPolygons() {

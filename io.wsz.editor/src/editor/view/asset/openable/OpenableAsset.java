@@ -3,6 +3,7 @@ package editor.view.asset.openable;
 import editor.view.asset.AssetStage;
 import editor.view.asset.coords.CoordsLineEditStage;
 import editor.view.asset.coords.CoordsPolygonsEditStage;
+import editor.view.asset.coords.PolygonsSetter;
 import io.wsz.model.item.Openable;
 import io.wsz.model.item.OpenableItem;
 import io.wsz.model.item.PosItem;
@@ -14,7 +15,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-public abstract class OpenableAsset<A extends PosItem> {
+public abstract class OpenableAsset<A extends PosItem<?,?>> {
     protected final AssetStage<A> assetStage;
     protected final A item;
     protected final OpenableItem openableItem;
@@ -54,7 +55,7 @@ public abstract class OpenableAsset<A extends PosItem> {
             return;
         }
         List<Coords> openDoorCoverLine = openableItem.getOpenCoverLine();
-        CoordsLineEditStage coverEdit = new CoordsLineEditStage(assetStage, item, openDoorCoverLine, background);
+        CoordsLineEditStage<A> coverEdit = new CoordsLineEditStage<>(assetStage, item, openDoorCoverLine, background);
         coverEdit.initWindow(isContent, "Open cover edit");
         coverEdit.show();
     }
@@ -67,7 +68,9 @@ public abstract class OpenableAsset<A extends PosItem> {
             return;
         }
         List<List<Coords>> openDoorCollisionPolygons = openableItem.getOpenCollisionPolygons();
-        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(assetStage, openDoorCollisionPolygons, item, background);
+        PolygonsSetter openCollisionPolygonsSetter = openableItem::setOpenCollisionPolygons;
+        CoordsPolygonsEditStage<A> collisionEdit =
+                new CoordsPolygonsEditStage<>(assetStage, openDoorCollisionPolygons, item, background, openCollisionPolygonsSetter);
         collisionEdit.initWindow(isContent, "Open collision edit");
         collisionEdit.show();
     }

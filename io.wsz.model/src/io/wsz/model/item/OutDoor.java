@@ -19,8 +19,8 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor() {}
 
-    public OutDoor(ItemType type, Controller controller) {
-        super(type, controller);
+    public OutDoor(Controller controller) {
+        super(ItemType.OUTDOOR, controller);
         this.exit = new Coords();
     }
 

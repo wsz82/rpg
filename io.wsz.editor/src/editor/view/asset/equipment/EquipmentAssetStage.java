@@ -19,7 +19,7 @@ import javafx.util.StringConverter;
 
 import java.util.Optional;
 
-public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStage<A> {
+public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends AssetStage<A> {
     protected final ChoiceBox<InventoryPlaceType> occupiedPlaceCB = new ChoiceBox<>();
     protected final ChoiceBox<EquipmentType> typeCB = new ChoiceBox<>();
     protected final DoubleField inputWeight = new DoubleField(0.0, isContent);

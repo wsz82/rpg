@@ -7,7 +7,6 @@ import editor.view.asset.ItemsStage;
 import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.OpenableItem;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -49,12 +48,9 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
         final Label sizeLabel = new Label("Netto size");
         sizeBox.getChildren().addAll(sizeLabel, inputNettoSize);
 
-        container.getChildren().addAll(weightBox, sizeBox);
+        container.getChildren().addAll(weightBox, sizeBox, itemsButton);
 
-        if (item != null) {
-            container.getChildren().add(itemsButton);
-            hookupContainerEvents();
-        }
+        hookupContainerEvents();
 
         fillInputs();
     }
@@ -68,9 +64,6 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
         OpenableItem openableItem = item.getIndividualOpenableItem();
         openable = new OpenableContainer(this, item, openableItem, isContent);
         openable.initOpenable(container);
@@ -97,6 +90,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
     protected void defineAsset() {
         super.defineAsset();
         openable.defineOpenable();
+
         String nettoWeight = inputNettoWeight.getText();
         if (nettoWeight.isEmpty()) {
             if (isContent) {
@@ -126,12 +120,8 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
     }
 
     @Override
-    protected Container createNewAsset() {
-        return new Container(getType(), controller);
+    protected Container getNewAsset() {
+        return new Container(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.CONTAINER;
-    }
 }

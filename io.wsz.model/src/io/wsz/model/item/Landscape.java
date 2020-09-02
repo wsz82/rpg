@@ -20,8 +20,8 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
         this.animationPos = new AnimationPos();
     }
 
-    public Landscape(ItemType type, Controller controller) {
-        super(type, controller);
+    public Landscape(Controller controller) {
+        super(ItemType.LANDSCAPE, controller);
         this.animationPos = new AnimationPos();
     }
 

@@ -12,7 +12,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 
-public abstract class EquipmentTableView<E extends Equipment> extends AssetsTableView<E> {
+public abstract class EquipmentTableView<E extends Equipment<?,?>> extends AssetsTableView<E> {
 
     public EquipmentTableView(Stage parent, ObservableList<E> assets,
                               EditorCanvas editorCanvas, EditorController editorController) {

@@ -21,8 +21,8 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         this.animationPos = new AnimationPos();
     }
 
-    public Cover(ItemType type, Controller controller) {
-        super(type, controller);
+    public Cover(Controller controller) {
+        super(ItemType.COVER, controller);
         this.animationPos = new AnimationPos();
     }
 

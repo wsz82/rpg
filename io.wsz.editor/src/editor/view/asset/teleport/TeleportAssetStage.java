@@ -4,10 +4,11 @@ import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.asset.coords.CoordsEdit;
 import editor.view.asset.coords.CoordsPolygonsEditStage;
+import editor.view.asset.coords.PolygonsSetter;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -19,7 +20,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     private final Button teleportCollisionButton = new Button("Teleport area");
 
-    private CoordsEdit coordsEdit;
+    private CoordsEdit exitEdit;
 
     public TeleportAssetStage(Stage parent, Teleport asset, boolean isContent,
                               EditorCanvas editorCanvas, EditorController editorController) {
@@ -37,11 +38,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
         super.initWindow();
         setTitle(TITLE);
 
-        if (item != null) {
-            if (!isContent) {
-                container.getChildren().addAll(teleportCollisionButton);
-            }
-        }
+        container.getChildren().addAll(teleportCollisionButton);
 
         fillInputs();
         hookUpTeleportEvents();
@@ -52,23 +49,26 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     private void openTeleportAreaEdit() {
-        Image background = item.getImage().getFxImage();
+        ResolutionImage image = item.getImage();
+        if (image == null) {
+            return;
+        }
+        Image background = image.getFxImage();
         if (background == null) {
             return;
         }
-        List<List<Coords>> teleportAreaPolygons = item.getTeleportCollisionPolygons();
-        CoordsPolygonsEditStage collisionEdit = new CoordsPolygonsEditStage(this, teleportAreaPolygons, item, background);
-        collisionEdit.initWindow(isContent, "Teleport area edit");
+        List<List<Coords>> teleportAreaPolygons = item.getIndividualTeleportCollisionPolygons();
+        PolygonsSetter teleportAreaSetter = item::setTeleportCollisionPolygons;
+        CoordsPolygonsEditStage<Teleport> collisionEdit =
+                new CoordsPolygonsEditStage<>(this, teleportAreaPolygons, item, background, teleportAreaSetter);
+        collisionEdit.initWindow(false, "Teleport area edit");
         collisionEdit.show();
     }
 
     @Override
     protected void fillInputs() {
-        if (item == null) {
-            item = createNewAsset();
-        }
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
-        coordsEdit.initCoords(container);
+        exitEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
+        exitEdit.initCoords(container);
 
         super.fillInputs();
     }
@@ -77,7 +77,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     protected void defineAsset() {
         super.defineAsset();
         Coords exit = item.getIndividualExit();
-        item.setExit(coordsEdit.defineCoords(exit));
+        item.setExit(exitEdit.defineCoords(exit));
     }
 
     @Override
@@ -86,12 +86,8 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
     }
 
     @Override
-    protected Teleport createNewAsset() {
-        return new Teleport(getType(), controller);
+    protected Teleport getNewAsset() {
+        return new Teleport(controller);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.TELEPORT;
-    }
 }
