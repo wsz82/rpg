@@ -1,13 +1,21 @@
 package io.wsz.model.animation.creature;
 
+import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.sizes.Paths;
+import io.wsz.model.sizes.Sizes;
 
-public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+public class CreatureAnimationPos extends AnimationPos {
+    private static final long serialVersionUID = 1L;
+
     private CreatureAnimationType curCreatureAnimationType;
     private String curMoveAnimation;
     private String moveDirection;
     private long nextPortraitUpdate;
-    private long timeToStartPlayIdleAfterStop;
+    private long nextTimeToStartPlayIdleAfterStop;
 
     public CreatureAnimationPos() {
         this.curCreatureAnimationType = CreatureAnimationType.IDLE;
@@ -20,7 +28,7 @@ public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
         this.curMoveAnimation = other.curMoveAnimation;
         this.moveDirection = other.moveDirection;
         this.nextPortraitUpdate = other.nextPortraitUpdate;
-        this.timeToStartPlayIdleAfterStop = other.timeToStartPlayIdleAfterStop;
+        this.nextTimeToStartPlayIdleAfterStop = other.nextTimeToStartPlayIdleAfterStop;
     }
 
     public CreatureAnimationType getCurAnimation() {
@@ -60,12 +68,59 @@ public class CreatureAnimationPos extends io.wsz.model.animation.AnimationPos {
         this.nextPortraitUpdate = nextPortraitUpdate;
     }
 
-    public long getTimeToStartPlayIdleAfterStop() {
-        return timeToStartPlayIdleAfterStop;
+    public long getNextTimeToStartPlayIdleAfterStop() {
+        return nextTimeToStartPlayIdleAfterStop;
     }
 
-    public void setTimeToStartPlayIdleAfterStop(long timeToStartPlayIdleAfterStop) {
-        this.timeToStartPlayIdleAfterStop = timeToStartPlayIdleAfterStop;
+    public void setNextTimeToStartPlayIdleAfterStop(long nextTimeToStartPlayIdleAfterStop) {
+        this.nextTimeToStartPlayIdleAfterStop = nextTimeToStartPlayIdleAfterStop;
     }
 
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+
+        out.writeObject(curCreatureAnimationType);
+
+        out.writeObject(curMoveAnimation);
+
+        out.writeObject(moveDirection);
+
+        long menuOpenTime = Sizes.getTimeOfMenuOpen();
+
+        if (nextPortraitUpdate > menuOpenTime) {
+            out.writeLong(menuOpenTime - nextPortraitUpdate);
+        } else {
+            out.writeLong(0);
+        }
+
+        if (nextTimeToStartPlayIdleAfterStop > menuOpenTime) {
+            out.writeLong(menuOpenTime - nextTimeToStartPlayIdleAfterStop);
+        } else {
+            out.writeLong(0);
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+
+        curCreatureAnimationType = (CreatureAnimationType) in.readObject();
+
+        curMoveAnimation = (String) in.readObject();
+
+        moveDirection = (String) in.readObject();
+
+        long curTime = System.currentTimeMillis();
+
+        long timeToNextPortraitUpdate = in.readLong();
+        if (timeToNextPortraitUpdate != 0) {
+            nextPortraitUpdate = curTime + timeToNextPortraitUpdate;
+        }
+
+        long timeToStartPlayIdleAfterStop = in.readLong();
+        if (timeToNextPortraitUpdate != 0) {
+            this.nextTimeToStartPlayIdleAfterStop = curTime + timeToStartPlayIdleAfterStop;
+        }
+    }
 }

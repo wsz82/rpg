@@ -14,7 +14,7 @@ public class Animation<A extends PosItem> {
     protected static final Random RANDOM = new Random();
 
     private static final Map<String, List<ResolutionImage>> IDLES_WITHOUT_MAIN = new HashMap<>(0);
-    private static final List<List<ResolutionImage>> IDLES_FOR_RANDOM = new ArrayList<>(0);
+    private static final List<String> IDLES_FOR_RANDOM = new ArrayList<>(0);
     private static final int MIN_IDLE_UPDATE_TIME_SEC = 2;
     private static final int MAX_IDLE_UPDATE_TIME_SEC = 4;
 
@@ -123,9 +123,9 @@ public class Animation<A extends PosItem> {
         Map<String, List<ResolutionImage>> curAnimation = idles.get(curIdleAnimation);
         if (curAnimation == null) return null;
         if (curAnimation.size() > 1) {
-            List<ResolutionImage> idleSequence = animationPos.getCurIdleSequence();
+            String idleSequence = animationPos.getCurIdleSequence();
             if (idleSequence == null) {
-                List<ResolutionImage> randomIdleSequence = getRandomIdleSequence(animationPos, curTime);
+                String randomIdleSequence = getRandomIdleSequence(animationPos, curTime);
                 animationPos.setCurIdleSequence(randomIdleSequence);
             }
             long nearestIdleUpdate = animationPos.getNextTemporaryIdleUpdate();
@@ -142,7 +142,11 @@ public class Animation<A extends PosItem> {
     }
 
     private ResolutionImage getNextTemporaryIdle(AnimationPos animationPos, double speed) {
-        List<ResolutionImage> frames = animationPos.getCurIdleSequence();
+        String curIdleAnimation = animationPos.getCurIdleAnimation();
+        if (curIdleAnimation == null) return null;
+        String curIdleSequence = animationPos.getCurIdleSequence();
+        if (curIdleSequence == null) return null;
+        List<ResolutionImage> frames = idles.get(curIdleAnimation).get(curIdleSequence);
 
         if (frames == null) return null;
         int framesSize = frames.size();
@@ -164,7 +168,11 @@ public class Animation<A extends PosItem> {
     }
 
     private ResolutionImage forceGetNextTemporaryIdle(AnimationPos animationPos, int framesSize, double speed) {
-        List<ResolutionImage> frames = animationPos.getCurIdleSequence();
+        String curIdleAnimation = animationPos.getCurIdleAnimation();
+        if (curIdleAnimation == null) return null;
+        String curIdleSequence = animationPos.getCurIdleSequence();
+        if (curIdleSequence == null) return null;
+        List<ResolutionImage> frames = idles.get(curIdleAnimation).get(curIdleSequence);
 
         int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
         if (animationPos.isCycleFinished()) {
@@ -223,7 +231,7 @@ public class Animation<A extends PosItem> {
         return getNextTemporaryIdle(animationPos, speed);
     }
 
-    private List<ResolutionImage> getRandomIdleSequence(AnimationPos animationPos, long curTime) {
+    private String getRandomIdleSequence(AnimationPos animationPos, long curTime) {
         long nextIdleUpdate = getNextIdleUpdate(curTime);
         animationPos.setNextTemporaryIdleUpdate(nextIdleUpdate);
         String curIdleAnimation = animationPos.getCurIdleAnimation();
@@ -231,12 +239,12 @@ public class Animation<A extends PosItem> {
         return getRandomIdleSequence(animation);
     }
 
-    protected List<ResolutionImage> getRandomIdleSequence(Map<String, List<ResolutionImage>> idles) {
+    protected String getRandomIdleSequence(Map<String, List<ResolutionImage>> idles) {
         IDLES_WITHOUT_MAIN.clear();
         IDLES_WITHOUT_MAIN.putAll(idles);
         IDLES_WITHOUT_MAIN.remove(MAIN);
         IDLES_FOR_RANDOM.clear();
-        IDLES_FOR_RANDOM.addAll(IDLES_WITHOUT_MAIN.values());
+        IDLES_FOR_RANDOM.addAll(IDLES_WITHOUT_MAIN.keySet());
         int idlesSize = IDLES_FOR_RANDOM.size();
         int randomIndex = RANDOM.nextInt(idlesSize);
         return IDLES_FOR_RANDOM.get(randomIndex);

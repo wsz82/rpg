@@ -18,13 +18,11 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, AnimationPos> i
 
     private DoorAnimation animation;
 
-    private final AnimationPos animationPos;
+    private AnimationPos animationPos;
     private OpenableItem openableItem;
     protected boolean isOpen;
 
-    public Door() {
-        this.animationPos = new AnimationPos();
-    }
+    public Door() {}
 
     public Door(ItemType type, Controller controller) {
         super(type, controller);
@@ -176,6 +174,8 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, AnimationPos> i
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(animationPos);
+
         out.writeBoolean(isOpen);
 
         out.writeObject(openableItem);
@@ -185,6 +185,9 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, AnimationPos> i
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new AnimationPos();
+        animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new DoorAnimation(getDir());

@@ -18,13 +18,11 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     private Animation<Teleport> animation;
 
-    private final AnimationPos animationPos;
+    private AnimationPos animationPos;
     private Coords exit;
     private List<List<Coords>> teleportCollisionPolygons;
 
-    public Teleport() {
-        this.animationPos = new AnimationPos();
-    }
+    public Teleport() {}
 
     public Teleport(Controller controller) {
         super(ItemType.TELEPORT, controller);
@@ -99,6 +97,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(animationPos);
+
         out.writeObject(exit);
 
         out.writeObject(teleportCollisionPolygons);
@@ -108,6 +108,9 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new AnimationPos();
+        animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new Animation<>(getDir());

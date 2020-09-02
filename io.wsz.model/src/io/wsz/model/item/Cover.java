@@ -15,11 +15,9 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
 
     private Animation<Cover> animation;
 
-    private final AnimationPos animationPos;
+    private AnimationPos animationPos;
 
-    public Cover() {
-        this.animationPos = new AnimationPos();
-    }
+    public Cover() {}
 
     public Cover(Controller controller) {
         super(ItemType.COVER, controller);
@@ -49,12 +47,17 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
+
+        out.writeObject(animationPos);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new AnimationPos();
+        animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new Animation<>(getDir());

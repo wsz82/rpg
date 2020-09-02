@@ -14,11 +14,9 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
 
     private Animation<Landscape> animation;
 
-    private final AnimationPos animationPos;
+    private AnimationPos animationPos;
 
-    public Landscape() {
-        this.animationPos = new AnimationPos();
-    }
+    public Landscape() {}
 
     public Landscape(Controller controller) {
         super(ItemType.LANDSCAPE, controller);
@@ -48,12 +46,17 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
+
+        out.writeObject(animationPos);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new AnimationPos();
+        animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new Animation<>(getDir());

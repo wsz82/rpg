@@ -14,14 +14,12 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
 
     private WeaponAnimation animation;
 
-    private final EquipmentAnimationPos animationPos;
+    private EquipmentAnimationPos animationPos;
     private Double damage;
     private Double range;
     private Double speed;
 
-    public Weapon() {
-        this.animationPos = new EquipmentAnimationPos();
-    }
+    public Weapon() {}
 
     public Weapon(Controller controller) {
         super(ItemType.WEAPON, controller);
@@ -141,6 +139,8 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(animationPos);
+
         out.writeObject(damage);
 
         out.writeObject(range);
@@ -152,6 +152,9 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new EquipmentAnimationPos();
+        animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new WeaponAnimation(getDir());

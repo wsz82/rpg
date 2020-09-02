@@ -1,14 +1,18 @@
 package io.wsz.model.animation;
 
 import io.wsz.model.sizes.Paths;
-import io.wsz.model.stage.ResolutionImage;
+import io.wsz.model.sizes.Sizes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class AnimationPos {
+public class AnimationPos implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
     protected String curIdleAnimation;
-    protected List<ResolutionImage> curIdleSequence;
+    protected String curIdleSequence;
     protected int frameNumber;
     protected boolean isCycleFinished;
     protected long nextFrameUpdate;
@@ -21,12 +25,7 @@ public class AnimationPos {
 
     public AnimationPos(AnimationPos other) {
         this.curIdleAnimation = other.curIdleAnimation;
-        List<ResolutionImage> curIdleSequence = other.curIdleSequence;
-        if (curIdleSequence == null) {
-            this.curIdleSequence = null;
-        } else {
-            this.curIdleSequence = new ArrayList<>(curIdleSequence);
-        }
+        this.curIdleSequence = other.curIdleSequence;
         this.frameNumber = other.frameNumber;
         this.isCycleFinished = other.isCycleFinished;
         this.nextFrameUpdate = other.nextFrameUpdate;
@@ -45,11 +44,11 @@ public class AnimationPos {
         this.curIdleAnimation = curIdleAnimation;
     }
 
-    public List<ResolutionImage> getCurIdleSequence() {
+    public String getCurIdleSequence() {
         return curIdleSequence;
     }
 
-    public void setCurIdleSequence(List<ResolutionImage> curIdleSequence) {
+    public void setCurIdleSequence(String curIdleSequence) {
         this.curIdleSequence = curIdleSequence;
     }
 
@@ -106,5 +105,61 @@ public class AnimationPos {
         if (this.isTemporaryIdle == isTemporaryIdle) return;
         frameNumber = 0;
         this.isTemporaryIdle = isTemporaryIdle;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(Sizes.VERSION);
+
+        out.writeObject(curIdleAnimation);
+
+        out.writeObject(curIdleSequence);
+
+        out.writeInt(frameNumber);
+
+        out.writeBoolean(isCycleFinished);
+
+        long menuOpenTime = Sizes.getTimeOfMenuOpen();
+
+        if (nextFrameUpdate > menuOpenTime) {
+            out.writeLong(menuOpenTime - nextFrameUpdate);
+        } else {
+            out.writeLong(0);
+        }
+
+        if (nextTemporaryIdleUpdate > menuOpenTime) {
+            out.writeLong(menuOpenTime - nextTemporaryIdleUpdate);
+        } else {
+            out.writeLong(0);
+        }
+
+        out.writeBoolean(isTemporaryIdle);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        long ver = in.readLong();
+
+        curIdleAnimation = (String) in.readObject();
+
+        curIdleSequence = (String) in.readObject();
+
+        frameNumber = in.readInt();
+
+        isCycleFinished = in.readBoolean();
+
+        long curTime = System.currentTimeMillis();
+
+        long timeToNextFrameUpdate = in.readLong();
+        if (timeToNextFrameUpdate != 0) {
+            this.nextFrameUpdate = curTime + timeToNextFrameUpdate;
+        }
+
+        long timeToNextTemporaryIdleUpdate = in.readLong();
+        if (timeToNextTemporaryIdleUpdate != 0) {
+            nextTemporaryIdleUpdate = curTime + timeToNextTemporaryIdleUpdate;
+        }
+
+        isTemporaryIdle = in.readBoolean();
     }
 }

@@ -19,7 +19,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     private ContainerAnimation animation;
 
-    private final EquipmentAnimationPos animationPos;
+    private EquipmentAnimationPos animationPos;
     private OpenableItem openableItem;
     private final List<Equipment> items;
     private Double nettoWeight;
@@ -27,7 +27,6 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     private boolean isOpen;
 
     public Container() {
-        this.animationPos = new EquipmentAnimationPos();
         this.items = new ArrayList<>(0);
     }
 
@@ -293,6 +292,8 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(animationPos);
+
         out.writeObject(items);
 
         out.writeObject(nettoWeight);
@@ -308,6 +309,9 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new EquipmentAnimationPos();
+        animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new ContainerAnimation(getDir());

@@ -144,7 +144,7 @@ public class CreatureAnimation extends Animation<Creature> {
         int randomTimeToStartIdleMillis = getRandomMillis(MAX_STOP_WAIT_TIME_SEC, MIN_STOP_WAIT_TIME_SEC);
         long curTime = System.currentTimeMillis();
         long timeToPlayIdleAfterStop = curTime + randomTimeToStartIdleMillis;
-        animationPos.setTimeToStartPlayIdleAfterStop(timeToPlayIdleAfterStop);
+        animationPos.setNextTimeToStartPlayIdleAfterStop(timeToPlayIdleAfterStop);
 
         String curMoveAnimation = animationPos.getCurMoveAnimation();
         String moveDirection = animationPos.getMoveDirection();
@@ -245,7 +245,7 @@ public class CreatureAnimation extends Animation<Creature> {
     protected ResolutionImage getNextIdle(AnimationPos animationPos, double speed) {
         long curTime = System.currentTimeMillis();
 
-        long timeToStartPlayIdleAfterStop = ((CreatureAnimationPos) animationPos).getTimeToStartPlayIdleAfterStop();
+        long timeToStartPlayIdleAfterStop = ((CreatureAnimationPos) animationPos).getNextTimeToStartPlayIdleAfterStop();
         if (curTime < timeToStartPlayIdleAfterStop) return null;
         return super.getNextIdle(animationPos, speed);
     }

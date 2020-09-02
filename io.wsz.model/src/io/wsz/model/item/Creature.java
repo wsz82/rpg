@@ -31,7 +31,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private CreatureAnimation animation;
 
     private final Task task = new Task();
-    private final CreatureAnimationPos animationPos;
+    private CreatureAnimationPos animationPos;
     private Coords middlePoint;
     private Inventory inventory;
     private CreatureSize size;
@@ -41,9 +41,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private Double range;
     private Integer strength;
 
-    public Creature() {
-        this.animationPos = new CreatureAnimationPos();
-    }
+    public Creature() {}
 
     public Creature(Controller controller) {
         super(ItemType.CREATURE, controller);
@@ -589,6 +587,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(animationPos);
+
         out.writeObject(task);
 
         out.writeObject(middlePoint);
@@ -612,6 +612,9 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+//        animationPos = new CreatureAnimationPos();
+        animationPos = (CreatureAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new CreatureAnimation(getDir());

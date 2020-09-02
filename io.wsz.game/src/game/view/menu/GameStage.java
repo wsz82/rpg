@@ -5,6 +5,7 @@ import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
@@ -49,9 +50,9 @@ public class GameStage extends Stage {
             root.setCenter(parentToReturn);
             if (parentToReturn == gameMenu) {
                 gameController.setGame(false);
+                Sizes.setTimeOfMenuOpen(System.currentTimeMillis());
                 setGameMenuForCenter();
-            } else
-            if (parentToReturn == gameView.getCanvas()) {
+            } else if (parentToReturn == gameView.getCanvas()) {
                 gameController.resumeGame();
             }
         }

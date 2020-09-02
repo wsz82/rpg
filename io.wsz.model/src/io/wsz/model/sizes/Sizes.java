@@ -24,6 +24,7 @@ public class Sizes {
     private static int verticalMeter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
     private static int portraitSize;
+    private static long timeOfMenuOpen;
 
     private static boolean resizeWithResolution;
     private static boolean reloadImages;
@@ -98,5 +99,13 @@ public class Sizes {
 
     public static void setReloadDialogImages(boolean reloadDialogImages) {
         Sizes.reloadDialogImages = reloadDialogImages;
+    }
+
+    public static long getTimeOfMenuOpen() {
+        return timeOfMenuOpen;
+    }
+
+    public static void setTimeOfMenuOpen(long timeOfMenuOpen) {
+        Sizes.timeOfMenuOpen = timeOfMenuOpen;
     }
 }
