@@ -38,20 +38,21 @@ public abstract class Asset implements Externalizable {
         if (path == null) {
             System.out.println("Null path passed to method");
         }
-        ItemType type = getType();
-        return getRelativeTypePath(type) + path;
+        return getRelativeTypePath() + path;
     }
 
-    public static File createAssetTypeDir(ItemType type, Controller controller) {
-        String relativeTypePath = getRelativeTypePath(type);
+    public File getTypeDir(Controller controller) {
+        String relativeTypePath = getRelativeTypePath();
         File dir = new File(controller.getProgramDir() + relativeTypePath);
         if (!dir.exists()) dir.mkdirs();
         return dir;
     }
 
-    public static String getRelativeTypePath(ItemType type) {
-        return Paths.ASSETS_DIR + File.separator + type.toString().toLowerCase();
+    public String getRelativeTypePath() {
+        return Paths.ASSETS_DIR + File.separator + getAssetDirName();
     }
+
+    protected abstract String getAssetDirName();
 
     public static String convertToRelativePath(String path) {
         File file = new File(path);

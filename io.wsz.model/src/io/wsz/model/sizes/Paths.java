@@ -3,6 +3,15 @@ package io.wsz.model.sizes;
 import java.io.File;
 
 public class Paths {
+    public static final String CREATURES = "Creatures";
+    public static final String COVERS = "Covers";
+    public static final String LANDSCAPES = "Landscapes";
+    public static final String TELEPORTS = "Teleports";
+    public static final String WEAPONS = "Weapons";
+    public static final String CONTAINERS = "Containers";
+    public static final String INDOORS = "InDoors";
+    public static final String OUTDOORS = "OutDoors";
+
     public static final String PLUGINS = "plugins";
     public static final String PLUGINS_DIR = File.separator + PLUGINS;
     public static final String PLUGIN = "plugin";

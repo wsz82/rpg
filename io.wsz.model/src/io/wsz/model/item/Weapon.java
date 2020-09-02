@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.weapon.WeaponAnimation;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.IOException;
@@ -38,6 +39,11 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         this.range = other.range;
         this.speed = other.speed;
         this.equipmentType = other.equipmentType;
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.WEAPONS;
     }
 
     @Override

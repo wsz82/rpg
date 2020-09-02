@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.Paths;
 
 public class InDoor extends Door<InDoor> {
     private static final long serialVersionUID = 1L;
@@ -13,6 +14,11 @@ public class InDoor extends Door<InDoor> {
 
     public InDoor(InDoor prototype, Boolean visible) {
         super(prototype, visible);
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.INDOORS;
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.effect.Teleportation;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
@@ -26,6 +27,11 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor(OutDoor prototype, Boolean visible) {
         super(prototype, visible);
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.OUTDOORS;
     }
 
     public boolean enter(Creature cr) {

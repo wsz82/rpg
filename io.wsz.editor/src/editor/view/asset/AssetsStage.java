@@ -14,6 +14,7 @@ import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.item.*;
+import io.wsz.model.sizes.Paths;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -57,35 +58,35 @@ public class AssetsStage extends ChildStage {
 
         ObservableList<Creature> creatures = observableAssets.getCreatures();
         AssetsTableView<Creature> creatureTableView = new CreatureTableView(this, creatures, editorCanvas, editorController);
-        setUpTab(creatureTableView, "Creatures");
+        setUpTab(creatureTableView, Paths.CREATURES);
 
         ObservableList<Cover> covers = observableAssets.getCovers();
         AssetsTableView<Cover> coverTableView = new CoverTableView(this, covers, editorCanvas, editorController);
-        setUpTab(coverTableView, "Covers");
+        setUpTab(coverTableView, Paths.COVERS);
 
         ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
         AssetsTableView<Landscape> landscapeTableView = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
-        setUpTab(landscapeTableView, "Landscapes");
+        setUpTab(landscapeTableView, Paths.LANDSCAPES);
 
         ObservableList<Teleport> teleports = observableAssets.getTeleports();
         AssetsTableView<Teleport> teleportTableView = new TeleportTableView(this, teleports, editorCanvas, editorController);
-        setUpTab(teleportTableView, "Teleports");
+        setUpTab(teleportTableView, Paths.TELEPORTS);
 
         ObservableList<Weapon> weapons = observableAssets.getWeapons();
         AssetsTableView<Weapon> weaponsTableView = new WeaponsTableView(this, weapons, editorCanvas, editorController);
-        setUpTab(weaponsTableView, "Weapons");
+        setUpTab(weaponsTableView, Paths.WEAPONS);
 
         ObservableList<Container> containers = observableAssets.getContainers();
         AssetsTableView<Container> containerTableView = new ContainerTableView(this, containers, editorCanvas, editorController);
-        setUpTab(containerTableView, "Containers");
+        setUpTab(containerTableView, Paths.CONTAINERS);
 
         ObservableList<InDoor> inDoors = observableAssets.getInDoors();
         AssetsTableView<InDoor> inDoorTableView = new InDoorTableView(this, inDoors, editorCanvas, editorController);
-        setUpTab(inDoorTableView, "Open/Closed doors");
+        setUpTab(inDoorTableView, Paths.INDOORS);
 
         ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
         AssetsTableView<OutDoor> outDoorTableView = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
-        setUpTab(outDoorTableView, "Out/In doors");
+        setUpTab(outDoorTableView, Paths.OUTDOORS);
 
         root.getChildren().add(tabPane);
     }

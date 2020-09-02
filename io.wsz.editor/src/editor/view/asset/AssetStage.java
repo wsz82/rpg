@@ -235,7 +235,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     public void setUpDirChooser(String title, Label label) {
         final DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
-        dirChooser.setInitialDirectory(Asset.createAssetTypeDir(item.getType(), controller));
+        dirChooser.setInitialDirectory(item.getTypeDir(controller));
         File selectedFile = dirChooser.showDialog(this);
         fillPath(label, selectedFile);
     }
@@ -307,7 +307,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         File parent = selectedFile.getParentFile();
         String actualPath = parent.getAbsolutePath().toLowerCase();
         File required = new File(
-                controller.getProgramDir() + Asset.getRelativeTypePath(item.getType()));
+                controller.getProgramDir() + item.getRelativeTypePath());
         String requiredPath = required.getAbsolutePath().toLowerCase();
         if (!parent.equals(required)) {
             alertWrongDirectory(actualPath, requiredPath);

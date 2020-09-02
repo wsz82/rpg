@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.IOException;
@@ -26,6 +27,11 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     public Landscape(Landscape prototype, Boolean visible) {
         super(prototype, visible);
         this.animationPos = new AnimationPos();
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.LANDSCAPES;
     }
 
     @Override

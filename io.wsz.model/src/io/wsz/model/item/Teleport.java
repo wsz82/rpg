@@ -4,6 +4,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.effect.Teleportation;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 
@@ -34,6 +35,11 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     public Teleport(Teleport prototype, Boolean visible) {
         super(prototype, visible);
         this.animationPos = new AnimationPos();
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.TELEPORTS;
     }
 
     public void enter(Creature cr) {

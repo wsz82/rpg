@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -50,6 +51,11 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         this.nettoWeight = other.weight;
         this.nettoSize = other.nettoSize;
         this.isOpen = other.isOpen;
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.CONTAINERS;
     }
 
     public boolean tryAdd(Equipment equipment) {

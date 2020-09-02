@@ -5,6 +5,7 @@ import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.animation.creature.CreatureAnimationPos;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -52,6 +53,11 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     public Creature(Creature prototype, Boolean visible) {
         super(prototype, visible);
         this.animationPos = new CreatureAnimationPos();
+    }
+
+    @Override
+    protected String getAssetDirName() {
+        return Paths.CREATURES;
     }
 
     @Override
