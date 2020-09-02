@@ -11,7 +11,7 @@ import java.util.Objects;
 public abstract class Asset implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    protected String name;
+    protected String assetId;
     protected ItemType type;
     protected String path;
 
@@ -21,14 +21,14 @@ public abstract class Asset implements Externalizable {
         this.type = type;
     }
 
-    public Asset(String name, ItemType type, String path) {
-        this.name = name;
+    public Asset(String assetId, ItemType type, String path) {
+        this.assetId = assetId;
         this.type = type;
         this.path = path;
     }
 
     public Asset(Asset other) {
-        this.name = other.getName();
+        this.assetId = other.getAssetId();
         this.type = other.getType();
         this.path = other.getPath();
     }
@@ -59,12 +59,12 @@ public abstract class Asset implements Externalizable {
         return File.separator + fileName;
     }
 
-    public String getName() {
-        return name;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
     public ItemType getType() {
@@ -85,7 +85,7 @@ public abstract class Asset implements Externalizable {
 
     @Override
     public String toString() {
-        return getName();
+        return getAssetId();
     }
 
     @Override
@@ -93,21 +93,21 @@ public abstract class Asset implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Asset)) return false;
         Asset asset = (Asset) o;
-        return Objects.equals(getName(), asset.getName()) &&
+        return Objects.equals(getAssetId(), asset.getAssetId()) &&
                 Objects.equals(getType(), asset.getType()) &&
                 Objects.equals(getPath(), asset.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getType(), getPath());
+        return Objects.hash(getAssetId(), getType(), getPath());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeObject(name);
+        out.writeObject(assetId);
 
         out.writeObject(type);
 
@@ -118,7 +118,7 @@ public abstract class Asset implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name = (String) in.readObject();
+        assetId = (String) in.readObject();
 
         type = (ItemType) in.readObject();
 

@@ -77,18 +77,12 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     @Override
-    public Animation<Teleport> getAnimation() {
-        Animation<Teleport> animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected Animation<Teleport> getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new Animation<>(getDir());
+            return new Animation<>(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override

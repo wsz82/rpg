@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Equipment<E extends Equipment, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Takeable {
+public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Takeable {
     private static final long serialVersionUID = 1L;
 
     public static List<Equipment> cloneEquipmentList(List<Equipment> equipment) {
@@ -124,7 +124,7 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
     public boolean tryTake(Creature cr) {
         boolean doesFitInventory = !cr.getInventory().fitsInventory(this);
         if (doesFitInventory) {
-            System.out.println(getName() + " does not fit " + cr.getName() + " inventory");
+            System.out.println(getAssetId() + " does not fit " + cr.getAssetId() + " inventory");
             return false;
         }
         Coords crCenter = cr.getCenter();
@@ -137,13 +137,13 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
-            String message = getName() + " cannot be taken: behind " + obstacleOnWay.getName();
+            String message = getAssetId() + " cannot be taken: behind " + obstacleOnWay.getAssetId();
             System.out.println(message);
             return false;
         } else {
             setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
-            System.out.println(getName() + " taken");
+            System.out.println(getAssetId() + " taken");
             return true;
         }
     }
@@ -180,19 +180,19 @@ public abstract class Equipment<E extends Equipment, B extends EquipmentAnimatio
             pos.y = tempY;
             pos.level = tempLevel;
             pos.setLocation(tempLocation);
-            String message = getName() + " cannot be dropped here";
+            String message = getAssetId() + " cannot be dropped here";
             if (obstacle != null) {
-                message += ": collides with " + obstacle.getName();
+                message += ": collides with " + obstacle.getAssetId();
             } else if (outOfLocation) {
                 message += ": beyond location";
             } else {
-                message += ": behind " + obstacleOnWay.getName();
+                message += ": behind " + obstacleOnWay.getAssetId();
             }
             System.out.println(message);
             return false;
         } else {
             l.getItemsToAdd().add(this);
-            System.out.println(getName() + " dropped");
+            System.out.println(getAssetId() + " dropped");
             return true;
         }
     }

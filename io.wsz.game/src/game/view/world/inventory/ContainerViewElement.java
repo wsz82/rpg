@@ -81,18 +81,18 @@ public class ContainerViewElement extends EquipmentViewElement {
     @Override
     public boolean tryRemove(Equipment e, Creature cr) {
         getItems().remove(e);
-        System.out.println(e.getName() + " removed from " + container.getName());
+        System.out.println(e.getAssetId() + " removed from " + container.getAssetId());
         return true;
     }
 
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
         if (!container.tryAdd(e)) {
-            System.out.println(e.getName() + " does not fit " + container.getName());
+            System.out.println(e.getAssetId() + " does not fit " + container.getAssetId());
             return false;
         } else {
             e.setPos(x, y, null);
-            System.out.println(e.getName() + " added to " + container.getName());
+            System.out.println(e.getAssetId() + " added to " + container.getAssetId());
             return true;
         }
     }

@@ -274,10 +274,10 @@ public class DialogView {
     }
 
     private void addDialogItem(PosItem pi, String text) {
-        String speakerName = pi.getName();
-        SpeakerMark speakerMark = SpeakerMark.ANSWERING;
+        String speakerName = pi.getAssetId();
+        SpeakerMark speakerMark = SpeakerMark.NPC;
         if (pi == dialogMemento.getAsking()) {
-            speakerMark = SpeakerMark.ASKING;
+            speakerMark = SpeakerMark.PC;
         }
         DialogItem di = new DialogItem(speakerMark, speakerName, text);
         dialogMemento.getDialogs().add(di);
@@ -312,7 +312,7 @@ public class DialogView {
         Text owner = new Text(ownerText);
         owner.setFont(new Font(fontSize));
         Color speakerNameColor = Color.RED;
-        if (di.getSpeakerMark() == SpeakerMark.ASKING) {
+        if (di.getSpeakerMark() == SpeakerMark.PC) {
             speakerNameColor = Color.BLUE;
         }
         owner.setFill(speakerNameColor);

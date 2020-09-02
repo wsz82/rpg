@@ -95,11 +95,11 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
     }
 
     private void initAssetsTable() {
-        TableColumn<A, String> nameCol = new TableColumn<>("Name");
+        TableColumn<A, String> nameCol = new TableColumn<>("ID");
         nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().getName();
+                return p.getValue().getAssetId();
             }
         });
         nameCol.setEditable(true);
@@ -108,9 +108,9 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
             Asset asset = t.getTableView().getItems().get(t.getTablePosition().getRow());
             String newValue = t.getNewValue();
             if (assetNameIsNotUnique(newValue)) {
-                asset.setName(t.getOldValue());
+                asset.setAssetId(t.getOldValue());
             } else {
-                asset.setName(newValue);
+                asset.setAssetId(newValue);
                 contentTableView.refresh();
             }
             refresh();
@@ -132,7 +132,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     private boolean assetNameIsNotUnique(String newValue) {
         return editorController.getObservableAssets().getMergedAssets().stream()
-                .anyMatch(p -> p.getName().equals(newValue));
+                .anyMatch(p -> p.getAssetId().equals(newValue));
     }
 
     private void setUpContextMenu() {
@@ -182,7 +182,7 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
         double width = img.getWidth();
         double height = img.getHeight();
         if (width > Sizes.MAX_IMAGE_WIDTH || height > Sizes.MAX_IMAGE_HEIGHT) {
-            alertTooBigImage(width, height, item.getName());
+            alertTooBigImage(width, height, item.getAssetId());
             return true;
         }
         return false;
@@ -222,12 +222,12 @@ public abstract class AssetsTableView<A extends PosItem> extends TableView<A> {
 
     private void removeContent(List<A> assetsToRemove) {
         List<String> assetsNames = assetsToRemove.stream()
-                .map(Asset::getName)
+                .map(Asset::getAssetId)
                 .collect(Collectors.toList());
        editorController.getObservableLocations().forEach(l -> {
            List<PosItem> contentToRemove = l.getItems().stream()
                     .filter(p -> {
-                        String name = p.getName();
+                        String name = p.getAssetId();
                         return assetsNames.contains(name);
                     })
                     .collect(Collectors.toList());

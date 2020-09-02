@@ -4,5 +4,5 @@ import io.wsz.model.animation.Animation;
 
 public interface Animable{
 
-    Animation getAnimation();
+    <M extends Animation<?>> M getAnimation();
 }

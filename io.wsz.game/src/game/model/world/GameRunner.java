@@ -300,7 +300,7 @@ public class GameRunner {
                 try {
                     reloadAssetImages(pi, programDir);
                 } catch (Exception e) {
-                    System.out.println("Error with " + pi.getName());
+                    System.out.println("Error with " + pi.getAssetId());
                     continue;
                 }
                 updateProgress(i, total);

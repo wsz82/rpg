@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends Asset implements Updatable, Interactable, Animable {
+public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> extends Asset implements Updatable, Interactable, Animable {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
@@ -355,11 +355,11 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
     }
 
     @Override
-    public String getName() {
+    public String getAssetId() {
         if (prototype != null) {
-            return prototype.getName();
+            return prototype.getAssetId();
         }
-        return super.getName();
+        return super.getAssetId();
     }
 
     @Override
@@ -477,6 +477,23 @@ public abstract class PosItem<A extends PosItem, B extends AnimationPos> extends
         if (animation == null) return;
         animation.play(this);
     }
+
+    @Override
+    public <M extends Animation<?>> M getAnimation() {
+        M animation;
+        if (isThisPrototype()) {
+            animation = getConcreteAnimation();
+        } else {
+            animation = prototype.getAnimation();
+        }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = getConcreteAnimation();
+        }
+        return animation;
+    }
+
+    protected abstract <M extends Animation<?>> M getConcreteAnimation();
 
     public abstract B getAnimationPos();
 

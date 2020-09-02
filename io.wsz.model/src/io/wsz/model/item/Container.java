@@ -92,7 +92,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
             controller.setCreatureToOpenInventory(cr);
             controller.setContainerToOpen(this);
             controller.setInventory(true);
-            System.out.println(getName() + " searched by " + cr.getName());
+            System.out.println(getAssetId() + " searched by " + cr.getAssetId());
         }
     }
 
@@ -165,10 +165,11 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     public ResolutionImage getImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
+            ContainerAnimation animation = getAnimation();
             if (isOpen()) {
-                return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+                return animation.getOpenableAnimation().getBasicMainOpen(programDir);
             } else {
-                return getAnimation().getBasicMain(programDir);
+                return animation.getBasicMain(programDir);
             }
         } else {
             return image;
@@ -245,7 +246,8 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     private boolean isNotOpenable() {
         File programDir = getController().getProgramDir();
-        return getAnimation().getOpenableAnimation().isNotOpenable(programDir);
+        ContainerAnimation animation = getAnimation();
+        return animation.getOpenableAnimation().isNotOpenable(programDir);
     }
 
     @Override
@@ -254,9 +256,9 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = false;
-            System.out.println(getName() + " cannot be open: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be open: collides with " + collision.getAssetId());
         } else {
-            System.out.println(getName() + " open");
+            System.out.println(getAssetId() + " open");
         }
     }
 
@@ -266,25 +268,19 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = true;
-            System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be closed: collides with " + collision.getAssetId());
         } else {
-            System.out.println(getName() + " closed");
+            System.out.println(getAssetId() + " closed");
         }
     }
 
     @Override
-    public ContainerAnimation getAnimation() {
-        ContainerAnimation animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected ContainerAnimation getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new ContainerAnimation(getDir());
+            return new ContainerAnimation(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override

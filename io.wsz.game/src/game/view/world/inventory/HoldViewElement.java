@@ -89,18 +89,18 @@ public class HoldViewElement extends EquipmentViewElement {
     @Override
     public boolean tryRemove(Equipment e, Creature cr) {
         inventory.remove(e);
-        System.out.println(e.getName() + " removed from " + cr.getName() + " inventory");
+        System.out.println(e.getAssetId() + " removed from " + cr.getAssetId() + " inventory");
         return true;
     }
 
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
         if (!inventory.tryAdd(e)) {
-            System.out.println(e.getName() + " does not fit " + cr.getName() + " inventory");
+            System.out.println(e.getAssetId() + " does not fit " + cr.getAssetId() + " inventory");
             return false;
         } else {
             e.setPos(x, y, null);
-            System.out.println(e.getName() + " added to " + cr.getName() + " inventory");
+            System.out.println(e.getAssetId() + " added to " + cr.getAssetId() + " inventory");
             return true;
         }
     }

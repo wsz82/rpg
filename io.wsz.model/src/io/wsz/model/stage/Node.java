@@ -32,6 +32,6 @@ public class Node<A extends PosItem> {
 
     @Override
     public String toString() {
-        return getItem().getName();
+        return getItem().getAssetId();
     }
 }

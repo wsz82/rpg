@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import io.wsz.model.Controller;
+import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.location.Location;
@@ -255,7 +256,8 @@ public class BarView {
             Creature cr = creatures.get(i);
 
             portrait.creature = cr;
-            ResolutionImage animationPortrait = cr.getAnimation().getPortrait(cr, programDir);
+            CreatureAnimation animation = cr.getAnimation();
+            ResolutionImage animationPortrait = animation.getPortrait(cr, programDir);
             if (animationPortrait != null) {
                 Image fxImage = animationPortrait.getFxImage();
                 if (fxImage != null) {

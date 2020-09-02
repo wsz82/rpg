@@ -9,6 +9,7 @@ import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.PointSetter;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
+import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.item.*;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -142,7 +143,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
                 inventoryPlaces = new HashMap<>(0);
             }
             File programDir = controller.getProgramDir();
-            ResolutionImage inventoryBasicForEditor = item.getAnimation().getInventoryBasicForEditor(programDir);
+            CreatureAnimation animation = item.getAnimation();
+            ResolutionImage inventoryBasicForEditor = animation.getInventoryBasicForEditor(programDir);
             Image basicInventory = inventoryBasicForEditor.getFxImage();
             InventoryPlaceEditStage editStage =
                     new InventoryPlaceEditStage(editorController, parent, item, basicInventory, inventoryPlaces);

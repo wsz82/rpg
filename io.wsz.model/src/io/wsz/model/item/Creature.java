@@ -465,18 +465,12 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public CreatureAnimation getAnimation() {
-        CreatureAnimation animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected CreatureAnimation getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new CreatureAnimation(getDir());
+            return new CreatureAnimation(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override

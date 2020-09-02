@@ -31,18 +31,12 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     }
 
     @Override
-    public Animation<Landscape> getAnimation() {
-        Animation<Landscape> animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected Animation<Landscape> getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new Animation<>(getDir());
+            return new Animation<>(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override

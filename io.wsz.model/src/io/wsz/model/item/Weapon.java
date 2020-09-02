@@ -123,18 +123,12 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     }
 
     @Override
-    public WeaponAnimation getAnimation() {
-        WeaponAnimation animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected WeaponAnimation getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new WeaponAnimation(getDir());
+            return new WeaponAnimation(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override

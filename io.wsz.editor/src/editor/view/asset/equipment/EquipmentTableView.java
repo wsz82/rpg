@@ -29,7 +29,7 @@ public abstract class EquipmentTableView<E extends Equipment> extends AssetsTabl
                 if (occupiedPlace == null) {
                     return "";
                 } else {
-                    return occupiedPlace.getName();
+                    return occupiedPlace.getId();
                 }
             }
         });
@@ -45,7 +45,7 @@ public abstract class EquipmentTableView<E extends Equipment> extends AssetsTabl
                 if (equipmentType == null) {
                     return null;
                 } else {
-                    return equipmentType.getName();
+                    return equipmentType.getId();
                 }
             }
         });

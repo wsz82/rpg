@@ -49,7 +49,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     protected A item;
     protected boolean isContent;
 
-    private final TextField nameInput = new TextField();
+    private final TextField idInput = new TextField();
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
@@ -92,12 +92,12 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
             ok.setOnAction(event -> {
                 onEdit();
             });
-            nameInput.setDisable(true);
+            idInput.setDisable(true);
         }
 
-        nameInput.setPromptText("Name");
+        idInput.setPromptText("Id");
         animationBox.getChildren().addAll(animationButton, pathLabel);
-        container.getChildren().addAll(nameInput);
+        container.getChildren().addAll(idInput);
 
         if (!isContent) {
             container.getChildren().add(animationBox);
@@ -124,7 +124,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         containerWithButtons.getChildren().addAll(container, buttons);
         root.getChildren().add(containerWithButtons);
         if (isContent) {
-            nameInput.setDisable(true);
+            idInput.setDisable(true);
         }
         hookUpAssetEvents();
     }
@@ -158,7 +158,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         if (item == null) {
             return;
         }
-        nameInput.setText(item.getName());
+        idInput.setText(item.getAssetId());
         pathLabel.setText(item.getPath());
 
         Double animationSpeed = item.getIndividualAnimationSpeed();
@@ -173,8 +173,8 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void onCreate() {
-        String name = nameInput.getText();
-        boolean inputNameIsEmpty = name == null || name.isEmpty();
+        String id = idInput.getText();
+        boolean inputNameIsEmpty = id == null || id.isEmpty();
         if (inputNameIsEmpty) {
             return;
         }
@@ -185,7 +185,7 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
         }
         List<Asset> assets = editorController.getObservableAssets().getMergedAssets();
         boolean assetNameAlreadyExists = assets.stream()
-                .anyMatch(a -> a.getName().equals(name));
+                .anyMatch(a -> a.getAssetId().equals(id));
         if (assetNameAlreadyExists) {
             alertOfNameExisting();
             return;
@@ -325,10 +325,10 @@ public abstract class AssetStage<A extends PosItem> extends ChildStage {
     }
 
     private void addNewAsset() {
-        String name = nameInput.getText();
+        String name = idInput.getText();
         String path = pathLabel.getText();
         String relativePath = Asset.convertToRelativePath(path);
-        item.setName(name);
+        item.setAssetId(name);
         item.setPath(relativePath);
         addAssetToList(item);
     }

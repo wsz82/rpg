@@ -1,5 +1,6 @@
 package io.wsz.model.item;
 
+import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -86,7 +87,8 @@ public class Inventory implements Externalizable {
 
     public boolean fitsPlace(double x, double y, Creature owner, Coords temp, List<Coords> place) {
         File programDir = owner.getController().getProgramDir();
-        ResolutionImage background = owner.getAnimation().getInventoryBasicForEditor(programDir);
+        CreatureAnimation animation = owner.getAnimation();
+        ResolutionImage background = animation.getInventoryBasicForEditor(programDir);
         double width = background.getWidth() / Sizes.getMeter();
         double height = background.getHeight() / Sizes.getMeter();
         double relX = x / width;

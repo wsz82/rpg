@@ -131,7 +131,7 @@ public class ItemsStage<A extends Containable> extends ChildStage {
         nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().equipment.getName();
+                return p.getValue().equipment.getAssetId();
             }
         });
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());

@@ -307,7 +307,7 @@ public class Board {
     private boolean getObstacleObstacleCollision(PosItem i, Coords nextPos, List iPolygons, PosItem o, Coords oPos, List oPolygons) {
         boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
-            System.out.println(i.getName() + " collides " + o.getName());
+            System.out.println(i.getAssetId() + " collides " + o.getAssetId());
         }
         return collides;
     }
@@ -323,7 +323,7 @@ public class Board {
     private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
         boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
         if (collides) {
-            System.out.println(cr.getName() + " collides " + crO.getName());
+            System.out.println(cr.getAssetId() + " collides " + crO.getAssetId());
         }
         return collides;
     }
@@ -335,7 +335,7 @@ public class Board {
 
             boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println(i.getName() + " collides " + cr.getName());
+                System.out.println(i.getAssetId() + " collides " + cr.getAssetId());
                 return true;
             }
         }
@@ -350,7 +350,7 @@ public class Board {
 
             boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println(cr.getName() + " collides " + o.getName());
+                System.out.println(cr.getAssetId() + " collides " + o.getAssetId());
                 return true;
             }
         }

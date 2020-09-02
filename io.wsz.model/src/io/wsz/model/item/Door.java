@@ -13,7 +13,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> implements Openable {
+public abstract class Door<I extends Door<?>> extends PosItem<I, AnimationPos> implements Openable {
     private static final long serialVersionUID = 1L;
 
     private DoorAnimation animation;
@@ -89,10 +89,11 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     public ResolutionImage getImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
+            DoorAnimation animation = getAnimation();
             if (isOpen()) {
-                return getAnimation().getOpenableAnimation().getBasicMainOpen(programDir);
+                return animation.getOpenableAnimation().getBasicMainOpen(programDir);
             } else {
-                return getAnimation().getBasicMain(programDir);
+                return animation.getBasicMain(programDir);
             }
         } else {
             return image;
@@ -100,18 +101,12 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
     }
 
     @Override
-    public DoorAnimation getAnimation() {
-        DoorAnimation animation;
-        if (isThisPrototype()) {
-            animation = this.animation;
-        } else {
-            animation = prototype.getAnimation();
-        }
+    protected DoorAnimation getConcreteAnimation() {
         if (animation == null) {
-            if (path == null) return null;
-            animation = new DoorAnimation(getDir());
+            return new DoorAnimation(getDir());
+        } else {
+            return animation;
         }
-        return animation;
     }
 
     @Override
@@ -143,9 +138,9 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = false;
-            System.out.println(getName() + " cannot be open: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be open: collides with " + collision.getAssetId());
         } else {
-            System.out.println(getName() + " open");
+            System.out.println(getAssetId() + " open");
         }
     }
 
@@ -155,9 +150,9 @@ public abstract class Door<I extends Door> extends PosItem<I, AnimationPos> impl
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = true;
-            System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be closed: collides with " + collision.getAssetId());
         } else {
-            System.out.println(getName() + " closed");
+            System.out.println(getAssetId() + " closed");
         }
     }
 

@@ -17,9 +17,9 @@ public class EquipmentTypeListView extends TypeListView<EquipmentType> {
         ObservableList<EquipmentType> items = editorController.getObservableEquipmentTypes();
         setItems(items);
         setOnEditCommit(e -> {
-            String name = e.getNewValue().getName();
+            String name = e.getNewValue().getId();
             EquipmentType type = getSelectionModel().getSelectedItem();
-            type.setName(name);
+            type.setId(name);
         });
     }
 
@@ -31,7 +31,7 @@ public class EquipmentTypeListView extends TypeListView<EquipmentType> {
                 if (type == null) {
                     return "";
                 } else {
-                    return type.getName();
+                    return type.getId();
                 }
             }
 

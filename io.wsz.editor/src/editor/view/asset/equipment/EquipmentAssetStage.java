@@ -82,13 +82,13 @@ public abstract class EquipmentAssetStage<A extends Equipment> extends AssetStag
             @Override
             public String toString(EquipmentType equipmentType) {
                 if (equipmentType == null) return null;
-                return equipmentType.getName();
+                return equipmentType.getId();
             }
 
             @Override
             public EquipmentType fromString(String name) {
                 Optional<EquipmentType> optType = editorController.getObservableEquipmentTypes().stream()
-                        .filter(t -> t.getName().equals(name))
+                        .filter(t -> t.getId().equals(name))
                         .findFirst();
                 return optType.orElse(null);
             }

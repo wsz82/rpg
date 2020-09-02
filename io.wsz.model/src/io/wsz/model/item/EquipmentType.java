@@ -12,33 +12,33 @@ public class EquipmentType implements Externalizable {
 
     public static final EquipmentType DEFAULT = new EquipmentType("default");
 
-    private String name;
+    private String id;
 
     public EquipmentType() {}
 
-    public EquipmentType(String name) {
-        this.name = name;
+    public EquipmentType(String id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name);
+        out.writeUTF(id);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name = in.readUTF();
+        id = in.readUTF();
     }
 }

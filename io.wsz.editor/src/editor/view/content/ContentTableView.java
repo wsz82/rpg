@@ -64,11 +64,11 @@ public class ContentTableView extends TableView<PosItem> {
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
 
-        TableColumn<PosItem, String> nameCol = new TableColumn<>("Name");
+        TableColumn<PosItem, String> nameCol = new TableColumn<>("Asset ID");
         nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return param.getValue().getName();
+                return param.getValue().getAssetId();
             }
         });
         TableColumn<PosItem, String> typeCol = new TableColumn<>("Type");

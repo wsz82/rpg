@@ -223,11 +223,11 @@ public class InventoryView {
         if (hero.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (hero.getInventory().tryAdd(dragged)) {
                 view.setMovedToHeroEquipmentPos(dragged.getPos());
-                System.out.println(dragged.getName() + " moved to " + hero.getName() + " inventory");
+                System.out.println(dragged.getAssetId() + " moved to " + hero.getAssetId() + " inventory");
                 return true;
             }
         } else {
-            System.out.println(hero.getName() + " out of " + cr.getName() + " range");
+            System.out.println(hero.getAssetId() + " out of " + cr.getAssetId() + " range");
         }
         return false;
     }

@@ -101,7 +101,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
         placeCB = new ChoiceBox<>(places);
         InventoryPlaceType type = typesCB.getValue();
         if (type != null) {
-            String name = type.getName();
+            String name = type.getId();
             placeCB.setValue(getPlace(name));
         }
         placeCBVBox.getChildren().add(1, placeCB);
@@ -113,7 +113,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
                 if (type == null) {
                     return "undefined";
                 } else {
-                    return type.getName();
+                    return type.getId();
                 }
             }
 
@@ -139,7 +139,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
                 if (type == null) {
                     return "";
                 } else {
-                    return type.getName();
+                    return type.getId();
                 }
             }
 
@@ -170,14 +170,14 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
 
     private Optional<InventoryPlaceType> getOptionalInventoryPlaceType(String s) {
         Optional<InventoryPlaceType> optType = types.stream()
-                .filter(t -> t.getName().equals(s))
+                .filter(t -> t.getId().equals(s))
                 .findFirst();
         return optType;
     }
 
     private List<Coords> getPlace(String name) {
         for (InventoryPlaceType type : inventoryPlaces.keySet()) {
-            String typeName = type.getName();
+            String typeName = type.getId();
             if (name.equals(typeName)) {
                 return inventoryPlaces.get(type);
             }

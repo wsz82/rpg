@@ -279,7 +279,7 @@ public class EditorController {
             Map<InventoryPlaceType, List<Coords>> inventoryPlaces = cr.getInventory().getInventoryPlaces();
             if (inventoryPlaces.isEmpty()) continue;
             Optional<InventoryPlaceType> optType = inventoryPlaces.keySet().stream()
-                    .filter(t -> t.getName().equals(oldName))
+                    .filter(t -> t.getId().equals(oldName))
                     .findFirst();
             InventoryPlaceType type = optType.orElse(null);
             if (type == null) continue;

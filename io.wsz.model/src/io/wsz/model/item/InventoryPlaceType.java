@@ -19,7 +19,7 @@ public class InventoryPlaceType implements Externalizable {
     public static Map<InventoryPlaceType, List<Coords>> cloneInventoryPlacesKeysWithValues(Map<InventoryPlaceType, List<Coords>> other) {
         Map<InventoryPlaceType, List<Coords>> clone = new HashMap<>(0);
         for (InventoryPlaceType type : other.keySet()) {
-            InventoryPlaceType clonedType = new InventoryPlaceType(type.getName());
+            InventoryPlaceType clonedType = new InventoryPlaceType(type.getId());
             List<Coords> otherPolygon = other.get(type);
             List<Coords> clonedPolygon = Geometry.cloneCoordsList(otherPolygon);
             clone.put(clonedType, clonedPolygon);
@@ -27,25 +27,25 @@ public class InventoryPlaceType implements Externalizable {
         return clone;
     }
 
-    private String name;
+    private String id;
 
     public InventoryPlaceType() {}
 
-    public InventoryPlaceType(String name) {
-        this.name = name;
+    public InventoryPlaceType(String id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
-        return name;
+        return id;
     }
 
     @Override
@@ -53,25 +53,25 @@ public class InventoryPlaceType implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof InventoryPlaceType)) return false;
         InventoryPlaceType type = (InventoryPlaceType) o;
-        return Objects.equals(getName(), type.getName());
+        return Objects.equals(getId(), type.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getId());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(name);
+        out.writeUTF(id);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        name = in.readUTF();
+        id = in.readUTF();
     }
 }

@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -94,7 +95,8 @@ public class OutDoor extends Door<OutDoor> {
 
     private boolean isNotOpenable() {
         File programDir = getController().getProgramDir();
-        return getAnimation().getOpenableAnimation().isNotOpenable(programDir);
+        DoorAnimation animation = getAnimation();
+        return animation.getOpenableAnimation().isNotOpenable(programDir);
     }
 
     @Override
@@ -103,11 +105,11 @@ public class OutDoor extends Door<OutDoor> {
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = false;
-            System.out.println(getName() + " cannot be open: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be open: collides with " + collision.getAssetId());
         } else {
             OutDoor connection = getConnection();
             if (connection == null || this == connection) {
-                System.out.println(getName() + " open");
+                System.out.println(getAssetId() + " open");
                 return;
             }
             connection.setOpen(true);
@@ -115,9 +117,9 @@ public class OutDoor extends Door<OutDoor> {
             if (connectionCollision != null) {
                 isOpen = false;
                 connection.setOpen(false);
-                System.out.println(getName() + " cannot be open: " + connectionCollision.getName() + " blocks behind");
+                System.out.println(getAssetId() + " cannot be open: " + connectionCollision.getAssetId() + " blocks behind");
             } else {
-                System.out.println(getName() + " open");
+                System.out.println(getAssetId() + " open");
             }
         }
     }
@@ -128,11 +130,11 @@ public class OutDoor extends Door<OutDoor> {
         PosItem collision = getCollision();
         if (collision != null) {
             isOpen = true;
-            System.out.println(getName() + " cannot be closed: collides with " + collision.getName());
+            System.out.println(getAssetId() + " cannot be closed: collides with " + collision.getAssetId());
         } else {
             OutDoor connection = getConnection();
             if (connection == null || this == connection) {
-                System.out.println(getName() + " open");
+                System.out.println(getAssetId() + " open");
                 return;
             }
             connection.setOpen(false);
@@ -140,9 +142,9 @@ public class OutDoor extends Door<OutDoor> {
             if (connectionCollision != null) {
                 isOpen = true;
                 connection.setOpen(true);
-                System.out.println(getName() + " cannot be closed: " + connectionCollision.getName() + " blocks behind");
+                System.out.println(getAssetId() + " cannot be closed: " + connectionCollision.getAssetId() + " blocks behind");
             } else {
-                System.out.println(getName() + " closed");
+                System.out.println(getAssetId() + " closed");
             }
         }
     }
@@ -158,7 +160,7 @@ public class OutDoor extends Door<OutDoor> {
         if (connection == null) {
             connectionName = "";
         } else {
-            connectionName = connection.getName();
+            connectionName = connection.getAssetId();
         }
         out.writeUTF(connectionName);
 
@@ -182,7 +184,7 @@ public class OutDoor extends Door<OutDoor> {
         Coords connectionPos = (Coords) in.readObject();
         if (!connectionName.isEmpty()) {
             connection = new OutDoor();
-            connection.setName(connectionName);
+            connection.setAssetId(connectionName);
             connection.setPos(connectionPos);
         }
     }

@@ -1,5 +1,6 @@
 package io.wsz.model;
 
+import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogItem;
@@ -78,10 +79,10 @@ public class Controller {
     private void restorePrototype(List<Asset> assets, PosItem pi) {
         PosItem prototype = pi.getPrototype();
         if (prototype != null) {
-            String prototypeName = prototype.getName();
+            String prototypeName = prototype.getAssetId();
 
             Optional<Asset> optAsset = assets.stream()
-                    .filter(a -> a.getName().equals(prototypeName))
+                    .filter(a -> a.getAssetId().equals(prototypeName))
                     .findFirst();
             Asset p = optAsset.orElse(null);
             if (p == null) {
@@ -132,7 +133,7 @@ public class Controller {
                 .findFirst();
         Dialog dialog = optDialog.orElse(null);
         if (dialog == null) {
-            throw new NullPointerException(pi.getName() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
+            throw new NullPointerException(pi.getAssetId() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
         }
         pi.setDialog(dialog);
     }
@@ -160,11 +161,11 @@ public class Controller {
             return null;
         }
         Optional<InventoryPlaceType> optType = places.stream()
-                .filter(t -> t.getName().equals(serType.getName()))
+                .filter(t -> t.getId().equals(serType.getId()))
                 .findFirst();
         InventoryPlaceType place = optType.orElse(null);
         if (place == null) {
-            throw new NullPointerException("Inventory place \"" + serType.getName() + "\" should be in list of inventory places");
+            throw new NullPointerException("Inventory place \"" + serType.getId() + "\" should be in list of inventory places");
         }
         return place;
     }
@@ -175,11 +176,11 @@ public class Controller {
             return;
         }
         Optional<EquipmentType> optType = types.stream()
-                .filter(t -> t.getName().equals(serEquipmentType.getName()))
+                .filter(t -> t.getId().equals(serEquipmentType.getId()))
                 .findFirst();
         EquipmentType equipmentType = optType.orElse(null);
         if (equipmentType == null) {
-            throw new NullPointerException("Equipment type \"" + serEquipmentType.getName() + "\" should be in list of equipment types");
+            throw new NullPointerException("Equipment type \"" + serEquipmentType.getId() + "\" should be in list of equipment types");
         }
         e.setEquipmentType(equipmentType);
     }
@@ -187,19 +188,19 @@ public class Controller {
     private void restoreOutDoorConnection(OutDoor od) {
         OutDoor serConnection = od.getIndividualConnection();
         if (serConnection == null) return;
-        String name = serConnection.getName();
+        String name = serConnection.getAssetId();
         Coords pos = serConnection.getPos();
         restoreCoordsOfLocation(pos);
         Location location = pos.getLocation();
         Optional<OutDoor> optConnection = location.getItems().stream()
                 .filter(o -> o instanceof OutDoor)
                 .map(o -> (OutDoor) o)
-                .filter(o -> o.getName().equals(name))
+                .filter(o -> o.getAssetId().equals(name))
                 .filter(o -> o.getPos().equals(pos))
                 .findFirst();
         OutDoor connection = optConnection.orElse(null);
         if (connection == null) {
-            throw new NullPointerException("OutDoor connection \"" + serConnection.getName() + "\" should be in location outDoors list");
+            throw new NullPointerException("OutDoor connection \"" + serConnection.getAssetId() + "\" should be in location outDoors list");
         }
         od.setConnection(connection);
     }
@@ -331,7 +332,12 @@ public class Controller {
         if (assets == null || assets.isEmpty()) return;
         assets.stream()
                 .filter(a -> a instanceof Creature)
-                .forEach(a -> ((Creature) a).getAnimation().clearResizablePictures());
+                .map(a -> (Creature) a)
+                .map(cr -> {
+                    CreatureAnimation anim = cr.getAnimation();
+                    return anim;
+                })
+                .forEach(CreatureAnimation::clearResizablePictures);
     }
 
     public boolean isInventory() {

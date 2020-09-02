@@ -53,7 +53,7 @@ public class CreatureAnimation extends Animation<Creature> {
         if (!equippedItems.isEmpty()) {
             EQUIPPED_ITEMS_NAMES.clear();
             equippedItems.values().stream()
-                    .forEach(e -> EQUIPPED_ITEMS_NAMES.add(e.getEquipmentType().getName()));
+                    .forEach(e -> EQUIPPED_ITEMS_NAMES.add(e.getEquipmentType().getId()));
             EQUIPPED_ITEMS_NAMES.sort(Comparator.naturalOrder());
             BUILD_ANIMATION_NAME.delete(0, BUILD_ANIMATION_NAME.length());
             for (int i = 0; i < EQUIPPED_ITEMS_NAMES.size(); i++) {

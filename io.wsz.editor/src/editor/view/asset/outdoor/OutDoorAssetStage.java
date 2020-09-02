@@ -66,7 +66,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
                 if (o == null) {
                     return "";
                 }
-                return o.getName() + "|" + o.getPos().toString();
+                return o.getAssetId() + "|" + o.getPos().toString();
             }
 
             @Override
@@ -103,7 +103,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         String outDoorName = name;
         Coords pos = Coords.parseCoords(posText, controller);
         Optional<OutDoor> optConnection = connectionCB.getItems().stream()
-                .filter(o -> o.getName().equals(outDoorName))
+                .filter(o -> o.getAssetId().equals(outDoorName))
                 .filter(o -> o.getPos().equals(pos))
                 .findFirst();
         return optConnection.orElse(null);
