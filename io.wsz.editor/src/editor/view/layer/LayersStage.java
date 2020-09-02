@@ -66,12 +66,12 @@ public class LayersStage extends ChildStage {
         boolean levelExists = layers.stream()
                 .anyMatch(l -> l.getLevel() == layer.getLevel());
         boolean nameExists = layers.stream()
-                .anyMatch(l -> l.getName().equals(layer.getName()));
+                .anyMatch(l -> l.getId().equals(layer.getId()));
         if (levelExists) {
             layer.setLevel(layer.getLevel() - 1);
             return getUniqueLayer(layer);
         } else if (nameExists) {
-            layer.setName(layer.getName() + 1);
+            layer.setId(layer.getId() + 1);
             return getUniqueLayer(layer);
         }else {
             return layer;

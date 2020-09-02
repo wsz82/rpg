@@ -9,13 +9,13 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.stage.Coords;
+import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.util.List;
@@ -54,7 +54,12 @@ class LayersTableView extends TableView<Layer> {
         setEditable(true);
 
         TableColumn<Layer, Integer> levelCol = new TableColumn<>("Level");
-        levelCol.setCellValueFactory(new PropertyValueFactory<>("level"));
+        levelCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected Integer computeValue() {
+                return p.getValue().getLevel();
+            }
+        });
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
@@ -74,17 +79,22 @@ class LayersTableView extends TableView<Layer> {
             refresh();
         });
 
-        TableColumn<Layer, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<Layer, String> nameCol = new TableColumn<>("ID");
+        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getId();
+            }
+        });
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         nameCol.setOnEditCommit(t -> {
             Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
             String newValue = t.getNewValue();
             if (isNameUnique(newValue)) {
-                layer.setName(newValue);
+                layer.setId(newValue);
             } else {
-                layer.setName(t.getOldValue());
+                layer.setId(t.getOldValue());
             }
             refresh();
         });
@@ -132,7 +142,7 @@ class LayersTableView extends TableView<Layer> {
 
     private boolean isNameUnique(String newValue) {
         return getItems().stream()
-                .noneMatch(layer -> layer.getName().equals(newValue));
+                .noneMatch(layer -> layer.getId().equals(newValue));
     }
 
     private boolean isLevelUnique(int newValue) {
