@@ -166,7 +166,7 @@ public class GameController {
         Settings.setCenterOnPC(memento.isCenterOnPc());
         Settings.setPauseOnInventory(memento.isPauseOnInventory());
         Settings.setResolutionWidth(memento.getResolutionWidth(), controller);
-        Settings.setResolutionHeight(memento.getResolutionHeight());
+        Settings.setResolutionHeight(memento.getResolutionHeight(), controller);
         Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
         return memento;
     }

@@ -8,6 +8,7 @@ public class Sizes {
     public static final int MIN_RESOLUTION_WIDTH = 100;
     public static final int MIN_RESOLUTION_HEIGHT = 100;
     public static final int ORIGIN_RESOLUTION_WIDTH = 1600;
+    public static final int ORIGIN_RESOLUTION_HEIGHT = 900;
     public static final int CONSTANT_METER = 100;
     public static final int FPS = 60;
     public static final int TURN_DURATION_MILLIS = 1000/FPS;
@@ -20,6 +21,7 @@ public class Sizes {
     public static final long DIF_TIME_BETWEEN_CLICKS = 150;
 
     private static int meter = CONSTANT_METER;
+    private static int verticalMeter = CONSTANT_METER;
     private static FontSize fontSize = FontSize.M;
     private static int portraitSize;
 
@@ -41,6 +43,15 @@ public class Sizes {
 
     public static void setMeter(int resWidth, Controller controller) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
+        controller.clearResizablePictures();
+    }
+
+    public static int getTrueVerticalMeter() {
+        return verticalMeter;
+    }
+
+    public static void setVerticalMeter(int resHeight, Controller controller) {
+        Sizes.verticalMeter = CONSTANT_METER * resHeight / ORIGIN_RESOLUTION_HEIGHT;
         controller.clearResizablePictures();
     }
 

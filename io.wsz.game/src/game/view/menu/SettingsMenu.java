@@ -214,7 +214,7 @@ class SettingsMenu extends StackPane {
         s.setBlockIncrement(1);
         s.setValue(Settings.getResolutionHeight());
         s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setResolutionHeight((int) s.getValue());
+            Settings.setResolutionHeight((int) s.getValue(), controller);
         });
         l.setText(String.valueOf(s.getValue()));
         l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);

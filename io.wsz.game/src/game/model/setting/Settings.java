@@ -67,7 +67,9 @@ public class Settings {
         return resolutionHeight;
     }
 
-    public static void setResolutionHeight(int resolutionHeight) {
+    public static void setResolutionHeight(int resolutionHeight, Controller controller) {
+        Sizes.setReloadImages(true);
+        Sizes.setVerticalMeter(resolutionHeight, controller);
         Settings.resolutionHeight = resolutionHeight;
     }
 

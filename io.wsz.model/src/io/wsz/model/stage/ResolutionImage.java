@@ -56,7 +56,7 @@ public class ResolutionImage {
         if (Sizes.getTrueMeter() == CONSTANT_METER) {
             this.fxImage = new Image(url);
         } else {
-            Dimension d = getImageDimension(file);
+            Dimension d = getImagePixelDimension(file);
             if (d == null) {
                 throw new NullPointerException(url + " dimension is null");
             }
@@ -95,7 +95,7 @@ public class ResolutionImage {
             throw new NullPointerException(name + " URL is null");
         }
 
-        if (Sizes.getTrueMeter() == CONSTANT_METER) {
+        if (Sizes.getTrueMeter() == CONSTANT_METER && Sizes.getTrueVerticalMeter() == CONSTANT_METER) {
             this.fxImage = new Image(url, width, height, false, false, false);
         } else {
             Dimension d = new Dimension(width, height);
@@ -120,13 +120,14 @@ public class ResolutionImage {
     }
 
     private Dimension getRequestedDimension(double width, double height) {
-        double ratio = (double) Sizes.getTrueMeter() / (double) CONSTANT_METER;
-        int rw = (int) (width * ratio);
-        int rh = (int) (height * ratio);
+        double horizontalRatio = (double) Sizes.getTrueMeter() / (double) CONSTANT_METER;
+        int rw = (int) (width * horizontalRatio);
+        double verticalRatio = (double) Sizes.getTrueVerticalMeter() / (double) CONSTANT_METER;
+        int rh = (int) (height * verticalRatio);
         return new Dimension(rw, rh);
     }
 
-    private Dimension getImageDimension(File input) {
+    private Dimension getImagePixelDimension(File input) {
         try(ImageInputStream in = ImageIO.createImageInputStream(input)){
             final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
             if (readers.hasNext()) {
