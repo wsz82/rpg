@@ -109,7 +109,6 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new AnimationPos();
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {

@@ -155,9 +155,7 @@ public class GameRunner {
 
         for (Location l : heroesLocations) { //TODO update locations of a current locations group
             if (l == null) continue;
-            for (PosItem pi : l.getItems()) {
-                pi.update();
-            }
+            l.getItems().forEach(PosItem::update);
         }
 
         updateCurrentLocation();

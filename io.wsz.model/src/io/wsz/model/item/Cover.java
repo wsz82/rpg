@@ -56,7 +56,6 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new AnimationPos();
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {

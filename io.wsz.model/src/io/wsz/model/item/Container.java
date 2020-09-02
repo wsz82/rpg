@@ -310,7 +310,6 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new EquipmentAnimationPos();
         animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {

@@ -153,7 +153,6 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new EquipmentAnimationPos();
         animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {

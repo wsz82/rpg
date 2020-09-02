@@ -186,7 +186,6 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, AnimationPos> i
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new AnimationPos();
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {

@@ -613,7 +613,6 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         super.readExternal(in);
         long ver = in.readLong();
 
-//        animationPos = new CreatureAnimationPos();
         animationPos = (CreatureAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
