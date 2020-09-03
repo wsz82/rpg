@@ -625,9 +625,10 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
             animation = new CreatureAnimation(getDir());
         }
 
-        Task readTask = (Task) in.readObject();
-        task.setDest(readTask.getDest());
-        task.setItem(this, readTask.getItem());
+        Task serTask = (Task) in.readObject();
+        task.setDest(serTask.getDest());
+        task.setItem(this, serTask.getItem());
+        task.setFinished(serTask.isFinished());
 
         middlePoint = (Coords) in.readObject();
 
