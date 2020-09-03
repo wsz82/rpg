@@ -27,6 +27,8 @@ class SettingsMenu extends StackPane {
     private Node parentToReturn;
     private BorderPane root;
     private StringConverter<Number> stringConverter;
+    private Slider resHeightInput;
+    private Slider resWidthInput;
 
     public SettingsMenu(GameStage gameStage, Controller controller) {
         this.gameStage = gameStage;
@@ -179,7 +181,7 @@ class SettingsMenu extends StackPane {
         final Label resWidthLabel = new Label("Resolution width");
         final Label resWidthActual = new Label();
         resWidthActual.setMinWidth(getWidth()/20);
-        final Slider resWidthInput = new Slider();
+        resWidthInput = new Slider();
         resWidthBox.getChildren().addAll(resWidthLabel, resWidthActual, resWidthInput);
         hookUpResWidthEvents(resWidthInput, resWidthActual);
 
@@ -188,7 +190,7 @@ class SettingsMenu extends StackPane {
         final Label resHeightLabel = new Label("Resolution height");
         final Label resHeightActual = new Label();
         resHeightActual.setMinWidth(getWidth()/20);
-        final Slider resHeightInput = new Slider();
+        resHeightInput = new Slider();
         resHeightBox.getChildren().addAll(resHeightLabel, resHeightActual, resHeightInput);
         hookUpResHeightEvents(resHeightInput, resHeightActual);
 
@@ -206,38 +208,54 @@ class SettingsMenu extends StackPane {
         graphics.getChildren().addAll(settings);
     }
 
-    private void hookUpResHeightEvents(Slider s, Label l) {
+    private void hookUpResHeightEvents(Slider heightSlider, Label l) {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
         int maxHeight = (int) bounds.getHeight();
-        s.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
-        s.setMax(maxHeight);
-        s.setBlockIncrement(1);
-        s.setValue(Settings.getResolutionHeight());
-        s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setResolutionHeight((int) s.getValue(), controller);
+        heightSlider.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
+        heightSlider.setMax(maxHeight);
+        heightSlider.setBlockIncrement(1);
+        heightSlider.setValue(Settings.getResolutionHeight());
+        heightSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int newHeightResolution = newValue.intValue();
+            Settings.setResolutionHeight(newHeightResolution, controller);
+            if (Sizes.isResizeWithResolution()) {
+                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+                resWidthInput.setValue(newHeightResolution * ratio);
+            }
         });
-        l.setText(String.valueOf(s.getValue()));
-        l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);
+        l.setText(String.valueOf(heightSlider.getValue()));
+        l.textProperty().bindBidirectional(heightSlider.valueProperty(), stringConverter);
     }
 
-    private void hookUpResWidthEvents(Slider s, Label l) {
+    private void hookUpResWidthEvents(Slider widthSlider, Label l) {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
         int maxWidth = (int) bounds.getWidth();
-        s.setMin(Sizes.MIN_RESOLUTION_WIDTH);
-        s.setMax(maxWidth);
-        s.setBlockIncrement(1);
-        s.setValue(Settings.getResolutionWidth());
-        s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setResolutionWidth((int) s.getValue(), controller);
+        widthSlider.setMin(Sizes.MIN_RESOLUTION_WIDTH);
+        widthSlider.setMax(maxWidth);
+        widthSlider.setBlockIncrement(1);
+        widthSlider.setValue(Settings.getResolutionWidth());
+        widthSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int newWidthResolution = newValue.intValue();
+            Settings.setResolutionWidth(newWidthResolution, controller);
+            if (Sizes.isResizeWithResolution()) {
+                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+                resHeightInput.setValue(newWidthResolution / ratio);
+            }
         });
-        l.setText(String.valueOf(s.getValue()));
-        l.textProperty().bindBidirectional(s.valueProperty(), stringConverter);
+        l.setText(String.valueOf(widthSlider.getValue()));
+        l.textProperty().bindBidirectional(widthSlider.valueProperty(), stringConverter);
     }
 
     private void hookUpResizeWithResolutionEvents(CheckBox cb) {
         cb.setSelected(Sizes.isResizeWithResolution());
         cb.setOnAction(event -> {
-            Sizes.setResizeWithResolution(cb.isSelected(), controller);
+            boolean isSelected = cb.isSelected();
+            Sizes.setResizeWithResolution(isSelected, controller);
+            if (isSelected) {
+                double resWidth = resWidthInput.getValue();
+                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+                resHeightInput.setValue(resWidth / ratio);
+            }
         });
     }
 
