@@ -5,8 +5,8 @@ import io.wsz.model.stage.Coords;
 
 public class Sizes {
     public static final long VERSION = 1L;
-    public static final int MIN_RESOLUTION_WIDTH = 100;
-    public static final int MIN_RESOLUTION_HEIGHT = 100;
+    public static final int MIN_RESOLUTION_WIDTH = 160;
+    public static final int MIN_RESOLUTION_HEIGHT = 90;
     public static final int ORIGIN_RESOLUTION_WIDTH = 1600;
     public static final int ORIGIN_RESOLUTION_HEIGHT = 900;
     public static final double BASIC_RESOLUTION_RATIO = 16.0/9;

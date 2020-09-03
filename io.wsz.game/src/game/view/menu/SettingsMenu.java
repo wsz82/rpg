@@ -208,25 +208,6 @@ class SettingsMenu extends StackPane {
         graphics.getChildren().addAll(settings);
     }
 
-    private void hookUpResHeightEvents(Slider heightSlider, Label l) {
-        Rectangle2D bounds = Screen.getPrimary().getBounds();
-        int maxHeight = (int) bounds.getHeight();
-        heightSlider.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
-        heightSlider.setMax(maxHeight);
-        heightSlider.setBlockIncrement(1);
-        heightSlider.setValue(Settings.getResolutionHeight());
-        heightSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int newHeightResolution = newValue.intValue();
-            Settings.setResolutionHeight(newHeightResolution, controller);
-            if (Sizes.isResizeWithResolution()) {
-                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
-                resWidthInput.setValue(newHeightResolution * ratio);
-            }
-        });
-        l.setText(String.valueOf(heightSlider.getValue()));
-        l.textProperty().bindBidirectional(heightSlider.valueProperty(), stringConverter);
-    }
-
     private void hookUpResWidthEvents(Slider widthSlider, Label l) {
         Rectangle2D bounds = Screen.getPrimary().getBounds();
         int maxWidth = (int) bounds.getWidth();
@@ -236,14 +217,41 @@ class SettingsMenu extends StackPane {
         widthSlider.setValue(Settings.getResolutionWidth());
         widthSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newWidthResolution = newValue.intValue();
-            Settings.setResolutionWidth(newWidthResolution, controller);
-            if (Sizes.isResizeWithResolution()) {
-                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
-                resHeightInput.setValue(newWidthResolution / ratio);
-            }
+            updateWidthResolution(newWidthResolution);
         });
         l.setText(String.valueOf(widthSlider.getValue()));
         l.textProperty().bindBidirectional(widthSlider.valueProperty(), stringConverter);
+    }
+
+    private void hookUpResHeightEvents(Slider heightSlider, Label l) {
+        Rectangle2D bounds = Screen.getPrimary().getBounds();
+        int maxHeight = (int) bounds.getHeight();
+        heightSlider.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
+        heightSlider.setMax(maxHeight);
+        heightSlider.setBlockIncrement(1);
+        heightSlider.setValue(Settings.getResolutionHeight());
+        heightSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int newHeightResolution = newValue.intValue();
+            updateHeightResolution(newHeightResolution);
+        });
+        l.setText(String.valueOf(heightSlider.getValue()));
+        l.textProperty().bindBidirectional(heightSlider.valueProperty(), stringConverter);
+    }
+
+    private void updateWidthResolution(int newWidthResolution) {
+        Settings.setResolutionWidth(newWidthResolution, controller);
+        if (Sizes.isResizeWithResolution()) {
+            double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+            resHeightInput.setValue(newWidthResolution / ratio);
+        }
+    }
+
+    private void updateHeightResolution(int newHeightResolution) {
+        Settings.setResolutionHeight(newHeightResolution, controller);
+        if (Sizes.isResizeWithResolution()) {
+            double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+            resWidthInput.setValue(newHeightResolution * ratio);
+        }
     }
 
     private void hookUpResizeWithResolutionEvents(CheckBox cb) {
@@ -252,11 +260,15 @@ class SettingsMenu extends StackPane {
             boolean isSelected = cb.isSelected();
             Sizes.setResizeWithResolution(isSelected, controller);
             if (isSelected) {
-                double resWidth = resWidthInput.getValue();
-                double ratio = Sizes.BASIC_RESOLUTION_RATIO;
-                resHeightInput.setValue(resWidth / ratio);
+                adjustHeightResolutionToPreserveRatio();
             }
         });
+    }
+
+    private void adjustHeightResolutionToPreserveRatio() {
+        double resWidth = resWidthInput.getValue();
+        double ratio = Sizes.BASIC_RESOLUTION_RATIO;
+        resHeightInput.setValue(resWidth / ratio);
     }
 
     private void hookUpFontSizeEvents(ChoiceBox<FontSize> fontSizeCB) {
