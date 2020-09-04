@@ -5,7 +5,7 @@ import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.stage.ResolutionImage;
 
-public abstract class EquipmentAnimation<E extends Equipment> extends Animation<E> {
+public abstract class EquipmentAnimation<E extends Equipment<?,?>> extends Animation<E> {
 
     public EquipmentAnimation(String animationDir) {
         super(animationDir);

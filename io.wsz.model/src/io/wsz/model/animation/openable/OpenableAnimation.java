@@ -1,25 +1,83 @@
 package io.wsz.model.animation.openable;
 
+import io.wsz.model.animation.Animation;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.stage.ResolutionImage;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class OpenableAnimation {
-    private final String animationDir;
-    private final Map<String, Map<String, List<ResolutionImage>>> idles;
-    private final FileFilter pngFileFilter;
+public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
+    private static final List<String> SEQUENCES_FOR_RANDOM = new ArrayList<>(0);
 
-    public OpenableAnimation(String animationDir, Map<String, Map<String, List<ResolutionImage>>> idles, FileFilter pngFileFilter) {
-        this.animationDir = animationDir;
-        this.idles = idles;
-        this.pngFileFilter = pngFileFilter;
+    private final Map<String, Map<String, List<ResolutionImage>>> operating = new HashMap<>(0);
+
+    public OpenableAnimation(String animationDir) {
+        super(animationDir);
+    }
+
+    @Override
+    public void initOtherAnimations(File framesDir, String fileName) {
+        if (fileName.equals(OPERATING)) {
+            initAnimations(framesDir, operating);
+        }
+    }
+
+    public ResolutionImage getOperatingImage(boolean isOpening, double speed, OpenableAnimationPos animationPos) {
+        long curTime = System.currentTimeMillis();
+        boolean isNotTimeForNextFrameUpdate = curTime < animationPos.getNextFrameUpdate();
+        if (isNotTimeForNextFrameUpdate) return null;
+
+        String curOperatingAnimation = animationPos.getCurOperatingAnimation();
+        if (curOperatingAnimation == null) {
+            return finishOperatingAnimation(animationPos);
+        }
+        Map<String, List<ResolutionImage>> operatingAnimations = operating.get(curOperatingAnimation);
+        if (operatingAnimations == null) {
+            return finishOperatingAnimation(animationPos);
+        }
+        String curOperatingSequence = animationPos.getCurOperatingSequence();
+        if (curOperatingSequence == null) {
+            curOperatingSequence = getRandomOperatingSequence(operatingAnimations.keySet());
+            animationPos.setCurOperatingSequence(curOperatingSequence);
+            animationPos.setFrameNumber(-1);
+        }
+        List<ResolutionImage> frames = operatingAnimations.get(curOperatingSequence);
+        if (frames == null || frames.isEmpty()) {
+            return finishOperatingAnimation(animationPos);
+        }
+
+        int size = frames.size();
+
+        long nextFrameUpdateTime = getNextUpdate(size, speed);
+        animationPos.setNextFrameUpdate(nextFrameUpdateTime);
+
+        int nextFrame;
+
+        if (isOpening) {
+            nextFrame = animationPos.getNextFrameNumber(size);
+        } else {
+            nextFrame = animationPos.getPreviousFrameNumber(size);
+        }
+        if (animationPos.isCycleFinished()) {
+            return finishOperatingAnimation(animationPos);
+        }
+        return frames.get(nextFrame);
+    }
+
+    private ResolutionImage finishOperatingAnimation(OpenableAnimationPos animationPos) {
+        animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
+        animationPos.setCurOperatingSequence(null);
+        return null;
+    }
+
+    private String getRandomOperatingSequence(Set<String> keySet) {
+        SEQUENCES_FOR_RANDOM.addAll(keySet);
+        int size = SEQUENCES_FOR_RANDOM.size();
+        int randomIndex = RANDOM.nextInt(size);
+        return SEQUENCES_FOR_RANDOM.get(randomIndex);
     }
 
     public ResolutionImage getBasicMainOpen(File programDir) {
@@ -41,7 +99,7 @@ public class OpenableAnimation {
         if (basicNotLoaded || mainNotLoaded || openImageNotLoaded) {
             String path = programDir + animationDir + IDLE_DIR + BASIC_OPEN_DIR + MAIN_DIR;
             File idleDir = new File(path);
-            File[] imagesFiles = idleDir.listFiles(pngFileFilter);
+            File[] imagesFiles = idleDir.listFiles(PNG_FILE_FILTER);
             if (imagesFiles == null || imagesFiles.length == 0) return null;
             File firstImageFile = imagesFiles[firstIndex];
             ResolutionImage loadedImage = new ResolutionImage(firstImageFile);

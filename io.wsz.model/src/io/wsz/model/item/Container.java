@@ -1,8 +1,9 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
-import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
+import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
+import io.wsz.model.animation.openable.OpenableAnimationType;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -15,12 +16,12 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container extends Equipment<Container, EquipmentAnimationPos> implements Containable, Openable {
+public class Container extends Equipment<Container, ContainerAnimationPos> implements Containable, Openable {
     private static final long serialVersionUID = 1L;
 
     private ContainerAnimation animation;
 
-    private EquipmentAnimationPos animationPos;
+    private ContainerAnimationPos animationPos;
     private OpenableItem openableItem;
     private final List<Equipment> items;
     private Double nettoWeight;
@@ -33,20 +34,20 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
 
     public Container(Controller controller) {
         super(ItemType.CONTAINER, controller);
-        this.animationPos = new EquipmentAnimationPos();
+        this.animationPos = new ContainerAnimationPos();
         this.openableItem = new OpenableItem();
         this.items = new ArrayList<>(0);
     }
 
     public Container(Container prototype, Boolean visible) {
         super(prototype, visible);
-        this.animationPos = new EquipmentAnimationPos();
+        this.animationPos = new ContainerAnimationPos();
         this.items = new ArrayList<>(0);
     }
 
     public Container(Container other) {
         super(other);
-        this.animationPos = new EquipmentAnimationPos(other.animationPos);
+        this.animationPos = new ContainerAnimationPos(other.animationPos);
         this.items = Equipment.cloneEquipmentList(other.items);
         this.nettoWeight = other.weight;
         this.nettoSize = other.nettoSize;
@@ -259,11 +260,12 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     public void open() {
         isOpen = true;
         PosItem collision = getCollision();
+        String message = "open";
         if (collision != null) {
             isOpen = false;
-            System.out.println(getAssetId() + " cannot be open: collides with " + collision.getAssetId());
+            onOperateActionFailure(collision, message);
         } else {
-            System.out.println(getAssetId() + " open");
+            onOperateActionSuccess(message);
         }
     }
 
@@ -271,12 +273,23 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     public void close() {
         isOpen = false;
         PosItem collision = getCollision();
+        String message = "closed";
         if (collision != null) {
             isOpen = true;
-            System.out.println(getAssetId() + " cannot be closed: collides with " + collision.getAssetId());
+            onOperateActionFailure(collision, message);
         } else {
-            System.out.println(getAssetId() + " closed");
+            onOperateActionSuccess(message);
         }
+    }
+
+    private void onOperateActionFailure(PosItem collision, String message) {
+        animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.IDLE);
+        System.out.println(getAssetId() + " cannot be " + message + ": collides with " + collision.getAssetId());
+    }
+
+    private void onOperateActionSuccess(String message) {
+        animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.OPERATING);
+        System.out.println(getAssetId() + " " + message);
     }
 
     @Override
@@ -289,7 +302,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
     }
 
     @Override
-    public EquipmentAnimationPos getAnimationPos() {
+    public ContainerAnimationPos getAnimationPos() {
         return animationPos;
     }
 
@@ -316,7 +329,7 @@ public class Container extends Equipment<Container, EquipmentAnimationPos> imple
         super.readExternal(in);
         long ver = in.readLong();
 
-        animationPos = (EquipmentAnimationPos) in.readObject();
+        animationPos = (ContainerAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
             animation = new ContainerAnimation(getDir());

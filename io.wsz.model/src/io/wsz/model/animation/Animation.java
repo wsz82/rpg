@@ -9,7 +9,7 @@ import java.util.*;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class Animation<A extends PosItem> {
+public class Animation<A extends PosItem<?,?>> {
     protected static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     protected static final Random RANDOM = new Random();
 
@@ -51,7 +51,7 @@ public class Animation<A extends PosItem> {
         }
     }
 
-    protected void initOtherAnimations(File framesDir, String fileName) {}
+    public void initOtherAnimations(File framesDir, String fileName) {}
 
     public void initAnimations(File animationDir, Map<String, Map<String, List<ResolutionImage>>> animations) {
         File[] animationFiles = animationDir.listFiles();
@@ -72,7 +72,7 @@ public class Animation<A extends PosItem> {
         for (File sequenceFile : sequencesFiles) {
             boolean isNotDirectory = !sequenceFile.isDirectory();
             if (isNotDirectory) continue;
-            List<ResolutionImage> sequence = getSequence(sequenceFile);
+            List<ResolutionImage> sequence = getLoadedSequence(sequenceFile);
             if (sequence == null || sequence.isEmpty()) continue;
             String sequenceName = sequenceFile.getName();
             animation.put(sequenceName, sequence);
@@ -80,7 +80,7 @@ public class Animation<A extends PosItem> {
         return animation;
     }
 
-    private List<ResolutionImage> getSequence(File framesDir) {
+    private List<ResolutionImage> getLoadedSequence(File framesDir) {
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
         if (imagesFiles == null || imagesFiles.length == 0) return null;
         List<ResolutionImage> sequence = new ArrayList<>(0);

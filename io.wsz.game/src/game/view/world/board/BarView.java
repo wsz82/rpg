@@ -22,7 +22,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -250,14 +249,13 @@ public class BarView {
                 portraits.add(i, new Portrait(null, null, 0));
             }
         }
-        File programDir = controller.getProgramDir();
         for (int i = 0; i < creatures.size(); i++) {
             Portrait portrait = portraits.get(i);
             Creature cr = creatures.get(i);
 
             portrait.creature = cr;
             CreatureAnimation animation = cr.getAnimation();
-            ResolutionImage animationPortrait = animation.getPortrait(cr, programDir);
+            ResolutionImage animationPortrait = animation.getPortrait(cr);
             if (animationPortrait != null) {
                 Image fxImage = animationPortrait.getFxImage();
                 if (fxImage != null) {

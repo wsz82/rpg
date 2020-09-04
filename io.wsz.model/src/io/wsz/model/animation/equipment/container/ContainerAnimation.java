@@ -1,36 +1,62 @@
 package io.wsz.model.animation.equipment.container;
 
 import io.wsz.model.animation.equipment.EquipmentAnimation;
-import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.animation.openable.OpenableAnimation;
+import io.wsz.model.animation.openable.OpenableAnimationPos;
+import io.wsz.model.animation.openable.OpenableAnimationType;
 import io.wsz.model.item.Container;
 import io.wsz.model.stage.ResolutionImage;
+
+import java.io.File;
 
 import static io.wsz.model.sizes.Paths.*;
 
 public class ContainerAnimation extends EquipmentAnimation<Container> {
-    private final OpenableAnimation openableAnimation = new OpenableAnimation(animationDir, idles, PNG_FILE_FILTER);
+    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir);
 
     public ContainerAnimation(String animationDir) {
         super(animationDir);
     }
 
     @Override
+    public void initOtherAnimations(File framesDir, String fileName) {
+        super.initOtherAnimations(framesDir, fileName);
+        openableAnimation.initOtherAnimations(framesDir, fileName);
+    }
+
+    @Override
     public void play(Container c) {
+        ContainerAnimationPos animationPos = c.getAnimationPos();
         boolean isOpen = c.isOpen();
-        EquipmentAnimationPos animationPos = c.getAnimationPos();
-        EquipmentAnimationType curAnimation = animationPos.getCurAnimation();
-        switch (curAnimation) {
+
+        EquipmentAnimationType curEquipmentAnimation = animationPos.getCurAnimation();
+        switch (curEquipmentAnimation) {
             case DROP -> playDrop(isOpen, animationPos);
             case INVENTORY -> playInventory(isOpen, animationPos);
         }
-        ResolutionImage nextIdle = getNextIdle(animationPos, c.getAnimationSpeed());
-        if (nextIdle == null) return;
-        c.setImage(nextIdle);
+
+        OpenableAnimationPos openableAnimationPos = animationPos.getOpenableAnimationPos();
+        OpenableAnimationType openableAnimationType = openableAnimationPos.getOpenableAnimationType();
+        ResolutionImage nextFrame = switch (openableAnimationType) {
+            case IDLE -> getIdle(c, animationPos);
+            case OPERATING -> getOperating(c, openableAnimationPos);
+        };
+
+        if (nextFrame == null) return;
+        c.setImage(nextFrame);
     }
 
-    protected void playDrop(boolean isOpen, EquipmentAnimationPos animationPos) {
+    private ResolutionImage getIdle(Container c, ContainerAnimationPos animationPos) {
+        return getNextIdle(animationPos, c.getAnimationSpeed());
+    }
+
+    private ResolutionImage getOperating(Container c, OpenableAnimationPos openableAnimationPos) {
+        return openableAnimation.getOperatingImage(c.isOpen(), c.getAnimationSpeed(), openableAnimationPos);
+    }
+
+    protected void playDrop(boolean isOpen, ContainerAnimationPos animationPos) {
+        animationPos.getOpenableAnimationPos().setCurOperatingAnimation(BASIC);
         if (isOpen) {
             playDropOpen(animationPos);
         } else {
@@ -38,15 +64,16 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
         }
     }
 
-    private void playDropClosed(EquipmentAnimationPos animationPos) {
+    private void playDropClosed(ContainerAnimationPos animationPos) {
         animationPos.setCurIdleAnimation(BASIC);
     }
 
-    private void playDropOpen(EquipmentAnimationPos animationPos) {
+    private void playDropOpen(ContainerAnimationPos animationPos) {
         animationPos.setCurIdleAnimation(BASIC_OPEN);
     }
 
-    protected void playInventory(boolean isOpen, EquipmentAnimationPos animationPos) {
+    protected void playInventory(boolean isOpen, ContainerAnimationPos animationPos) {
+        animationPos.getOpenableAnimationPos().setCurOperatingAnimation(INVENTORY);
         if (isOpen) {
             playInventoryOpen(animationPos);
         } else {
@@ -54,15 +81,15 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
         }
     }
 
-    private void playInventoryOpen(EquipmentAnimationPos animationPos) {
+    private void playInventoryOpen(ContainerAnimationPos animationPos) {
         animationPos.setCurIdleAnimation(INVENTORY_OPEN);
     }
 
-    private void playInventoryClosed(EquipmentAnimationPos animationPos) {
+    private void playInventoryClosed(ContainerAnimationPos animationPos) {
         animationPos.setCurIdleAnimation(INVENTORY);
     }
 
-    public OpenableAnimation getOpenableAnimation() {
+    public OpenableAnimation<?> getOpenableAnimation() {
         return openableAnimation;
     }
 }

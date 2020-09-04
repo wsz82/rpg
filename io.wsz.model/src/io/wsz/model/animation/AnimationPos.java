@@ -11,11 +11,11 @@ import java.io.ObjectOutput;
 public class AnimationPos implements Externalizable {
     private static final long serialVersionUID = 1L;
 
+    protected int frameNumber;
+    protected long nextFrameUpdate;
+    protected boolean isCycleFinished;
     protected String curIdleAnimation;
     protected String curIdleSequence;
-    protected int frameNumber;
-    protected boolean isCycleFinished;
-    protected long nextFrameUpdate;
     protected long nextTemporaryIdleUpdate;
     protected boolean isTemporaryIdle;
 
@@ -60,16 +60,24 @@ public class AnimationPos implements Externalizable {
         this.frameNumber = frameNumber;
     }
 
-    public int getNextFrameNumber(int framesSize) {
+    public int getNextFrameNumber(int size) {
+        if (size == 1) {
+            isCycleFinished = true;
+            return 0;
+        }
         int frameNumber = this.frameNumber;
-        if (frameNumber >= framesSize) {
+        if (frameNumber >= size) {
             isCycleFinished = true;
             this.frameNumber = 1;
             return 0;
-        } else {
+        } else if (frameNumber >= 0) {
             isCycleFinished = false;
             this.frameNumber++;
             return frameNumber;
+        } else {
+            isCycleFinished = false;
+            this.frameNumber = 1;
+            return 0;
         }
     }
 

@@ -23,6 +23,7 @@ public class CreatureAnimation extends Animation<Creature> {
     private static final StringBuilder BUILD_ANIMATION_NAME = new StringBuilder();
 
     private final Map<String, Map<String, List<ResolutionImage>>> walk = new HashMap<>(0);
+    private final List<File> portraitsFiles = new ArrayList<>(0);
     private final List<ResolutionImage> portraits = new ArrayList<>(0);
     private final Map<String, File> creatureInventoryFiles = new HashMap<>(0);
     private final Map<String, ResolutionImage> creatureInventoryPictures = new HashMap<>(0);
@@ -70,9 +71,9 @@ public class CreatureAnimation extends Animation<Creature> {
     }
 
     @Override
-    protected void initOtherAnimations(File framesDir, String fileName) {
+    public void initOtherAnimations(File framesDir, String fileName) {
         switch (fileName) {
-            case PORTRAIT -> initPortraitFrames(framesDir, portraits);
+            case PORTRAIT -> initPortraitPicturesFiles(framesDir, portraitsFiles);
             case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
             case WALK -> initAnimations(framesDir, walk);
         }
@@ -83,9 +84,9 @@ public class CreatureAnimation extends Animation<Creature> {
         File[] inventoryFiles = inventoryDir.listFiles();
         if (inventoryFiles == null || inventoryFiles.length == 0) return;
         for (File inventoryFile : inventoryFiles) {
-            boolean isNotPNGfile = !inventoryFile.getName().endsWith(".png");
+            boolean isNotPNGfile = !inventoryFile.getName().endsWith(PNG);
             if (isNotPNGfile) continue;
-            String fileName = inventoryFile.getName().replace(".png", "");
+            String fileName = inventoryFile.getName().replace(PNG, "");
             creatureInventoryFiles.put(fileName, inventoryFile);
         }
     }
@@ -105,33 +106,32 @@ public class CreatureAnimation extends Animation<Creature> {
     public ResolutionImage getInventoryBasicForEditor(File programDir) {
         ResolutionImage basicInventoryImage = creatureInventoryPictures.get(BASIC);
         if (basicInventoryImage == null) {
-            String path = programDir + animationDir + INVENTORY_DIR + BASIC_DIR + ".png";
+            String path = programDir + animationDir + INVENTORY_DIR + BASIC_DIR + PNG;
             basicInventoryImage = new ResolutionImage(path);
             creatureInventoryPictures.put(BASIC, basicInventoryImage);
         }
         return basicInventoryImage;
     }
 
-    private void initPortraitFrames(File framesDir, List<ResolutionImage> portrait) {
-        portrait.clear();
+    private void initPortraitPicturesFiles(File framesDir, List<File> portraitsFiles) {
+        portraitsFiles.clear();
         File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
         if (imagesFiles == null || imagesFiles.length == 0) return;
-        int portraitSize = Sizes.getPortraitSize();
-        if (portraitSize <= 0) return;
-        for (File imageFile : imagesFiles) {
-            ResolutionImage loadedFrame = new ResolutionImage(imageFile, portraitSize, portraitSize);
-            portrait.add(loadedFrame);
+        for (File portraitFile : imagesFiles) {
+            boolean isNotPNGfile = !portraitFile.getName().endsWith(PNG);
+            if (isNotPNGfile) continue;
+            portraitsFiles.add(portraitFile);
         }
     }
 
-    public ResolutionImage getPortrait(Creature cr, File programDir) {
+    public ResolutionImage getPortrait(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
         long curTime = System.currentTimeMillis();
         if (curTime < animationPos.getNextPortraitUpdate()) return null;
         int randomDifTimeMillis = getRandomMillis(MAX_PORTRAIT_UPDATE_TIME_SEC, MIN_PORTRAIT_UPDATE_TIME_SEC);
         long nextPortraitUpdate = curTime + randomDifTimeMillis;
         animationPos.setNextPortraitUpdate(nextPortraitUpdate);
-        List<ResolutionImage> portraits = getPortraits(programDir);
+        List<ResolutionImage> portraits = getPortraits();
         int portraitsSize = portraits.size();
         if (portraitsSize == 0) return null;
         int randomIndex = RANDOM.nextInt(portraitsSize);
@@ -250,12 +250,13 @@ public class CreatureAnimation extends Animation<Creature> {
         return super.getNextIdle(animationPos, speed);
     }
 
-    public List<ResolutionImage> getPortraits(File programDir) {
+    public List<ResolutionImage> getPortraits() {
+        int portraitSize = Sizes.getPortraitSize();
+        if (portraitSize <= 0) return null;
         if (portraits.isEmpty()) {
-            String path = programDir + animationDir + PORTRAIT_DIR;
-            File file = new File(path);
-            if (file.exists()) {
-                initPortraitFrames(file, portraits);
+            for (File imageFile : portraitsFiles) {
+                ResolutionImage loadedFrame = new ResolutionImage(imageFile, portraitSize, portraitSize);
+                portraits.add(loadedFrame);
             }
         }
         return portraits;

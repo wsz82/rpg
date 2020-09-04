@@ -31,6 +31,8 @@ public class Paths {
     public static final String OPEN = "open";
     public static final String BASIC_OPEN = BASIC + DIVIDER + OPEN;
     public static final String BASIC_OPEN_DIR = File.separator + BASIC_OPEN;
+    public static final String OPERATING = "operating";
+    public static final String OPERATING_DIR = File.separator + OPERATING;
     public static final String INVENTORY = "inventory";
     public static final String INVENTORY_DIR = File.separator + INVENTORY;
     public static final String INVENTORY_OPEN = INVENTORY + DIVIDER + OPEN;
