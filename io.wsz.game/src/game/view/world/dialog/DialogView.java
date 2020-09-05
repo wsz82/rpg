@@ -217,9 +217,8 @@ public class DialogView {
 
         if (answer != null) {
             addDialogItem(answering, answer.getText());
-
-            dialogMemento.setLastAnswer(answer);
         }
+        dialogMemento.setLastAnswer(answer);
 
         isToRefresh = true;
 
@@ -366,6 +365,10 @@ public class DialogView {
     private void drawQuestions(int lastPos) {
         questionsPos.clear();
         Answer lastAnswer = dialogMemento.getLastAnswer();
+        if (lastAnswer == null) {
+            dialogMemento.setFinished(true);
+            return;
+        }
         String questionsID = lastAnswer.getQuestionsID();
         if (questionsID == null) {
             dialogMemento.setFinished(true);
