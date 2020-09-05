@@ -32,11 +32,11 @@ public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
 
         String curOperatingAnimation = animationPos.getCurOperatingAnimation();
         if (curOperatingAnimation == null) {
-            return finishOperatingAnimation(animationPos);
+            return finishOperatingAnimationWithNull(animationPos);
         }
         Map<String, List<ResolutionImage>> operatingAnimations = operating.get(curOperatingAnimation);
         if (operatingAnimations == null) {
-            return finishOperatingAnimation(animationPos);
+            return finishOperatingAnimationWithNull(animationPos);
         }
         String curOperatingSequence = animationPos.getCurOperatingSequence();
         if (curOperatingSequence == null) {
@@ -46,7 +46,7 @@ public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
         }
         List<ResolutionImage> frames = operatingAnimations.get(curOperatingSequence);
         if (frames == null || frames.isEmpty()) {
-            return finishOperatingAnimation(animationPos);
+            return finishOperatingAnimationWithNull(animationPos);
         }
 
         int size = frames.size();
@@ -62,15 +62,19 @@ public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
             nextFrame = animationPos.getPreviousFrameNumber(size);
         }
         if (animationPos.isCycleFinished()) {
-            return finishOperatingAnimation(animationPos);
+            finishOperatingAnimation(animationPos);
         }
         return frames.get(nextFrame);
     }
 
-    private ResolutionImage finishOperatingAnimation(OpenableAnimationPos animationPos) {
+    private ResolutionImage finishOperatingAnimationWithNull(OpenableAnimationPos animationPos) {
+        finishOperatingAnimation(animationPos);
+        return null;
+    }
+
+    private void finishOperatingAnimation(OpenableAnimationPos animationPos) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
         animationPos.setCurOperatingSequence(null);
-        return null;
     }
 
     private String getRandomOperatingSequence(Set<String> keySet) {
