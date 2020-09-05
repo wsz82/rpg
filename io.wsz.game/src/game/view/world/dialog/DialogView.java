@@ -221,10 +221,6 @@ public class DialogView {
         dialogMemento.setLastAnswer(answer);
 
         isToRefresh = true;
-
-        if (activeQuestion.isFinishingDialog()) {
-            dialogMemento.setFinished(true);
-        }
     }
 
     private void endDialog() {

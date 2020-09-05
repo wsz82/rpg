@@ -13,14 +13,12 @@ public class Question implements Externalizable {
 
     private String text;
     private String answerID;
-    private boolean isFinishingDialog;
 
     public Question() {}
 
-    public Question(String text, String answerID, boolean isFinishingDialog) {
+    public Question(String text, String answerID) {
         this.text = text;
         this.answerID = answerID;
-        this.isFinishingDialog = isFinishingDialog;
     }
 
     public String getText() {
@@ -39,14 +37,6 @@ public class Question implements Externalizable {
         this.answerID = answerID;
     }
 
-    public boolean isFinishingDialog() {
-        return isFinishingDialog;
-    }
-
-    public void setFinishingDialog(boolean finishingDialog) {
-        this.isFinishingDialog = finishingDialog;
-    }
-
     @Override
     public String toString() {
         int max = 20;
@@ -63,35 +53,30 @@ public class Question implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Question)) return false;
         Question question = (Question) o;
-        return isFinishingDialog() == question.isFinishingDialog() &&
-                Objects.equals(getText(), question.getText()) &&
+        return Objects.equals(getText(), question.getText()) &&
                 Objects.equals(getAnswerID(), question.getAnswerID());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getText(), getAnswerID(), isFinishingDialog());
+        return Objects.hash(getText(), getAnswerID());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(text);
+        out.writeObject(text);
 
-        out.writeUTF(answerID);
-
-        out.writeBoolean(isFinishingDialog);
+        out.writeObject(answerID);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        text = in.readUTF();
+        text = (String) in.readObject();
 
-        answerID = in.readUTF();
-
-        isFinishingDialog = in.readBoolean();
+        answerID = (String) in.readObject();
     }
 }
