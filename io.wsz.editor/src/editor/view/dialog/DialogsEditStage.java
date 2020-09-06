@@ -51,7 +51,7 @@ public class DialogsEditStage extends ChildStage {
     private VBox answersVBox;
     private VBox questionsListsVBox;
     private VBox answerCenter;
-    private RequirementsList requirementsList;
+    private RequirementsListView requirementsListView;
 
     public DialogsEditStage(Stage parent, EditorController editorController) {
         super(parent);
@@ -155,8 +155,8 @@ public class DialogsEditStage extends ChildStage {
         String answerID = question.getAnswerID();
         Answer answer = getAnswerWithID(answerID);
         questionAnswerCB.setValue(answer);
-        requirementsList.clear();
-        requirementsList.populate(question.getRequirements());
+        requirementsListView.clear();
+        requirementsListView.populate(question.getRequirements());
     }
 
     private Answer getAnswerWithID(String answerID) {
@@ -178,8 +178,8 @@ public class DialogsEditStage extends ChildStage {
         refreshQuestionAnswerCB();
         questionProperties.getChildren().addAll(questionAnswerBox);
 
-        requirementsList = new RequirementsList(editorController);
-        ScrollPane listScrollPane = requirementsList.getListScrollPane();
+        requirementsListView = new RequirementsListView(editorController);
+        ScrollPane listScrollPane = requirementsListView.getListScrollPane();
 
         questionDetails.getChildren().addAll(questionText, questionProperties, listScrollPane);
     }
@@ -606,7 +606,7 @@ public class DialogsEditStage extends ChildStage {
     private void saveQuestionItem(QuestionItem qi) {
         Question question = qi.question;
         question.setText(questionText.getText());
-        question.setRequirements(requirementsList.getOutput());
+        question.setRequirements(requirementsListView.getOutput());
         Answer answer = questionAnswerCB.getValue();
         if (answer != null) {
             String answerID = answer.getID();

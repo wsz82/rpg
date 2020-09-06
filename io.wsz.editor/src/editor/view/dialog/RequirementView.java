@@ -10,17 +10,17 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public class Requirement {
+public class RequirementView {
     private final EditorController editorController;
     private final HBox elements = new HBox(5);
     private final ChoiceBox<Method> methodCB = new ChoiceBox<>();
     private final HBox elementsWithMethodCB = new HBox(5, methodCB, elements);
     private final Button removeButton = new Button("Remove");
     private final HBox row = new HBox(5, elementsWithMethodCB, removeButton);
-    private final RequirementsList owner;
-    private RequirementCreatureItem specificRequirement;
+    private final RequirementsListView owner;
+    private ArgumentTypeRequirementView argumentTypeRequirementView;
 
-    public Requirement(RequirementsList owner, EditorController editorController) {
+    public RequirementView(RequirementsListView owner, EditorController editorController) {
         this.editorController = editorController;
         this.owner = owner;
         setUpMethodCB();
@@ -34,20 +34,19 @@ public class Requirement {
         methodCB.setItems(observableMethods);
         methodCB.valueProperty().addListener((observable, oldMethod, newMethod) -> {
             elements.getChildren().clear();
-            setUpSpecificRequirement(newMethod);
+            setUpArgumentTypeRequirement(newMethod);
         });
     }
 
-    private void setUpSpecificRequirement(Method newMethod) {
+    private void setUpArgumentTypeRequirement(Method newMethod) {
         switch (newMethod) {
-            case PChas -> setUpCreatureItemRequirement();
+            case PChas -> setUpArgumentTypeRequirement();
         }
     }
 
-    private void setUpCreatureItemRequirement() {
-        RequirementCreatureItem specificRequirement = new RequirementCreatureItem(editorController);
-        this.specificRequirement = specificRequirement;
-        elements.getChildren().addAll(specificRequirement.getElements());
+    private void setUpArgumentTypeRequirement() {
+        this.argumentTypeRequirementView = new ArgumentTypeRequirementView(editorController);
+        elements.getChildren().addAll(argumentTypeRequirementView.getElements());
     }
 
     private void hookUpRemoveEvent() {
@@ -73,11 +72,7 @@ public class Requirement {
         methodCB.setValue(method);
     }
 
-    public RequirementCreatureItem getSpecificRequirement() {
-        return specificRequirement;
-    }
-
-    public void setSpecificRequirement(RequirementCreatureItem specificRequirement) {
-        this.specificRequirement = specificRequirement;
+    public ArgumentTypeRequirementView getArgumentTypeRequirementView() {
+        return argumentTypeRequirementView;
     }
 }

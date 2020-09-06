@@ -1,7 +1,6 @@
 package io.wsz.model.dialog;
 
 import io.wsz.model.item.Creature;
-import io.wsz.model.script.BooleanCreatureItemExpression;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -49,13 +48,7 @@ public class Dialog implements Externalizable {
     private List<Question> geFilteredQuestions(Creature pc, List<Question> questions) {
         FILTERED_QUESTIONS.clear();
         for (Question question : questions) {
-            Requirements requirements = question.getRequirements();
-            if (requirements == null) continue;
-            List<BooleanCreatureItemExpression> booleanPChasExpressions = requirements.getBooleanPChasExpressions();
-            if (booleanPChasExpressions == null) continue;
-            boolean allRequirementsMatch = booleanPChasExpressions.stream()
-                    .allMatch(b -> b.isTrue(pc));
-            if (allRequirementsMatch) {
+            if (question.doMatchRequirements(pc)) {
                 FILTERED_QUESTIONS.add(question);
             }
         }

@@ -263,6 +263,7 @@ public class GameRunner {
         gameController.initNewGameSettings();
         controller.initNewGameHeroes();
         controller.setDialogMemento(null);
+        gameController.setDialog(false);
     }
 
     private class Loader extends Task<String> {

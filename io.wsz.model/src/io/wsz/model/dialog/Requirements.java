@@ -1,5 +1,6 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.item.Creature;
 import io.wsz.model.script.BooleanCreatureItemExpression;
 import io.wsz.model.sizes.Sizes;
 
@@ -16,6 +17,17 @@ public class Requirements implements Externalizable {
 
     public List<BooleanCreatureItemExpression> getBooleanPChasExpressions() {
         return booleanPChasExpressions;
+    }
+
+    public boolean doMatch(Creature pc) {
+        boolean doMatchPChasRequirements = booleanPChasExpressions == null || doMatchPChasRequirements(pc, booleanPChasExpressions);
+
+        return doMatchPChasRequirements;
+    }
+
+    private boolean doMatchPChasRequirements(Creature pc, List<BooleanCreatureItemExpression> booleanPChasExpressions) {
+        return booleanPChasExpressions.stream()
+                .allMatch(b -> b.isTrue(pc));
     }
 
     public void setBooleanPChasExpressions(List<BooleanCreatureItemExpression> booleanPChasExpressions) {
