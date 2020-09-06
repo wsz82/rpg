@@ -67,7 +67,7 @@ public class DialogsEditStage extends ChildStage {
 
     public void initWindow() {
         setTitle("Dialogs edit");
-        setHeight(800);
+        setHeight(750);
         final BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
@@ -213,14 +213,16 @@ public class DialogsEditStage extends ChildStage {
         questionsListsView.setEditable(true);
         questionsListsView.setOnEditCommit(d -> {
             QuestionsList tempQuestionList = d.getNewValue();
-            String newName = tempQuestionList.getID();
+            String newID = tempQuestionList.getID();
             QuestionsList selectedQuestionList = questionsListsView.getSelectionModel().getSelectedItem();
             if (selectedQuestionList == null) return;
-            if (selectedQuestionList.getID().equals(newName)) {
+            String oldID = selectedQuestionList.getID();
+            if (oldID.equals(newID)) {
                 return;
             }
-            newName = getUniqueQuestionsListID(newName);
-            selectedQuestionList.setID(newName);
+            newID = getUniqueQuestionsListID(newID);
+            selectedQuestionList.setID(newID);
+            updateAnswersQuestionsListID(oldID, newID);
             answerCenter.refreshQuestionsListForAnswerCB();
         });
         questionsListsView.setCellFactory(param -> new TextFieldListCell<>(new StringConverter<>() {
@@ -240,6 +242,18 @@ public class DialogsEditStage extends ChildStage {
         }));
         setUpQuestionsListsContextMenu();
         hookUpQuestionsListsEvents();
+    }
+
+    private void updateAnswersQuestionsListID(String oldID, String newID) {
+        for (AnswersList answersList : observableAnswersList) {
+            if (answersList == null) continue;
+            List<Answer> answers = answersList.getAnswers();
+            for (Answer answer : answers) {
+                if (answer.getQuestionsListID().equals(oldID)){
+                    answer.setQuestionsListID(newID);
+                }
+            }
+        }
     }
 
     private void setUpQuestionsListsContextMenu() {
@@ -266,6 +280,7 @@ public class DialogsEditStage extends ChildStage {
 
     private String getUniqueQuestionsListID(String ID) {
         List<String> IDs = observableQuestionsLists.stream()
+                .filter(Objects::nonNull)
                 .map(QuestionsList::getID)
                 .collect(Collectors.toList());
         ID = getUniqueID(ID, IDs);
@@ -328,11 +343,13 @@ public class DialogsEditStage extends ChildStage {
             String newID = tempAnswersList.getID();
             AnswersList selectedAnswersList = answersListView.getSelectionModel().getSelectedItem();
             if (selectedAnswersList == null) return;
-            if (selectedAnswersList.getID().equals(newID)) {
+            String oldID = selectedAnswersList.getID();
+            if (oldID.equals(newID)) {
                 return;
             }
             newID = getUniqueAnswersListID(newID);
             selectedAnswersList.setID(newID);
+            updateQuestionsAnswersListID(oldID, newID);
             refreshQuestionAnswerCB();
             refreshStartAnswerCB();
         });
@@ -353,6 +370,18 @@ public class DialogsEditStage extends ChildStage {
         }));
         setUpAnswersListContextMenu();
         hookUpAnswersListEvents();
+    }
+
+    private void updateQuestionsAnswersListID(String oldID, String newID) {
+        for (QuestionsList questionsList : observableQuestionsLists) {
+            if (questionsList == null) continue;
+            List<Question> questions = questionsList.getQuestions();
+            for (Question question : questions) {
+                if (question.getAnswersListID().equals(oldID)){
+                    question.setAnswersListID(newID);
+                }
+            }
+        }
     }
 
     private void setUpDialogsVBox(VBox dialogsVBox) {
