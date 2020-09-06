@@ -6,28 +6,12 @@ import io.wsz.model.item.Equipment;
 import java.util.List;
 
 public class BooleanCreatureItemExpression extends BooleanCountableExpression<Creature> {
+    private static final long serialVersionUID = 4041489417192634892L;
 
     public BooleanCreatureItemExpression() {}
 
     public BooleanCreatureItemExpression(CompareOperator compareOperator, String itemID, int argument) {
         super(compareOperator, itemID, argument);
-    }
-
-    @Override
-    public boolean isTrue(Creature creature) {
-        this.checkedItem = creature;
-        return creatureHas();
-    }
-
-    private boolean creatureHas() {
-        return switch (compareOperator) {
-            case EQUAL -> isEqual();
-            case NOT_EQUAL -> isNotEqual();
-            case GREATER -> isGreater();
-            case GREATER_OR_EQUAL -> isGreaterOrEqual();
-            case LESSER -> isLesser();
-            case LESSER_OR_EQUAL -> isLesserOrEqual();
-        };
     }
 
     @Override

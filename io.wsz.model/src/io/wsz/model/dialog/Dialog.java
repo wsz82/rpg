@@ -1,6 +1,7 @@
 package io.wsz.model.dialog;
 
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -34,21 +35,21 @@ public class Dialog implements Externalizable {
         this.greetingAnswerID = greetingAnswerID;
     }
 
-    public List<Question> getQuestionsListByID(String ID, Creature pc) {
+    public List<Question> getQuestionsListByID(String ID, Creature pc, PosItem npc) {
         for (QuestionsList questionsList : questionsLists) {
             String id = questionsList.getID();
             if (id.equals(ID)) {
                 List<Question> questions = questionsList.getQuestions();
-                return geFilteredQuestions(pc, questions);
+                return geFilteredQuestions(pc, npc, questions);
             }
         }
         return null;
     }
 
-    private List<Question> geFilteredQuestions(Creature pc, List<Question> questions) {
+    private List<Question> geFilteredQuestions(Creature pc, PosItem npc, List<Question> questions) {
         FILTERED_QUESTIONS.clear();
         for (Question question : questions) {
-            if (question.doMatchRequirements(pc)) {
+            if (question.doMatchRequirements(pc, npc)) {
                 FILTERED_QUESTIONS.add(question);
             }
         }

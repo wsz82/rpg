@@ -40,7 +40,7 @@ public class RequirementView {
 
     private void setUpArgumentTypeRequirement(Method newMethod) {
         switch (newMethod) {
-            case PChas -> setUpArgumentTypeRequirement();
+            case PChas, NPChas -> setUpArgumentTypeRequirement();
         }
     }
 

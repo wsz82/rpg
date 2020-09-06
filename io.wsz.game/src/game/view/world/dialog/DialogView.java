@@ -374,7 +374,7 @@ public class DialogView {
         PosItem answering = dialogMemento.getAnswering();
         Dialog dialog = answering.getDialog();
         Creature asking = dialogMemento.getPc();
-        List<Question> questions = dialog.getQuestionsListByID(questionsID, asking);
+        List<Question> questions = dialog.getQuestionsListByID(questionsID, asking, answering);
         if (questions == null || questions.isEmpty()) {
             dialogMemento.setFinished(true);
             return;

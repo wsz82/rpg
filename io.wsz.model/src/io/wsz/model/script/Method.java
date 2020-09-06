@@ -1,5 +1,6 @@
 package io.wsz.model.script;
 
 public enum Method {
-    PChas
+    PChas,
+    NPChas
 }

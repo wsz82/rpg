@@ -3,6 +3,7 @@ package editor.view.dialog;
 import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.script.BooleanCountableExpression;
 import io.wsz.model.script.BooleanCreatureItemExpression;
 import io.wsz.model.script.CompareOperator;
 import javafx.collections.FXCollections;
@@ -90,7 +91,7 @@ public class RequirementCreatureItemView {
         return expression;
     }
 
-    public void populate(BooleanCreatureItemExpression expression) {
+    public void populate(BooleanCountableExpression expression) {
         Optional<Asset> optAsset = editorController.getObservableAssets().getEquipmentAssets().stream()
                 .filter(a -> a.getAssetId().equals(expression.getItemID()))
                 .findFirst();

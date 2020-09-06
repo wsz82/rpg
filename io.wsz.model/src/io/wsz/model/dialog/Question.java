@@ -1,6 +1,7 @@
 package io.wsz.model.dialog;
 
 import io.wsz.model.item.Creature;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -23,11 +24,11 @@ public class Question implements Externalizable {
         this.answerID = answerID;
     }
 
-    public boolean doMatchRequirements(Creature pc) {
+    public boolean doMatchRequirements(Creature pc, PosItem npc) {
         if (requirements == null) {
             return true;
         }
-        return requirements.doMatch(pc);
+        return requirements.doMatch(pc, npc);
     }
 
     public String getText() {

@@ -1,7 +1,8 @@
 package io.wsz.model.dialog;
 
 import io.wsz.model.item.Creature;
-import io.wsz.model.script.BooleanCreatureItemExpression;
+import io.wsz.model.item.PosItem;
+import io.wsz.model.script.BooleanCountableExpression;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -13,29 +14,37 @@ import java.util.List;
 public class Requirements implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private List<BooleanCreatureItemExpression> booleanPChasExpressions;
+    private List<BooleanCountableExpression> booleanPChasExpressions;
+    private List<BooleanCountableExpression> booleanNPChasExpressions;
 
-    public List<BooleanCreatureItemExpression> getBooleanPChasExpressions() {
+    public boolean doMatch(Creature pc, PosItem npc) {
+        return doMatchCreatureRequirements(pc, booleanPChasExpressions) && doMatchCreatureRequirements(npc, booleanNPChasExpressions);
+    }
+
+    private boolean doMatchCreatureRequirements(PosItem npc, List<BooleanCountableExpression> expressions) {
+        return expressions == null || expressions.stream()
+                .allMatch(b -> b.isTrue(npc));
+    }
+
+    public List<BooleanCountableExpression> getBooleanPChasExpressions() {
         return booleanPChasExpressions;
     }
 
-    public boolean doMatch(Creature pc) {
-        boolean doMatchPChasRequirements = booleanPChasExpressions == null || doMatchPChasRequirements(pc, booleanPChasExpressions);
-
-        return doMatchPChasRequirements;
-    }
-
-    private boolean doMatchPChasRequirements(Creature pc, List<BooleanCreatureItemExpression> booleanPChasExpressions) {
-        return booleanPChasExpressions.stream()
-                .allMatch(b -> b.isTrue(pc));
-    }
-
-    public void setBooleanPChasExpressions(List<BooleanCreatureItemExpression> booleanPChasExpressions) {
+    public void setBooleanPChasExpressions(List<BooleanCountableExpression> booleanPChasExpressions) {
         this.booleanPChasExpressions = booleanPChasExpressions;
     }
 
+    public List<BooleanCountableExpression> getBooleanNPChasExpressions() {
+        return booleanNPChasExpressions;
+    }
+
+    public void setBooleanNPChasExpressions(List<BooleanCountableExpression> booleanNPChasExpressions) {
+        this.booleanNPChasExpressions = booleanNPChasExpressions;
+    }
+
     public boolean isEmpty() {
-        return booleanPChasExpressions == null || booleanPChasExpressions.isEmpty();
+        return (booleanPChasExpressions == null || booleanPChasExpressions.isEmpty())
+                && (booleanNPChasExpressions == null || booleanNPChasExpressions.isEmpty());
     }
 
     @Override
@@ -43,12 +52,16 @@ public class Requirements implements Externalizable {
         out.writeLong(Sizes.VERSION);
 
         out.writeObject(booleanPChasExpressions);
+
+        out.writeObject(booleanNPChasExpressions);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        booleanPChasExpressions = (List<BooleanCreatureItemExpression>) in.readObject();
+        booleanPChasExpressions = (List<BooleanCountableExpression>) in.readObject();
+
+        booleanNPChasExpressions = (List<BooleanCountableExpression>) in.readObject();
     }
 }

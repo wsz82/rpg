@@ -1,6 +1,6 @@
 package io.wsz.model.script;
 
-import io.wsz.model.item.PosItem;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public abstract class BooleanCountableExpression<A extends PosItem<?,?>> implements Externalizable {
+public abstract class BooleanCountableExpression<A extends Asset> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     protected String itemID;
@@ -24,7 +24,21 @@ public abstract class BooleanCountableExpression<A extends PosItem<?,?>> impleme
         this.argument = argument;
     }
 
-    public abstract boolean isTrue(A checkedItem);
+    public boolean isTrue(A checkedItem) {
+        this.checkedItem = checkedItem;
+        return itemHas();
+    }
+
+    protected boolean itemHas() {
+        return switch (compareOperator) {
+            case EQUAL -> isEqual();
+            case NOT_EQUAL -> isNotEqual();
+            case GREATER -> isGreater();
+            case GREATER_OR_EQUAL -> isGreaterOrEqual();
+            case LESSER -> isLesser();
+            case LESSER_OR_EQUAL -> isLesserOrEqual();
+        };
+    }
 
     protected boolean isLesserOrEqual() {
         long amount;
