@@ -754,9 +754,9 @@ public class DialogsEditStage extends ChildStage {
     }
 
     private void setUpQuestionsTableContextMenu() {
-        MenuItem addQuestion = new MenuItem("Add question");
+        MenuItem addQuestion = new MenuItem("Add text");
         addQuestion.setOnAction(e -> addQuestion());
-        MenuItem removeQuestions = new MenuItem("Remove question/s");
+        MenuItem removeQuestions = new MenuItem("Remove text/s");
         removeQuestions.setOnAction(e -> removeQuestion());
         ContextMenu cm = new ContextMenu(addQuestion, removeQuestions);
         questionsTableView.setContextMenu(cm);
