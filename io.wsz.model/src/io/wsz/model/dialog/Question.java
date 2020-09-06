@@ -14,14 +14,14 @@ public class Question implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String text;
-    private String answerID;
+    private String answersListID;
     private Requirements requirements;
 
     public Question() {}
 
-    public Question(String text, String answerID) {
+    public Question(String text, String answersListID) {
         this.text = text;
-        this.answerID = answerID;
+        this.answersListID = answersListID;
     }
 
     public boolean doMatchRequirements(Creature pc, PosItem npc) {
@@ -39,12 +39,12 @@ public class Question implements Externalizable {
         this.text = text;
     }
 
-    public String getAnswerID() {
-        return answerID;
+    public String getAnswersListID() {
+        return answersListID;
     }
 
-    public void setAnswerID(String answerID) {
-        this.answerID = answerID;
+    public void setAnswersListID(String answersListID) {
+        this.answersListID = answersListID;
     }
 
     public Requirements getRequirements() {
@@ -72,13 +72,13 @@ public class Question implements Externalizable {
         if (!(o instanceof Question)) return false;
         Question question = (Question) o;
         return Objects.equals(getText(), question.getText()) &&
-                Objects.equals(getAnswerID(), question.getAnswerID()) &&
+                Objects.equals(getAnswersListID(), question.getAnswersListID()) &&
                 Objects.equals(getRequirements(), question.getRequirements());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getText(), getAnswerID(), getRequirements());
+        return Objects.hash(getText(), getAnswersListID(), getRequirements());
     }
 
     @Override
@@ -87,7 +87,7 @@ public class Question implements Externalizable {
 
         out.writeObject(text);
 
-        out.writeObject(answerID);
+        out.writeObject(answersListID);
 
         out.writeObject(requirements);
     }
@@ -98,7 +98,7 @@ public class Question implements Externalizable {
 
         text = (String) in.readObject();
 
-        answerID = (String) in.readObject();
+        answersListID = (String) in.readObject();
 
         requirements = (Requirements) in.readObject();
     }

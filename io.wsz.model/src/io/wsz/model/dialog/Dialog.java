@@ -18,9 +18,9 @@ public class Dialog implements Externalizable {
     private static final List<Question> FILTERED_QUESTIONS = new ArrayList<>(0);
 
     private String ID;
-    private List<Answer> answers;
+    private List<AnswersList> answersLists;
     private List<QuestionsList> questionsLists;
-    private String greetingAnswerID;
+    private String greetingAnswersListID;
 
     public Dialog() {}
 
@@ -28,11 +28,11 @@ public class Dialog implements Externalizable {
         this.ID = ID;
     }
 
-    public Dialog(String ID, List<Answer> answers, List<QuestionsList> questionsLists, String greetingAnswerID) {
+    public Dialog(String ID, List<AnswersList> answersLists, List<QuestionsList> questionsLists, String greetingAnswersListID) {
         this.ID = ID;
-        this.answers = answers;
+        this.answersLists = answersLists;
         this.questionsLists = questionsLists;
-        this.greetingAnswerID = greetingAnswerID;
+        this.greetingAnswersListID = greetingAnswersListID;
     }
 
     public List<Question> getQuestionsListByID(String ID, Creature pc, PosItem npc) {
@@ -56,21 +56,42 @@ public class Dialog implements Externalizable {
         return FILTERED_QUESTIONS;
     }
 
-    public Answer getAnswerByID(String ID) {
-        for (Answer answer : answers) {
-            String id = answer.getID();
+    public Answer getAnswerByID(String ID, Creature pc, PosItem npc) {
+        for (AnswersList answersList : answersLists) {
+            String id = answersList.getID();
             if (id.equals(ID)) {
+                List<Answer> answers = answersList.getAnswers();
+                return getFirstMatchedAnswer(answers, pc, npc);
+            }
+        }
+        return null;
+    }
+
+    private Answer getFirstMatchedAnswer(List<Answer> answers, Creature pc, PosItem npc) {
+        for (Answer answer : answers) {
+            if (answer.doMatchRequirements(pc, npc)) {
                 return answer;
             }
         }
         return null;
     }
 
-    public Answer getGreeting() {
-        for (Answer answer : answers) {
-            String id = answer.getID();
-            if (id.equals(greetingAnswerID)) {
-                return answer;
+    public AnswersList getGreetingList() {
+        for (AnswersList answersList : answersLists) {
+            String id = answersList.getID();
+            if (id.equals(greetingAnswersListID)) {
+                return answersList;
+            }
+        }
+        return null;
+    }
+
+    public Answer getGreeting(Creature pc, PosItem npc) {
+        for (AnswersList answersList : answersLists) {
+            String id = answersList.getID();
+            if (id.equals(greetingAnswersListID)) {
+                List<Answer> answers = answersList.getAnswers();
+                return getFirstMatchedAnswer(answers, pc, npc);
             }
         }
         return null;
@@ -84,12 +105,12 @@ public class Dialog implements Externalizable {
         this.ID = ID;
     }
 
-    public List<Answer> getAnswers() {
-        return answers;
+    public List<AnswersList> getAnswersLists() {
+        return answersLists;
     }
 
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
+    public void setAnswersLists(List<AnswersList> answersLists) {
+        this.answersLists = answersLists;
     }
 
     public List<QuestionsList> getQuestionsLists() {
@@ -100,12 +121,12 @@ public class Dialog implements Externalizable {
         this.questionsLists = questionsLists;
     }
 
-    public String getGreetingAnswerID() {
-        return greetingAnswerID;
+    public String getGreetingAnswersListID() {
+        return greetingAnswersListID;
     }
 
-    public void setGreetingAnswerID(String greetingAnswerID) {
-        this.greetingAnswerID = greetingAnswerID;
+    public void setGreetingAnswersListID(String greetingAnswersListID) {
+        this.greetingAnswersListID = greetingAnswersListID;
     }
 
     @Override
@@ -118,39 +139,40 @@ public class Dialog implements Externalizable {
         if (this == o) return true;
         if (!(o instanceof Dialog)) return false;
         Dialog dialog = (Dialog) o;
-        return getGreetingAnswerID() == dialog.getGreetingAnswerID() &&
-                Objects.equals(getID(), dialog.getID()) &&
-                Objects.equals(getAnswers(), dialog.getAnswers());
+        return Objects.equals(getID(), dialog.getID()) &&
+                Objects.equals(getAnswersLists(), dialog.getAnswersLists()) &&
+                Objects.equals(getQuestionsLists(), dialog.getQuestionsLists()) &&
+                Objects.equals(getGreetingAnswersListID(), dialog.getGreetingAnswersListID());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getID(), getAnswers(), getGreetingAnswerID());
+        return Objects.hash(getID(), getAnswersLists(), getQuestionsLists(), getGreetingAnswersListID());
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
 
-        out.writeUTF(ID);
+        out.writeObject(ID);
 
-        out.writeObject(answers);
+        out.writeObject(answersLists);
 
         out.writeObject(questionsLists);
 
-        out.writeUTF(greetingAnswerID);
+        out.writeObject(greetingAnswersListID);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        ID = in.readUTF();
+        ID = (String) in.readObject();
 
-        answers = (List<Answer>) in.readObject();
+        answersLists = (List<AnswersList>) in.readObject();
 
         questionsLists = (List<QuestionsList>) in.readObject();
 
-        greetingAnswerID = in.readUTF();
+        greetingAnswersListID = (String) in.readObject();
     }
 }

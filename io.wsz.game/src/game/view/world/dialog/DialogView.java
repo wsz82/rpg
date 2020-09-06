@@ -113,10 +113,11 @@ public class DialogView {
     }
 
     private void initConversation() {
-        PosItem speaker = dialogMemento.getAnswering();
-        Dialog dialog = speaker.getDialog();
-        Answer answer = dialog.getGreeting();
-        addDialogItem(speaker, answer.getText());
+        PosItem npc = dialogMemento.getNpc();
+        Dialog dialog = npc.getDialog();
+        Creature pc = dialogMemento.getPc();
+        Answer answer = dialog.getGreeting(pc, npc);
+        addDialogItem(npc, answer.getText());
         dialogMemento.setLastAnswer(answer);
     }
 
@@ -208,13 +209,13 @@ public class DialogView {
     }
 
     private void addQuestionAndAnswer() {
-        PosItem asking = dialogMemento.getPc();
+        Creature asking = dialogMemento.getPc();
         addDialogItem(asking, activeQuestion.getText());
 
-        PosItem answering = dialogMemento.getAnswering();
-        Dialog dialog = dialogMemento.getAnswering().getDialog();
-        String answerID = activeQuestion.getAnswerID();
-        Answer answer = dialog.getAnswerByID(answerID);
+        PosItem answering = dialogMemento.getNpc();
+        Dialog dialog = dialogMemento.getNpc().getDialog();
+        String answerID = activeQuestion.getAnswersListID();
+        Answer answer = dialog.getAnswerByID(answerID, asking, answering);
 
         if (answer != null) {
             addDialogItem(answering, answer.getText());
@@ -366,12 +367,12 @@ public class DialogView {
             dialogMemento.setFinished(true);
             return;
         }
-        String questionsID = lastAnswer.getQuestionsID();
+        String questionsID = lastAnswer.getQuestionsListID();
         if (questionsID == null) {
             dialogMemento.setFinished(true);
             return;
         }
-        PosItem answering = dialogMemento.getAnswering();
+        PosItem answering = dialogMemento.getNpc();
         Dialog dialog = answering.getDialog();
         Creature asking = dialogMemento.getPc();
         List<Question> questions = dialog.getQuestionsListByID(questionsID, asking, answering);

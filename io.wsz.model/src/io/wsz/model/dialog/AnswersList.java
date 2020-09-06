@@ -9,21 +9,21 @@ import java.io.ObjectOutput;
 import java.util.List;
 import java.util.Objects;
 
-public class QuestionsList implements Externalizable {
+public class AnswersList implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private String ID;
-    private List<Question> questions;
+    private List<Answer> answers;
 
-    public QuestionsList() {}
+    public AnswersList() {}
 
-    public QuestionsList(String ID) {
+    public AnswersList(String ID) {
         this.ID = ID;
     }
 
-    public QuestionsList(String ID, List<Question> questions) {
+    public AnswersList(String ID, List<Answer> answers) {
         this.ID = ID;
-        this.questions = questions;
+        this.answers = answers;
     }
 
     public String getID() {
@@ -34,12 +34,12 @@ public class QuestionsList implements Externalizable {
         this.ID = ID;
     }
 
-    public List<Question> getQuestions() {
-        return questions;
+    public List<Answer> getAnswers() {
+        return answers;
     }
 
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 
     @Override
@@ -50,15 +50,15 @@ public class QuestionsList implements Externalizable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof QuestionsList)) return false;
-        QuestionsList that = (QuestionsList) o;
+        if (!(o instanceof AnswersList)) return false;
+        AnswersList that = (AnswersList) o;
         return Objects.equals(getID(), that.getID()) &&
-                Objects.equals(getQuestions(), that.getQuestions());
+                Objects.equals(getAnswers(), that.getAnswers());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getID(), getQuestions());
+        return Objects.hash(getID(), getAnswers());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class QuestionsList implements Externalizable {
 
         out.writeObject(ID);
 
-        out.writeObject(questions);
+        out.writeObject(answers);
     }
 
     @Override
@@ -76,6 +76,6 @@ public class QuestionsList implements Externalizable {
 
         ID = (String) in.readObject();
 
-        questions = (List<Question>) in.readObject();
+        answers = (List<Answer>) in.readObject();
     }
 }

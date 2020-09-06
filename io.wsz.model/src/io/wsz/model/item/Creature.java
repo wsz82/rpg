@@ -491,7 +491,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         if (getObstacleOnWay(cr) != null) return false;
         if (cr == this) return false;
         Controller controller = getController();
-        controller.setAsking(cr);
+        controller.setDialogNpc(cr);
         controller.setAnswering(this);
         controller.setPosToCenter(getCenter());
         return true;

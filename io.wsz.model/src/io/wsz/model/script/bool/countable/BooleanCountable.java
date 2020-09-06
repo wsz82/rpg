@@ -133,12 +133,16 @@ public abstract class BooleanCountable<A extends Asset> extends BooleanExpressio
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+
         out.writeObject(compareOperator);
         out.writeInt(argument);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+
         compareOperator = (CompareOperator) in.readObject();
         argument = in.readInt();
     }

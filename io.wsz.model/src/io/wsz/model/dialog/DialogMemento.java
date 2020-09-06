@@ -10,12 +10,12 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-public class DialogMemento<A extends PosItem, B extends PosItem> implements Externalizable {
+public class DialogMemento<B extends PosItem<?,?>> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private List<DialogItem> dialogs;
     private Creature pc;
-    private B answering;
+    private B npc;
     private Answer lastAnswer;
     private boolean isFinished;
     private int curPos;
@@ -38,12 +38,12 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
         this.pc = pc;
     }
 
-    public PosItem getAnswering() {
-        return answering;
+    public PosItem getNpc() {
+        return npc;
     }
 
-    public void setAnswering(B answering) {
-        this.answering = answering;
+    public void setNpc(B npc) {
+        this.npc = npc;
     }
 
     public Answer getLastAnswer() {
@@ -78,7 +78,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         out.writeObject(pc);
 
-        out.writeObject(answering);
+        out.writeObject(npc);
 
         out.writeObject(lastAnswer);
 
@@ -95,7 +95,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         pc = (Creature) in.readObject();
 
-        answering = (B) in.readObject();
+        npc = (B) in.readObject();
 
         lastAnswer = (Answer) in.readObject();
 

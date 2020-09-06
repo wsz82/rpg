@@ -189,18 +189,18 @@ public class GameRunner {
     }
 
     private void tryToStartDialog() {
-        PosItem asking = controller.getAsking();
-        if (asking == null) {
+        Creature pc = controller.getDialogPc();
+        if (pc == null) {
             return;
         }
-        PosItem answering = controller.getAnswering();
-        if (answering == null) {
+        PosItem npc = controller.getAnswering();
+        if (npc == null) {
             return;
         }
-        Dialog dialog = answering.getDialog();
-        if (dialog == null || dialog.getGreeting() == null) {
+        Dialog dialog = npc.getDialog();
+        if (dialog == null || dialog.getGreetingList() == null) {
             controller.setDialogMemento(null);
-            logger.logNoAnsweringResponse(answering);
+            logger.logNoAnsweringResponse(npc);
             return;
         }
 

@@ -90,7 +90,7 @@ public class GameController {
         DialogMemento dialogMemento = memento.getDialogMemento();
         if (dialogMemento != null) {
             controller.setDialogMemento(dialogMemento);
-            restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getAnswering());
+            restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getNpc());
         }
         return memento;
     }
@@ -103,7 +103,7 @@ public class GameController {
             for (PosItem pi : l.getItems()) {
                 if (!askingSet && asking.equals(pi)) {
                     Creature cr = (Creature) pi;
-                    controller.setAsking(cr);
+                    controller.setDialogNpc(cr);
                     askingSet = true;
                     continue;
                 }

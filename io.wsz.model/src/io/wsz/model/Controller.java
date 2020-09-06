@@ -268,7 +268,7 @@ public class Controller {
         return containerToOpen;
     }
 
-    public PosItem getAsking() {
+    public Creature getDialogPc() {
         if (dialogMemento == null) {
             return null;
         } else {
@@ -276,22 +276,22 @@ public class Controller {
         }
     }
 
-    public void setAsking(Creature asking) {
+    public void setDialogNpc(Creature npc) {
         initDialogMementoIfIsNull();
-        this.dialogMemento.setPc(asking);
+        this.dialogMemento.setPc(npc);
     }
 
     public PosItem getAnswering() {
         if (dialogMemento == null) {
             return null;
         } else {
-            return dialogMemento.getAnswering();
+            return dialogMemento.getNpc();
         }
     }
 
     public void setAnswering(PosItem answering) {
         initDialogMementoIfIsNull();
-        this.dialogMemento.setAnswering(answering);
+        this.dialogMemento.setNpc(answering);
     }
 
     private void initDialogMementoIfIsNull() {

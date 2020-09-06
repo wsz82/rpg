@@ -1,4 +1,4 @@
-package editor.view.dialog;
+package editor.view.dialog.requirement;
 
 import io.wsz.model.script.bool.BooleanExpression;
 import javafx.scene.layout.HBox;

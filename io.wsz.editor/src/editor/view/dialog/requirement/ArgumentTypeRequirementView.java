@@ -1,4 +1,4 @@
-package editor.view.dialog;
+package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.ArgumentType;
