@@ -1,4 +1,4 @@
-package io.wsz.model.script;
+package io.wsz.model.script.bool.countable;
 
 import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
@@ -7,16 +7,14 @@ import io.wsz.model.item.PosItem;
 
 import java.util.List;
 
-public class BooleanPosItemItemExpression extends BooleanCountableExpression<PosItem<?,?>> {
+public class BooleanPosItemItem extends BooleanCountable<PosItem<?,?>> {
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected long getAmount() {
         if (checkedItem instanceof Creature) {
             Creature cr = (Creature) checkedItem;
-            List<Equipment> items = cr.getItems();
-            return items.stream()
-                    .filter(i -> i.getAssetId().equals(itemID))
-                    .count();
+            return getCreatureAmount(cr);
         }
         if (checkedItem instanceof Container) {
             Container c = (Container) checkedItem;

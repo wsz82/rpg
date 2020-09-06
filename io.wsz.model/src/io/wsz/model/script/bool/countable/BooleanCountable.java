@@ -1,35 +1,37 @@
-package io.wsz.model.script;
+package io.wsz.model.script.bool.countable;
 
 import io.wsz.model.asset.Asset;
-import io.wsz.model.sizes.Sizes;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.Equipment;
+import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.bool.BooleanExpression;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 
-public abstract class BooleanCountableExpression<A extends Asset> implements Externalizable {
+public abstract class BooleanCountable<A extends Asset> extends BooleanExpression<A> {
     private static final long serialVersionUID = 1L;
 
-    protected String itemID;
     protected CompareOperator compareOperator;
     protected int argument;
-    protected A checkedItem;
 
-    public BooleanCountableExpression() {}
+    public BooleanCountable() {}
 
-    public BooleanCountableExpression(CompareOperator compareOperator, String itemID, int argument) {
+    public BooleanCountable(CompareOperator compareOperator, String itemID, int argument) {
         this.compareOperator = compareOperator;
         this.itemID = itemID;
         this.argument = argument;
     }
 
+    @Override
     public boolean isTrue(A checkedItem) {
         this.checkedItem = checkedItem;
-        return itemHas();
+        return itemHasAmount();
     }
 
-    protected boolean itemHas() {
+    protected boolean itemHasAmount() {
         return switch (compareOperator) {
             case EQUAL -> isEqual();
             case NOT_EQUAL -> isNotEqual();
@@ -102,20 +104,23 @@ public abstract class BooleanCountableExpression<A extends Asset> implements Ext
 
     protected abstract long getAmount();
 
+    protected long getCreatureAmount(Creature cr) {
+        List<Equipment> items = cr.getItems();
+        long count = items.stream()
+                .filter(i -> i.getAssetId().equals(itemID))
+                .count();
+        count += cr.getInventory().getEquippedItems().values().stream()
+                .filter(i -> i.getAssetId().equals(itemID))
+                .count();
+        return count;
+    }
+
     public CompareOperator getCompareOperator() {
         return compareOperator;
     }
 
     public void setCompareOperator(CompareOperator compareOperator) {
         this.compareOperator = compareOperator;
-    }
-
-    public String getItemID() {
-        return itemID;
-    }
-
-    public void setItemID(String itemID) {
-        this.itemID = itemID;
     }
 
     public int getArgument() {
@@ -128,19 +133,13 @@ public abstract class BooleanCountableExpression<A extends Asset> implements Ext
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(Sizes.VERSION);
-
         out.writeObject(compareOperator);
-        out.writeObject(itemID);
         out.writeInt(argument);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        long ver = in.readLong();
-
         compareOperator = (CompareOperator) in.readObject();
-        itemID = (String) in.readObject();
         argument = in.readInt();
     }
 }

@@ -14,7 +14,7 @@ public class ArgumentTypeRequirementView {
     private final ChoiceBox<ArgumentType> argumentTypeCB = new ChoiceBox<>();
     private final HBox elementsWithArgumentTypeCB = new HBox(5, argumentTypeCB, elements);
     private final EditorController editorController;
-    private RequirementCreatureItemView requirementCreatureItemView;
+    private SpecificRequirement specificRequirement;
 
     public ArgumentTypeRequirementView(EditorController editorController) {
         this.editorController = editorController;
@@ -34,13 +34,19 @@ public class ArgumentTypeRequirementView {
 
     private void setUpSpecificRequirement(ArgumentType newType) {
         switch (newType) {
-            case ITEM -> setUpCreatureItemRequirement();
+            case ITEM -> setUpItemCountableRequirement();
+            case INVENTORY_PLACE -> setUpItemHasRequirement();
         }
     }
 
-    private void setUpCreatureItemRequirement() {
-        this.requirementCreatureItemView = new RequirementCreatureItemView(editorController);
-        elements.getChildren().addAll(requirementCreatureItemView.getElements());
+    private void setUpItemCountableRequirement() {
+        this.specificRequirement = new RequirementItemCountableView(editorController);
+        elements.getChildren().addAll(specificRequirement.getElements());
+    }
+
+    private void setUpItemHasRequirement() {
+        this.specificRequirement = new RequirementItemHasView(editorController);
+        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     public ArgumentType getArgumentType() {
@@ -51,8 +57,8 @@ public class ArgumentTypeRequirementView {
         argumentTypeCB.setValue(argumentType);
     }
 
-    public RequirementCreatureItemView getRequirementCreatureItemView() {
-        return requirementCreatureItemView;
+    public SpecificRequirement getSpecificRequirement() {
+        return specificRequirement;
     }
 
     public HBox getElements() {

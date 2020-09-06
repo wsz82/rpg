@@ -3,9 +3,10 @@ package editor.view.dialog;
 import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.script.BooleanCountableExpression;
-import io.wsz.model.script.BooleanCreatureItemExpression;
 import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.bool.BooleanExpression;
+import io.wsz.model.script.bool.countable.BooleanCountable;
+import io.wsz.model.script.bool.countable.BooleanCreatureItemExpression;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -14,14 +15,14 @@ import javafx.scene.layout.HBox;
 import java.util.List;
 import java.util.Optional;
 
-public class RequirementCreatureItemView {
+public class RequirementItemCountableView extends SpecificRequirement {
     private final HBox elements = new HBox(5);
     private final ChoiceBox<Asset> itemCB = new ChoiceBox<>();
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
     private final IntegerField argumentInput = new IntegerField(0, false);
     private final EditorController editorController;
 
-    public RequirementCreatureItemView(EditorController editorController) {
+    public RequirementItemCountableView(EditorController editorController) {
         this.editorController = editorController;
         setUpItemCB();
         setUpOperatorCB();
@@ -44,6 +45,34 @@ public class RequirementCreatureItemView {
         operatorCB.setItems(observableOperators);
     }
 
+    @Override
+    public BooleanCreatureItemExpression getExpression() {
+        BooleanCreatureItemExpression expression = new BooleanCreatureItemExpression();
+        Asset item = getItem();
+        if (item != null) {
+            expression.setItemID(item.getAssetId());
+        }
+        CompareOperator compareOperator = getCompareOperator();
+        if (compareOperator != null) {
+            expression.setCompareOperator(compareOperator);
+        }
+        expression.setArgument(getArgument());
+        return expression;
+    }
+
+    @Override
+    public void populate(BooleanExpression expression) {
+        if (!(expression instanceof BooleanCountable)) return;
+        BooleanCountable specificExpression = (BooleanCountable) expression;
+        Optional<Asset> optAsset = editorController.getObservableAssets().getEquipmentAssets().stream()
+                .filter(a -> a.getAssetId().equals(expression.getItemID()))
+                .findFirst();
+        setItem(optAsset.orElse(null));
+        setCompareOperator(specificExpression.getCompareOperator());
+        setArgument(specificExpression.getArgument());
+    }
+
+    @Override
     public HBox getElements() {
         return elements;
     }
@@ -75,28 +104,5 @@ public class RequirementCreatureItemView {
 
     public void setArgument(int argument) {
         argumentInput.setText(String.valueOf(argument));
-    }
-
-    public BooleanCreatureItemExpression getExpression() {
-        BooleanCreatureItemExpression expression = new BooleanCreatureItemExpression();
-        Asset item = getItem();
-        if (item != null) {
-            expression.setItemID(item.getAssetId());
-        }
-        CompareOperator compareOperator = getCompareOperator();
-        if (compareOperator != null) {
-            expression.setCompareOperator(compareOperator);
-        }
-        expression.setArgument(getArgument());
-        return expression;
-    }
-
-    public void populate(BooleanCountableExpression expression) {
-        Optional<Asset> optAsset = editorController.getObservableAssets().getEquipmentAssets().stream()
-                .filter(a -> a.getAssetId().equals(expression.getItemID()))
-                .findFirst();
-        setItem(optAsset.orElse(null));
-        setCompareOperator(expression.getCompareOperator());
-        setArgument(expression.getArgument());
     }
 }

@@ -803,6 +803,7 @@ public class DialogsEditStage extends ChildStage {
 
     private String getUniqueAnswerID(String newAnswerID) {
         List<String> answersIDs = observableAnswers.stream()
+                .filter(Objects::nonNull)
                 .map(Answer::getID)
                 .collect(Collectors.toList());
         newAnswerID = getUniqueID(newAnswerID, answersIDs);
