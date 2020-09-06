@@ -1,16 +1,21 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.item.Creature;
+import io.wsz.model.script.BooleanCreatureItemExpression;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Dialog implements Externalizable {
     private static final long serialVersionUID = 1L;
+
+    private static final List<Question> FILTERED_QUESTIONS = new ArrayList<>(0);
 
     private String ID;
     private List<Answer> answers;
@@ -30,14 +35,31 @@ public class Dialog implements Externalizable {
         this.greetingAnswerID = greetingAnswerID;
     }
 
-    public QuestionsList getQuestionsListByID(String ID) {
+    public List<Question> getQuestionsListByID(String ID, Creature pc) {
         for (QuestionsList questionsList : questionsLists) {
             String id = questionsList.getID();
             if (id.equals(ID)) {
-                return questionsList;
+                List<Question> questions = questionsList.getQuestions();
+                return geFilteredQuestions(pc, questions);
             }
         }
         return null;
+    }
+
+    private List<Question> geFilteredQuestions(Creature pc, List<Question> questions) {
+        FILTERED_QUESTIONS.clear();
+        for (Question question : questions) {
+            Requirements requirements = question.getRequirements();
+            if (requirements == null) continue;
+            List<BooleanCreatureItemExpression> booleanPChasExpressions = requirements.getBooleanPChasExpressions();
+            if (booleanPChasExpressions == null) continue;
+            boolean allRequirementsMatch = booleanPChasExpressions.stream()
+                    .allMatch(b -> b.isTrue(pc));
+            if (allRequirementsMatch) {
+                FILTERED_QUESTIONS.add(question);
+            }
+        }
+        return FILTERED_QUESTIONS;
     }
 
     public Answer getAnswerByID(String ID) {

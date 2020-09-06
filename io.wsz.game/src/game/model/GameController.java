@@ -90,19 +90,20 @@ public class GameController {
         DialogMemento dialogMemento = memento.getDialogMemento();
         if (dialogMemento != null) {
             controller.setDialogMemento(dialogMemento);
-            restoreAskingAndAnswering(dialogMemento.getAsking(), dialogMemento.getAnswering());
+            restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getAnswering());
         }
         return memento;
     }
 
-    private void restoreAskingAndAnswering(PosItem asking, PosItem answering) {
+    private void restoreAskingAndAnswering(Creature asking, PosItem answering) {
         List<Location> locations = controller.getLocations();
         boolean askingSet = false;
         boolean answeringSet = false;
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
                 if (!askingSet && asking.equals(pi)) {
-                    controller.setAsking(pi);
+                    Creature cr = (Creature) pi;
+                    controller.setAsking(cr);
                     askingSet = true;
                     continue;
                 }

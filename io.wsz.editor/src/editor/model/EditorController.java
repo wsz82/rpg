@@ -185,7 +185,7 @@ public class EditorController {
     }
 
     private void loadObservableAssetsToPlugin(World world) {
-        List<Asset> mergedAssets = observableAssets.getMergedAssets();
+        List<Asset> mergedAssets = new ArrayList<>(observableAssets.getMergedAssets());
         world.setAssets(mergedAssets);
     }
 

@@ -272,13 +272,13 @@ public class Controller {
         if (dialogMemento == null) {
             return null;
         } else {
-            return dialogMemento.getAsking();
+            return dialogMemento.getPc();
         }
     }
 
-    public void setAsking(PosItem asking) {
+    public void setAsking(Creature asking) {
         initDialogMementoIfIsNull();
-        this.dialogMemento.setAsking(asking);
+        this.dialogMemento.setPc(asking);
     }
 
     public PosItem getAnswering() {

@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.*;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
@@ -207,7 +208,7 @@ public class DialogView {
     }
 
     private void addQuestionAndAnswer() {
-        PosItem asking = dialogMemento.getAsking();
+        PosItem asking = dialogMemento.getPc();
         addDialogItem(asking, activeQuestion.getText());
 
         PosItem answering = dialogMemento.getAnswering();
@@ -271,7 +272,7 @@ public class DialogView {
     private void addDialogItem(PosItem pi, String text) {
         String speakerName = pi.getAssetId();
         SpeakerMark speakerMark = SpeakerMark.NPC;
-        if (pi == dialogMemento.getAsking()) {
+        if (pi == dialogMemento.getPc()) {
             speakerMark = SpeakerMark.PC;
         }
         DialogItem di = new DialogItem(speakerMark, speakerName, text);
@@ -372,12 +373,12 @@ public class DialogView {
         }
         PosItem answering = dialogMemento.getAnswering();
         Dialog dialog = answering.getDialog();
-        QuestionsList questionsList = dialog.getQuestionsListByID(questionsID);
-        if (questionsList == null) {
+        Creature asking = dialogMemento.getPc();
+        List<Question> questions = dialog.getQuestionsListByID(questionsID, asking);
+        if (questions == null || questions.isEmpty()) {
             dialogMemento.setFinished(true);
             return;
         }
-        List<Question> questions = questionsList.getQuestions();
 
         for (int i = 0; i < questions.size(); i++) {
             Question q = questions.get(i);

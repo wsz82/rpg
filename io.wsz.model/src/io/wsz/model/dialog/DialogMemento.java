@@ -1,5 +1,6 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 
@@ -13,7 +14,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
     private static final long serialVersionUID = 1L;
 
     private List<DialogItem> dialogs;
-    private A asking;
+    private Creature pc;
     private B answering;
     private Answer lastAnswer;
     private boolean isFinished;
@@ -29,12 +30,12 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
         return dialogs;
     }
 
-    public PosItem getAsking() {
-        return asking;
+    public Creature getPc() {
+        return pc;
     }
 
-    public void setAsking(A asking) {
-        this.asking = asking;
+    public void setPc(Creature pc) {
+        this.pc = pc;
     }
 
     public PosItem getAnswering() {
@@ -75,7 +76,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         out.writeObject(dialogs);
 
-        out.writeObject(asking);
+        out.writeObject(pc);
 
         out.writeObject(answering);
 
@@ -92,7 +93,7 @@ public class DialogMemento<A extends PosItem, B extends PosItem> implements Exte
 
         dialogs = (List<DialogItem>) in.readObject();
 
-        asking = (A) in.readObject();
+        pc = (Creature) in.readObject();
 
         answering = (B) in.readObject();
 

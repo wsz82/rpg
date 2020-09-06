@@ -51,6 +51,7 @@ public class DialogsEditStage extends ChildStage {
     private VBox answersVBox;
     private VBox questionsListsVBox;
     private VBox answerCenter;
+    private RequirementsList requirementsList;
 
     public DialogsEditStage(Stage parent, EditorController editorController) {
         super(parent);
@@ -154,6 +155,8 @@ public class DialogsEditStage extends ChildStage {
         String answerID = question.getAnswerID();
         Answer answer = getAnswerWithID(answerID);
         questionAnswerCB.setValue(answer);
+        requirementsList.clear();
+        requirementsList.populate(question.getRequirements());
     }
 
     private Answer getAnswerWithID(String answerID) {
@@ -174,7 +177,11 @@ public class DialogsEditStage extends ChildStage {
         final HBox questionProperties = new HBox(5);
         refreshQuestionAnswerCB();
         questionProperties.getChildren().addAll(questionAnswerBox);
-        questionDetails.getChildren().addAll(questionText, questionProperties);
+
+        requirementsList = new RequirementsList(editorController);
+        ScrollPane listScrollPane = requirementsList.getListScrollPane();
+
+        questionDetails.getChildren().addAll(questionText, questionProperties, listScrollPane);
     }
 
     private void setUpAnswerCenter() {
@@ -597,11 +604,13 @@ public class DialogsEditStage extends ChildStage {
     }
 
     private void saveQuestionItem(QuestionItem qi) {
-        qi.question.setText(questionText.getText());
+        Question question = qi.question;
+        question.setText(questionText.getText());
+        question.setRequirements(requirementsList.getOutput());
         Answer answer = questionAnswerCB.getValue();
         if (answer != null) {
             String answerID = answer.getID();
-            qi.question.setAnswerID(answerID);
+            question.setAnswerID(answerID);
         }
         questionsTableView.refresh();
     }

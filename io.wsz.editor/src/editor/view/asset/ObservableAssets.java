@@ -5,7 +5,6 @@ import io.wsz.model.item.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,8 @@ public class ObservableAssets {
 
     public ObservableAssets() {}
 
-    public List<Asset> getMergedAssets() {
-        List<Asset> assets = new ArrayList<>(0);
+    public ObservableList<Asset> getMergedAssets() {
+        ObservableList<Asset> assets = FXCollections.observableArrayList();
         assets.addAll(creatures);
         assets.addAll(landscapes);
         assets.addAll(covers);
@@ -34,6 +33,13 @@ public class ObservableAssets {
         assets.addAll(inDoors);
         assets.addAll(outDoors);
         return assets;
+    }
+
+    public ObservableList<Asset> getEquipmentAssets() {
+        ObservableList<Asset> equipments = FXCollections.observableArrayList();
+        equipments.addAll(weapons);
+        equipments.addAll(containers);
+        return equipments;
     }
 
     public void clearLists() {

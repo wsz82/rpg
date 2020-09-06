@@ -13,6 +13,7 @@ public class Question implements Externalizable {
 
     private String text;
     private String answerID;
+    private Requirements requirements;
 
     public Question() {}
 
@@ -37,6 +38,14 @@ public class Question implements Externalizable {
         this.answerID = answerID;
     }
 
+    public Requirements getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(Requirements requirements) {
+        this.requirements = requirements;
+    }
+
     @Override
     public String toString() {
         int max = 20;
@@ -54,12 +63,13 @@ public class Question implements Externalizable {
         if (!(o instanceof Question)) return false;
         Question question = (Question) o;
         return Objects.equals(getText(), question.getText()) &&
-                Objects.equals(getAnswerID(), question.getAnswerID());
+                Objects.equals(getAnswerID(), question.getAnswerID()) &&
+                Objects.equals(getRequirements(), question.getRequirements());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getText(), getAnswerID());
+        return Objects.hash(getText(), getAnswerID(), getRequirements());
     }
 
     @Override
@@ -69,6 +79,8 @@ public class Question implements Externalizable {
         out.writeObject(text);
 
         out.writeObject(answerID);
+
+        out.writeObject(requirements);
     }
 
     @Override
@@ -78,5 +90,7 @@ public class Question implements Externalizable {
         text = (String) in.readObject();
 
         answerID = (String) in.readObject();
+
+        requirements = (Requirements) in.readObject();
     }
 }
