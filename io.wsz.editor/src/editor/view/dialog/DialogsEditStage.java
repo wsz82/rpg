@@ -1,12 +1,9 @@
 package editor.view.dialog;
 
 import editor.model.EditorController;
-import editor.view.dialog.requirement.RequirementsListView;
 import editor.view.stage.ChildStage;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.*;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -16,15 +13,15 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import javafx.util.converter.IntegerStringConverter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DialogsEditStage extends ChildStage {
@@ -36,18 +33,12 @@ public class DialogsEditStage extends ChildStage {
     private ListView<AnswersList> answersListView;
     private ListView<QuestionsList> questionsListsView;
     private VBox center;
-    private VBox questionsCenter;
     private HBox startAnswersListBox;
     private ChoiceBox<AnswersList> startAnswersListCB;
-    private TableView<QuestionItem> questionsTableView;
-    private VBox questionDetails;
-    private ChoiceBox<AnswersList> questionAnswersListCB;
-    private HBox questionAnswerBox;
-    private TextArea questionText;
-    private VBox answersVBox;
+    private VBox answersListsVBox;
     private VBox questionsListsVBox;
-    private RequirementsListView questionRequirementsListView;
-    private AnswersCenterView answerCenter;
+    private AnswersCenterView answersCenter;
+    private QuestionsCenterView questionsCenter;
 
     public DialogsEditStage(Stage parent, EditorController editorController) {
         super(parent);
@@ -87,7 +78,7 @@ public class DialogsEditStage extends ChildStage {
     }
 
     private void setIsDialogChosenSettings(boolean isDialogChosen) {
-        answersVBox.setVisible(isDialogChosen);
+        answersListsVBox.setVisible(isDialogChosen);
         questionsListsVBox.setVisible(isDialogChosen);
     }
 
@@ -98,87 +89,18 @@ public class DialogsEditStage extends ChildStage {
         setUpAnswersCenter();
         setUpQuestionCenter();
 
-        center.getChildren().add(answerCenter.getAnswersCenter());
+        center.getChildren().add(answersCenter.getAnswersCenter());
         root.setCenter(center);
     }
 
     private void setUpAnswersCenter() {
-        answerCenter = new AnswersCenterView(editorController, answersListView, observableQuestionsLists);
-        answerCenter.initAnswersCenter();
+        answersCenter = new AnswersCenterView(editorController, observableQuestionsLists);
+        answersCenter.initAnswersCenter();
     }
 
     private void setUpQuestionCenter() {
-        questionsCenter = new VBox(5);
-
-        setUpQuestionsTableView();
-        setUpQuestionDetails();
-
-        questionsCenter.getChildren().addAll(questionsTableView, questionDetails);
-    }
-
-    private void setUpQuestionsTableView() {
-        questionsTableView = new TableView<>();
-        setUpQuestionsTable();
-        hookUpQuestionsTableViewEvents();
-        setUpQuestionsTableContextMenu();
-    }
-
-    private void hookUpQuestionsTableViewEvents() {
-        ChangeListener<QuestionItem> questionTableItemListener = (observable, oldQuestionItem, newQuestionItem) -> {
-            if (newQuestionItem == null) {
-                disableQuestionDetails();
-                return;
-            }
-            if (questionsTableView.getItems().size() < 1) {
-                disableQuestionDetails();
-                return;
-            }
-            if (oldQuestionItem != null) {
-                saveQuestionItem(oldQuestionItem);
-            }
-            startEditQuestionDetails(newQuestionItem);
-            enableQuestionsDetails();
-        };
-        questionsTableView.getSelectionModel().selectedItemProperty().addListener(questionTableItemListener);
-    }
-
-    private void enableQuestionsDetails() {
-        questionDetails.setVisible(true);
-    }
-
-    private void startEditQuestionDetails(QuestionItem newQuestionItem) {
-        Question question = newQuestionItem.question;
-        questionText.setText(question.getText());
-        String answerID = question.getAnswersListID();
-        AnswersList answersList = getAnswersListWithID(answerID);
-        questionAnswersListCB.setValue(answersList);
-        questionRequirementsListView.clear();
-        questionRequirementsListView.populate(question.getRequirements());
-    }
-
-    private AnswersList getAnswersListWithID(String answersListID) {
-        Optional<AnswersList> optAnswer = observableAnswersList.stream()
-                .filter(Objects::nonNull)
-                .filter(a -> a.getID().equals(answersListID))
-                .findFirst();
-        return optAnswer.orElse(null);
-    }
-
-    private void setUpQuestionDetails() {
-        questionDetails = new VBox(5);
-        questionDetails.setVisible(false);
-        questionText = new TextArea();
-        questionAnswerBox = new HBox(5);
-        final Label answerLabel = new Label("NPC text");
-        questionAnswerBox.getChildren().addAll(answerLabel);
-        final HBox questionProperties = new HBox(5);
-        refreshQuestionAnswerCB();
-        questionProperties.getChildren().addAll(questionAnswerBox);
-
-        questionRequirementsListView = new RequirementsListView(editorController);
-        ScrollPane listScrollPane = questionRequirementsListView.getListScrollPane();
-
-        questionDetails.getChildren().addAll(questionText, questionProperties, listScrollPane);
+        questionsCenter = new QuestionsCenterView(editorController, observableAnswersList);
+        questionsCenter.initQuestionsCenter();
     }
 
     private void setUpLeft(BorderPane root) {
@@ -188,8 +110,8 @@ public class DialogsEditStage extends ChildStage {
 
         FilteredList<AnswersList> answersWithoutNull = new FilteredList<>(observableAnswersList, Objects::nonNull);
         answersListView = new ListView<>(answersWithoutNull);
-        answersVBox = new VBox(5);
-        setUpAnswersVBox(answersVBox);
+        answersListsVBox = new VBox(5);
+        setUpAnswersListsVBox(answersListsVBox);
 
         FilteredList<QuestionsList> questionsListsWithoutNull = new FilteredList<>(observableQuestionsLists, Objects::nonNull);
         questionsListsView = new ListView<>(questionsListsWithoutNull);
@@ -197,7 +119,7 @@ public class DialogsEditStage extends ChildStage {
         setUpQuestionsVBox(questionsListsVBox);
 
         final HBox dialogsAnswersQuestions = new HBox();
-        dialogsAnswersQuestions.getChildren().addAll(dialogsVBox, answersVBox, questionsListsVBox);
+        dialogsAnswersQuestions.getChildren().addAll(dialogsVBox, answersListsVBox, questionsListsVBox);
         root.setLeft(dialogsAnswersQuestions);
     }
 
@@ -223,7 +145,7 @@ public class DialogsEditStage extends ChildStage {
             newID = getUniqueQuestionsListID(newID);
             selectedQuestionList.setID(newID);
             updateAnswersQuestionsListID(oldID, newID);
-            answerCenter.refreshQuestionsListForAnswerCB();
+            answersCenter.refreshQuestionsListForAnswerCB();
         });
         questionsListsView.setCellFactory(param -> new TextFieldListCell<>(new StringConverter<>() {
             @Override
@@ -296,33 +218,18 @@ public class DialogsEditStage extends ChildStage {
         });
         questionsListsView.getSelectionModel().selectedItemProperty().addListener((observable, oldQuestionsList, newQuestionsList) -> {
             if (oldQuestionsList != null) {
-                saveQuestionsList(oldQuestionsList);
+                questionsCenter.saveQuestionsList(oldQuestionsList);
             }
 
             boolean isQuestionsListNotNull = newQuestionsList != null;
             if (isQuestionsListNotNull) {
-                startEditQuestionsList(newQuestionsList);
+                questionsCenter.startEditQuestionsList(newQuestionsList);
             }
             center.setVisible(isQuestionsListNotNull);
         });
     }
 
-    private void saveQuestionsList(QuestionsList questionsList) {
-        saveCurrentQuestionItem();
-
-        ObservableList<QuestionItem> questionItems = questionsTableView.getItems();
-        List<Question> questions = questionItemsToQuestions(questionItems);
-        questionsList.setQuestions(questions);
-    }
-
-    private void saveCurrentQuestionItem() {
-        QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
-        if (qi != null) {
-            saveQuestionItem(qi);
-        }
-    }
-
-    private void setUpAnswersVBox(VBox answersVBox) {
+    private void setUpAnswersListsVBox(VBox answersListsVBox) {
         final Label answersLabel = new Label("NPC texts list");
         startAnswersListBox = new HBox(5);
         final Label startAnswersListLabel = new Label("NPC starting texts list");
@@ -330,7 +237,7 @@ public class DialogsEditStage extends ChildStage {
         startAnswersListCB = new ChoiceBox<>(observableAnswersList);
         startAnswersListCB.setMaxWidth(100);
         startAnswersListBox.getChildren().addAll(startAnswersListLabel, startAnswersListCB);
-        answersVBox.getChildren().addAll(answersLabel, answersListView, startAnswersListBox);
+        answersListsVBox.getChildren().addAll(answersLabel, answersListView, startAnswersListBox);
         setUpAnswerListView();
     }
 
@@ -350,7 +257,7 @@ public class DialogsEditStage extends ChildStage {
             newID = getUniqueAnswersListID(newID);
             selectedAnswersList.setID(newID);
             updateQuestionsAnswersListID(oldID, newID);
-            refreshQuestionAnswerCB();
+            questionsCenter.refreshQuestionAnswerCB();
             refreshStartAnswerCB();
         });
         answersListView.setCellFactory(param -> new TextFieldListCell<>(new StringConverter<>() {
@@ -474,10 +381,8 @@ public class DialogsEditStage extends ChildStage {
     }
 
     private void saveCurrentQuestionsList() {
-        List<Question> questions = questionItemsToQuestions(questionsTableView.getItems());
         QuestionsList selectedQuestionsList = questionsListsView.getSelectionModel().getSelectedItem();
-        if (selectedQuestionsList == null) return;
-        selectedQuestionsList.setQuestions(questions);
+        questionsCenter.saveCurrentQuestionsList(selectedQuestionsList);
     }
 
     private void startEditNewDialog(Dialog newDialog) {
@@ -517,132 +422,24 @@ public class DialogsEditStage extends ChildStage {
         editorController.getObservableDialogs().removeAll(selectedDialogs);
     }
 
-    private void hookUpQuestionAnswerCBEvents() {
-        questionAnswersListCB.valueProperty().addListener((observable, oldAnswer, newAnswer) -> {
-            QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
-            if (qi == null) {
-                return;
-            }
-            String answerID;
-            if (newAnswer == null) {
-                answerID = null;
-            } else {
-                answerID = newAnswer.getID();
-            }
-            qi.question.setAnswersListID(answerID);
-            questionsTableView.refresh();
-        });
-    }
-
-    private void setUpQuestionsTable() {
-        questionsTableView.setEditable(true);
-        TableColumn<QuestionItem, Integer> posCol = new TableColumn<>("Position");
-        posCol.setCellValueFactory(p -> new ObjectBinding<>() {
-            @Override
-            protected Integer computeValue() {
-                return p.getValue().pos;
-            }
-        });
-        posCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        posCol.setOnEditCommit(t -> {
-            int newPos = t.getNewValue();
-            ObservableList<QuestionItem> questionsItems = questionsTableView.getItems();
-            QuestionItem qi = questionsItems.get(t.getTablePosition().getRow());
-            boolean newPosExists = questionsItems.stream()
-                    .anyMatch(q -> q.pos == newPos);
-            if (!newPosExists) {
-                qi.pos = newPos;
-            }
-            questionsTableView.refresh();
-        });
-        posCol.setSortable(false);
-        questionsTableView.getColumns().add(posCol);
-
-        TableColumn<QuestionItem, String> textCol = new TableColumn<>("Text");
-        textCol.setCellValueFactory(p -> new ObjectBinding<>() {
-            @Override
-            protected String computeValue() {
-                QuestionItem questionItem = p.getValue();
-                if (questionItem == null) return "";
-                Question question = questionItem.question;
-                if (question == null) return "";
-                return question.getText();
-            }
-        });
-        textCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        textCol.setEditable(false);
-        textCol.setSortable(false);
-        questionsTableView.getColumns().add(textCol);
-
-        TableColumn<QuestionItem, String> answerCol = new TableColumn<>("NPC text");
-        answerCol.setCellValueFactory(p -> new ObjectBinding<>() {
-            @Override
-            protected String computeValue() {
-                QuestionItem questionItem = p.getValue();
-                if (questionItem == null) return "";
-                Question question = questionItem.question;
-                if (question == null) return "";
-                return question.getAnswersListID();
-            }
-        });
-        answerCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        answerCol.setEditable(false);
-        answerCol.setSortable(false);
-        questionsTableView.getColumns().add(answerCol);
-    }
-
-    private void disableQuestionDetails() {
-        questionDetails.setVisible(false);
-        questionText.setText(null);
-        questionAnswersListCB.setValue(null);
-    }
-
-    private void saveQuestionItem(QuestionItem qi) {
-        Question question = qi.question;
-        question.setText(questionText.getText());
-        question.setRequirements(questionRequirementsListView.getOutput());
-        AnswersList answersList = questionAnswersListCB.getValue();
-        if (answersList != null) {
-            String answerID = answersList.getID();
-            question.setAnswersListID(answerID);
-        }
-        questionsTableView.refresh();
-    }
-
     private void hookUpAnswersListEvents() {
         answersListView.setOnMouseClicked(e -> {
             ObservableList<Node> centerChildren = center.getChildren();
-            if (!centerChildren.contains(answerCenter)) {
+            if (!centerChildren.contains(answersCenter)) {
                 changeCenterToAnswerEdit(centerChildren);
             }
         });
         answersListView.getSelectionModel().selectedItemProperty().addListener((observable, oldAnswersList, newAnswersList) -> {
             if (oldAnswersList != null) {
-                answerCenter.saveAnswersList(oldAnswersList);
+                answersCenter.saveAnswersList(oldAnswersList);
             }
 
             boolean isAnswersListNotNull = newAnswersList != null;
             if (isAnswersListNotNull) {
-                answerCenter.startEditNewAnswersList(newAnswersList);
+                answersCenter.startEditNewAnswersList(newAnswersList);
             }
             center.setVisible(isAnswersListNotNull);
         });
-    }
-
-    private void refreshQuestionAnswerCB() {
-        boolean wasCreated = questionAnswersListCB != null;
-        AnswersList temp = null;
-        if (wasCreated) {
-            temp = questionAnswersListCB.getValue();
-        }
-        questionAnswerBox.getChildren().remove(questionAnswersListCB);
-        questionAnswersListCB = new ChoiceBox<>(observableAnswersList);
-        questionAnswersListCB.setMaxWidth(100);
-        questionAnswerBox.getChildren().add(questionAnswersListCB);
-        if (wasCreated) {
-            questionAnswersListCB.setValue(temp);
-        }
-        hookUpQuestionAnswerCBEvents();
     }
 
     private void refreshStartAnswerCB() {
@@ -660,81 +457,14 @@ public class DialogsEditStage extends ChildStage {
         }
     }
 
-    private List<Question> questionItemsToQuestions(List<QuestionItem> items) {
-        List<QuestionItem> input = new ArrayList<>(items);
-        input.sort(Comparator.comparingInt(q -> q.pos));
-        List<Question> output = input.stream()
-                .map(qi -> qi.question)
-                .collect(Collectors.toList());
-        return output;
-    }
-
-    private QuestionsList getQuestionsList(String questionsID) {
-        Optional<QuestionsList> optQuestionsList = observableQuestionsLists.stream()
-                .filter(Objects::nonNull)
-                .filter(q -> q.getID().equals(questionsID))
-                .findFirst();
-        return optQuestionsList.orElse(null);
-    }
-
-    private void startEditQuestionsList(QuestionsList questions) {
-        ObservableList<QuestionItem> questionItems = questionsToQuestionItems(questions.getQuestions());
-        questionsTableView.setItems(questionItems);
-        if (questionItems.isEmpty()) {
-            disableQuestionDetails();
-        }
-    }
-
     private void changeCenterToQuestionsEdit(ObservableList<Node> centerChildren) {
         centerChildren.clear();
-        centerChildren.add(questionsCenter);
+        centerChildren.add(questionsCenter.getQuestionsCenter());
     }
 
     private void changeCenterToAnswerEdit(ObservableList<Node> centerChildren) {
         centerChildren.clear();
-        centerChildren.add(answerCenter.getAnswersCenter());
-    }
-
-    private ObservableList<QuestionItem> questionsToQuestionItems(List<Question> questions) {
-        ObservableList<QuestionItem> output = FXCollections.observableArrayList();
-        for (int i = 0; i < questions.size(); i++) {
-            Question question = questions.get(i);
-            QuestionItem qi = new QuestionItem(i, question);
-            output.add(qi);
-        }
-        return output;
-    }
-
-    private void setUpQuestionsTableContextMenu() {
-        MenuItem addQuestion = new MenuItem("Add text");
-        addQuestion.setOnAction(e -> addQuestion());
-        MenuItem removeQuestions = new MenuItem("Remove text/s");
-        removeQuestions.setOnAction(e -> removeQuestion());
-        ContextMenu cm = new ContextMenu(addQuestion, removeQuestions);
-        questionsTableView.setContextMenu(cm);
-    }
-
-    private void addQuestion() {
-        ObservableList<QuestionItem> items = questionsTableView.getItems();
-        OptionalInt optionalNext = items.stream()
-                .mapToInt(q -> q.pos)
-                .max();
-        int nextPos;
-        if (optionalNext.isPresent()) {
-            nextPos = optionalNext.getAsInt();
-            nextPos++;
-        } else {
-            nextPos = 0;
-        }
-
-        Question question = new Question("", "");
-        QuestionItem questionItem = new QuestionItem(nextPos, question);
-        items.add(questionItem);
-    }
-
-    private void removeQuestion() {
-        QuestionItem q = questionsTableView.getSelectionModel().getSelectedItem();
-        questionsTableView.getItems().remove(q);
+        centerChildren.add(answersCenter.getAnswersCenter());
     }
 
     private void setUpAnswersListContextMenu() {
@@ -766,34 +496,5 @@ public class DialogsEditStage extends ChildStage {
     private void removeAnswersLists() {
         List<AnswersList> selectedAnswers = answersListView.getSelectionModel().getSelectedItems();
         observableAnswersList.removeAll(selectedAnswers);
-    }
-
-    private class QuestionItem {
-        private int pos;
-        private final Question question;
-
-        private QuestionItem(int pos, Question question) {
-            this.pos = pos;
-            this.question = question;
-        }
-
-        @Override
-        public String toString() {
-            return question.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof QuestionItem)) return false;
-            QuestionItem that = (QuestionItem) o;
-            return pos == that.pos &&
-                    Objects.equals(question, that.question);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(pos, question);
-        }
     }
 }

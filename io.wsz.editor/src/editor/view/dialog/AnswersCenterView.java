@@ -21,19 +21,18 @@ import java.util.stream.Collectors;
 
 public class AnswersCenterView {
     private final EditorController editorController;
+    private final ObservableList<QuestionsList> questionsLists;
     private final VBox answersCenter = new VBox(5);
     private final TableView<AnswerItem> answersTableView = new TableView<>();
     private final VBox answerDetails = new VBox(5);
     private final TextArea answerTextArea = new TextArea();
     private final HBox questionsListForAnswerBox = new HBox(5);
-    private final ListView<AnswersList> answersListView;
-    private final ObservableList<QuestionsList> questionsLists;
+
     private ChoiceBox<QuestionsList> questionsListForAnswerCB;
     private RequirementsListView answerRequirementsListView;
 
-    public AnswersCenterView(EditorController editorController, ListView<AnswersList> answersListView, ObservableList<QuestionsList> questionsLists) {
+    public AnswersCenterView(EditorController editorController, ObservableList<QuestionsList> questionsLists) {
         this.editorController = editorController;
-        this.answersListView = answersListView;
         this.questionsLists = questionsLists;
     }
 
@@ -43,22 +42,12 @@ public class AnswersCenterView {
         answersCenter.getChildren().addAll(answersTableView, answerDetails);
     }
 
-    private void setUpAnswerDetails() {
-        answerDetails.setVisible(false);
-
-        setUpAnswerTextArea();
-        setUpQuestionsListForAnswerCB();
-
-        answerRequirementsListView = new RequirementsListView(editorController);
-        ScrollPane listScrollPane = answerRequirementsListView.getListScrollPane();
-
-        answerDetails.getChildren().addAll(answerTextArea, questionsListForAnswerBox, listScrollPane);
-    }
-
-    private void setUpQuestionsListForAnswerCB() {
-        final Label questionsListForAnswerLabel = new Label("PC texts list");
-        questionsListForAnswerBox.getChildren().addAll(questionsListForAnswerLabel);
-        refreshQuestionsListForAnswerCB();
+    public void startEditNewAnswersList(AnswersList newAnswersList) {
+        ObservableList<AnswerItem> answersItems = answersToAnswersItems(newAnswersList.getAnswers());
+        answersTableView.setItems(answersItems);
+        if (answersItems.isEmpty()) {
+            disableAnswerDetails();
+        }
     }
 
     public void refreshQuestionsListForAnswerCB() {
@@ -77,6 +66,32 @@ public class AnswersCenterView {
         }
 
         hookUpQuestionsListForAnswerCBEvents();
+    }
+
+    public void saveAnswersList(AnswersList answersList) {
+        saveCurrentAnswerItem();
+
+        ObservableList<AnswerItem> answerItems = answersTableView.getItems();
+        List<Answer> answers = answerItemsToAnswers(answerItems);
+        answersList.setAnswers(answers);
+    }
+
+    private void setUpAnswerDetails() {
+        answerDetails.setVisible(false);
+
+        setUpAnswerTextArea();
+        setUpQuestionsListForAnswerCB();
+
+        answerRequirementsListView = new RequirementsListView(editorController);
+        ScrollPane listScrollPane = answerRequirementsListView.getListScrollPane();
+
+        answerDetails.getChildren().addAll(answerTextArea, questionsListForAnswerBox, listScrollPane);
+    }
+
+    private void setUpQuestionsListForAnswerCB() {
+        final Label questionsListForAnswerLabel = new Label("PC texts list");
+        questionsListForAnswerBox.getChildren().addAll(questionsListForAnswerLabel);
+        refreshQuestionsListForAnswerCB();
     }
 
     private void hookUpQuestionsListForAnswerCBEvents() {
@@ -254,18 +269,6 @@ public class AnswersCenterView {
         answersTableView.getItems().remove(items);
     }
 
-    public VBox getAnswersCenter() {
-        return answersCenter;
-    }
-
-    public void saveAnswersList(AnswersList answersList) {
-        saveCurrentAnswerItem();
-
-        ObservableList<AnswerItem> answerItems = answersTableView.getItems();
-        List<Answer> answers = answerItemsToAnswers(answerItems);
-        answersList.setAnswers(answers);
-    }
-
     private List<Answer> answerItemsToAnswers(ObservableList<AnswerItem> items) {
         List<AnswerItem> input = new ArrayList<>(items);
         input.sort(Comparator.comparingInt(q -> q.pos));
@@ -281,14 +284,6 @@ public class AnswersCenterView {
         }
     }
 
-    public void startEditNewAnswersList(AnswersList newAnswersList) {
-        ObservableList<AnswerItem> answersItems = answersToAnswersItems(newAnswersList.getAnswers());
-        answersTableView.setItems(answersItems);
-        if (answersItems.isEmpty()) {
-            disableAnswerDetails();
-        }
-    }
-
     private ObservableList<AnswerItem> answersToAnswersItems(List<Answer> answers) {
         ObservableList<AnswerItem> output = FXCollections.observableArrayList();
         for (int i = 0; i < answers.size(); i++) {
@@ -299,7 +294,12 @@ public class AnswersCenterView {
         return output;
     }
 
+    public VBox getAnswersCenter() {
+        return answersCenter;
+    }
+
     private class AnswerItem {
+
         private int pos;
         private final Answer answer;
 
