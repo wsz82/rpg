@@ -17,6 +17,7 @@ module io.wsz.model {
     exports io.wsz.model.script.bool;
     exports io.wsz.model.script.bool.countable;
     exports io.wsz.model.script.bool.has;
+    exports io.wsz.model.script.variable;
     exports io.wsz.model.sizes;
     exports io.wsz.model.dialog;
     exports io.wsz.model.asset;

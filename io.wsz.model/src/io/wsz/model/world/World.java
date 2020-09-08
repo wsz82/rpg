@@ -5,6 +5,7 @@ import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.location.Location;
+import io.wsz.model.script.variable.Variable;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -21,6 +22,7 @@ public class World implements Externalizable {
     private List<EquipmentType> equipmentTypes;
     private List<InventoryPlaceType> inventoryPlaceTypes;
     private List<Dialog> dialogs;
+    private List<Variable<?>> globalVariables;
 
     public World() {}
 
@@ -64,6 +66,14 @@ public class World implements Externalizable {
         this.dialogs = dialogs;
     }
 
+    public List<Variable<?>> getGlobalVariables() {
+        return globalVariables;
+    }
+
+    public void setGlobalVariables(List<Variable<?>> globalVariables) {
+        this.globalVariables = globalVariables;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(Sizes.VERSION);
@@ -77,6 +87,8 @@ public class World implements Externalizable {
         out.writeObject(inventoryPlaceTypes);
 
         out.writeObject(dialogs);
+
+        out.writeObject(globalVariables);
     }
 
     @Override
@@ -92,5 +104,7 @@ public class World implements Externalizable {
         inventoryPlaceTypes = (List<InventoryPlaceType>) in.readObject();
 
         dialogs = (List<Dialog>) in.readObject();
+
+        globalVariables = (List<Variable<?>>) in.readObject();
     }
 }

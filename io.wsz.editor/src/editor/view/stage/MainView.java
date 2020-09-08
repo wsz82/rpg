@@ -13,6 +13,7 @@ import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
+import editor.view.script.GlobalVariablesEditStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.plugin.PluginMetadata;
@@ -183,9 +184,20 @@ class MainView {
         final MenuItem weaponTypes = getEquipmentTypesMenuItem();
         final MenuItem inventoryPlaces = getInventoryPlacesMenuItem();
         final MenuItem dialogs = getDialogsMenuItem();
+        final MenuItem globalVariables = getGlobalVariablesMenuItem();
 
-        world.getItems().addAll(weaponTypes, inventoryPlaces, dialogs);
+        world.getItems().addAll(weaponTypes, inventoryPlaces, dialogs, globalVariables);
         return world;
+    }
+
+    private MenuItem getGlobalVariablesMenuItem() {
+        final MenuItem globalVariables = new MenuItem("Global variables");
+        globalVariables.setOnAction(event -> {
+            GlobalVariablesEditStage variablesEditStage = new GlobalVariablesEditStage(mainStage, editorController);
+            variablesEditStage.initStage();
+            variablesEditStage.show();
+        });
+        return globalVariables;
     }
 
     private MenuItem getDialogsMenuItem() {

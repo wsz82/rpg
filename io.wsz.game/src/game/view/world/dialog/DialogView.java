@@ -2,10 +2,12 @@ package game.view.world.dialog;
 
 import game.model.GameController;
 import game.model.setting.Settings;
+import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.*;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.script.Script;
 import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
@@ -116,9 +118,13 @@ public class DialogView {
         PosItem npc = dialogMemento.getNpc();
         Dialog dialog = npc.getDialog();
         Creature pc = dialogMemento.getPc();
-        Answer answer = dialog.getGreeting(pc, npc);
-        addDialogItem(npc, answer.getText());
-        dialogMemento.setLastAnswer(answer);
+        Answer greeting = dialog.getGreeting(pc, npc);
+        addDialogItem(npc, greeting.getText());
+        Script answerScript = greeting.getBeginScript();
+        if (answerScript != null) {
+            answerScript.execute(gameController.getController());
+        }
+        dialogMemento.setLastAnswer(greeting);
     }
 
     private void hookupEvents() {
@@ -209,16 +215,25 @@ public class DialogView {
     }
 
     private void addQuestionAndAnswer() {
-        Creature asking = dialogMemento.getPc();
-        addDialogItem(asking, activeQuestion.getText());
+        Creature pc = dialogMemento.getPc();
+        addDialogItem(pc, activeQuestion.getText());
+        Script questionScript = activeQuestion.getBeginScript();
+        Controller controller = gameController.getController();
+        if (questionScript != null) {
+            questionScript.execute(controller);
+        }
 
-        PosItem answering = dialogMemento.getNpc();
+        PosItem npc = dialogMemento.getNpc();
         Dialog dialog = dialogMemento.getNpc().getDialog();
         String answerID = activeQuestion.getAnswersListID();
-        Answer answer = dialog.getAnswerByID(answerID, asking, answering);
+        Answer answer = dialog.getAnswerByID(answerID, pc, npc);
 
         if (answer != null) {
-            addDialogItem(answering, answer.getText());
+            addDialogItem(npc, answer.getText());
+            Script answerScript = answer.getBeginScript();
+            if (answerScript != null) {
+                answerScript.execute(controller);
+            }
         }
         dialogMemento.setLastAnswer(answer);
 
@@ -270,10 +285,10 @@ public class DialogView {
         gc.fillRect(right, dialogRectangleTop, scrollWidth, scrollHeight);
     }
 
-    private void addDialogItem(PosItem pi, String text) {
-        String speakerName = pi.getAssetId();
+    private void addDialogItem(PosItem talkingItem, String text) {
+        String speakerName = talkingItem.getAssetId();
         SpeakerMark speakerMark = SpeakerMark.NPC;
-        if (pi == dialogMemento.getPc()) {
+        if (talkingItem == dialogMemento.getPc()) {
             speakerMark = SpeakerMark.PC;
         }
         DialogItem di = new DialogItem(speakerMark, speakerName, text);

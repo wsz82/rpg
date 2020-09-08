@@ -21,7 +21,7 @@ public class LocationsTableView extends TableView<Location> {
     private final EditorController editorController;
     private final Controller controller;
 
-    LocationsTableView(EditorCanvas editorCanvas, EditorController editorController) {
+    public LocationsTableView(EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;

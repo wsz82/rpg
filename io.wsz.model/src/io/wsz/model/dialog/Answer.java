@@ -2,6 +2,7 @@ package io.wsz.model.dialog;
 
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.script.Script;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -16,6 +17,7 @@ public class Answer implements Externalizable {
     private String text;
     private String questionsListID;
     private Requirements requirements;
+    private Script beginScript;
 
     public Answer() {}
 
@@ -55,6 +57,14 @@ public class Answer implements Externalizable {
         this.requirements = requirements;
     }
 
+    public Script getBeginScript() {
+        return beginScript;
+    }
+
+    public void setBeginScript(Script beginScript) {
+        this.beginScript = beginScript;
+    }
+
     @Override
     public String toString() {
         int max = 20;
@@ -90,6 +100,8 @@ public class Answer implements Externalizable {
         out.writeObject(questionsListID);
 
         out.writeObject(requirements);
+
+        out.writeObject(beginScript);
     }
 
     @Override
@@ -101,5 +113,7 @@ public class Answer implements Externalizable {
         questionsListID = (String) in.readObject();
 
         requirements = (Requirements) in.readObject();
+
+        beginScript = (Script) in.readObject();
     }
 }

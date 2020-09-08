@@ -2,6 +2,7 @@ package editor.view.dialog;
 
 import editor.model.EditorController;
 import editor.view.dialog.requirement.RequirementsListView;
+import editor.view.dialog.script.ScriptArea;
 import io.wsz.model.dialog.AnswersList;
 import io.wsz.model.dialog.Question;
 import io.wsz.model.dialog.QuestionsList;
@@ -25,9 +26,11 @@ public class QuestionsCenterView {
     private final TableView<QuestionItem> questionsTableView = new TableView<>();
     private final VBox questionDetails = new VBox(5);
     private final HBox questionAnswersListBox = new HBox(5);
-    private ChoiceBox<AnswersList> questionAnswersListCB;
     private final TextArea questionText = new TextArea();
+
+    private ChoiceBox<AnswersList> questionAnswersListCB;
     private RequirementsListView questionRequirementsListView;
+    private ScriptArea scriptArea;
 
     public QuestionsCenterView(EditorController editorController, ObservableList<AnswersList> answersLists) {
         this.editorController = editorController;
@@ -115,6 +118,7 @@ public class QuestionsCenterView {
         questionAnswersListCB.setValue(answersList);
         questionRequirementsListView.clear();
         questionRequirementsListView.populate(question.getRequirements());
+        scriptArea.restoreScript(question.getBeginScript());
     }
 
     private AnswersList getAnswersListWithID(String answersListID) {
@@ -134,9 +138,13 @@ public class QuestionsCenterView {
         questionProperties.getChildren().addAll(questionAnswersListBox);
 
         questionRequirementsListView = new RequirementsListView(editorController);
-        ScrollPane listScrollPane = questionRequirementsListView.getListScrollPane();
+        final ScrollPane requirementsScrollPane = questionRequirementsListView.getListScrollPane();
 
-        questionDetails.getChildren().addAll(questionText, questionProperties, listScrollPane);
+        scriptArea = new ScriptArea(editorController);
+        scriptArea.init();
+        final VBox scriptArea = this.scriptArea.getScriptArea();
+
+        questionDetails.getChildren().addAll(questionText, questionProperties, requirementsScrollPane, scriptArea);
     }
 
     private void saveCurrentQuestionItem() {
@@ -224,6 +232,7 @@ public class QuestionsCenterView {
         questionDetails.setVisible(false);
         questionText.setText(null);
         questionAnswersListCB.setValue(null);
+        scriptArea.clearArea();
     }
 
     private void saveQuestionItem(QuestionItem qi) {
@@ -235,6 +244,7 @@ public class QuestionsCenterView {
             String answerID = answersList.getID();
             question.setAnswersListID(answerID);
         }
+        question.setBeginScript(scriptArea.getScript());
         questionsTableView.refresh();
     }
 

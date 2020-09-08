@@ -2,6 +2,7 @@ package editor.view.dialog;
 
 import editor.model.EditorController;
 import editor.view.dialog.requirement.RequirementsListView;
+import editor.view.dialog.script.ScriptArea;
 import io.wsz.model.dialog.Answer;
 import io.wsz.model.dialog.AnswersList;
 import io.wsz.model.dialog.QuestionsList;
@@ -30,6 +31,7 @@ public class AnswersCenterView {
 
     private ChoiceBox<QuestionsList> questionsListForAnswerCB;
     private RequirementsListView answerRequirementsListView;
+    private ScriptArea scriptArea;
 
     public AnswersCenterView(EditorController editorController, ObservableList<QuestionsList> questionsLists) {
         this.editorController = editorController;
@@ -85,7 +87,11 @@ public class AnswersCenterView {
         answerRequirementsListView = new RequirementsListView(editorController);
         ScrollPane listScrollPane = answerRequirementsListView.getListScrollPane();
 
-        answerDetails.getChildren().addAll(answerTextArea, questionsListForAnswerBox, listScrollPane);
+        scriptArea = new ScriptArea(editorController);
+        scriptArea.init();
+        final VBox scriptArea = this.scriptArea.getScriptArea();
+
+        answerDetails.getChildren().addAll(answerTextArea, questionsListForAnswerBox, listScrollPane, scriptArea);
     }
 
     private void setUpQuestionsListForAnswerCB() {
@@ -191,7 +197,7 @@ public class AnswersCenterView {
             if (oldAnswerItem != null) {
                 saveAnswerItem(oldAnswerItem);
             }
-            startEditQuestionDetails(newAnswerItem);
+            startEditAnswerDetails(newAnswerItem);
             enableAnswerDetails();
         };
         answersTableView.getSelectionModel().selectedItemProperty().addListener(questionTableItemListener);
@@ -201,6 +207,7 @@ public class AnswersCenterView {
         answerDetails.setVisible(false);
         answerTextArea.setText(null);
         questionsListForAnswerCB.setValue(null);
+        scriptArea.clearArea();
     }
 
     private void enableAnswerDetails() {
@@ -216,10 +223,11 @@ public class AnswersCenterView {
             String questionsListID = questionsList.getID();
             answer.setQuestionsListID(questionsListID);
         }
+        answer.setBeginScript(scriptArea.getScript());
         answersTableView.refresh();
     }
 
-    private void startEditQuestionDetails(AnswerItem newAnswerItem) {
+    private void startEditAnswerDetails(AnswerItem newAnswerItem) {
         Answer answer = newAnswerItem.answer;
         answerTextArea.setText(answer.getText());
         String questionsListID = answer.getQuestionsListID();
@@ -227,6 +235,7 @@ public class AnswersCenterView {
         questionsListForAnswerCB.setValue(questionsList);
         answerRequirementsListView.clear();
         answerRequirementsListView.populate(answer.getRequirements());
+        scriptArea.restoreScript(answer.getBeginScript());
     }
 
     private QuestionsList getAnswerWithID(String questionsListID) {

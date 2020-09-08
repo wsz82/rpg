@@ -30,13 +30,13 @@ public class DialogsEditStage extends ChildStage {
     private final ObservableList<QuestionsList> observableQuestionsLists = FXCollections.observableArrayList();
 
     private ListView<Dialog> dialogsListView;
+    private VBox answersListsVBox;
     private ListView<AnswersList> answersListView;
-    private ListView<QuestionsList> questionsListsView;
-    private VBox center;
     private HBox startAnswersListBox;
     private ChoiceBox<AnswersList> startAnswersListCB;
-    private VBox answersListsVBox;
     private VBox questionsListsVBox;
+    private ListView<QuestionsList> questionsListsView;
+    private VBox center;
     private AnswersCenterView answersCenter;
     private QuestionsCenterView questionsCenter;
 
