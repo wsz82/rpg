@@ -34,7 +34,7 @@ public class Controller {
     private Location locationToUpdate;
     private Creature creatureToOpenInventory;
     private Container containerToOpen;
-    private DialogMemento dialogMemento;
+    private DialogMemento<PosItem<?,?>> dialogMemento;
 
     public Controller(){}
 

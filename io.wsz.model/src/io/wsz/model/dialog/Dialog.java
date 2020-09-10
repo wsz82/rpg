@@ -1,5 +1,6 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
@@ -35,41 +36,41 @@ public class Dialog implements Externalizable {
         this.greetingAnswersListID = greetingAnswersListID;
     }
 
-    public List<Question> getQuestionsListByID(String ID, Creature pc, PosItem npc) {
+    public List<Question> getQuestionsListByID(String ID, Controller controller, Creature pc, PosItem npc) {
         for (QuestionsList questionsList : questionsLists) {
             String id = questionsList.getID();
             if (id.equals(ID)) {
                 List<Question> questions = questionsList.getQuestions();
-                return geFilteredQuestions(pc, npc, questions);
+                return geFilteredQuestions(questions, controller, pc, npc);
             }
         }
         return null;
     }
 
-    private List<Question> geFilteredQuestions(Creature pc, PosItem npc, List<Question> questions) {
+    private List<Question> geFilteredQuestions(List<Question> questions, Controller controller, Creature pc, PosItem npc) {
         FILTERED_QUESTIONS.clear();
         for (Question question : questions) {
-            if (question.doMatchRequirements(pc, npc)) {
+            if (question.doMatchRequirements(controller, pc, npc)) {
                 FILTERED_QUESTIONS.add(question);
             }
         }
         return FILTERED_QUESTIONS;
     }
 
-    public Answer getAnswerByID(String ID, Creature pc, PosItem npc) {
+    public Answer getAnswerByID(String ID, Controller controller, Creature pc, PosItem npc) {
         for (AnswersList answersList : answersLists) {
             String id = answersList.getID();
             if (id.equals(ID)) {
                 List<Answer> answers = answersList.getAnswers();
-                return getFirstMatchedAnswer(answers, pc, npc);
+                return getFirstMatchedAnswer(answers, controller, pc, npc);
             }
         }
         return null;
     }
 
-    private Answer getFirstMatchedAnswer(List<Answer> answers, Creature pc, PosItem npc) {
+    private Answer getFirstMatchedAnswer(List<Answer> answers, Controller controller, Creature pc, PosItem npc) {
         for (Answer answer : answers) {
-            if (answer.doMatchRequirements(pc, npc)) {
+            if (answer.doMatchRequirements(controller, pc, npc)) {
                 return answer;
             }
         }
@@ -86,12 +87,12 @@ public class Dialog implements Externalizable {
         return null;
     }
 
-    public Answer getGreeting(Creature pc, PosItem npc) {
+    public Answer getGreeting(Controller controller, Creature pc, PosItem npc) {
         for (AnswersList answersList : answersLists) {
             String id = answersList.getID();
             if (id.equals(greetingAnswersListID)) {
                 List<Answer> answers = answersList.getAnswers();
-                return getFirstMatchedAnswer(answers, pc, npc);
+                return getFirstMatchedAnswer(answers, controller, pc, npc);
             }
         }
         return null;

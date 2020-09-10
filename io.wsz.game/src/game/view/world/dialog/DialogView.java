@@ -118,7 +118,11 @@ public class DialogView {
         PosItem npc = dialogMemento.getNpc();
         Dialog dialog = npc.getDialog();
         Creature pc = dialogMemento.getPc();
-        Answer greeting = dialog.getGreeting(pc, npc);
+        Answer greeting = dialog.getGreeting(gameController.getController(), pc, npc);
+        if (greeting == null) {
+            dialogMemento.setFinished(true);
+            return;
+        }
         addDialogItem(npc, greeting.getText());
         Script answerScript = greeting.getBeginScript();
         if (answerScript != null) {
@@ -226,7 +230,7 @@ public class DialogView {
         PosItem npc = dialogMemento.getNpc();
         Dialog dialog = dialogMemento.getNpc().getDialog();
         String answerID = activeQuestion.getAnswersListID();
-        Answer answer = dialog.getAnswerByID(answerID, pc, npc);
+        Answer answer = dialog.getAnswerByID(answerID, controller, pc, npc);
 
         if (answer != null) {
             addDialogItem(npc, answer.getText());
@@ -390,7 +394,8 @@ public class DialogView {
         PosItem answering = dialogMemento.getNpc();
         Dialog dialog = answering.getDialog();
         Creature asking = dialogMemento.getPc();
-        List<Question> questions = dialog.getQuestionsListByID(questionsID, asking, answering);
+        Controller controller = gameController.getController();
+        List<Question> questions = dialog.getQuestionsListByID(questionsID, controller, asking, answering);
         if (questions == null || questions.isEmpty()) {
             dialogMemento.setFinished(true);
             return;

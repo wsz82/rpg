@@ -18,7 +18,7 @@ public class RequirementView {
     private final Button removeButton = new Button("Remove");
     private final HBox row = new HBox(5, elementsWithMethodCB, removeButton);
     private final RequirementsListView owner;
-    private ArgumentTypeRequirementView argumentTypeRequirementView;
+    private AfterMethodRequirementView afterMethodRequirementView;
 
     public RequirementView(RequirementsListView owner, EditorController editorController) {
         this.editorController = editorController;
@@ -34,19 +34,25 @@ public class RequirementView {
         methodCB.setItems(observableMethods);
         methodCB.valueProperty().addListener((observable, oldMethod, newMethod) -> {
             elements.getChildren().clear();
-            setUpArgumentTypeRequirement(newMethod);
+            resolveMethodSelection(newMethod);
         });
     }
 
-    private void setUpArgumentTypeRequirement(Method newMethod) {
+    private void resolveMethodSelection(Method newMethod) {
         switch (newMethod) {
             case PChas, NPChas -> setUpArgumentTypeRequirement();
+            case GlobalVariable -> setUpGlobalVariableRequirement();
         }
     }
 
+    private void setUpGlobalVariableRequirement() {
+        this.afterMethodRequirementView = new GlobalVariableRequirementView(editorController);
+        elements.getChildren().addAll(afterMethodRequirementView.getElements());
+    }
+
     private void setUpArgumentTypeRequirement() {
-        this.argumentTypeRequirementView = new ArgumentTypeRequirementView(editorController);
-        elements.getChildren().addAll(argumentTypeRequirementView.getElements());
+        this.afterMethodRequirementView = new ArgumentTypeRequirementView(editorController);
+        elements.getChildren().addAll(afterMethodRequirementView.getElements());
     }
 
     private void hookUpRemoveEvent() {
@@ -72,7 +78,7 @@ public class RequirementView {
         methodCB.setValue(method);
     }
 
-    public ArgumentTypeRequirementView getArgumentTypeRequirementView() {
-        return argumentTypeRequirementView;
+    public AfterMethodRequirementView getAfterMethodRequirementView() {
+        return afterMethodRequirementView;
     }
 }

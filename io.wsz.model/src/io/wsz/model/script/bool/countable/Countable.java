@@ -1,37 +1,30 @@
 package io.wsz.model.script.bool.countable;
 
-import io.wsz.model.asset.Asset;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.BooleanExpression;
 
+import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-public abstract class BooleanCountable<A extends Asset> extends BooleanExpression<A> {
+public abstract class Countable<N extends Number> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     protected CompareOperator compareOperator;
-    protected int argument;
+    protected N argument;
 
-    public BooleanCountable() {}
+    public Countable() {
+    }
 
-    public BooleanCountable(CompareOperator compareOperator, String itemID, int argument) {
+    public Countable(CompareOperator compareOperator, N argument) {
         this.compareOperator = compareOperator;
-        this.itemID = itemID;
         this.argument = argument;
     }
 
-    @Override
-    public boolean isTrue(A checkedItem) {
-        this.checkedItem = checkedItem;
-        return itemHasAmount();
-    }
-
-    protected boolean itemHasAmount() {
+    public boolean isFitAmount() {
         return switch (compareOperator) {
             case EQUAL -> isEqual();
             case NOT_EQUAL -> isNotEqual();
@@ -42,78 +35,79 @@ public abstract class BooleanCountable<A extends Asset> extends BooleanExpressio
         };
     }
 
-    protected boolean isLesserOrEqual() {
-        long amount;
+    public boolean isLesserOrEqual() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return true;
         }
-        return amount <= argument;
+        return isLesserOrEqual(amount);
     }
 
-    protected boolean isLesser() {
-        long amount;
+    protected abstract boolean isLesserOrEqual(N amount);
+
+    public boolean isLesser() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return true;
         }
-        return amount < argument;
+        return isLesser(amount);
     }
 
-    protected boolean isGreaterOrEqual() {
-        long amount;
+    protected abstract boolean isLesser(N amount);
+
+    public boolean isGreaterOrEqual() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return false;
         }
-        return amount >= argument;
+        return isGreaterOrEqual(amount);
     }
 
-    protected boolean isGreater() {
-        long amount;
+    protected abstract boolean isGreaterOrEqual(N amount);
+
+    public boolean isGreater() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return false;
         }
-        return amount > argument;
+        return isGreater(amount);
     }
 
-    protected boolean isNotEqual() {
-        long amount;
+    protected abstract boolean isGreater(N amount);
+
+    public boolean isNotEqual() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return true;
         }
-        return amount != argument;
+        return isNotEqual(amount);
     }
 
-    protected boolean isEqual() {
-        long amount;
+    protected abstract boolean isNotEqual(N amount);
+
+    public boolean isEqual() {
+        N amount;
         try {
             amount = getAmount();
         } catch (NullPointerException e) {
             return false;
         }
-        return amount == argument;
+        return isEqual(amount);
     }
 
-    protected abstract long getAmount();
+    protected abstract boolean isEqual(N amount);
 
-    protected long getCreatureAmount(Creature cr) {
-        List<Equipment> items = cr.getItems();
-        long count = items.stream()
-                .filter(i -> i.getAssetId().equals(itemID))
-                .count();
-        count += cr.getInventory().getEquippedItems().values().stream()
-                .filter(i -> i.getAssetId().equals(itemID))
-                .count();
-        return count;
-    }
+    public abstract N getAmount();
 
     public CompareOperator getCompareOperator() {
         return compareOperator;
@@ -123,27 +117,34 @@ public abstract class BooleanCountable<A extends Asset> extends BooleanExpressio
         this.compareOperator = compareOperator;
     }
 
-    public int getArgument() {
+    public N getArgument() {
         return argument;
     }
 
-    public void setArgument(int argument) {
+    public void setArgument(N argument) {
         this.argument = argument;
+    }
+
+    protected int getCreatureAmount(Creature cr, String checkedID) {
+        List<Equipment> items = cr.getItems();
+        int count = (int) items.stream()
+                .filter(i -> i.getAssetId().equals(checkedID))
+                .count();
+        count += cr.getInventory().getEquippedItems().values().stream()
+                .filter(i -> i.getAssetId().equals(checkedID))
+                .count();
+        return count;
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        super.writeExternal(out);
-
         out.writeObject(compareOperator);
-        out.writeInt(argument);
+        out.writeObject(argument);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
-
         compareOperator = (CompareOperator) in.readObject();
-        argument = in.readInt();
+        argument = (N) in.readObject();
     }
 }

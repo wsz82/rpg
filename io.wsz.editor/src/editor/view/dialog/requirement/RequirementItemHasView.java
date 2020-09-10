@@ -4,30 +4,28 @@ import editor.model.EditorController;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.script.Not;
 import io.wsz.model.script.bool.BooleanExpression;
-import io.wsz.model.script.bool.has.BooleanCreatureHasInventoryPlace;
-import io.wsz.model.script.bool.has.BooleanHas;
+import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
+import io.wsz.model.script.bool.has.item.HasableCreatureInventoryPlace;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.HBox;
 
 import java.util.List;
 import java.util.Optional;
 
 public class RequirementItemHasView extends SpecificRequirement{
-    private final HBox elements = new HBox(5);
     private final ChoiceBox<Not> notCB = new ChoiceBox<>();
     private final ChoiceBox<InventoryPlaceType> placeTypeCB = new ChoiceBox<>();
-    private final EditorController editorController;
 
     public RequirementItemHasView(EditorController editorController) {
-        this.editorController = editorController;
+        super(editorController);
         setUpNotCB();
         setUpPlaceTypeCB();
         fillElements();
     }
 
-    private void fillElements() {
+    @Override
+    protected void fillElements() {
         elements.getChildren().addAll(notCB, placeTypeCB);
     }
 
@@ -45,14 +43,16 @@ public class RequirementItemHasView extends SpecificRequirement{
     }
 
     @Override
-    public BooleanHas getExpression() {
-        BooleanCreatureHasInventoryPlace expression = new BooleanCreatureHasInventoryPlace();
+    public BooleanCreatureHasInventoryPlace getExpression() {
+        HasableCreatureInventoryPlace hasable = new HasableCreatureInventoryPlace();
+        BooleanCreatureHasInventoryPlace expression = new BooleanCreatureHasInventoryPlace(hasable);
+        hasable.setExpression(expression);
         InventoryPlaceType placeType = getInventoryPlaceType();
         if (placeType != null) {
-            expression.setItemID(placeType.getId());
+            expression.setCheckedID(placeType.getId());
         }
         Not not = getNot();
-        expression.setNot(not);
+        hasable.setNot(not);
         return expression;
     }
 
@@ -60,16 +60,11 @@ public class RequirementItemHasView extends SpecificRequirement{
     public void populate(BooleanExpression expression) {
         if (!(expression instanceof BooleanCreatureHasInventoryPlace)) return;
         BooleanCreatureHasInventoryPlace specificExpression = (BooleanCreatureHasInventoryPlace) expression;
-        setNot(specificExpression.getNot());
+        setNot(specificExpression.getHasable().getNot());
         Optional<InventoryPlaceType> optPlaceType = editorController.getObservableInventoryPlacesTypes().stream()
-                .filter(a -> a.getId().equals(expression.getItemID()))
+                .filter(a -> a.getId().equals(expression.getCheckedID()))
                 .findFirst();
         setInventoryPlaceType(optPlaceType.orElse(null));
-    }
-
-    @Override
-    public HBox getElements() {
-        return elements;
     }
 
     public Not getNot() {

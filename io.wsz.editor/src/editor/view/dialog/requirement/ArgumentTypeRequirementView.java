@@ -9,15 +9,12 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public class ArgumentTypeRequirementView {
-    private final HBox elements = new HBox(5);
+public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
     private final ChoiceBox<ArgumentType> argumentTypeCB = new ChoiceBox<>();
     private final HBox elementsWithArgumentTypeCB = new HBox(5, argumentTypeCB, elements);
-    private final EditorController editorController;
-    private SpecificRequirement specificRequirement;
 
     public ArgumentTypeRequirementView(EditorController editorController) {
-        this.editorController = editorController;
+        super(editorController);
         setUpArgumentTypeCB();
     }
 
@@ -57,10 +54,7 @@ public class ArgumentTypeRequirementView {
         argumentTypeCB.setValue(argumentType);
     }
 
-    public SpecificRequirement getSpecificRequirement() {
-        return specificRequirement;
-    }
-
+    @Override
     public HBox getElements() {
         return elementsWithArgumentTypeCB;
     }

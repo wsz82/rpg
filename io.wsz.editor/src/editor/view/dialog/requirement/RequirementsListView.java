@@ -4,10 +4,14 @@ import editor.model.EditorController;
 import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.ArgumentType;
 import io.wsz.model.script.Method;
-import io.wsz.model.script.bool.countable.BooleanCountable;
-import io.wsz.model.script.bool.countable.BooleanCreatureItemExpression;
-import io.wsz.model.script.bool.has.BooleanCreatureHasInventoryPlace;
-import io.wsz.model.script.bool.has.BooleanHas;
+import io.wsz.model.script.bool.BooleanItemExpression;
+import io.wsz.model.script.bool.BooleanVariableExpression;
+import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
+import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
+import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
+import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
+import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
+import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -18,8 +22,7 @@ import java.util.List;
 
 import static io.wsz.model.script.ArgumentType.INVENTORY_PLACE;
 import static io.wsz.model.script.ArgumentType.ITEM;
-import static io.wsz.model.script.Method.NPChas;
-import static io.wsz.model.script.Method.PChas;
+import static io.wsz.model.script.Method.*;
 
 public class RequirementsListView {
     private final EditorController editorController;
@@ -42,42 +45,75 @@ public class RequirementsListView {
 
     public void populate(Requirements input) {
         if (input == null) return;
-        List<BooleanCountable> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
+        List<BooleanCountableItem> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
         if (booleanPCItemExpressions != null) {
-            for (BooleanCountable expression : booleanPCItemExpressions) {
+            for (BooleanCountableItem expression : booleanPCItemExpressions) {
                 populateWithCreatureItemExpression(expression, PChas);
             }
         }
-        List<BooleanCountable> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
+        List<BooleanCountableItem> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
         if (booleanNPCItemExpressions != null) {
-            for (BooleanCountable expression : booleanNPCItemExpressions) {
+            for (BooleanCountableItem expression : booleanNPCItemExpressions) {
                 populateWithCreatureItemExpression(expression, NPChas);
             }
         }
-        List<BooleanHas> booleanPChasExpressions = input.getBooleanPChasExpressions();
+        List<BooleanItemExpression> booleanPChasExpressions = input.getBooleanPChasExpressions();
         if (booleanPChasExpressions != null) {
-            for (BooleanHas expression : booleanPChasExpressions) {
+            for (BooleanItemExpression expression : booleanPChasExpressions) {
                 populateWithCreatureHasInventoryPlaceExpression(expression, PChas);
             }
         }
-        List<BooleanHas> booleanNPChasExpressions = input.getBooleanNPChasExpressions();
+        List<BooleanItemExpression> booleanNPChasExpressions = input.getBooleanNPChasExpressions();
         if (booleanNPChasExpressions != null) {
-            for (BooleanHas expression : booleanNPChasExpressions) {
+            for (BooleanItemExpression expression : booleanNPChasExpressions) {
                 populateWithCreatureHasInventoryPlaceExpression(expression, NPChas);
+            }
+        }
+
+        List<BooleanNumberGlobalVariable> booleanNumberGlobalVariablesExpressions = input.getBooleanNumberGlobalVariablesExpressions();
+        if (booleanNumberGlobalVariablesExpressions != null) {
+            for (BooleanNumberGlobalVariable expression : booleanNumberGlobalVariablesExpressions) {
+                populateWithGlobalVariableExpression(expression, GlobalVariable);
+            }
+        }
+        List<BooleanStringVariableEquals> booleanStringGlobalVariablesExpressions = input.getBooleanStringGlobalVariablesExpressions();
+        if (booleanStringGlobalVariablesExpressions != null) {
+            for (BooleanStringVariableEquals expression : booleanStringGlobalVariablesExpressions) {
+                populateWithGlobalVariableExpression(expression, GlobalVariable);
             }
         }
     }
 
-    private void populateWithCreatureHasInventoryPlaceExpression(BooleanHas expression, Method method) {
+    private void populateWithGlobalVariableExpression(BooleanVariableExpression expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
 
-        ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, INVENTORY_PLACE);
+        GlobalVariableRequirementView secondaryView = getNewGlobalVariableRequirementView(requirementView, expression);
+
+        SpecificRequirement globalVariableView = secondaryView.getSpecificRequirement();
+        globalVariableView.populate(expression);
+    }
+
+    private GlobalVariableRequirementView getNewGlobalVariableRequirementView(RequirementView requirementView,
+                                                                              BooleanVariableExpression expression) {
+        GlobalVariableRequirementView globalVariableView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
+        Variable<?> variable = editorController.getObservableGlobalVariables().stream()
+                .filter(v -> v.getID().equals(expression.getCheckedID()))
+                .findFirst()
+                .orElse(null);
+        globalVariableView.setVariable(variable);
+        return globalVariableView;
+    }
+
+    private void populateWithCreatureHasInventoryPlaceExpression(BooleanItemExpression expression, Method method) {
+        RequirementView requirementView = getNewRequirementView(method);
+
+        AfterMethodRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, INVENTORY_PLACE);
 
         SpecificRequirement creatureHasView = typeView.getSpecificRequirement();
         creatureHasView.populate(expression);
     }
 
-    private void populateWithCreatureItemExpression(BooleanCountable expression, Method method) {
+    private void populateWithCreatureItemExpression(BooleanCountableItem expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
 
         ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, ITEM);
@@ -95,7 +131,7 @@ public class RequirementsListView {
     }
 
     private ArgumentTypeRequirementView getNewArgumentTypeRequirementView(RequirementView requirementView, ArgumentType inventoryPlace) {
-        ArgumentTypeRequirementView typeView = requirementView.getArgumentTypeRequirementView();
+        ArgumentTypeRequirementView typeView = (ArgumentTypeRequirementView) requirementView.getAfterMethodRequirementView();
         typeView.setArgumentType(inventoryPlace);
         return typeView;
     }
@@ -107,6 +143,7 @@ public class RequirementsListView {
             if (method == null) continue;
             switch (method) {
                 case PChas, NPChas -> addItemHasExpression(method, output, requirementView);
+                case GlobalVariable -> addGlobalVariableExpression(output, requirementView);
             }
         }
         if (output.isEmpty()) {
@@ -116,8 +153,42 @@ public class RequirementsListView {
         }
     }
 
+    private void addGlobalVariableExpression(Requirements output, RequirementView requirementView) {
+        GlobalVariableRequirementView secondaryView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
+        Object value = secondaryView.getVariable().getValue();
+        if (value instanceof Integer || value instanceof Double) {
+            addGlobalNumberExpression(output, secondaryView);
+        } else if (value instanceof String) {
+            addGlobalStringExpression(output, secondaryView);
+        }
+    }
+
+    private void addGlobalNumberExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
+        SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
+        BooleanNumberGlobalVariable expression = (BooleanNumberGlobalVariable) specificRequirement.getExpression();
+
+        List<BooleanNumberGlobalVariable> expressions = output.getBooleanNumberGlobalVariablesExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setBooleanNumberGlobalVariablesExpressions(expressions);
+        }
+        expressions.add(expression);
+    }
+
+    private void addGlobalStringExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
+        SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
+        BooleanStringVariableEquals expression = (BooleanStringVariableEquals) specificRequirement.getExpression();
+
+        List<BooleanStringVariableEquals> expressions = output.getBooleanStringGlobalVariablesExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setBooleanStringGlobalVariablesExpressions(expressions);
+        }
+        expressions.add(expression);
+    }
+
     private void addItemHasExpression(Method method, Requirements output, RequirementView requirementView) {
-        ArgumentTypeRequirementView argumentTypeRequirementView = requirementView.getArgumentTypeRequirementView();
+        ArgumentTypeRequirementView argumentTypeRequirementView = (ArgumentTypeRequirementView) requirementView.getAfterMethodRequirementView();
         ArgumentType argumentType = argumentTypeRequirementView.getArgumentType();
         if (argumentType == null) return;
         switch (method) {
@@ -126,25 +197,25 @@ public class RequirementsListView {
         }
     }
 
-    private void switchBetweenArgumentTypesPChas(ArgumentType argumentType, Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
+    private void switchBetweenArgumentTypesPChas(ArgumentType argumentType, Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
         switch (argumentType) {
-            case ITEM -> addPChasItemExpression(output, argumentTypeRequirementView);
-            case INVENTORY_PLACE -> addPChasInventoryPlaceExpression(output, argumentTypeRequirementView);
+            case ITEM -> addPChasItemExpression(output, afterMethodRequirementView);
+            case INVENTORY_PLACE -> addPChasInventoryPlaceExpression(output, afterMethodRequirementView);
         }
     }
 
-    private void switchBetweenArgumentTypesNPChas(ArgumentType argumentType, Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
+    private void switchBetweenArgumentTypesNPChas(ArgumentType argumentType, Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
         switch (argumentType) {
-            case ITEM -> addNPChasItemExpression(output, argumentTypeRequirementView);
-            case INVENTORY_PLACE -> addNPChasInventoryPlaceExpression(output, argumentTypeRequirementView);
+            case ITEM -> addNPChasItemExpression(output, afterMethodRequirementView);
+            case INVENTORY_PLACE -> addNPChasInventoryPlaceExpression(output, afterMethodRequirementView);
         }
     }
 
-    private void addPChasInventoryPlaceExpression(Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
-        SpecificRequirement specificRequirement = argumentTypeRequirementView.getSpecificRequirement();
+    private void addPChasInventoryPlaceExpression(Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
+        SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement();
         BooleanCreatureHasInventoryPlace expression = (BooleanCreatureHasInventoryPlace) specificRequirement.getExpression();
 
-        List<BooleanHas> booleanPChasExpressions = output.getBooleanPChasExpressions();
+        List<BooleanItemExpression> booleanPChasExpressions = output.getBooleanPChasExpressions();
         if (booleanPChasExpressions == null) {
             booleanPChasExpressions = new ArrayList<>(1);
             output.setBooleanPChasExpressions(booleanPChasExpressions);
@@ -152,11 +223,11 @@ public class RequirementsListView {
         booleanPChasExpressions.add(expression);
     }
 
-    private void addNPChasInventoryPlaceExpression(Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
-        SpecificRequirement specificRequirement = argumentTypeRequirementView.getSpecificRequirement();
+    private void addNPChasInventoryPlaceExpression(Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
+        SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement();
         BooleanCreatureHasInventoryPlace expression = (BooleanCreatureHasInventoryPlace) specificRequirement.getExpression();
 
-        List<BooleanHas> booleanNPChasExpressions = output.getBooleanNPChasExpressions();
+        List<BooleanItemExpression> booleanNPChasExpressions = output.getBooleanNPChasExpressions();
         if (booleanNPChasExpressions == null) {
             booleanNPChasExpressions = new ArrayList<>(1);
             output.setBooleanNPChasExpressions(booleanNPChasExpressions);
@@ -164,11 +235,11 @@ public class RequirementsListView {
         booleanNPChasExpressions.add(expression);
     }
 
-    private void addPChasItemExpression(Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
-        SpecificRequirement specificRequirement = argumentTypeRequirementView.getSpecificRequirement();
-        BooleanCreatureItemExpression expression = (BooleanCreatureItemExpression) specificRequirement.getExpression();
+    private void addPChasItemExpression(Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
+        SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement();
+        BooleanItemVsItem expression = (BooleanItemVsItem) specificRequirement.getExpression();
 
-        List<BooleanCountable> booleanPChasExpressions = output.getBooleanPChasItemExpressions();
+        List<BooleanCountableItem> booleanPChasExpressions = output.getBooleanPChasItemExpressions();
         if (booleanPChasExpressions == null) {
             booleanPChasExpressions = new ArrayList<>(1);
             output.setBooleanPChasItemExpressions(booleanPChasExpressions);
@@ -176,11 +247,11 @@ public class RequirementsListView {
         booleanPChasExpressions.add(expression);
     }
 
-    private void addNPChasItemExpression(Requirements output, ArgumentTypeRequirementView argumentTypeRequirementView) {
-        SpecificRequirement specificRequirement = argumentTypeRequirementView.getSpecificRequirement(); //TODO class specific req
-        BooleanCreatureItemExpression expression = (BooleanCreatureItemExpression) specificRequirement.getExpression();
+    private void addNPChasItemExpression(Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
+        SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement(); //TODO class specific req
+        BooleanItemVsItem expression = (BooleanItemVsItem) specificRequirement.getExpression();
 
-        List<BooleanCountable> booleanNPChasExpressions = output.getBooleanNPChasItemExpressions();
+        List<BooleanCountableItem> booleanNPChasExpressions = output.getBooleanNPChasItemExpressions();
         if (booleanNPChasExpressions == null) {
             booleanNPChasExpressions = new ArrayList<>(1);
             output.setBooleanNPChasItemExpressions(booleanNPChasExpressions);

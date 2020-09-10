@@ -1,5 +1,6 @@
 package io.wsz.model.dialog;
 
+import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.script.Script;
@@ -26,11 +27,11 @@ public class Question implements Externalizable {
         this.answersListID = answersListID;
     }
 
-    public boolean doMatchRequirements(Creature pc, PosItem npc) {
+    public boolean doMatchRequirements(Controller controller, Creature pc, PosItem npc) {
         if (requirements == null) {
             return true;
         }
-        return requirements.doMatch(pc, npc);
+        return requirements.doMatch(controller, pc, npc);
     }
 
     public String getText() {

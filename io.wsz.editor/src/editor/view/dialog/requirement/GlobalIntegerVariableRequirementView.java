@@ -2,51 +2,44 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import editor.view.IntegerField;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.script.CompareOperator;
 import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.bool.countable.Countable;
-import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
-import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
-import io.wsz.model.script.bool.countable.item.CountableConcreteItem;
-import javafx.collections.ObservableList;
+import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
+import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.ChoiceBox;
 
 import java.util.Optional;
 
-public class RequirementItemCountableView extends SpecificRequirement {
-    private final ChoiceBox<Asset> itemCB = new ChoiceBox<>();
+public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
-    private final IntegerField argumentInput = new IntegerField(0, false);
+    private final IntegerField argumentInput = new IntegerField(false);
+    private final GlobalVariableRequirementView previousView;
 
-    public RequirementItemCountableView(EditorController editorController) {
+    public GlobalIntegerVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
         super(editorController);
-        setUpItemCB();
+        this.previousView = previousView;
         setUpOperatorCB(operatorCB);
         fillElements();
     }
 
     @Override
     protected void fillElements() {
-        elements.getChildren().addAll(itemCB, operatorCB, argumentInput);
-    }
-
-    private void setUpItemCB() {
-        ObservableList<Asset> assets = editorController.getObservableAssets().getEquipmentAssets();
-        itemCB.setItems(assets);
+        elements.getChildren().addAll(operatorCB, argumentInput);
     }
 
     @Override
-    public BooleanItemVsItem getExpression() {
-        //TODO generic populate i getExpression
-        Asset item = getItem();
+    public BooleanExpression<?> getExpression() {
+        Variable<Integer> variable = (Variable<Integer>) previousView.getVariable();
 
         String id = null;
-        if (item != null) {
-            id = item.getAssetId();
+        if (variable != null) {
+            id = variable.getID();
         }
-        CountableConcreteItem countable = new CountableConcreteItem();
-        BooleanItemVsItem expression = new BooleanItemVsItem(id, countable);
+
+        CountableIntegerVariable countable = new CountableIntegerVariable();
+        BooleanIntegerGlobalVariable expression = new BooleanIntegerGlobalVariable(id, countable);
         countable.setExpression(expression);
 
         CompareOperator compareOperator = getCompareOperator();
@@ -59,23 +52,16 @@ public class RequirementItemCountableView extends SpecificRequirement {
 
     @Override
     public void populate(BooleanExpression<?> expression) {
-        if (!(expression instanceof BooleanCountableItem)) return;
-        BooleanCountableItem specificExpression = (BooleanCountableItem) expression;
-        Optional<Asset> optAsset = editorController.getObservableAssets().getEquipmentAssets().stream()
-                .filter(a -> a.getAssetId().equals(expression.getCheckedID()))
+        if (!(expression instanceof BooleanIntegerGlobalVariable)) return;
+        BooleanIntegerGlobalVariable specificExpression = (BooleanIntegerGlobalVariable) expression;
+        Optional<Variable<?>> optAsset = editorController.getObservableGlobalVariables().stream()
+                .filter(a -> a.getID().equals(expression.getCheckedID()))
                 .findFirst();
-        setItem(optAsset.orElse(null));
+        previousView.setVariable(optAsset.orElse(null));
         Countable<Integer> countable = specificExpression.getCountable();
+        if (countable == null) return;
         setCompareOperator(countable.getCompareOperator());
         setArgument(countable.getArgument());
-    }
-
-    public Asset getItem() {
-        return itemCB.getValue();
-    }
-
-    public void setItem(Asset asset) {
-        itemCB.setValue(asset);
     }
 
     public CompareOperator getCompareOperator() {
