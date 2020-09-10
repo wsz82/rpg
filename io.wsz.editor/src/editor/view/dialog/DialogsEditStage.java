@@ -171,7 +171,9 @@ public class DialogsEditStage extends ChildStage {
             if (answersList == null) continue;
             List<Answer> answers = answersList.getAnswers();
             for (Answer answer : answers) {
-                if (answer.getQuestionsListID().equals(oldID)){
+                String questionsListID = answer.getQuestionsListID();
+                if (questionsListID == null) continue;
+                if (questionsListID.equals(oldID)){
                     answer.setQuestionsListID(newID);
                 }
             }
@@ -284,7 +286,9 @@ public class DialogsEditStage extends ChildStage {
             if (questionsList == null) continue;
             List<Question> questions = questionsList.getQuestions();
             for (Question question : questions) {
-                if (question.getAnswersListID().equals(oldID)){
+                String answersListID = question.getAnswersListID();
+                if (answersListID == null) continue;
+                if (answersListID.equals(oldID)){
                     question.setAnswersListID(newID);
                 }
             }

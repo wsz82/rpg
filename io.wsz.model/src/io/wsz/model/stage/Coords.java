@@ -101,6 +101,13 @@ public class Coords implements Externalizable {
         this.y -= pos2.y;
     }
 
+    public void reset() {
+        this.x = 0;
+        this.y = 0;
+        this.level = 0;
+        this.location = null;
+    }
+
     public Location getLocation() {
         return location;
     }
