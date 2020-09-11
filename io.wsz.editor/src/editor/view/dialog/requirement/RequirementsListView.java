@@ -13,7 +13,6 @@ import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -29,7 +28,6 @@ public class RequirementsListView {
     private final VBox requirementsBox = new VBox(5);
     private final Button addButton = new Button("Add requirement");
     private final VBox requirementsAndAddButtonBox = new VBox(5, requirementsBox, addButton);
-    private final ScrollPane listScrollPane = new ScrollPane(requirementsAndAddButtonBox);
     private final List<RequirementView> requirementViews = new ArrayList<>(0);
 
     public RequirementsListView(EditorController editorController) {
@@ -277,7 +275,7 @@ public class RequirementsListView {
         requirementViews.clear();
     }
 
-    public ScrollPane getListScrollPane() {
-        return listScrollPane;
+    public VBox getContainer() {
+        return requirementsAndAddButtonBox;
     }
 }

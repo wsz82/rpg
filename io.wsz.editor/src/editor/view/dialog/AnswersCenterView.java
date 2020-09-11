@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class AnswersCenterView {
     private final EditorController editorController;
     private final ObservableList<QuestionsList> questionsLists;
-    private final VBox answersCenter = new VBox(5);
+    private final ScrollPane answersCenter = new ScrollPane();
     private final TableView<AnswerItem> answersTableView = new TableView<>();
     private final VBox answerDetails = new VBox(5);
     private final TextArea answerTextArea = new TextArea();
@@ -38,7 +38,13 @@ public class AnswersCenterView {
     public void initAnswersCenter() {
         setUpAnswersTable();
         setUpAnswerDetails();
-        answersCenter.getChildren().addAll(answersTableView, answerDetails);
+        setUpContainer();
+    }
+
+    protected void setUpContainer() {
+        VBox container = new VBox(5);
+        container.getChildren().addAll(answersTableView, answerDetails);
+        answersCenter.setContent(container);
     }
 
     public void startEditNewAnswersList(AnswersList newAnswersList) {
@@ -63,13 +69,13 @@ public class AnswersCenterView {
         setUpAnswerTextArea();
 
         answerRequirementsListView = new RequirementsListView(editorController);
-        ScrollPane listScrollPane = answerRequirementsListView.getListScrollPane();
+        VBox requirementsContainer = answerRequirementsListView.getContainer();
 
         scriptArea = new ScriptArea(editorController);
         scriptArea.init();
         final VBox scriptArea = this.scriptArea.getScriptArea();
 
-        answerDetails.getChildren().addAll(answerTextArea, listScrollPane, scriptArea);
+        answerDetails.getChildren().addAll(answerTextArea, requirementsContainer, scriptArea);
     }
 
     private void setUpAnswerTextArea() {
@@ -271,7 +277,7 @@ public class AnswersCenterView {
         return output;
     }
 
-    public VBox getAnswersCenter() {
+    public ScrollPane getAnswersCenter() {
         return answersCenter;
     }
 

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class QuestionsCenterView {
     private final EditorController editorController;
     private final ObservableList<AnswersList> answersLists;
-    private final VBox questionsCenter = new VBox(5);
+    private final ScrollPane questionsCenter = new ScrollPane();
     private final TableView<QuestionItem> questionsTableView = new TableView<>();
     private final VBox questionDetails = new VBox(5);
     private final TextArea questionText = new TextArea();
@@ -38,7 +38,13 @@ public class QuestionsCenterView {
     public void initQuestionsCenter() {
         setUpQuestionsTableView();
         setUpQuestionDetails();
-        questionsCenter.getChildren().addAll(questionsTableView, questionDetails);
+        setUpContainer();
+    }
+
+    protected void setUpContainer() {
+        VBox container = new VBox(5);
+        container.getChildren().addAll(questionsTableView, questionDetails);
+        questionsCenter.setContent(container);
     }
 
     public void startEditQuestionsList(QuestionsList questions) {
@@ -113,13 +119,13 @@ public class QuestionsCenterView {
     private void setUpQuestionDetails() {
         questionDetails.setVisible(false);
         questionRequirementsListView = new RequirementsListView(editorController);
-        final ScrollPane requirementsScrollPane = questionRequirementsListView.getListScrollPane();
+        final VBox requirementsContainer = questionRequirementsListView.getContainer();
 
         scriptArea = new ScriptArea(editorController);
         scriptArea.init();
         final VBox scriptArea = this.scriptArea.getScriptArea();
 
-        questionDetails.getChildren().addAll(questionText, requirementsScrollPane, scriptArea);
+        questionDetails.getChildren().addAll(questionText, requirementsContainer, scriptArea);
     }
 
     private void saveCurrentQuestionItem() {
@@ -269,7 +275,7 @@ public class QuestionsCenterView {
         questionsTableView.getItems().remove(q);
     }
 
-    public VBox getQuestionsCenter() {
+    public ScrollPane getQuestionsCenter() {
         return questionsCenter;
     }
 
