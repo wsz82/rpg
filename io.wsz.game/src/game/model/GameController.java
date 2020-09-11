@@ -31,10 +31,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -54,6 +51,7 @@ public class GameController {
 
     public GameController(Controller controller) {
         this.controller = controller;
+        restoreSettings();
     }
 
     public boolean startGame(SaveMemento memento) {
@@ -164,34 +162,43 @@ public class GameController {
         getSavesList().addAll(savesNames);
     }
 
-    public SettingMemento loadSettingsMemento(File programDir) {
+    private void restoreSettings() {
+        File programDir = controller.getProgramDir();
+        SettingMemento memento = loadSettingsMemento(programDir);
+        this.settings = memento.getSettings();
+        Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
+        setLocale(settings.getLanguage());
+    }
+
+    private SettingMemento loadSettingsMemento(File programDir) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
         return sc.loadMemento();
     }
 
-    public void restoreSettings(SettingMemento memento) {
-        Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
-        setLocale(settings.getLocale());
-    }
-
     public void setLocale(String locale) {
         if (locale == null || locale.isEmpty()) return;
-        Properties localeProperties = new Properties();
+        Properties defaultProperties = new Properties();
+        fillProperties(defaultProperties, Paths.ENGLISH);
+        Properties localeProperties = new Properties(defaultProperties);
+        fillProperties(localeProperties, locale);
+        controller.setLocale(localeProperties);
+    }
+
+    private void fillProperties(Properties properties, String locale) {
         File programDir = controller.getProgramDir();
         String localePath = programDir + Paths.LOCALE_DIR + File.separator + locale + Paths.DOT_PROPERTIES;
-        FileInputStream in = null;
+        Reader in = null;
         try {
-            in = new FileInputStream(localePath);
+            in = new FileReader(localePath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         if (in == null) return;
         try {
-            localeProperties.load(in);
+            properties.load(in);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        controller.setLocale(localeProperties);
     }
 
     public void saveSettings(File programDir, SettingMemento memento) {
@@ -335,9 +342,5 @@ public class GameController {
 
     public Settings getSettings() {
         return settings;
-    }
-
-    public void setSettings(Settings settings) {
-        this.settings = settings;
     }
 }

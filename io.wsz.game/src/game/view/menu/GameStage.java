@@ -5,6 +5,7 @@ import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
+import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
@@ -24,13 +25,16 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.util.Properties;
 
 public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
 
-    private GameController gameController;
+    private final GameController gameController;
     private final Controller controller;
-    private GameView gameView;
+    private final BorderPane root;
+    private final GameView gameView;
+
     private Node parentToReturn;
     private StackPane mainMenu;
     private StackPane gameMenu;
@@ -38,69 +42,140 @@ public class GameStage extends Stage {
     private StackPane loads;
     private ListView<String> savesView;
     private ListView<String> loadsView;
-
-    private final BorderPane root = new BorderPane();
-    private final Button cancel = new Button("Cancel");
-    private final EventHandler<KeyEvent> returnEvent = e -> {
-        if (e.getCode() == KeyCode.ESCAPE) {
-            e.consume();
-            if (parentToReturn == null) {
-                return;
-            }
-            root.setCenter(parentToReturn);
-            if (parentToReturn == gameMenu) {
-                gameController.setGame(false);
-                Sizes.setTimeOfMenuOpen(System.currentTimeMillis());
-                setGameMenuForCenter();
-            } else if (parentToReturn == gameView.getCanvas()) {
-                gameController.resumeGame();
-            }
-        }
-    };
+    private Button cancel;
+    private Button newGame;
+    private Button loadGame;
+    private Button openSettings;
+    private Button exit;
 
     public GameStage(GameController gameController) {
         super(StageStyle.DECORATED);
         this.gameController = gameController;
         this.controller = gameController.getController();
-        gameView = new GameView(this, gameController);
+        this.root = new BorderPane();
+        this.gameView = new GameView(this, gameController);
         gameController.setGameStage(this);
         gameController.setGameView(gameView);
     }
 
-    private void showMainMenu() {
+    public void init() {
+        Properties locale = controller.getLocale();
+        cancel = new Button(locale.getProperty(LocaleKeys.CANCEL));
+        setFullScreenExitHint("");
+        setFullScreenExitKeyCombination(CLOSE_GAME);
+        setWidth(1280);
+        setHeight(720);
+        setMinWidth(300);
+        setMinHeight(300);
+
+        File programDir = controller.getProgramDir();
+        initSavesList(programDir);
+        restoreSettings();
+
+        root.setFocusTraversable(false);
+        setMainMenuForCenter();
+        final Scene scene = new Scene(root);
+        setScene(scene);
+
+        hookUpCloseEvent();
+        hookUpReturnEvent();
+    }
+
+    private void hookUpCloseEvent() {
+        setOnCloseRequest(e -> {
+            storeSettings();
+        });
+    }
+
+    private void hookUpReturnEvent() {
+        EventHandler<KeyEvent> returnEvent = e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                e.consume();
+                if (parentToReturn == null) {
+                    return;
+                }
+                root.setCenter(parentToReturn);
+                if (parentToReturn == gameMenu) {
+                    gameController.setGame(false);
+                    Sizes.setTimeOfMenuOpen(System.currentTimeMillis());
+                    setGameMenuForCenter();
+                } else if (parentToReturn == gameView.getCanvas()) {
+                    gameController.resumeGame();
+                }
+            }
+        };
+        addEventHandler(KeyEvent.KEY_RELEASED, returnEvent);
+    }
+
+    public void setMainMenuForCenter() {
         parentToReturn = null;
+        final StackPane mainMenu = getMainMenu();
         root.setCenter(mainMenu);
     }
 
-    private void createMainMenu() {
+    public void setGameMenuForCenter() {
+        final StackPane gameMenu = getGameMenu();
+        parentToReturn = gameView.getCanvas();
+        root.setCenter(gameMenu);
+    }
+
+    public void setGameViewForCenter() {
+        gameMenu = getGameMenu();
+        parentToReturn = gameMenu;
+        if (root.getCenter() != gameView.getCanvas()) {
+            root.setCenter(gameView.getCanvas());
+        }
+    }
+
+    public void setLoaderViewToCenter(Task<String> loader) {
+        final StackPane sp = new StackPane();
+        final ProgressBar pb = new ProgressBar();
+        sp.getChildren().addAll(pb);
+        root.setCenter(sp);
+
+        pb.progressProperty().bind(loader.progressProperty());
+        pb.progressProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() >= 1) {
+                setGameViewForCenter();
+            }
+        });
+    }
+
+    private StackPane getMainMenu() {
+        Properties locale = controller.getLocale();
         mainMenu = new StackPane();
 
-        VBox menu = new VBox(10);
+        final VBox menu = new VBox(10);
 
-        Button newGame = new Button("New Game");
+        newGame = new Button(locale.getProperty(LocaleKeys.NEW_GAME));
         newGame.setOnAction(event -> startNewGame());
-        Button loadGame = new Button("Load game");
+        loadGame = new Button(locale.getProperty(LocaleKeys.LOAD_GAME));
         loadGame.setOnAction(event -> {
             openSaveListToLoad();
-            cancel.setOnAction(e -> {
-                showMainMenu();
-            });
+            cancel.setOnAction(e -> setMainMenuForCenter());
         });
-        Button openSettings = new Button("Settings");
+        openSettings = new Button(locale.getProperty(LocaleKeys.SETTINGS));
         openSettings.setOnAction(event -> openSettings());
-        Button exit = new Button("Exit");
+        exit = new Button(locale.getProperty(LocaleKeys.EXIT));
         exit.setOnAction(event -> close());
 
         menu.setAlignment(Pos.CENTER);
         menu.getChildren().addAll(newGame, loadGame, openSettings, exit);
         mainMenu.getChildren().addAll(menu);
+        return mainMenu;
     }
 
     private void openSettings() {
-        SettingsMenu settingsMenu = new SettingsMenu(this, gameController);
         parentToReturn = root.getCenter();
+        SettingsParent parent;
+        if (root.getCenter() == mainMenu) {
+            parent = SettingsParent.MAIN_MENU;
+        } else {
+            parent = SettingsParent.GAME_MENU;
+        }
+        final SettingsMenu settingsMenu = new SettingsMenu(this, gameController, parent);
         root.setCenter(settingsMenu);
-        settingsMenu.open(root, parentToReturn);
+        settingsMenu.open(root);
     }
 
     private void startNewGame() {
@@ -108,41 +183,27 @@ public class GameStage extends Stage {
         startGame(null);
     }
 
-    private void setGameMenuForCenter() {
-        if (gameMenu == null) {
-            createGameMenu();
-        }
-        parentToReturn = gameView.getCanvas();
-        root.setCenter(gameMenu);
-    }
-
-    private void createGameMenu() {
+    private StackPane getGameMenu() {
+        Properties locale = controller.getLocale();
         gameMenu = new StackPane();
-        VBox menu = new VBox(10);
+        final VBox menu = new VBox(10);
         menu.setAlignment(Pos.CENTER);
-        Button resume = new Button("Resume");
-        resume.setOnAction(event -> {
-            gameController.resumeGame();
-        });
-        Button saveMenu = new Button("Save game");
-        saveMenu.setOnAction(event -> {
-            openSaveListToSave();
-        });
-        Button loadMenu = new Button("Load game");
+        final Button resume = new Button(locale.getProperty(LocaleKeys.RESUME));
+        resume.setOnAction(event -> gameController.resumeGame());
+        final Button saveMenu = new Button(locale.getProperty(LocaleKeys.SAVE_GAME));
+        saveMenu.setOnAction(event -> openSaveListToSave());
+        final Button loadMenu = new Button(locale.getProperty(LocaleKeys.LOAD_GAME));
         loadMenu.setOnAction(event -> {
             openSaveListToLoad();
-            cancel.setOnAction(e -> {
-                setGameMenuForCenter();
-            });
+            cancel.setOnAction(e -> setGameMenuForCenter());
         });
-        Button openSettings = new Button("Settings");
-        openSettings.setOnAction(event -> openSettings());
-        Button mainMenu = new Button("Main menu");
-        mainMenu.setOnAction(event -> {
-            showMainMenu();
-        });
-        menu.getChildren().addAll(resume, saveMenu, loadMenu, openSettings, mainMenu);
+        final Button openSettingsFromGameMenu = new Button(locale.getProperty(LocaleKeys.SETTINGS));
+        openSettingsFromGameMenu.setOnAction(event -> openSettings());
+        final Button openMainMenuFromGameMenu = new Button(locale.getProperty(LocaleKeys.MAIN_MENU));
+        openMainMenuFromGameMenu.setOnAction(event -> setMainMenuForCenter());
+        menu.getChildren().addAll(resume, saveMenu, loadMenu, openSettingsFromGameMenu, openMainMenuFromGameMenu);
         gameMenu.getChildren().addAll(menu);
+        return gameMenu;
     }
 
     private void openSaveListToSave() {
@@ -168,7 +229,7 @@ public class GameStage extends Stage {
 
     private void initLoadsView() {
         loads = new StackPane();
-        BorderPane borderPane = new BorderPane();
+        final BorderPane borderPane = new BorderPane();
         borderPane.setMaxWidth(300);
         borderPane.setMaxHeight(500);
 
@@ -178,11 +239,12 @@ public class GameStage extends Stage {
 
         borderPane.setCenter(loadsView);
 
-        HBox buttons = new HBox(10);
+        final HBox buttons = new HBox(10);
         buttons.setAlignment(Pos.CENTER);
 
         cancel.setCancelButton(true);
-        Button load = new Button("Load");
+        Properties locale = controller.getLocale();
+        final Button load = new Button(locale.getProperty(LocaleKeys.LOAD));
         load.setOnAction(event -> loadSave());
         buttons.getChildren().addAll(cancel, load);
         borderPane.setBottom(buttons);
@@ -192,7 +254,7 @@ public class GameStage extends Stage {
 
     private void initSavesView() {
         saves = new StackPane();
-        BorderPane borderPane = new BorderPane();
+        final BorderPane borderPane = new BorderPane();
         borderPane.setMaxWidth(300);
         borderPane.setMaxHeight(500);
 
@@ -202,19 +264,20 @@ public class GameStage extends Stage {
 
         borderPane.setCenter(savesView);
 
-        HBox buttons = new HBox(10);
+        Properties locale = controller.getLocale();
+        final HBox buttons = new HBox(10);
         buttons.setAlignment(Pos.CENTER);
-        Button delete = new Button("Delete");
+        final Button delete = new Button(locale.getProperty(LocaleKeys.DELETE));
         delete.setOnAction(event -> deleteSave());
-        Button cancel = new Button("Cancel");
-        cancel.setCancelButton(true);
-        cancel.setOnAction(event -> setGameMenuForCenter());
-        Button save = new Button("Save");
+        final Button cancelSave = new Button(locale.getProperty(LocaleKeys.CANCEL));
+        cancelSave.setCancelButton(true);
+        cancelSave.setOnAction(event -> setGameMenuForCenter());
+        final Button save = new Button(locale.getProperty(LocaleKeys.SAVE));
         save.setOnAction(event -> overwriteSave());
-        Button newSave = new Button("New save");
+        final Button newSave = new Button(locale.getProperty(LocaleKeys.NEW_SAVE));
         newSave.setOnAction(event -> createNewSave());
 
-        buttons.getChildren().addAll(delete, cancel, save, newSave);
+        buttons.getChildren().addAll(delete, cancelSave, save, newSave);
 
         borderPane.setBottom(buttons);
 
@@ -234,19 +297,18 @@ public class GameStage extends Stage {
     }
 
     private void alertNoGame() {
-        VBox alert = new VBox(5);
+        final VBox alert = new VBox(5);
         alert.setAlignment(Pos.CENTER);
         alert.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
 
-        Label message = new Label("No game is chosen");
-        message.setAlignment(Pos.CENTER);
-        Button returnButton = new Button("Return");
+        Properties locale = controller.getLocale();
+        final Label messageNoGameChosen = new Label(locale.getProperty(LocaleKeys.NO_GAME_CHOSEN));
+        messageNoGameChosen.setAlignment(Pos.CENTER);
+        final Button returnButton = new Button(locale.getProperty(LocaleKeys.RETURN));
         returnButton.setAlignment(Pos.CENTER);
-        returnButton.setOnAction(e -> {
-            removeAlert(alert);
-        });
+        returnButton.setOnAction(e -> removeAlert(alert));
 
-        alert.getChildren().addAll(message, returnButton);
+        alert.getChildren().addAll(messageNoGameChosen, returnButton);
 
         if (root.getCenter() == mainMenu) {
             mainMenu.getChildren().add(alert);
@@ -305,62 +367,15 @@ public class GameStage extends Stage {
         gameController.resumeGame();
     }
 
-    public void setGameViewForCenter() {
-        if (gameMenu == null) {
-            createGameMenu();
-        }
-        parentToReturn = gameMenu;
-        if (root.getCenter() != gameView.getCanvas()) {
-            root.setCenter(gameView.getCanvas());
-        }
-    }
-
-    private void restoreSettings(File programDir) {
-        SettingMemento memento = gameController.loadSettingsMemento(programDir);
-        gameController.setSettings(memento.getSettings());
-        gameController.restoreSettings(memento);
-        setFullScreen(memento.isFullScreen());
+    private void restoreSettings() {
+        boolean isFullScreen = gameController.getSettings().isFullScreen();
+        setFullScreen(isFullScreen);
     }
 
     private void storeSettings() {
         SettingMemento memento = new SettingMemento();
         memento.setFullScreen(isFullScreen());
         gameController.saveSettings(controller.getProgramDir(), memento);
-    }
-
-    public void setLoaderViewToCenter(Task<String> loader) {
-        final StackPane sp = new StackPane();
-        final ProgressBar pb = new ProgressBar();
-        sp.getChildren().addAll(pb);
-        root.setCenter(sp);
-
-        pb.progressProperty().bind(loader.progressProperty());
-        pb.progressProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() >= 1) {
-                setGameViewForCenter();
-            }
-        });
-    }
-
-    public void open() {
-        setFullScreenExitHint("");
-        setFullScreenExitKeyCombination(CLOSE_GAME);
-        setWidth(1280);
-        setHeight(720);
-        setMinWidth(300);
-        setMinHeight(300);
-
-        createMainMenu();
-        File programDir = controller.getProgramDir();
-        initSavesList(programDir);
-        restoreSettings(programDir);
-        addEventHandler(KeyEvent.KEY_RELEASED, returnEvent);
-
-        root.setFocusTraversable(false);
-        root.setCenter(mainMenu);
-        Scene scene = new Scene(root);
-        setScene(scene);
-        show();
     }
 
     @Override

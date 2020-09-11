@@ -2,12 +2,15 @@ package game.view.launcher;
 
 import game.model.GameController;
 import game.view.menu.GameStage;
+import io.wsz.model.locale.LocaleKeys;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Properties;
 
 class Launcher {
     private final Stage stage;
@@ -26,32 +29,34 @@ class Launcher {
     }
 
     private void initLauncher(GameController gameController) {
-        StackPane root = new StackPane();
+        final StackPane root = new StackPane();
 
-        VBox menu = new VBox(10);
-        Button play = new Button("Play");
+        Properties locale = gameController.getController().getLocale();
+        final VBox menu = new VBox(10);
+        final Button play = new Button(locale.getProperty(LocaleKeys.START_GAME));
         play.setOnAction(event -> play(gameController));
-        Button plugins = new Button("Plugins");
+        final Button plugins = new Button(locale.getProperty(LocaleKeys.PLUGINS));
         plugins.setOnAction(event -> openPluginsTable(gameController));
-        Button exit = new Button("Exit");
+        final Button exit = new Button(locale.getProperty(LocaleKeys.EXIT));
         exit.setOnAction(event -> exit());
         menu.getChildren().addAll(play, plugins, exit);
         menu.setAlignment(Pos.CENTER);
         root.getChildren().addAll(menu);
 
-        Scene scene = new Scene(root);
+        final Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
     }
 
     private void play(GameController gameController) {
-        GameStage gameStage = new GameStage(gameController);
-        gameStage.open();
+        final GameStage gameStage = new GameStage(gameController);
+        gameStage.init();
+        gameStage.show();
         stage.close();
     }
 
     private void openPluginsTable(GameController gameController) {
-        Stage plugins = new GamePluginsTable(gameController);
+        final Stage plugins = new GamePluginsTable(gameController);
         plugins.initOwner(stage);
         plugins.show();
     }

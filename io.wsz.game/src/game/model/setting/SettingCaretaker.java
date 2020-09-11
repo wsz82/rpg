@@ -6,6 +6,7 @@ import java.io.*;
 
 public class SettingCaretaker {
     private static final String FILE_NAME = "game_settings";
+
     private final File programDir;
 
     public SettingCaretaker(File programDir) {

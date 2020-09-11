@@ -7,7 +7,7 @@ import io.wsz.model.item.Containable;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.locale.Locale;
+import io.wsz.model.locale.LocaleKeys;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -90,9 +90,9 @@ public class GiveToAdversary implements Executable, Externalizable {
                 String message;
                 Properties locale = controller.getLocale();
                 if (giving == pc) {
-                    message = locale.getProperty(Locale.RETURNED);
+                    message = locale.getProperty(LocaleKeys.RETURNED);
                 } else {
-                    message = locale.getProperty(Locale.RECEIVED);
+                    message = locale.getProperty(LocaleKeys.RECEIVED);
                 }
                 message = message + " " + availableAmount + " " + equipment.getAssetId(); //TODO change to name
                 DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);

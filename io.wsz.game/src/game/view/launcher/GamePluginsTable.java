@@ -2,6 +2,7 @@ package game.view.launcher;
 
 import game.model.GameController;
 import io.wsz.model.Controller;
+import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.plugin.PluginMetadata;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ import javafx.util.StringConverter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 public class GamePluginsTable extends Stage {
     private final ChoiceBox<PluginMetadata> activePluginCB = new ChoiceBox<>();
@@ -41,21 +43,23 @@ public class GamePluginsTable extends Stage {
         final VBox container = new VBox(10);
         container.setPadding(new Insets(10));
 
+        Properties locale = controller.getLocale();
+
         final TableView<PluginMetadata> table = new TableView<>();
-        final TableColumn<PluginMetadata, String> nameCol = new TableColumn<>("Name");
-        final TableColumn<PluginMetadata, Boolean> startCol = new TableColumn<>("Starting");
+        final TableColumn<PluginMetadata, String> nameCol = new TableColumn<>(locale.getProperty(LocaleKeys.NAME));
+        final TableColumn<PluginMetadata, Boolean> startCol = new TableColumn<>(locale.getProperty(LocaleKeys.STARTING));
 
         final HBox activePluginBox = new HBox(5);
         activePluginBox.setAlignment(Pos.CENTER);
-        final Label activePluginLabel = new Label("Active plugin");
+        final Label activePluginLabel = new Label(locale.getProperty(LocaleKeys.ACTIVE_PLUGIN));
         activePluginLabel.setAlignment(Pos.CENTER);
         activePluginBox.getChildren().addAll(activePluginLabel, activePluginCB);
 
         final HBox buttons = new HBox(5);
         buttons.setAlignment(Pos.CENTER);
-        final Button cancel = new Button("Cancel");
+        final Button cancel = new Button(locale.getProperty(LocaleKeys.CANCEL));
         cancel.setAlignment(Pos.CENTER);
-        final Button ok = new Button("Accept");
+        final Button ok = new Button(locale.getProperty(LocaleKeys.ACCEPT));
         ok.setAlignment(Pos.CENTER);
         buttons.getChildren().addAll(cancel, ok);
 
@@ -88,8 +92,10 @@ public class GamePluginsTable extends Stage {
     }
 
     private void alertNoPluginToActivate() {
+        Properties locale = controller.getLocale();
+        String message = locale.getProperty(LocaleKeys.NO_PLUGIN_CHOSEN);
         final Alert alert = new Alert(
-                Alert.AlertType.ERROR, "No starting plugin is chosen", ButtonType.CANCEL);
+                Alert.AlertType.ERROR, message, ButtonType.CANCEL);
         alert.showAndWait()
                 .filter(r -> r == ButtonType.CANCEL)
                 .ifPresent(r -> alert.close());

@@ -3,6 +3,7 @@ package game.view.menu;
 import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
+import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.sizes.FontSize;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
@@ -11,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -21,22 +21,31 @@ import javafx.stage.Screen;
 import javafx.util.StringConverter;
 
 import java.io.File;
+import java.util.Properties;
 
 class SettingsMenu extends StackPane {
     private final GameController gameController;
     private final Settings settings;
     private final Controller controller;
     private final GameStage gameStage;
+    private final SettingsParent parent;
+    private final Button graphics;
+    private final Button game;
+    private final Button back;
 
-    private StackPane graphics;
-    private StackPane game;
-    private Node parentToReturn;
     private BorderPane root;
     private StringConverter<Number> stringConverter;
     private Slider resHeightInput;
     private Slider resWidthInput;
+    private Label mapScrollLabel;
+    private Label dialogScrollLabel;
+    private Label centerOnPcLabel;
+    private Label stopOnInventoryLabel;
+    private Label languageLabel;
+    private Button backToSettings;
 
-    public SettingsMenu(GameStage gameStage, GameController gameController) {
+    public SettingsMenu(GameStage gameStage, GameController gameController, SettingsParent parent) {
+        this.parent = parent;
         this.gameStage = gameStage;
         this.gameController = gameController;
         this.settings = gameController.getSettings();
@@ -44,41 +53,45 @@ class SettingsMenu extends StackPane {
         final VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
-        final Button graphics = new Button("Graphics");
+        Properties locale = controller.getLocale();
+        graphics = new Button(locale.getProperty(LocaleKeys.GRAPHICS));
         graphics.setOnAction(event -> openGraphicsSettings());
-        final Button game = new Button("Game");
+        game = new Button(locale.getProperty(LocaleKeys.GAME));
         game.setOnAction(event -> openGameSettings());
-        final Button back = new Button("Back");
+        back = new Button(locale.getProperty(LocaleKeys.BACK));
         back.setOnAction(event -> goBackToMenu());
 
         buttons.getChildren().addAll(graphics, game, back);
         getChildren().addAll(buttons);
     }
 
-    private void openGameSettings() {
-        if (game == null) {
-            initGameSettings();
-        }
-        root.setCenter(game);
+    void open(BorderPane root){
+        this.root = root;
     }
 
-    private void initGameSettings() {
-        game = new StackPane();
+    private void openGameSettings() {
+        StackPane gameSettingsContainer = getGameSettings();
+        root.setCenter(gameSettingsContainer);
+    }
+
+    private StackPane getGameSettings() {
+        StackPane gameContainer = new StackPane();
 
         final VBox container = new VBox(10);
         container.setAlignment(Pos.CENTER);
 
-        final HBox gameScrollBox = new HBox(5);
-        gameScrollBox.setAlignment(Pos.CENTER);
-        final Label gameScrollLabel = new Label("Game scroll speed");
-        final Slider gameScrollSpeed = new Slider();
-        gameScrollBox.getChildren().addAll(gameScrollLabel, gameScrollSpeed);
-        gameScrollSpeed.setMaxWidth(getWidth()/10);
-        hookUpGameScrollSpeedEvents(gameScrollSpeed);
+        Properties locale = controller.getLocale();
+        final HBox mapScrollBox = new HBox(5);
+        mapScrollBox.setAlignment(Pos.CENTER);
+        mapScrollLabel = new Label(locale.getProperty(LocaleKeys.MAP_SCROLL_SPEED));
+        final Slider mapScrollSpeed = new Slider();
+        mapScrollBox.getChildren().addAll(mapScrollLabel, mapScrollSpeed);
+        mapScrollSpeed.setMaxWidth(getWidth()/10);
+        hookUpGameScrollSpeedEvents(mapScrollSpeed);
 
         final HBox dialogScrollBox = new HBox(5);
         dialogScrollBox.setAlignment(Pos.CENTER);
-        final Label dialogScrollLabel = new Label("Dialog scroll speed");
+        dialogScrollLabel = new Label(locale.getProperty(LocaleKeys.DIALOG_SCROLL_SPEED));
         final Slider dialogScrollSpeed = new Slider();
         dialogScrollBox.getChildren().addAll(dialogScrollLabel, dialogScrollSpeed);
         dialogScrollSpeed.setMaxWidth(getWidth()/10);
@@ -86,7 +99,7 @@ class SettingsMenu extends StackPane {
 
         final HBox centerOnPcBox = new HBox(5);
         centerOnPcBox.setAlignment(Pos.CENTER);
-        final Label centerOnPcLabel = new Label("Center on PC");
+        centerOnPcLabel = new Label(locale.getProperty(LocaleKeys.CENTER_ON_PC));
         final CheckBox centerOnPcCB = new CheckBox();
         centerOnPcBox.getChildren().addAll(centerOnPcLabel, centerOnPcCB);
         centerOnPcCB.setMaxWidth(getWidth()/10);
@@ -94,7 +107,7 @@ class SettingsMenu extends StackPane {
 
         final HBox stopOnInventoryBox = new HBox(5);
         stopOnInventoryBox.setAlignment(Pos.CENTER);
-        final Label stopOnInventoryLabel = new Label("Pause on inventory");
+        stopOnInventoryLabel = new Label(locale.getProperty(LocaleKeys.PAUSE_ON_INVENTORY));
         final CheckBox stopOnInventoryCB = new CheckBox();
         stopOnInventoryBox.getChildren().addAll(stopOnInventoryLabel, stopOnInventoryCB);
         stopOnInventoryCB.setMaxWidth(getWidth()/10);
@@ -102,22 +115,23 @@ class SettingsMenu extends StackPane {
 
         final HBox languageBox = new HBox(5);
         languageBox.setAlignment(Pos.CENTER);
-        final Label languageLabel = new Label("Language");
+        languageLabel = new Label(locale.getProperty(LocaleKeys.LANGUAGE));
         final ChoiceBox<String> languageCB = new ChoiceBox<>(getLanguages());
-        String locale = settings.getLocale();
-        if (locale == null) {
-            locale = Paths.ENGLISH;
+        String language = settings.getLanguage();
+        if (language == null) {
+            language = Paths.ENGLISH;
         }
-        languageCB.setValue(locale);
+        languageCB.setValue(language);
         languageBox.getChildren().addAll(languageLabel, languageCB);
         languageCB.setMaxWidth(getWidth()/10);
         hookUpLanguageEvents(languageCB);
 
-        final Button back = new Button("Back");
-        back.setOnAction(event -> goBackToSettings());
+        backToSettings = new Button(locale.getProperty(LocaleKeys.BACK));
+        backToSettings.setOnAction(event -> goBackToSettings());
 
-        container.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, stopOnInventoryBox, languageBox, back);
-        game.getChildren().addAll(container);
+        container.getChildren().addAll(mapScrollBox, dialogScrollBox, centerOnPcBox, stopOnInventoryBox, languageBox, backToSettings);
+        gameContainer.getChildren().addAll(container);
+        return gameContainer;
     }
 
     private void hookUpLanguageEvents(ChoiceBox<String> languageCB) {
@@ -126,9 +140,23 @@ class SettingsMenu extends StackPane {
             if (language == null) {
                 language = Paths.ENGLISH;
             }
-            settings.setLocale(language);
+            settings.setLanguage(language);
             gameController.setLocale(language);
+            updateNodesDisplayText();
         });
+    }
+
+    private void updateNodesDisplayText() {
+        Properties locale = controller.getLocale();
+        graphics.setText(locale.getProperty(LocaleKeys.GRAPHICS));
+        game.setText(locale.getProperty(LocaleKeys.GAME));
+        back.setText(locale.getProperty(LocaleKeys.BACK));
+        mapScrollLabel.setText(locale.getProperty(LocaleKeys.MAP_SCROLL_SPEED));
+        dialogScrollLabel.setText(locale.getProperty(LocaleKeys.DIALOG_SCROLL_SPEED));
+        centerOnPcLabel.setText(locale.getProperty(LocaleKeys.CENTER_ON_PC));
+        stopOnInventoryLabel.setText(locale.getProperty(LocaleKeys.PAUSE_ON_INVENTORY));
+        languageLabel.setText(locale.getProperty(LocaleKeys.LANGUAGE));
+        backToSettings.setText(locale.getProperty(LocaleKeys.BACK));
     }
 
     private ObservableList<String> getLanguages() {
@@ -136,6 +164,7 @@ class SettingsMenu extends StackPane {
         File programDir = controller.getProgramDir();
         File locales = new File(programDir + Paths.LOCALE_DIR);
         File[] languagesPropertiesFiles = locales.listFiles();
+        if (languagesPropertiesFiles == null) return languages;
         for (File languageFile : languagesPropertiesFiles) {
             if (languageFile.isDirectory()) continue;
             String name = languageFile.getName();
@@ -149,16 +178,12 @@ class SettingsMenu extends StackPane {
 
     private void hookUpStopOnInventoryEvents(CheckBox cb) {
         cb.setSelected(settings.isPauseOnInventory());
-        cb.setOnAction(e -> {
-            settings.setPauseOnInventory(cb.isSelected());
-        });
+        cb.setOnAction(e -> settings.setPauseOnInventory(cb.isSelected()));
     }
 
     private void hookUpCenterOnPCEvents(CheckBox cb) {
         cb.setSelected(settings.isCenterOnPC());
-        cb.setOnAction(e -> {
-            settings.setCenterOnPC(cb.isSelected());
-        });
+        cb.setOnAction(e -> settings.setCenterOnPC(cb.isSelected()));
     }
 
     private void hookUpDialogScrollSpeedEvents(Slider s) {
@@ -166,9 +191,7 @@ class SettingsMenu extends StackPane {
         s.setMax(1);
         s.setBlockIncrement(0.01);
         s.setValue(settings.getDialogScrollSpeed());
-        s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            settings.setDialogScrollSpeed(s.getValue());
-        });
+        s.valueProperty().addListener((observable, oldValue, newValue) -> settings.setDialogScrollSpeed(s.getValue()));
     }
 
     private void hookUpGameScrollSpeedEvents(Slider s) {
@@ -176,24 +199,24 @@ class SettingsMenu extends StackPane {
         s.setMax(1);
         s.setBlockIncrement(0.01);
         s.setValue(settings.getGameScrollSpeed());
-        s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            settings.setGameScrollSpeed(s.getValue());
-        });
+        s.valueProperty().addListener((observable, oldValue, newValue) -> settings.setGameScrollSpeed(s.getValue()));
     }
 
     private void goBackToMenu() {
-        root.setCenter(parentToReturn);
+        if (parent == SettingsParent.MAIN_MENU) {
+            gameStage.setMainMenuForCenter();
+        } else {
+            gameStage.setGameMenuForCenter();
+        }
     }
 
     private void openGraphicsSettings() {
-        if (graphics == null) {
-            initGraphicsSettings();
-        }
-        root.setCenter(graphics);
+        StackPane graphicsContainer = getGraphicsSettings();
+        root.setCenter(graphicsContainer);
     }
 
-    private void initGraphicsSettings() {
-        graphics = new StackPane();
+    private StackPane getGraphicsSettings() {
+        StackPane graphicsContainer = new StackPane();
 
         stringConverter = new StringConverter<>() {
             @Override
@@ -210,23 +233,24 @@ class SettingsMenu extends StackPane {
         final VBox settings = new VBox(10);
         settings.setAlignment(Pos.CENTER);
 
+        Properties locale = controller.getLocale();
         final HBox fullScreenBox = new HBox(5);
         fullScreenBox.setAlignment(Pos.CENTER);
-        final Label fullScreenLabel = new Label("Full screen");
+        final Label fullScreenLabel = new Label(locale.getProperty(LocaleKeys.FULL_SCREEN));
         final CheckBox fullScreenCB = new CheckBox();
         fullScreenBox.getChildren().addAll(fullScreenLabel, fullScreenCB);
         hookUpFullScreenEvents(fullScreenCB);
 
         final HBox resizeWithResolutionBox = new HBox(5);
         resizeWithResolutionBox.setAlignment(Pos.CENTER);
-        final Label resizeWithResolutionLabel = new Label("Resize with resolution");
+        final Label resizeWithResolutionLabel = new Label(locale.getProperty(LocaleKeys.RESIZE_WITH_RESOLUTION));
         final CheckBox resizeWithResolutionCB = new CheckBox();
         resizeWithResolutionBox.getChildren().addAll(resizeWithResolutionLabel, resizeWithResolutionCB);
         hookUpResizeWithResolutionEvents(resizeWithResolutionCB);
 
         final HBox resWidthBox = new HBox(5);
         resWidthBox.setAlignment(Pos.CENTER);
-        final Label resWidthLabel = new Label("Resolution width");
+        final Label resWidthLabel = new Label(locale.getProperty(LocaleKeys.HORIZONTAL_RESOLUTION));
         final Label resWidthActual = new Label();
         resWidthActual.setMinWidth(getWidth()/20);
         resWidthInput = new Slider();
@@ -235,7 +259,7 @@ class SettingsMenu extends StackPane {
 
         final HBox resHeightBox = new HBox(5);
         resHeightBox.setAlignment(Pos.CENTER);
-        final Label resHeightLabel = new Label("Resolution height");
+        final Label resHeightLabel = new Label(locale.getProperty(LocaleKeys.VERTICAL_RESOLUTION));
         final Label resHeightActual = new Label();
         resHeightActual.setMinWidth(getWidth()/20);
         resHeightInput = new Slider();
@@ -244,16 +268,17 @@ class SettingsMenu extends StackPane {
 
         final HBox fontBox = new HBox(5);
         fontBox.setAlignment(Pos.CENTER);
-        final Label fontLabel = new Label("Font size");
+        final Label fontLabel = new Label(locale.getProperty(LocaleKeys.FONT_SIZE));
         final ChoiceBox<FontSize> fontSizeCB = new ChoiceBox<>();
         fontBox.getChildren().addAll(fontLabel, fontSizeCB);
         hookUpFontSizeEvents(fontSizeCB);
 
-        final Button back = new Button("Back");
-        back.setOnAction(event -> goBackToSettings());
+        final Button backToSettingsFromGraphics = new Button(locale.getProperty(LocaleKeys.BACK));
+        backToSettingsFromGraphics.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(fullScreenBox, resizeWithResolutionBox, resWidthBox, resHeightBox, fontBox, back);
-        graphics.getChildren().addAll(settings);
+        settings.getChildren().addAll(fullScreenBox, resizeWithResolutionBox, resWidthBox, resHeightBox, fontBox, backToSettingsFromGraphics);
+        graphicsContainer.getChildren().addAll(settings);
+        return graphicsContainer;
     }
 
     private void hookUpResWidthEvents(Slider widthSlider, Label l) {
@@ -331,12 +356,11 @@ class SettingsMenu extends StackPane {
 
     private void hookUpFullScreenEvents(CheckBox cb) {
         cb.setSelected(gameStage.isFullScreen());
-        cb.setOnAction(event -> {
-            changeFullScreenSetting(cb.isSelected());
-        });
+        cb.setOnAction(event -> changeFullScreenSetting(cb.isSelected()));
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
+        settings.setFullScreen(isSelected);
         gameStage.setFullScreen(isSelected);
         Coords current = controller.getCurPos();
         current.x = 0;
@@ -345,10 +369,5 @@ class SettingsMenu extends StackPane {
 
     private void goBackToSettings(){
         root.setCenter(this);
-    }
-
-    void open(BorderPane root, Node parentToReturn){
-        this.root = root;
-        this.parentToReturn = parentToReturn;
     }
 }

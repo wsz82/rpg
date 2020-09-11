@@ -16,24 +16,26 @@ public class Settings implements Externalizable {
     private FontSize fontSize;
     private double gameScrollSpeed;
     private double dialogScrollSpeed;
-    private boolean centerOnPC;
-    private boolean pauseOnInventory;
+    private boolean isCenterOnPC;
+    private boolean isPauseOnInventory;
     private int resolutionWidth;
     private int resolutionHeight;
-    private boolean showBar;
-    private String locale;
+    private boolean isShowBar;
+    private String language;
+    private boolean isFullScreen;
 
     public void initDefaultSettings() {
         barPart = 0.08;
         gameScrollSpeed = 0.2;
         dialogScrollSpeed = 0.2;
-        centerOnPC = false;
-        pauseOnInventory = true;
+        isCenterOnPC = false;
+        isPauseOnInventory = true;
         resolutionWidth = 1600;
         resolutionHeight = 900;
-        showBar = true;
-        locale = "English";
+        isShowBar = true;
+        language = "English";
         fontSize = FontSize.M;
+        isFullScreen = true;
     }
 
     public double getBarPart() {
@@ -61,19 +63,19 @@ public class Settings implements Externalizable {
     }
 
     public boolean isCenterOnPC() {
-        return centerOnPC;
+        return isCenterOnPC;
     }
 
     public void setCenterOnPC(boolean centerOnPC) {
-        this.centerOnPC = centerOnPC;
+        this.isCenterOnPC = centerOnPC;
     }
 
     public boolean isPauseOnInventory() {
-        return pauseOnInventory;
+        return isPauseOnInventory;
     }
 
     public void setPauseOnInventory(boolean pauseOnInventory) {
-        this.pauseOnInventory = pauseOnInventory;
+        this.isPauseOnInventory = pauseOnInventory;
     }
 
     public int getResolutionWidth() {
@@ -97,19 +99,19 @@ public class Settings implements Externalizable {
     }
 
     public boolean isShowBar() {
-        return showBar;
+        return isShowBar;
     }
 
     public void setShowBar(boolean showBar) {
-        this.showBar = showBar;
+        this.isShowBar = showBar;
     }
 
-    public String getLocale() {
-        return locale;
+    public String getLanguage() {
+        return language;
     }
 
-    public void setLocale(String locale) {
-        this.locale = locale;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public FontSize getFontSize() {
@@ -121,18 +123,27 @@ public class Settings implements Externalizable {
         this.fontSize = fontSize;
     }
 
+    public boolean isFullScreen() {
+        return isFullScreen;
+    }
+
+    public void setFullScreen(boolean fullScreen) {
+        isFullScreen = fullScreen;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeDouble(barPart);
         out.writeObject(fontSize);
         out.writeDouble(gameScrollSpeed);
         out.writeDouble(dialogScrollSpeed);
-        out.writeBoolean(centerOnPC);
-        out.writeBoolean(pauseOnInventory);
+        out.writeBoolean(isCenterOnPC);
+        out.writeBoolean(isPauseOnInventory);
         out.writeInt(resolutionWidth);
         out.writeInt(resolutionHeight);
-        out.writeBoolean(showBar);
-        out.writeObject(locale);
+        out.writeBoolean(isShowBar);
+        out.writeObject(language);
+        out.writeBoolean(isFullScreen);
     }
 
     @Override
@@ -141,11 +152,12 @@ public class Settings implements Externalizable {
         fontSize = (FontSize) in.readObject();
         gameScrollSpeed = in.readDouble();
         dialogScrollSpeed = in.readDouble();
-        centerOnPC = in.readBoolean();
-        pauseOnInventory = in.readBoolean();
+        isCenterOnPC = in.readBoolean();
+        isPauseOnInventory = in.readBoolean();
         resolutionWidth = in.readInt();
         resolutionHeight = in.readInt();
-        showBar = in.readBoolean();
-        locale = (String) in.readObject();
+        isShowBar = in.readBoolean();
+        language = (String) in.readObject();
+        isFullScreen = in.readBoolean();
     }
 }
