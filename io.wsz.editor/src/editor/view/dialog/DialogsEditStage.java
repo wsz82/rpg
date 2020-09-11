@@ -145,7 +145,6 @@ public class DialogsEditStage extends ChildStage {
             newID = getUniqueQuestionsListID(newID);
             selectedQuestionList.setID(newID);
             updateAnswersQuestionsListID(oldID, newID);
-            answersCenter.refreshQuestionsListForAnswerCB();
         });
         questionsListsView.setCellFactory(param -> new TextFieldListCell<>(new StringConverter<>() {
             @Override
@@ -259,7 +258,6 @@ public class DialogsEditStage extends ChildStage {
             newID = getUniqueAnswersListID(newID);
             selectedAnswersList.setID(newID);
             updateQuestionsAnswersListID(oldID, newID);
-            questionsCenter.refreshQuestionAnswerCB();
             refreshStartAnswerCB();
         });
         answersListView.setCellFactory(param -> new TextFieldListCell<>(new StringConverter<>() {

@@ -11,8 +11,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
@@ -25,10 +25,8 @@ public class QuestionsCenterView {
     private final VBox questionsCenter = new VBox(5);
     private final TableView<QuestionItem> questionsTableView = new TableView<>();
     private final VBox questionDetails = new VBox(5);
-    private final HBox questionAnswersListBox = new HBox(5);
     private final TextArea questionText = new TextArea();
 
-    private ChoiceBox<AnswersList> questionAnswersListCB;
     private RequirementsListView questionRequirementsListView;
     private ScriptArea scriptArea;
 
@@ -57,22 +55,6 @@ public class QuestionsCenterView {
         ObservableList<QuestionItem> questionItems = questionsTableView.getItems();
         List<Question> questions = questionItemsToQuestions(questionItems);
         questionsList.setQuestions(questions);
-    }
-
-    public void refreshQuestionAnswerCB() {
-        boolean wasCreated = questionAnswersListCB != null;
-        AnswersList temp = null;
-        if (wasCreated) {
-            temp = questionAnswersListCB.getValue();
-        }
-        questionAnswersListBox.getChildren().remove(questionAnswersListCB);
-        questionAnswersListCB = new ChoiceBox<>(answersLists);
-        questionAnswersListCB.setMaxWidth(100);
-        questionAnswersListBox.getChildren().add(questionAnswersListCB);
-        if (wasCreated) {
-            questionAnswersListCB.setValue(temp);
-        }
-        hookUpQuestionAnswerCBEvents();
     }
 
     public void saveCurrentQuestionsList(QuestionsList selectedQuestionsList) {
@@ -115,7 +97,6 @@ public class QuestionsCenterView {
         questionText.setText(question.getText());
         String answerID = question.getAnswersListID();
         AnswersList answersList = getAnswersListWithID(answerID);
-        questionAnswersListCB.setValue(answersList);
         questionRequirementsListView.clear();
         questionRequirementsListView.populate(question.getRequirements());
         scriptArea.restoreScript(question.getBeginScript());
@@ -131,12 +112,6 @@ public class QuestionsCenterView {
 
     private void setUpQuestionDetails() {
         questionDetails.setVisible(false);
-        final Label answerLabel = new Label("NPC text");
-        questionAnswersListBox.getChildren().addAll(answerLabel);
-        final HBox questionProperties = new HBox(5);
-        refreshQuestionAnswerCB();
-        questionProperties.getChildren().addAll(questionAnswersListBox);
-
         questionRequirementsListView = new RequirementsListView(editorController);
         final ScrollPane requirementsScrollPane = questionRequirementsListView.getListScrollPane();
 
@@ -144,7 +119,7 @@ public class QuestionsCenterView {
         scriptArea.init();
         final VBox scriptArea = this.scriptArea.getScriptArea();
 
-        questionDetails.getChildren().addAll(questionText, questionProperties, requirementsScrollPane, scriptArea);
+        questionDetails.getChildren().addAll(questionText, requirementsScrollPane, scriptArea);
     }
 
     private void saveCurrentQuestionItem() {
@@ -152,23 +127,6 @@ public class QuestionsCenterView {
         if (qi != null) {
             saveQuestionItem(qi);
         }
-    }
-
-    private void hookUpQuestionAnswerCBEvents() {
-        questionAnswersListCB.valueProperty().addListener((observable, oldAnswer, newAnswer) -> {
-            QuestionItem qi = questionsTableView.getSelectionModel().getSelectedItem();
-            if (qi == null) {
-                return;
-            }
-            String answerID;
-            if (newAnswer == null) {
-                answerID = null;
-            } else {
-                answerID = newAnswer.getID();
-            }
-            qi.question.setAnswersListID(answerID);
-            questionsTableView.refresh();
-        });
     }
 
     private void setUpQuestionsTable() {
@@ -211,27 +169,45 @@ public class QuestionsCenterView {
         textCol.setSortable(false);
         questionsTableView.getColumns().add(textCol);
 
-        TableColumn<QuestionItem, String> answerCol = new TableColumn<>("NPC text");
+        TableColumn<QuestionItem, AnswersList> answerCol = new TableColumn<>("NPC text");
         answerCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
-            protected String computeValue() {
+            protected AnswersList computeValue() {
                 QuestionItem questionItem = p.getValue();
-                if (questionItem == null) return "";
+                if (questionItem == null) return null;
                 Question question = questionItem.question;
-                if (question == null) return "";
-                return question.getAnswersListID();
+                if (question == null) return null;
+                String answersListID = question.getAnswersListID();
+                if (answersListID == null) return null;
+                return answersLists.stream()
+                        .filter(a -> {
+                            if (a == null) return false;
+                            String id = a.getID();
+                            if (id == null) return false;
+                            return id.equals(answersListID);
+                        })
+                        .findFirst()
+                        .orElse(null);
             }
         });
-        answerCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        answerCol.setEditable(false);
+        answerCol.setEditable(true);
+        answerCol.setCellFactory(ChoiceBoxTableCell.forTableColumn(answersLists));
         answerCol.setSortable(false);
+        answerCol.setOnEditCommit(t -> {
+            AnswersList newList = t.getNewValue();
+            if (newList == null) return;
+            QuestionItem item = questionsTableView.getSelectionModel().getSelectedItem();
+            if (item == null) return;
+            Question question = item.question;
+            if (question == null) return;
+            question.setAnswersListID(newList.getID());
+        });
         questionsTableView.getColumns().add(answerCol);
     }
 
     private void disableQuestionDetails() {
         questionDetails.setVisible(false);
         questionText.setText(null);
-        questionAnswersListCB.setValue(null);
         scriptArea.clearArea();
     }
 
@@ -239,11 +215,6 @@ public class QuestionsCenterView {
         Question question = qi.question;
         question.setText(questionText.getText());
         question.setRequirements(questionRequirementsListView.getOutput());
-        AnswersList answersList = questionAnswersListCB.getValue();
-        if (answersList != null) {
-            String answerID = answersList.getID();
-            question.setAnswersListID(answerID);
-        }
         question.setBeginScript(scriptArea.getScript());
         questionsTableView.refresh();
     }
