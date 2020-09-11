@@ -323,23 +323,31 @@ public class DialogView {
     }
 
     private TextFlow getDialogTextFlow(DialogItem di) {
-        String speakerName = di.getSpeakerName();
-        String ownerText = speakerName + " - ";
-        Text owner = new Text(ownerText);
-        owner.setFont(new Font(fontSize));
-        Color speakerNameColor = Color.RED;
-        if (di.getSpeakerMark() == SpeakerMark.PC) {
-            speakerNameColor = Color.BLUE;
+        TextFlow tf = new TextFlow();
+        Color answerFill;
+        if (di.getSpeakerMark() == SpeakerMark.INFO) {
+            answerFill = Color.WHITE;
+        } else {
+            answerFill = Color.BLACK;
+            String speakerName = di.getSpeakerName();
+            String ownerText = speakerName + " - ";
+            Text owner = new Text(ownerText);
+            owner.setFont(new Font(fontSize));
+            Color speakerNameColor = Color.RED;
+            if (di.getSpeakerMark() == SpeakerMark.PC) {
+                speakerNameColor = Color.BLUE;
+            }
+            owner.setFill(speakerNameColor);
+            tf.getChildren().add(owner);
         }
-        owner.setFill(speakerNameColor);
 
         String answerText = di.getText();
         Text answer = new Text();
+        answer.setFill(answerFill);
         answer.setFont(new Font(fontSize));
         answer.setText(answerText);
 
-        TextFlow tf = new TextFlow();
-        tf.getChildren().addAll(owner, answer);
+        tf.getChildren().add(answer);
         tf.setTextAlignment(TextAlignment.JUSTIFY);
         tf.setMaxWidth(dialogWidth);
         return tf;

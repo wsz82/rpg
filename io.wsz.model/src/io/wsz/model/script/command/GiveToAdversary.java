@@ -1,7 +1,10 @@
 package io.wsz.model.script.command;
 
 import io.wsz.model.Controller;
+import io.wsz.model.dialog.DialogItem;
+import io.wsz.model.dialog.SpeakerMark;
 import io.wsz.model.item.Containable;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
 
@@ -80,6 +83,18 @@ public class GiveToAdversary implements Executable, Externalizable {
                 for (int i = 0; i < availableAmount; i++) {
                     receivingCo.getItems().add(equipment);
                 }
+
+
+                Creature pc = controller.getDialogMemento().getPc();
+                String message;
+                if (giving == pc) {
+                    message = "Returned";
+                } else {
+                    message = "Received";
+                }
+                message = message + " " + availableAmount + " " + equipment.getAssetId(); //TODO change to name
+                DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
+                controller.getDialogMemento().getDialogs().add(di);
             }
         }
     }

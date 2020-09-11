@@ -2,5 +2,6 @@ package io.wsz.model.dialog;
 
 public enum SpeakerMark {
     PC,
-    NPC
+    NPC,
+    INFO
 }

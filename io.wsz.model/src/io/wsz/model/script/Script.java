@@ -17,9 +17,8 @@ import static io.wsz.model.script.ScriptKeyWords.*;
 public class Script implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private ArrayDeque<Executable> executables;
-
     private String initialText;
+    private ArrayDeque<Executable> executables;
 
     public static Script parseScript(String s) {
         if (s == null || s.isEmpty()) return null;
