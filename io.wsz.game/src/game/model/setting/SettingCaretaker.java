@@ -27,10 +27,9 @@ public class SettingCaretaker {
         boolean mementoExists = new File(programDir + File.separator + FILE_NAME).exists();
 
         if (!mementoExists) {
-            return new SettingMemento(true, Sizes.getFontSize(),
-                    Settings.getGameScrollSpeed(), Settings.getDialogScrollSpeed(), Settings.isCenterOnPC(),
-                    Settings.isPauseOnInventory(), Settings.getResolutionWidth(), Settings.getResolutionHeight(),
-                    Sizes.isResizeWithResolution());
+            Settings settings = new Settings();
+            settings.initDefaultSettings();
+            return new SettingMemento(true, settings, Sizes.isResizeWithResolution());
         }
         SettingMemento memento = new SettingMemento();
         try (

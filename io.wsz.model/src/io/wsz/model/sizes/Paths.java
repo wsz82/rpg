@@ -55,4 +55,8 @@ public class Paths {
 
     public static final String ARROW_RIGHT_PNG = "arrow_right" + PNG;
     public static final String ARROW_LEFT_PNG = "arrow_left" + PNG;
+    public static final String LOCALE = "locale";
+    public static final String LOCALE_DIR = File.separator + LOCALE;
+    public static final String DOT_PROPERTIES = ".properties";
+    public static final String ENGLISH = "English";
 }

@@ -1,83 +1,151 @@
 package game.model.setting;
 
 import io.wsz.model.Controller;
+import io.wsz.model.sizes.FontSize;
 import io.wsz.model.sizes.Sizes;
 
-public class Settings {
-    private static double barPart = 0.08;
-    private static double gameScrollSpeed = 0.2;
-    private static double dialogScrollSpeed = 0.2;
-    private static boolean centerOnPC = false;
-    private static boolean pauseOnInventory = true;
-    private static int resolutionWidth = 1600;
-    private static int resolutionHeight = 900;
-    private static boolean showBar = true;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-    public static double getBarPart() {
+public class Settings implements Externalizable {
+    private static final long serialVersionUID = 1L;
+
+    private double barPart;
+    private FontSize fontSize;
+    private double gameScrollSpeed;
+    private double dialogScrollSpeed;
+    private boolean centerOnPC;
+    private boolean pauseOnInventory;
+    private int resolutionWidth;
+    private int resolutionHeight;
+    private boolean showBar;
+    private String locale;
+
+    public void initDefaultSettings() {
+        barPart = 0.08;
+        gameScrollSpeed = 0.2;
+        dialogScrollSpeed = 0.2;
+        centerOnPC = false;
+        pauseOnInventory = true;
+        resolutionWidth = 1600;
+        resolutionHeight = 900;
+        showBar = true;
+        locale = "English";
+        fontSize = FontSize.M;
+    }
+
+    public double getBarPart() {
         return barPart;
     }
 
-    public static void setBarPart(double barPart) {
-        Settings.barPart = barPart;
+    public void setBarPart(double barPart) {
+        this.barPart = barPart;
     }
 
-    public static double getGameScrollSpeed() {
+    public double getGameScrollSpeed() {
         return gameScrollSpeed;
     }
 
-    public static void setGameScrollSpeed(double gameScrollSpeed) {
-        Settings.gameScrollSpeed = gameScrollSpeed;
+    public void setGameScrollSpeed(double gameScrollSpeed) {
+        this.gameScrollSpeed = gameScrollSpeed;
     }
 
-    public static double getDialogScrollSpeed() {
+    public double getDialogScrollSpeed() {
         return dialogScrollSpeed;
     }
 
-    public static void setDialogScrollSpeed(double dialogScrollSpeed) {
-        Settings.dialogScrollSpeed = dialogScrollSpeed;
+    public void setDialogScrollSpeed(double dialogScrollSpeed) {
+        this.dialogScrollSpeed = dialogScrollSpeed;
     }
 
-    public static boolean isCenterOnPC() {
+    public boolean isCenterOnPC() {
         return centerOnPC;
     }
 
-    public static void setCenterOnPC(boolean centerOnPC) {
-        Settings.centerOnPC = centerOnPC;
+    public void setCenterOnPC(boolean centerOnPC) {
+        this.centerOnPC = centerOnPC;
     }
 
-    public static boolean isPauseOnInventory() {
+    public boolean isPauseOnInventory() {
         return pauseOnInventory;
     }
 
-    public static void setPauseOnInventory(boolean pauseOnInventory) {
-        Settings.pauseOnInventory = pauseOnInventory;
+    public void setPauseOnInventory(boolean pauseOnInventory) {
+        this.pauseOnInventory = pauseOnInventory;
     }
 
-    public static int getResolutionWidth() {
+    public int getResolutionWidth() {
         return resolutionWidth;
     }
 
-    public static void setResolutionWidth(int resolutionWidth, Controller controller) {
+    public void setResolutionWidth(int resolutionWidth, Controller controller) {
         Sizes.setReloadImages(true);
         Sizes.setMeter(resolutionWidth, controller);
-        Settings.resolutionWidth = resolutionWidth;
+        this.resolutionWidth = resolutionWidth;
     }
 
-    public static int getResolutionHeight() {
+    public int getResolutionHeight() {
         return resolutionHeight;
     }
 
-    public static void setResolutionHeight(int resolutionHeight, Controller controller) {
+    public void setResolutionHeight(int resolutionHeight, Controller controller) {
         Sizes.setReloadImages(true);
         Sizes.setVerticalMeter(resolutionHeight, controller);
-        Settings.resolutionHeight = resolutionHeight;
+        this.resolutionHeight = resolutionHeight;
     }
 
-    public static boolean isShowBar() {
+    public boolean isShowBar() {
         return showBar;
     }
 
-    public static void setShowBar(boolean showBar) {
-        Settings.showBar = showBar;
+    public void setShowBar(boolean showBar) {
+        this.showBar = showBar;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
+    public FontSize getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(FontSize fontSize) {
+        Sizes.setReloadDialogImages(true);
+        this.fontSize = fontSize;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeDouble(barPart);
+        out.writeObject(fontSize);
+        out.writeDouble(gameScrollSpeed);
+        out.writeDouble(dialogScrollSpeed);
+        out.writeBoolean(centerOnPC);
+        out.writeBoolean(pauseOnInventory);
+        out.writeInt(resolutionWidth);
+        out.writeInt(resolutionHeight);
+        out.writeBoolean(showBar);
+        out.writeObject(locale);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        barPart = in.readDouble();
+        fontSize = (FontSize) in.readObject();
+        gameScrollSpeed = in.readDouble();
+        dialogScrollSpeed = in.readDouble();
+        centerOnPC = in.readBoolean();
+        pauseOnInventory = in.readBoolean();
+        resolutionWidth = in.readInt();
+        resolutionHeight = in.readInt();
+        showBar = in.readBoolean();
+        locale = (String) in.readObject();
     }
 }

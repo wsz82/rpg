@@ -97,7 +97,7 @@ public class GameStage extends Stage {
     }
 
     private void openSettings() {
-        SettingsMenu settingsMenu = new SettingsMenu(this, controller);
+        SettingsMenu settingsMenu = new SettingsMenu(this, gameController);
         parentToReturn = root.getCenter();
         root.setCenter(settingsMenu);
         settingsMenu.open(root, parentToReturn);
@@ -316,7 +316,9 @@ public class GameStage extends Stage {
     }
 
     private void restoreSettings(File programDir) {
-        SettingMemento memento = gameController.loadSettings(programDir);
+        SettingMemento memento = gameController.loadSettingsMemento(programDir);
+        gameController.setSettings(memento.getSettings());
+        gameController.restoreSettings(memento);
         setFullScreen(memento.isFullScreen());
     }
 

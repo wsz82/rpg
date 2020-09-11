@@ -35,6 +35,7 @@ public class Controller {
     private Creature creatureToOpenInventory;
     private Container containerToOpen;
     private DialogMemento<PosItem<?,?>> dialogMemento;
+    private Properties locale;
 
     public Controller(){}
 
@@ -400,5 +401,13 @@ public class Controller {
 
     public Fog getFog() {
         return fog;
+    }
+
+    public Properties getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Properties locale) {
+        this.locale = locale;
     }
 }

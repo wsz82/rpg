@@ -7,11 +7,13 @@ import io.wsz.model.item.Containable;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.locale.Locale;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Properties;
 
 import static io.wsz.model.script.ScriptKeyWords.GIVE_TO_ADVERSARY;
 
@@ -84,13 +86,13 @@ public class GiveToAdversary implements Executable, Externalizable {
                     receivingCo.getItems().add(equipment);
                 }
 
-
                 Creature pc = controller.getDialogMemento().getPc();
                 String message;
+                Properties locale = controller.getLocale();
                 if (giving == pc) {
-                    message = "Returned";
+                    message = locale.getProperty(Locale.RETURNED);
                 } else {
-                    message = "Received";
+                    message = locale.getProperty(Locale.RECEIVED);
                 }
                 message = message + " " + availableAmount + " " + equipment.getAssetId(); //TODO change to name
                 DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);

@@ -1,7 +1,6 @@
 package game.view.world.dialog;
 
 import game.model.GameController;
-import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.*;
@@ -69,7 +68,7 @@ public class DialogView {
     public void refresh() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
-        fontSize = width / Sizes.getFontSize().getSize();
+        fontSize = width / gameController.getSettings().getFontSize().getSize();
         dialogTop = (int) height - getViewHeight();
         dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
         dialogLeft = (int) ((width - dialogWidth) / 2);
@@ -555,7 +554,7 @@ public class DialogView {
     }
 
     private int getScrollSpeed() {
-        return (int) (Settings.getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
+        return (int) (gameController.getSettings().getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
     }
 
     private class VerticalPos {

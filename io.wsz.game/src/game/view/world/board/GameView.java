@@ -101,7 +101,7 @@ public class GameView extends CanvasView {
         if (isSelectionMode) {
             drawSelection();
         }
-        if (Settings.isShowBar()) {
+        if (gameController.getSettings().isShowBar()) {
             barView.refresh();
         }
     }
@@ -268,7 +268,7 @@ public class GameView extends CanvasView {
             }
         }
 
-        if (Settings.isCenterOnPC()) {
+        if (gameController.getSettings().isCenterOnPC()) {
             Location location = controller.getCurrentLocation().getLocation();
             List<Creature> controlledCreatures = board.getControlledCreatures(location);
             if (!controlledCreatures.isEmpty()) {
@@ -324,22 +324,22 @@ public class GameView extends CanvasView {
     }
 
     private void scrollDown(double locHeight) {
-        double newY = curPos.y + Settings.getGameScrollSpeed();
+        double newY = curPos.y + gameController.getSettings().getGameScrollSpeed();
         curPos.y = Math.min(newY, locHeight - canvas.getHeight()/Sizes.getMeter());
     }
 
     private void scrollUp() {
-        double newY = curPos.y - Settings.getGameScrollSpeed();
+        double newY = curPos.y - gameController.getSettings().getGameScrollSpeed();
         curPos.y = Math.max(newY, 0);
     }
 
     private void scrollRight(double locWidth) {
-        double newX = curPos.x + Settings.getGameScrollSpeed();
+        double newX = curPos.x + gameController.getSettings().getGameScrollSpeed();
         curPos.x = Math.min(newX, locWidth - canvas.getWidth()/Sizes.getMeter());
     }
 
     private void scrollLeft() {
-        double newX = curPos.x - Settings.getGameScrollSpeed();
+        double newX = curPos.x - gameController.getSettings().getGameScrollSpeed();
         curPos.x = Math.max(newX, 0);
     }
 
@@ -425,7 +425,7 @@ public class GameView extends CanvasView {
         double finalY = modifiedCoords.y;
 
         if (button.equals(MouseButton.PRIMARY)) {
-            if (Settings.isShowBar()) {
+            if (gameController.getSettings().isShowBar()) {
                 double barLeft = barView.getLeft();
                 if (x > barLeft) {
                     return;
@@ -460,7 +460,8 @@ public class GameView extends CanvasView {
         switch (key) {
             case P -> {
                 e.consume();
-                Settings.setShowBar(!Settings.isShowBar());
+                Settings settings = gameController.getSettings();
+                settings.setShowBar(!settings.isShowBar());
             }
             case I -> {
                 e.consume();
@@ -596,8 +597,9 @@ public class GameView extends CanvasView {
         }
         int locWidth = (int) (controller.getCurrentLocation().getWidth() * Sizes.getMeter());
         int locHeight = (int) (controller.getCurrentLocation().getHeight() * Sizes.getMeter());
-        int resWidth = Settings.getResolutionWidth();
-        int resHeight = Settings.getResolutionHeight();
+        Settings settings = gameController.getSettings();
+        int resWidth = settings.getResolutionWidth();
+        int resHeight = settings.getResolutionHeight();
         int sceneWidth = (int) canvas.getScene().getWidth();
         int sceneHeight = (int) canvas.getScene().getHeight();
         double maxWidth = sceneWidth;

@@ -23,6 +23,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.plugin.PluginMetadata;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.world.World;
@@ -31,8 +32,12 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
@@ -41,6 +46,7 @@ public class GameController {
     private final AtomicBoolean isGame = new AtomicBoolean();
     private final AtomicBoolean isDialog = new AtomicBoolean();
 
+    private Settings settings;
     private GameView gameView;
     private GameStage gameStage;
     private GameRunner gameRunner;
@@ -158,30 +164,40 @@ public class GameController {
         getSavesList().addAll(savesNames);
     }
 
-    public SettingMemento loadSettings(File programDir) {
+    public SettingMemento loadSettingsMemento(File programDir) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
-        SettingMemento memento = sc.loadMemento();
-        Sizes.setFontSize(memento.getFontSize());
-        Settings.setGameScrollSpeed(memento.getGameScrollSpeed());
-        Settings.setDialogScrollSpeed(memento.getDialogScrollSpeed());
-        Settings.setCenterOnPC(memento.isCenterOnPc());
-        Settings.setPauseOnInventory(memento.isPauseOnInventory());
-        Settings.setResolutionWidth(memento.getResolutionWidth(), controller);
-        Settings.setResolutionHeight(memento.getResolutionHeight(), controller);
+        return sc.loadMemento();
+    }
+
+    public void restoreSettings(SettingMemento memento) {
         Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
-        return memento;
+        setLocale(settings.getLocale());
+    }
+
+    public void setLocale(String locale) {
+        if (locale == null || locale.isEmpty()) return;
+        Properties localeProperties = new Properties();
+        File programDir = controller.getProgramDir();
+        String localePath = programDir + Paths.LOCALE_DIR + File.separator + locale + Paths.DOT_PROPERTIES;
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(localePath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (in == null) return;
+        try {
+            localeProperties.load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        controller.setLocale(localeProperties);
     }
 
     public void saveSettings(File programDir, SettingMemento memento) {
         SettingCaretaker sc = new SettingCaretaker(programDir);
-        memento.setFontSize(Sizes.getFontSize());
-        memento.setGameScrollSpeed(Settings.getGameScrollSpeed());
-        memento.setDialogScrollSpeed(Settings.getDialogScrollSpeed());
-        memento.setCenterOnPc(Settings.isCenterOnPC());
-        memento.setPauseOnInventory(Settings.isPauseOnInventory());
-        memento.setResolutionWidth(Settings.getResolutionWidth());
-        memento.setResolutionHeight(Settings.getResolutionHeight());
         memento.setResizeWithResolution(Sizes.isResizeWithResolution());
+        memento.setSettings(settings);
         sc.saveMemento(memento);
     }
 
@@ -315,5 +331,13 @@ public class GameController {
 
     public Controller getController() {
         return controller;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
     }
 }

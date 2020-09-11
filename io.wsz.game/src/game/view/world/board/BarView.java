@@ -1,7 +1,6 @@
 package game.view.world.board;
 
 import game.model.GameController;
-import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureAnimation;
@@ -50,7 +49,7 @@ public class BarView {
         if (canvasWidth == 0) {
             return;
         }
-        double barWidth = canvasWidth * Settings.getBarPart();
+        double barWidth = canvasWidth * gameController.getSettings().getBarPart();
         double leftX = canvasWidth - barWidth;
 
         drawBackground(leftX, barWidth);
@@ -117,6 +116,7 @@ public class BarView {
             Location location = controller.getCurrentLocation().getLocation();
             controller.getBoard().looseCreaturesControl(location);
         }
+        if (portraits.isEmpty()) return;
         Portrait cl = portraits.get(hoveredPortrait);
         resolveCreatureControlAndLocation(cl);
     }
@@ -284,7 +284,7 @@ public class BarView {
 
     public double getLeft() {
         double canvasWidth = canvas.getWidth();
-        double barWidth = canvasWidth * Settings.getBarPart();
+        double barWidth = canvasWidth * gameController.getSettings().getBarPart();
         return canvasWidth - barWidth;
     }
 

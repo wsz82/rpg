@@ -3,7 +3,6 @@ package game.model.world;
 import game.model.GameController;
 import game.model.logger.Logger;
 import game.model.save.SaveMemento;
-import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.*;
@@ -131,7 +130,7 @@ public class GameRunner {
             LATER_RUN_BUFFER.pop().run();
         }
 
-        if (controller.isInventory() && Settings.isPauseOnInventory()) {
+        if (controller.isInventory() && gameController.getSettings().isPauseOnInventory()) {
             return;
         }
 

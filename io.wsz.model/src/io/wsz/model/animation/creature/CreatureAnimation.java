@@ -132,6 +132,7 @@ public class CreatureAnimation extends Animation<Creature> {
         long nextPortraitUpdate = curTime + randomDifTimeMillis;
         animationPos.setNextPortraitUpdate(nextPortraitUpdate);
         List<ResolutionImage> portraits = getPortraits();
+        if (portraits == null) return null;
         int portraitsSize = portraits.size();
         if (portraitsSize == 0) return null;
         int randomIndex = RANDOM.nextInt(portraitsSize);

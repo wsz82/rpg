@@ -1,7 +1,6 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
-import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
@@ -290,7 +289,7 @@ public class InventoryView {
     public void refresh() {
         double width = canvas.getWidth();
         if (width == 0) return;
-        double barViewWidth = Settings.getBarPart() * width;
+        double barViewWidth = gameController.getSettings().getBarPart() * width;
         double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
 
         Creature cr = controller.getCreatureToOpenInventory();

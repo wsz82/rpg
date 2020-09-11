@@ -1,8 +1,10 @@
 package game.view.menu;
 
+import game.model.GameController;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.sizes.FontSize;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.collections.FXCollections;
@@ -18,7 +20,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.util.StringConverter;
 
+import java.io.File;
+
 class SettingsMenu extends StackPane {
+    private final GameController gameController;
+    private final Settings settings;
     private final Controller controller;
     private final GameStage gameStage;
 
@@ -30,9 +36,11 @@ class SettingsMenu extends StackPane {
     private Slider resHeightInput;
     private Slider resWidthInput;
 
-    public SettingsMenu(GameStage gameStage, Controller controller) {
+    public SettingsMenu(GameStage gameStage, GameController gameController) {
         this.gameStage = gameStage;
-        this.controller = controller;
+        this.gameController = gameController;
+        this.settings = gameController.getSettings();
+        this.controller = gameController.getController();
         final VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
@@ -57,8 +65,8 @@ class SettingsMenu extends StackPane {
     private void initGameSettings() {
         game = new StackPane();
 
-        final VBox settings = new VBox(10);
-        settings.setAlignment(Pos.CENTER);
+        final VBox container = new VBox(10);
+        container.setAlignment(Pos.CENTER);
 
         final HBox gameScrollBox = new HBox(5);
         gameScrollBox.setAlignment(Pos.CENTER);
@@ -92,24 +100,64 @@ class SettingsMenu extends StackPane {
         stopOnInventoryCB.setMaxWidth(getWidth()/10);
         hookUpStopOnInventoryEvents(stopOnInventoryCB);
 
+        final HBox languageBox = new HBox(5);
+        languageBox.setAlignment(Pos.CENTER);
+        final Label languageLabel = new Label("Language");
+        final ChoiceBox<String> languageCB = new ChoiceBox<>(getLanguages());
+        String locale = settings.getLocale();
+        if (locale == null) {
+            locale = Paths.ENGLISH;
+        }
+        languageCB.setValue(locale);
+        languageBox.getChildren().addAll(languageLabel, languageCB);
+        languageCB.setMaxWidth(getWidth()/10);
+        hookUpLanguageEvents(languageCB);
+
         final Button back = new Button("Back");
         back.setOnAction(event -> goBackToSettings());
 
-        settings.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, stopOnInventoryBox, back);
-        game.getChildren().addAll(settings);
+        container.getChildren().addAll(gameScrollBox, dialogScrollBox, centerOnPcBox, stopOnInventoryBox, languageBox, back);
+        game.getChildren().addAll(container);
+    }
+
+    private void hookUpLanguageEvents(ChoiceBox<String> languageCB) {
+        languageCB.setOnAction(e -> {
+            String language = languageCB.getValue();
+            if (language == null) {
+                language = Paths.ENGLISH;
+            }
+            settings.setLocale(language);
+            gameController.setLocale(language);
+        });
+    }
+
+    private ObservableList<String> getLanguages() {
+        ObservableList<String> languages = FXCollections.observableArrayList();
+        File programDir = controller.getProgramDir();
+        File locales = new File(programDir + Paths.LOCALE_DIR);
+        File[] languagesPropertiesFiles = locales.listFiles();
+        for (File languageFile : languagesPropertiesFiles) {
+            if (languageFile.isDirectory()) continue;
+            String name = languageFile.getName();
+            String dotProperties = Paths.DOT_PROPERTIES;
+            if (!name.endsWith(dotProperties)) continue;
+            name = name.replace(dotProperties, "");
+            languages.add(name);
+        }
+        return languages;
     }
 
     private void hookUpStopOnInventoryEvents(CheckBox cb) {
-        cb.setSelected(Settings.isPauseOnInventory());
+        cb.setSelected(settings.isPauseOnInventory());
         cb.setOnAction(e -> {
-            Settings.setPauseOnInventory(cb.isSelected());
+            settings.setPauseOnInventory(cb.isSelected());
         });
     }
 
     private void hookUpCenterOnPCEvents(CheckBox cb) {
-        cb.setSelected(Settings.isCenterOnPC());
+        cb.setSelected(settings.isCenterOnPC());
         cb.setOnAction(e -> {
-            Settings.setCenterOnPC(cb.isSelected());
+            settings.setCenterOnPC(cb.isSelected());
         });
     }
 
@@ -117,9 +165,9 @@ class SettingsMenu extends StackPane {
         s.setMin(0.01);
         s.setMax(1);
         s.setBlockIncrement(0.01);
-        s.setValue(Settings.getDialogScrollSpeed());
+        s.setValue(settings.getDialogScrollSpeed());
         s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setDialogScrollSpeed(s.getValue());
+            settings.setDialogScrollSpeed(s.getValue());
         });
     }
 
@@ -127,9 +175,9 @@ class SettingsMenu extends StackPane {
         s.setMin(0.01);
         s.setMax(1);
         s.setBlockIncrement(0.01);
-        s.setValue(Settings.getGameScrollSpeed());
+        s.setValue(settings.getGameScrollSpeed());
         s.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.setGameScrollSpeed(s.getValue());
+            settings.setGameScrollSpeed(s.getValue());
         });
     }
 
@@ -214,7 +262,7 @@ class SettingsMenu extends StackPane {
         widthSlider.setMin(Sizes.MIN_RESOLUTION_WIDTH);
         widthSlider.setMax(maxWidth);
         widthSlider.setBlockIncrement(1);
-        widthSlider.setValue(Settings.getResolutionWidth());
+        widthSlider.setValue(settings.getResolutionWidth());
         widthSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newWidthResolution = newValue.intValue();
             updateWidthResolution(newWidthResolution);
@@ -229,7 +277,7 @@ class SettingsMenu extends StackPane {
         heightSlider.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
         heightSlider.setMax(maxHeight);
         heightSlider.setBlockIncrement(1);
-        heightSlider.setValue(Settings.getResolutionHeight());
+        heightSlider.setValue(settings.getResolutionHeight());
         heightSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newHeightResolution = newValue.intValue();
             updateHeightResolution(newHeightResolution);
@@ -239,7 +287,7 @@ class SettingsMenu extends StackPane {
     }
 
     private void updateWidthResolution(int newWidthResolution) {
-        Settings.setResolutionWidth(newWidthResolution, controller);
+        settings.setResolutionWidth(newWidthResolution, controller);
         if (Sizes.isResizeWithResolution()) {
             double ratio = Sizes.BASIC_RESOLUTION_RATIO;
             resHeightInput.setValue(newWidthResolution / ratio);
@@ -247,7 +295,7 @@ class SettingsMenu extends StackPane {
     }
 
     private void updateHeightResolution(int newHeightResolution) {
-        Settings.setResolutionHeight(newHeightResolution, controller);
+        settings.setResolutionHeight(newHeightResolution, controller);
         if (Sizes.isResizeWithResolution()) {
             double ratio = Sizes.BASIC_RESOLUTION_RATIO;
             resWidthInput.setValue(newHeightResolution * ratio);
@@ -274,10 +322,10 @@ class SettingsMenu extends StackPane {
     private void hookUpFontSizeEvents(ChoiceBox<FontSize> fontSizeCB) {
         ObservableList<FontSize> fontSizes = FXCollections.observableArrayList(FontSize.values());
         fontSizeCB.setItems(fontSizes);
-        fontSizeCB.setValue(Sizes.getFontSize());
+        fontSizeCB.setValue(settings.getFontSize());
         fontSizeCB.setOnAction(e -> {
             FontSize value = fontSizeCB.getValue();
-            Sizes.setFontSize(value);
+            settings.setFontSize(value);
         });
     }
 

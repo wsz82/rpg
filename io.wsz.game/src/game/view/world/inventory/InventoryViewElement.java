@@ -1,7 +1,6 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
-import game.model.setting.Settings;
 import game.view.world.CanvasView;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
@@ -72,7 +71,7 @@ public abstract class InventoryViewElement extends CanvasView {
     }
 
     protected double getScrollSpeed() {
-        return Settings.getDialogScrollSpeed();
+        return gameController.getSettings().getDialogScrollSpeed();
     }
 
     public void setSize(double width, double height) {

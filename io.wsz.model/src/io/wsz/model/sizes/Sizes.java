@@ -23,7 +23,6 @@ public class Sizes {
 
     private static int meter = CONSTANT_METER;
     private static int verticalMeter = CONSTANT_METER;
-    private static FontSize fontSize = FontSize.M;
     private static int portraitSize;
     private static long timeOfMenuOpen;
 
@@ -55,15 +54,6 @@ public class Sizes {
     public static void setVerticalMeter(int resHeight, Controller controller) {
         Sizes.verticalMeter = CONSTANT_METER * resHeight / ORIGIN_RESOLUTION_HEIGHT;
         controller.clearResizablePictures();
-    }
-
-    public static FontSize getFontSize() {
-        return fontSize;
-    }
-
-    public static void setFontSize(FontSize fontSize) {
-        setReloadDialogImages(true);
-        Sizes.fontSize = fontSize;
     }
 
     public static boolean isResizeWithResolution() {
