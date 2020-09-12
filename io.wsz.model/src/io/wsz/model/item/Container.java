@@ -98,7 +98,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
             controller.setCreatureToOpenInventory(cr);
             controller.setContainerToOpen(this);
             controller.setInventory(true);
-            System.out.println(getName() + " searched by " + cr.getName());
+            controller.getLogger().logContainerSearchedBy(getName(), cr.getName());
         }
     }
 
@@ -284,12 +284,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
 
     private void onOperateActionFailure(PosItem collision, String message) {
         animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.IDLE);
-        System.out.println(getName() + " cannot be " + message + ": collides with " + collision.getName());
+        controller.getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
     }
 
     private void onOperateActionSuccess(String message) {
         animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.OPERATING);
-        System.out.println(getName() + " " + message);
+        controller.getLogger().logItemAction(getName(), message);
     }
 
     @Override

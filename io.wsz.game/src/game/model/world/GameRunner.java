@@ -1,7 +1,6 @@
 package game.model.world;
 
 import game.model.GameController;
-import game.model.logger.Logger;
 import game.model.save.SaveMemento;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
@@ -29,7 +28,6 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 public class GameRunner {
     private static final ArrayDeque<Runnable> LATER_RUN_BUFFER = new ArrayDeque<>(0);
 
-    private final Logger logger = new Logger();
     private final GameController gameController;
     private final Controller controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
@@ -80,7 +78,7 @@ public class GameRunner {
         gameThread = new Thread(() -> {
             while (true) {
                 long modelStart = System.currentTimeMillis();
-                logger.logTimeBetweenModelStarts(modelStart);
+                controller.getLogger().logTimeBetweenModelStarts(modelStart);
 
                 if (!gameController.isGame()) {
                     continue;
@@ -91,15 +89,15 @@ public class GameRunner {
 
                 Platform.runLater(() -> {
                     synchronized (this) {
-                        logger.logTimeBetweenViewStarts();
+                        controller.getLogger().logTimeBetweenViewStarts();
                         updateView();
-                        logger.logTimeOfViewLoopDuration();
+                        controller.getLogger().logTimeOfViewLoopDuration();
                     }
                 });
 
                 long modelEnd = System.currentTimeMillis();
                 long modelDif = modelEnd - modelStart;
-                logger.logTimeOfModelLoopDuration(modelDif);
+                controller.getLogger().logTimeOfModelLoopDuration(modelDif);
 
                 if (modelDif < TURN_DURATION_MILLIS) {
                     try {
@@ -199,7 +197,7 @@ public class GameRunner {
         Dialog dialog = npc.getDialog();
         if (dialog == null || dialog.getGreetingList() == null) {
             controller.setDialogMemento(null);
-            logger.logNoAnsweringResponse(npc);
+            controller.getLogger().logNoAnsweringResponse(npc.getName());
             return;
         }
 
@@ -298,7 +296,7 @@ public class GameRunner {
                 try {
                     reloadAssetImages(pi, programDir);
                 } catch (Exception e) {
-                    System.out.println("Error with " + pi.getAssetId());
+                    controller.getLogger().logAssetReloadImagesError(pi.getAssetId());
                     continue;
                 }
                 updateProgress(i, total);

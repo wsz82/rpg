@@ -160,7 +160,7 @@ public class OutDoor extends Door<OutDoor> {
 
     private void onOperateConnectionActionFailure(PosItem connectionCollision, String message) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
-        System.out.println(getName() + " cannot be " +  message + ": " + connectionCollision.getName() + " blocks behind");
+        controller.getLogger().logItemCannotBeActionBecauseIsBlockedBehind(getName(), message, connectionCollision.getName());
     }
 
     @Override

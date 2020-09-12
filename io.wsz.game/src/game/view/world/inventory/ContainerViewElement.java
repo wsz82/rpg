@@ -63,10 +63,6 @@ public class ContainerViewElement extends EquipmentViewElement {
         }
     }
 
-    public Container getContainer() {
-        return container;
-    }
-
     public void setContainer(Container container) {
         this.container = container;
     }
@@ -81,18 +77,18 @@ public class ContainerViewElement extends EquipmentViewElement {
     @Override
     public boolean tryRemove(Equipment e, Creature cr) {
         getItems().remove(e);
-        System.out.println(e.getName() + " removed from " + container.getName());
+        controller.getLogger().logItemRemoved(e.getName(), container.getName());
         return true;
     }
 
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
         if (!container.tryAdd(e)) {
-            System.out.println(e.getName() + " does not fit " + container.getName());
+            controller.getLogger().logItemDoesNotFit(e.getName(), container.getName());
             return false;
         } else {
             e.setPos(x, y, null);
-            System.out.println(e.getName() + " added to " + container.getName());
+            controller.getLogger().logItemAddedTo(e.getName(), container.getName());
             return true;
         }
     }

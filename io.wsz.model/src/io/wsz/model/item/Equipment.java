@@ -124,7 +124,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     public boolean tryTake(Creature cr) {
         boolean doesFitInventory = !cr.getInventory().fitsInventory(this);
         if (doesFitInventory) {
-            System.out.println(getName() + " does not fit " + cr.getName() + " inventory");
+            controller.getLogger().logItemDoesNotFitInventory(getName(), cr.getName());
             return false;
         }
         Coords crCenter = cr.getCenter();
@@ -137,13 +137,12 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
-            String message = getName() + " cannot be taken: behind " + obstacleOnWay.getName();
-            System.out.println(message);
+            controller.getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
             return false;
         } else {
             setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
-            System.out.println(getName() + " taken");
+            controller.getLogger().logItemAction(getName(), "taken");
             return true;
         }
     }
@@ -180,7 +179,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             pos.y = tempY;
             pos.level = tempLevel;
             pos.setLocation(tempLocation);
-            String message = getName() + " cannot be dropped here";
+            String message = "cannot be dropped here";
             if (obstacle != null) {
                 message += ": collides with " + obstacle.getName();
             } else if (outOfLocation) {
@@ -188,11 +187,11 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             } else {
                 message += ": behind " + obstacleOnWay.getName();
             }
-            System.out.println(message);
+            controller.getLogger().logItemAction(getName(), message);
             return false;
         } else {
             l.getItemsToAdd().add(this);
-            System.out.println(getName() + " dropped");
+            controller.getLogger().logItemAction(getName(), "dropped");
             return true;
         }
     }

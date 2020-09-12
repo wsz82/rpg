@@ -160,12 +160,12 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
 
     protected void onOperateActionFailure(PosItem collision, String message) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
-        System.out.println(getName() + " cannot be " + message + ": collides with " + collision.getName());
+        controller.getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
     }
 
     protected void onOperateActionSuccess(String message) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.OPERATING);
-        System.out.println(getName() + " " + message);
+        controller.getLogger().logItemAction(getName(), message);
     }
 
     @Override

@@ -222,11 +222,11 @@ public class InventoryView {
         if (hero.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
             if (hero.getInventory().tryAdd(dragged)) {
                 view.setMovedToHeroEquipmentPos(dragged.getPos());
-                System.out.println(dragged.getName() + " moved to " + hero.getName() + " inventory");
+                controller.getLogger().logItemMovedToInventory(dragged.getName(), hero.getName());
                 return true;
             }
         } else {
-            System.out.println(hero.getName() + " out of " + cr.getName() + " range");
+            controller.getLogger().logOneCreatureOutOfAnotherCreatureRange(hero.getName(), cr.getName());
         }
         return false;
     }

@@ -9,6 +9,7 @@ import io.wsz.model.item.*;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
+import io.wsz.model.logger.Logger;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.plugin.PluginMetadataCaretaker;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
+    private final Logger logger = new Logger();
     private final Board board = new Board(this);
     private final Fog fog = new Fog();
     private final LinkedList<Creature> heroes = new LinkedList<>();
@@ -218,6 +220,10 @@ public class Controller {
             }
             pos.setLocation(foundLoc);
         }
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public Board getBoard() {

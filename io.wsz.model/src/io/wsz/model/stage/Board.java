@@ -307,7 +307,7 @@ public class Board {
     private boolean getObstacleObstacleCollision(PosItem i, Coords nextPos, List iPolygons, PosItem o, Coords oPos, List oPolygons) {
         boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
-            System.out.println(i.getName() + " collides " + o.getName());
+            controller.getLogger().logItemCollides(i.getName(), o.getName());
         }
         return collides;
     }
@@ -315,7 +315,7 @@ public class Board {
     private boolean getWayCollision(Coords oPos, List oPolygons) {
         boolean collides = Geometry.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
         if (collides) {
-            System.out.println("Way collision");
+            controller.getLogger().logWayCollision();
         }
         return collides;
     }
@@ -323,7 +323,7 @@ public class Board {
     private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
         boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
         if (collides) {
-            System.out.println(cr.getName() + " collides " + crO.getName());
+            controller.getLogger().logItemCollides(cr.getName(), crO.getName());
         }
         return collides;
     }
@@ -335,7 +335,7 @@ public class Board {
 
             boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println(i.getName() + " collides " + cr.getName());
+                controller.getLogger().logItemCollides(i.getName(), cr.getName());
                 return true;
             }
         }
@@ -350,7 +350,7 @@ public class Board {
 
             boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
             if (ovalIntersectsPolygon) {
-                System.out.println(cr.getName() + " collides " + o.getName());
+                controller.getLogger().logItemCollides(cr.getName(), o.getName());
                 return true;
             }
         }
