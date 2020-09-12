@@ -95,19 +95,19 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private void initAssetsTable() {
-        TableColumn<A, String> nameCol = new TableColumn<>("ID");
-        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+        TableColumn<A, String> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
                 return p.getValue().getAssetId();
             }
         });
-        nameCol.setEditable(true);
-        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        nameCol.setOnEditCommit(t -> {
-            Asset asset = t.getTableView().getItems().get(t.getTablePosition().getRow());
+        idCol.setEditable(true);
+        idCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        idCol.setOnEditCommit(t -> {
+            Asset asset = getSelectionModel().getSelectedItem();
             String newValue = t.getNewValue();
-            if (assetNameIsNotUnique(newValue)) {
+            if (assetIdIsNotUnique(newValue)) {
                 asset.setAssetId(t.getOldValue());
             } else {
                 asset.setAssetId(newValue);
@@ -115,6 +115,16 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
             }
             refresh();
         });
+
+        TableColumn<A, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getIndividualName();
+            }
+        });
+        nameCol.setEditable(false);
+        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         TableColumn<A, String> pathCol = new TableColumn<>("Path");
         pathCol.setCellValueFactory(p -> new ObjectBinding<>() {
@@ -127,10 +137,10 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         pathCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         ObservableList<TableColumn<A, ?>> columns = getColumns();
-        columns.addAll(nameCol, pathCol);
+        columns.addAll(idCol, nameCol, pathCol);
     }
 
-    private boolean assetNameIsNotUnique(String newValue) {
+    private boolean assetIdIsNotUnique(String newValue) {
         return editorController.getObservableAssets().getMergedAssets().stream()
                 .anyMatch(p -> p.getAssetId().equals(newValue));
     }

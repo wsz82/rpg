@@ -64,13 +64,23 @@ public class ContentTableView extends TableView<PosItem> {
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
 
-        TableColumn<PosItem, String> nameCol = new TableColumn<>("Asset ID");
-        nameCol.setCellValueFactory(param -> new ObjectBinding<>() {
+        TableColumn<PosItem, String> idCol = new TableColumn<>("Asset ID");
+        idCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
                 return param.getValue().getAssetId();
             }
         });
+        TableColumn<PosItem, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
+            @Override
+            protected String computeValue() {
+                return p.getValue().getIndividualName();
+            }
+        });
+        nameCol.setEditable(false);
+        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
         TableColumn<PosItem, String> typeCol = new TableColumn<>("Type");
         typeCol.setCellValueFactory(param -> new ObjectBinding<>() {
             @Override
@@ -151,12 +161,7 @@ public class ContentTableView extends TableView<PosItem> {
         posCol.getColumns().addAll(xCol, yCol);
 
         ObservableList<TableColumn<PosItem, ?>> columns = getColumns();
-        columns.add(0, nameCol);
-        columns.add(1, typeCol);
-        columns.add(2, levelCol);
-        columns.add(3, visibilityCol);
-        columns.add(4, blockedCol);
-        columns.add(5, posCol);
+        columns.addAll(idCol, nameCol, typeCol, levelCol, visibilityCol, blockedCol, posCol);
     }
 
     private void alertLayerNotExisting(int level) {

@@ -124,7 +124,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     public boolean tryTake(Creature cr) {
         boolean doesFitInventory = !cr.getInventory().fitsInventory(this);
         if (doesFitInventory) {
-            System.out.println(getAssetId() + " does not fit " + cr.getAssetId() + " inventory");
+            System.out.println(getName() + " does not fit " + cr.getName() + " inventory");
             return false;
         }
         Coords crCenter = cr.getCenter();
@@ -137,13 +137,13 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
-            String message = getAssetId() + " cannot be taken: behind " + obstacleOnWay.getAssetId();
+            String message = getName() + " cannot be taken: behind " + obstacleOnWay.getName();
             System.out.println(message);
             return false;
         } else {
             setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
-            System.out.println(getAssetId() + " taken");
+            System.out.println(getName() + " taken");
             return true;
         }
     }
@@ -180,19 +180,19 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             pos.y = tempY;
             pos.level = tempLevel;
             pos.setLocation(tempLocation);
-            String message = getAssetId() + " cannot be dropped here";
+            String message = getName() + " cannot be dropped here";
             if (obstacle != null) {
-                message += ": collides with " + obstacle.getAssetId();
+                message += ": collides with " + obstacle.getName();
             } else if (outOfLocation) {
                 message += ": beyond location";
             } else {
-                message += ": behind " + obstacleOnWay.getAssetId();
+                message += ": behind " + obstacleOnWay.getName();
             }
             System.out.println(message);
             return false;
         } else {
             l.getItemsToAdd().add(this);
-            System.out.println(getAssetId() + " dropped");
+            System.out.println(getName() + " dropped");
             return true;
         }
     }

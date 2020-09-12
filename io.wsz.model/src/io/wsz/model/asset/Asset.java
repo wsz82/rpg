@@ -111,13 +111,14 @@ public abstract class Asset implements Externalizable {
         if (!(o instanceof Asset)) return false;
         Asset asset = (Asset) o;
         return Objects.equals(getAssetId(), asset.getAssetId()) &&
-                Objects.equals(getType(), asset.getType()) &&
+                Objects.equals(getName(), asset.getName()) &&
+                getType() == asset.getType() &&
                 Objects.equals(getPath(), asset.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAssetId(), getType(), getPath());
+        return Objects.hash(getAssetId(), getName(), getType(), getPath());
     }
 
     @Override

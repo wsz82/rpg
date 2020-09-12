@@ -65,10 +65,10 @@ public class CreatureViewElement extends InventoryViewElement {
     public boolean tryRemove(Equipment toRemove, Creature cr) {
         Inventory inventory = cr.getInventory();
         if (inventory.tryTakeOff(toRemove)) {
-            System.out.println(toRemove.getAssetId() + " unequipped from " + toRemove.getOccupiedPlace().getId());
+            System.out.println(toRemove.getName() + " unequipped from " + toRemove.getOccupiedPlace().getId());
             return true;
         } else {
-            System.out.println(toRemove.getAssetId() + " could not be unequipped from " + toRemove.getOccupiedPlace().getId());
+            System.out.println(toRemove.getName() + " could not be unequipped from " + toRemove.getOccupiedPlace().getId());
             return false;
         }
     }
@@ -76,10 +76,10 @@ public class CreatureViewElement extends InventoryViewElement {
     @Override
     public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
         if (cr.getInventory().tryWear(e, x, y)) {
-            System.out.println(e.getAssetId() + " equipped on place " + e.getOccupiedPlace().getId());
+            System.out.println(e.getName() + " equipped on place " + e.getOccupiedPlace().getId());
             return true;
         } else {
-            System.out.println(e.getAssetId() + " does not fit this place");
+            System.out.println(e.getName() + " does not fit this place");
             return false;
         }
     }

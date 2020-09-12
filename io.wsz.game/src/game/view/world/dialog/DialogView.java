@@ -289,7 +289,7 @@ public class DialogView {
     }
 
     private void addDialogItem(PosItem talkingItem, String text) {
-        String speakerName = talkingItem.getAssetId();
+        String speakerName = talkingItem.getName();
         SpeakerMark speakerMark = SpeakerMark.NPC;
         if (talkingItem == dialogMemento.getPc()) {
             speakerMark = SpeakerMark.PC;

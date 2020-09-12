@@ -94,7 +94,7 @@ public class GiveToAdversary implements Executable, Externalizable {
                 } else {
                     message = locale.getProperty(LocaleKeys.RECEIVED);
                 }
-                message = message + " " + availableAmount + " " + equipment.getAssetId(); //TODO change to name
+                message = message + " " + availableAmount + " " + equipment.getName();
                 DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
                 controller.getDialogMemento().getDialogs().add(di);
             }

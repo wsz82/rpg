@@ -44,6 +44,6 @@ public class Logger {
     }
 
     public void logNoAnsweringResponse(PosItem answering) {
-        System.out.println(answering.getAssetId() + " does not respond");
+        System.out.println(answering.getName() + " does not respond");
     }
 }

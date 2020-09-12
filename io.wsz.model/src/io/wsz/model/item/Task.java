@@ -57,7 +57,7 @@ public class Task implements Externalizable {
             return;
         }
         Inventory inventory = cr.getIndividualInventory();
-        String name = cr.getAssetId();
+        String name = cr.getName();
         if (inventory.getActualWeight() > inventory.getMaxWeight()) {
             System.out.println(name + " overloaded");
             setFinished(true);
