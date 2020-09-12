@@ -3,10 +3,14 @@ package io.wsz.model.plugin;
 import io.wsz.model.sizes.Paths;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PluginMetadataCaretaker {
+    private static final String TEMP_DIR = File.separator + "temp_metadata";
     private final File programDir;
 
     public PluginMetadataCaretaker(File programDir) {
@@ -14,15 +18,29 @@ public class PluginMetadataCaretaker {
     }
 
     public void serialize(PluginMetadata metadata, String pluginName) {
-        String pluginDir = File.separator + pluginName;
+        String metadataDir = File.separator + pluginName;
+        String metadataProgramDir = programDir + Paths.PLUGINS_DIR + metadataDir;
+        String tempMetadataProgramDir = metadataProgramDir + TEMP_DIR;
+        File tempFile = new File(tempMetadataProgramDir);
         try (
-                FileOutputStream fos = new FileOutputStream(programDir + Paths.PLUGINS_DIR + pluginDir + Paths.METADATA_DIR);
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
+                ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(tempFile))
         ) {
-            oos.writeObject(metadata);
+            os.writeObject(metadata);
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
+        String path = metadataProgramDir + Paths.METADATA_DIR;
+        File targetFile = new File(path);
+        Path source = Path.of(tempFile.toURI());
+        Path target = Path.of(targetFile.toURI());
+        try {
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        tempFile.delete();
     }
 
     public PluginMetadata deserialize(String pluginName) {
