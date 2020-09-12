@@ -75,7 +75,9 @@ public class CoordsEdit {
         if (pos == null) return;
         Board board = controller.getBoard();
         int meter = Sizes.getMeter();
-        board.centerScreenOn(pos, editorCanvas.getWidth() / meter, editorCanvas.getHeight() / meter);
+        double canvasMeterWidth = editorCanvas.getWidth() / meter;
+        double canvasMeterHeight = editorCanvas.getHeight() / meter;
+        board.centerScreenOn(pos, canvasMeterWidth, canvasMeterHeight, 0);
         editorCanvas.refresh();
     }
 

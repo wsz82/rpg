@@ -49,7 +49,7 @@ public class BarView {
         if (canvasWidth == 0) {
             return;
         }
-        double barWidth = canvasWidth * gameController.getSettings().getBarPart();
+        double barWidth = getBarWidth(canvasWidth);
         double leftX = canvasWidth - barWidth;
 
         drawBackground(leftX, barWidth);
@@ -284,8 +284,12 @@ public class BarView {
 
     public double getLeft() {
         double canvasWidth = canvas.getWidth();
-        double barWidth = canvasWidth * gameController.getSettings().getBarPart();
+        double barWidth = getBarWidth(canvasWidth);
         return canvasWidth - barWidth;
+    }
+
+    public double getBarWidth(double canvasWidth) {
+        return canvasWidth * gameController.getSettings().getBarPart();
     }
 
     private class Portrait {

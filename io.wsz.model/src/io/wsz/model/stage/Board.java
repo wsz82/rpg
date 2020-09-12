@@ -37,7 +37,7 @@ public class Board {
         return curPos;
     }
 
-    public void centerScreenOn(Coords posToCenter, double canvasWidth, double canvasHeight) {
+    public void centerScreenOn(Coords posToCenter, double canvasMeterWidth, double canvasMeterHeight, double widthCorrection) {
         Location locationToGo = posToCenter.getLocation();
         if (locationToGo != null) {
             Location actual = controller.getCurrentLocation().getLocation();
@@ -55,17 +55,17 @@ public class Board {
         }
         controller.getCurrentLayer().setLayer(layer);
 
-        double x = posToCenter.x - canvasWidth/2;
-        double y = posToCenter.y - canvasHeight/2;
+        double x = posToCenter.x - canvasMeterWidth/2;
+        double y = posToCenter.y - canvasMeterHeight/2;
         double locWidth = controller.getCurrentLocation().getWidth();
         double locHeight = controller.getCurrentLocation().getHeight();
-        if (x > locWidth - canvasWidth) {
-            curPos.x = locWidth - canvasWidth;
+        if (x > locWidth - canvasMeterWidth - widthCorrection) {
+            curPos.x = locWidth - canvasMeterWidth - widthCorrection;
         } else {
             curPos.x = Math.max(x, 0);
         }
-        if (y > locHeight - canvasHeight) {
-            curPos.y = locHeight - canvasHeight;
+        if (y > locHeight - canvasMeterHeight) {
+            curPos.y = locHeight - canvasMeterHeight;
         } else {
             curPos.y = Math.max(y, 0);
         }
