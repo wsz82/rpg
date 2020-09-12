@@ -228,8 +228,10 @@ public class GameView extends CanvasView {
     private void updatePos() {
         Coords posToCenter = controller.getPosToCenter();
         int meter = Sizes.getMeter();
+        double canvasWidth = canvas.getWidth() / meter;
+        double canvasHeight = canvas.getHeight() / meter;
         if (posToCenter.x != -1) {
-            board.centerScreenOn(posToCenter, canvas.getWidth() / meter, canvas.getHeight() / meter);
+            board.centerScreenOn(posToCenter, canvasWidth, canvasHeight);
             posToCenter.x = -1;
             return;
         }
@@ -274,7 +276,7 @@ public class GameView extends CanvasView {
             if (!controlledCreatures.isEmpty()) {
                 Creature cr = controlledCreatures.get(0);
                 if (cr != null) {
-                    board.centerScreenOn(cr.getCenter(), canvas.getWidth() / meter, canvas.getHeight() / meter);
+                    board.centerScreenOn(cr.getCenter(), canvasWidth, canvasHeight);
                     return;
                 }
             }

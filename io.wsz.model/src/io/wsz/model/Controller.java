@@ -26,7 +26,7 @@ public class Controller {
     private final LinkedList<Creature> heroes = new LinkedList<>();
     private final List<Creature> creaturesToControl = new ArrayList<>(0);
     private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
-    private final Coords posToCenter = new Coords();
+    private final Coords posToCenter = new Coords(-1, -1);
     private final AtomicBoolean isInventory = new AtomicBoolean();
 
     private Model model;
@@ -100,7 +100,7 @@ public class Controller {
         if (a instanceof PosItem) {
             PosItem pi = (PosItem) a;
             Coords pos = pi.getPos();
-            restoreCoordsOfLocation(pos);
+            restoreLocationOfCoords(pos);
             restoreDialog(pi, dialogs);
         }
         if (a instanceof Creature) {
@@ -110,12 +110,12 @@ public class Controller {
         if (a instanceof Teleport) {
             Teleport t = (Teleport) a;
             Coords exit = t.getExit();
-            restoreCoordsOfLocation(exit);
+            restoreLocationOfCoords(exit);
         }
         if (a instanceof OutDoor) {
             OutDoor od = (OutDoor) a;
             Coords exit = od.getExit();
-            restoreCoordsOfLocation(exit);
+            restoreLocationOfCoords(exit);
             restoreOutDoorConnection(od);
         }
         if (a instanceof Equipment) {
@@ -191,7 +191,7 @@ public class Controller {
         if (serConnection == null) return;
         String name = serConnection.getAssetId();
         Coords pos = serConnection.getPos();
-        restoreCoordsOfLocation(pos);
+        restoreLocationOfCoords(pos);
         Location location = pos.getLocation();
         Optional<OutDoor> optConnection = location.getItems().stream()
                 .filter(o -> o instanceof OutDoor)
@@ -206,7 +206,7 @@ public class Controller {
         od.setConnection(connection);
     }
 
-    public void restoreCoordsOfLocation(Coords pos) {
+    public void restoreLocationOfCoords(Coords pos) {
         Location serLoc = pos.getLocation();
         if (serLoc != null) {
             Optional<Location> optionalLocation = getLocations().stream()

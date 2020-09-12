@@ -273,7 +273,7 @@ public class EditorController {
         boolean isStartingLocation = metadata.isStartingLocation();
         pss.setStartingLocation(isStartingLocation);
         Coords startPos = activePlugin.getStartPos();
-        controller.restoreCoordsOfLocation(startPos);
+        controller.restoreLocationOfCoords(startPos);
         pss.setStartLocation(startPos.getLocation());
         pss.setStartX(startPos.x);
         pss.setStartY(startPos.y);

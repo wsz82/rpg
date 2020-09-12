@@ -222,7 +222,15 @@ public class GameController {
         world.setLocations(locations);
 
         Coords lastPos = m.getLastPos();
+        setCurPos(lastPos);
         restorePluginReferences(world, lastPos);
+    }
+
+    private void setCurPos(Coords lastPos) {
+        Coords curPos = controller.getCurPos();
+        curPos.x = lastPos.x;
+        curPos.y = lastPos.y;
+        curPos.level = lastPos.level;
     }
 
     private void restorePluginReferences(World world, Coords lastPos) {
@@ -256,7 +264,7 @@ public class GameController {
     }
 
     private void restoreStartLocationAndLayer(Coords startPos) {
-        controller.restoreCoordsOfLocation(startPos);
+        controller.restoreLocationOfCoords(startPos);
         Location first = startPos.getLocation();
         controller.getCurrentLocation().setLocation(first);
 

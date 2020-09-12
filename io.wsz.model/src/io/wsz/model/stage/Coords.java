@@ -23,7 +23,7 @@ public class Coords implements Externalizable {
             String locName = substring;
             Location loc = new Location(locName);
             pos.setLocation(loc);
-            controller.restoreCoordsOfLocation(pos);
+            controller.restoreLocationOfCoords(pos);
             s = s.replaceFirst(locName + "x:", "");
         } else {
             s = s.replaceFirst("x:", "");
