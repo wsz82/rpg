@@ -358,16 +358,31 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     public String getAssetId() {
         if (prototype != null) {
             return prototype.getAssetId();
+        } else {
+            return super.getAssetId();
         }
-        return super.getAssetId();
+    }
+
+    @Override
+    public String getName() {
+        if (name == null) {
+            if (prototype == null) {
+                return super.getName();
+            } else {
+                return prototype.getName();
+            }
+        } else {
+            return name;
+        }
     }
 
     @Override
     public ItemType getType() {
         if (prototype != null) {
             return prototype.getType();
+        } else {
+            return super.getType();
         }
-        return super.getType();
     }
 
     @Override

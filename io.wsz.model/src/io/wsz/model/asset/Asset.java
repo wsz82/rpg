@@ -12,6 +12,7 @@ public abstract class Asset implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     protected String assetId;
+    protected String name;
     protected ItemType type;
     protected String path;
 
@@ -21,14 +22,9 @@ public abstract class Asset implements Externalizable {
         this.type = type;
     }
 
-    public Asset(String assetId, ItemType type, String path) {
-        this.assetId = assetId;
-        this.type = type;
-        this.path = path;
-    }
-
     public Asset(Asset other) {
         this.assetId = other.getAssetId();
+        this.name = other.getName();
         this.type = other.getType();
         this.path = other.getPath();
     }
@@ -70,6 +66,22 @@ public abstract class Asset implements Externalizable {
 
     public void setAssetId(String assetId) {
         this.assetId = assetId;
+    }
+
+    public String getIndividualName() {
+        return name;
+    }
+
+    public String getName() {
+        if (name == null) {
+            return "";
+        } else {
+            return name;
+        }
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public ItemType getType() {
@@ -114,6 +126,8 @@ public abstract class Asset implements Externalizable {
 
         out.writeObject(assetId);
 
+        out.writeObject(name);
+
         out.writeObject(type);
 
         out.writeObject(path);
@@ -124,6 +138,8 @@ public abstract class Asset implements Externalizable {
         long ver = in.readLong();
 
         assetId = (String) in.readObject();
+
+        name = (String) in.readObject();
 
         type = (ItemType) in.readObject();
 

@@ -41,11 +41,11 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     protected boolean isContent;
 
     private final TextField idInput = new TextField();
+    private final TextField nameInput = new TextField();
     private final Button ok = new Button("OK");
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
     private final DoubleField animationSpeedInput = new DoubleField(true);
-    private final HBox animationBox = new HBox(10);
     private final Button animationButton = new Button("Animation");
     private final Label pathLabel = new Label();
     private final ChoiceBox<Dialog> dialogsCB = new ChoiceBox<>();
@@ -94,10 +94,12 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         }
 
         idInput.setPromptText("Id");
-        animationBox.getChildren().addAll(animationButton, pathLabel);
-        container.getChildren().addAll(idInput);
+        nameInput.setPromptText("Name");
+        container.getChildren().addAll(idInput, nameInput);
 
         if (!isContent) {
+            final HBox animationBox = new HBox(10);
+            animationBox.getChildren().addAll(animationButton, pathLabel);
             container.getChildren().add(animationBox);
         }
 
@@ -159,6 +161,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
             return;
         }
         idInput.setText(item.getAssetId());
+        nameInput.setText(item.getIndividualName());
         pathLabel.setText(item.getPath());
 
         Double animationSpeed = item.getIndividualAnimationSpeed();
@@ -198,6 +201,11 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     protected void defineAsset() {
         String path = pathLabel.getText();
         item.setPath(path);
+
+        String name = nameInput.getText();
+        if (!name.isEmpty()) {
+            item.setName(name);
+        }
 
         String animationSpeed = animationSpeedInput.getText();
         if (animationSpeed.isEmpty()) {
