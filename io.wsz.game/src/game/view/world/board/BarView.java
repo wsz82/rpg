@@ -34,15 +34,17 @@ public class BarView {
     private final GraphicsContext gc;
     private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
+
+    private double width;
     private int hoveredPortrait;
     private double lastPortraitSize;
 
     public BarView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
         this.gameController = gameController;
-        controller = gameController.getController();
+        this.controller = gameController.getController();
         this.gc = canvas.getGraphicsContext2D();
-        hookupEvents();
+        hookUpEvents();
     }
 
     public void refresh() {
@@ -50,16 +52,17 @@ public class BarView {
         if (canvasWidth == 0) {
             return;
         }
-        double barWidth = getBarWidth(canvasWidth);
-        double leftX = canvasWidth - barWidth;
-
-        drawBackground(leftX, barWidth);
 
         double canvasHeight = canvas.getHeight();
-        double portraitSize = barWidth*PORTRAIT_PART;
+        double portraitSize = 0.08*canvasWidth*PORTRAIT_PART;
         if (portraitSize*9 > canvasHeight) {
             portraitSize = canvasHeight/9;
         }
+
+        width = portraitSize * 1.2;
+        double leftX = canvasWidth - width;
+        drawBackground(leftX, width);
+
         if (lastPortraitSize != portraitSize) {
             lastPortraitSize = portraitSize;
             Sizes.setPortraitSize((int) portraitSize);
@@ -76,7 +79,7 @@ public class BarView {
         updateActivePortrait(leftX, padding, portraitSize);
     }
 
-    private void hookupEvents() {
+    private void hookUpEvents() {
         EventHandler<MouseEvent> clickEvent = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
@@ -290,12 +293,11 @@ public class BarView {
 
     public double getLeft() {
         double canvasWidth = canvas.getWidth();
-        double barWidth = getBarWidth(canvasWidth);
-        return canvasWidth - barWidth;
+        return canvasWidth - width;
     }
 
-    public double getBarWidth(double canvasWidth) {
-        return canvasWidth * gameController.getSettings().getBarPart();
+    public double getWidth() {
+        return width;
     }
 
     private class Portrait {

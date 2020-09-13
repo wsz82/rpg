@@ -45,10 +45,6 @@ public class GameStage extends Stage {
     private ListView<String> savesView;
     private ListView<String> loadsView;
     private Button cancel;
-    private Button newGame;
-    private Button loadGame;
-    private Button openSettings;
-    private Button exit;
 
     public GameStage(GameController gameController) {
         super(StageStyle.DECORATED);
@@ -157,16 +153,16 @@ public class GameStage extends Stage {
 
         final VBox menu = new VBox(10);
 
-        newGame = new Button(locale.getProperty(LocaleKeys.NEW_GAME));
+        Button newGame = new Button(locale.getProperty(LocaleKeys.NEW_GAME));
         newGame.setOnAction(event -> startNewGame());
-        loadGame = new Button(locale.getProperty(LocaleKeys.LOAD_GAME));
+        Button loadGame = new Button(locale.getProperty(LocaleKeys.LOAD_GAME));
         loadGame.setOnAction(event -> {
             openSaveListToLoad();
             cancel.setOnAction(e -> setMainMenuForCenter());
         });
-        openSettings = new Button(locale.getProperty(LocaleKeys.SETTINGS));
+        Button openSettings = new Button(locale.getProperty(LocaleKeys.SETTINGS));
         openSettings.setOnAction(event -> openSettings());
-        exit = new Button(locale.getProperty(LocaleKeys.EXIT));
+        Button exit = new Button(locale.getProperty(LocaleKeys.EXIT));
         exit.setOnAction(event -> close());
 
         menu.setAlignment(Pos.CENTER);

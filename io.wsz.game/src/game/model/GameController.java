@@ -307,6 +307,10 @@ public class GameController {
         gameView.refresh();
     }
 
+    public GameView getGameView() {
+        return gameView;
+    }
+
     public void setGameView(GameView gameView) {
         this.gameView = gameView;
     }

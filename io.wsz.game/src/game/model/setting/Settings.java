@@ -2,6 +2,7 @@ package game.model.setting;
 
 import io.wsz.model.Controller;
 import io.wsz.model.sizes.FontSize;
+import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.Externalizable;
@@ -12,7 +13,6 @@ import java.io.ObjectOutput;
 public class Settings implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private double barPart;
     private FontSize fontSize;
     private double gameScrollSpeed;
     private double dialogScrollSpeed;
@@ -25,7 +25,6 @@ public class Settings implements Externalizable {
     private boolean isFullScreen;
 
     public void initDefaultSettings() {
-        barPart = 0.08;
         gameScrollSpeed = 0.2;
         dialogScrollSpeed = 0.2;
         isCenterOnPC = false;
@@ -33,17 +32,9 @@ public class Settings implements Externalizable {
         resolutionWidth = 1600;
         resolutionHeight = 900;
         isShowBar = true;
-        language = "English";
+        language = Paths.ENGLISH;
         fontSize = FontSize.M;
         isFullScreen = true;
-    }
-
-    public double getBarPart() {
-        return barPart;
-    }
-
-    public void setBarPart(double barPart) {
-        this.barPart = barPart;
     }
 
     public double getGameScrollSpeed() {
@@ -141,7 +132,6 @@ public class Settings implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeDouble(barPart);
         out.writeObject(fontSize);
         out.writeDouble(gameScrollSpeed);
         out.writeDouble(dialogScrollSpeed);
@@ -156,7 +146,6 @@ public class Settings implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        barPart = in.readDouble();
         fontSize = (FontSize) in.readObject();
         gameScrollSpeed = in.readDouble();
         dialogScrollSpeed = in.readDouble();

@@ -237,7 +237,7 @@ public class GameView extends CanvasView {
         if (posToCenter.x != -1) {
             double widthCorrection = 0;
             if (settings.isShowBar()) {
-                widthCorrection = barView.getBarWidth(canvasWidth) / meter;
+                widthCorrection = barView.getWidth() / meter;
             }
             board.centerScreenOn(posToCenter, canvasMeterWidth, canvasMeterHeight, -widthCorrection);
             posToCenter.x = -1;
@@ -252,7 +252,7 @@ public class GameView extends CanvasView {
         double top = b.getMinY();
         double right = b.getMaxX();
         if (settings.isShowBar()) {
-            right -= barView.getBarWidth(canvasWidth);
+            right -= barView.getWidth();
         }
         double bottom = b.getMaxY();
         CurrentLocation currentLocation = controller.getCurrentLocation();
@@ -292,7 +292,7 @@ public class GameView extends CanvasView {
                 if (cr != null) {
                     double widthCorrection = 0;
                     if (settings.isShowBar()) {
-                        widthCorrection = barView.getBarWidth(canvasWidth) / meter;
+                        widthCorrection = barView.getWidth() / meter;
                     }
                     board.centerScreenOn(cr.getCenter(), canvasMeterWidth, canvasMeterHeight, -widthCorrection);
                     return;
@@ -380,7 +380,7 @@ public class GameView extends CanvasView {
         int meter = Sizes.getMeter();
         double canvasWidth = canvas.getWidth();
         if (settings.isShowBar()) {
-            double additionalWidth = barView.getBarWidth(canvasWidth) / meter;
+            double additionalWidth = barView.getWidth() / meter;
             locWidth += additionalWidth;
         }
         double newX = curPos.x + settings.getGameScrollSpeed();
@@ -705,5 +705,9 @@ public class GameView extends CanvasView {
 
     public Canvas getCanvas() {
         return canvas;
+    }
+
+    public BarView getBarView() {
+        return barView;
     }
 }

@@ -289,7 +289,7 @@ public class InventoryView {
     public void refresh() {
         double width = canvas.getWidth();
         if (width == 0) return;
-        double barViewWidth = gameController.getSettings().getBarPart() * width;
+        double barViewWidth = gameController.getGameView().getBarView().getWidth();
         double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
 
         Creature cr = controller.getCreatureToOpenInventory();
