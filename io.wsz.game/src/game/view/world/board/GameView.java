@@ -2,12 +2,14 @@ package game.view.world.board;
 
 import game.model.GameController;
 import game.model.setting.Settings;
+import game.model.textures.Cursor;
 import game.model.world.GameRunner;
 import game.view.world.CanvasView;
 import game.view.world.FoggableDelegate;
 import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
 import io.wsz.model.dialog.DialogMemento;
+import io.wsz.model.item.Container;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
@@ -40,16 +42,18 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
+    private static final ItemType[] CURSOR_TYPES =
+            new ItemType[] {LANDSCAPE, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] PRIMARY_TYPES =
             new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
+    private static final Coords TEMP = new Coords();
 
     private final Stage parent;
     private final List<PosItem> items = new ArrayList<>(0);
     private final Coords mousePos = new Coords();
-    private final Coords modifiedCoords = new Coords();
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView;
@@ -122,6 +126,8 @@ public class GameView extends CanvasView {
                 canOpenInventory = false;
                 removeRemovableEvents();
                 inventoryView = new InventoryView(canvas, gameController);
+                ImageCursor main = gameController.getCursor().getMain();
+                setCursor(main);
             }
             inventoryView.refresh();
             return true;
@@ -214,10 +220,10 @@ public class GameView extends CanvasView {
     }
 
     private Coords translateCoordsToScreenCoords(Coords pos) {
-        modifiedCoords.x = pos.x;
-        modifiedCoords.y = pos.y;
-        modifiedCoords.subtract(curPos);
-        return modifiedCoords;
+        TEMP.x = pos.x;
+        TEMP.y = pos.y;
+        TEMP.subtract(curPos);
+        return TEMP;
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
@@ -269,41 +275,27 @@ public class GameView extends CanvasView {
             return;
         }
 
+        Coords pos = getMapCoords(x, y, left, top);
         if (isSelectionMode) {
-            Coords pos = getMousePos(x, y, left, top);
-            modifiedCoords.x = pos.x;
-            modifiedCoords.y = pos.y;
-            modifiedCoords.add(curPos);
-
             if (selFirst.x == -1) {
-                selFirst.x = modifiedCoords.x;
-                selFirst.y = modifiedCoords.y;
+                selFirst.x = pos.x;
+                selFirst.y = pos.y;
             } else {
-                selSecond.x = modifiedCoords.x;
-                selSecond.y = modifiedCoords.y;
+                selSecond.x = pos.x;
+                selSecond.y = pos.y;
             }
         }
+
+        Location location = currentLocation.getLocation();
 
         if (settings.isCenterOnPC()) {
-            Location location = currentLocation.getLocation();
-            List<Creature> controlledCreatures = board.getControlledCreatures(location);
-            if (!controlledCreatures.isEmpty()) {
-                Creature cr = controlledCreatures.get(0);
-                if (cr != null) {
-                    double widthCorrection = 0;
-                    if (settings.isShowBar()) {
-                        widthCorrection = barView.getWidth() / meter;
-                    }
-                    board.centerScreenOn(cr.getCenter(), canvasMeterWidth, canvasMeterHeight, -widthCorrection);
-                    return;
-                }
-            }
+            centerOnPC(meter, canvasMeterWidth, canvasMeterHeight, settings, location);
         }
+
+        drawAppropriateCursor(pos, location);
 
         if (x >= left+OFFSET && x <= right-OFFSET
                 && y >= top+OFFSET && y <= bottom-OFFSET) {
-            ImageCursor main = gameController.getCursor().getMain();
-            setCursor(main);
             return;
         }
 
@@ -359,6 +351,63 @@ public class GameView extends CanvasView {
             scrollRight(locWidth);
             scrollDown(locHeight);
         }
+    }
+
+    private void centerOnPC(int meter, double canvasMeterWidth, double canvasMeterHeight, Settings settings, Location location) {
+        List<Creature> controlledCreatures = board.getControlledCreatures(location);
+        if (!controlledCreatures.isEmpty()) {
+            Creature cr = controlledCreatures.get(0);
+            if (cr != null) {
+                double widthCorrection = 0;
+                if (settings.isShowBar()) {
+                    widthCorrection = barView.getWidth() / meter;
+                }
+                board.centerScreenOn(cr.getCenter(), canvasMeterWidth, canvasMeterHeight, -widthCorrection);
+            }
+        }
+    }
+
+    private void drawAppropriateCursor(Coords pos, Location location) {
+        int level = controller.getCurrentLayer().getLevel();
+        PosItem item = board.lookForItem(location, pos.x, pos.y, level, CURSOR_TYPES, false);
+        if (item instanceof Landscape) {
+            ImageCursor cursor = gameController.getCursor().getMain();
+            setCursor(cursor);
+        } else if (item instanceof InDoor || item instanceof OutDoor) {
+            Openable door = (Openable) item;
+            ImageCursor imageCursor;
+            Cursor cursor = gameController.getCursor();
+            if (door.isOpen()) {
+                imageCursor = cursor.getOpenDoorCursor();
+            } else {
+                imageCursor = cursor.getClosedDoorCursor();
+            }
+            setCursor(imageCursor);
+        } else if (item instanceof Container) {
+            Openable container = (Openable) item;
+            ImageCursor imageCursor;
+            Cursor cursor = gameController.getCursor();
+            if (container.isOpen()) {
+                imageCursor = cursor.getOpenContainerCursor();
+            } else {
+                imageCursor = cursor.getClosedContainerCursor();
+            }
+            setCursor(imageCursor);
+        } else if (item instanceof Equipment) {
+            ImageCursor cursor = gameController.getCursor().getMain();
+            setCursor(cursor);
+        } else {
+            ImageCursor cursor = gameController.getCursor().getMain();
+            setCursor(cursor);
+        }
+    }
+
+    private Coords getMapCoords(double x, double y, double left, double top) {
+        Coords pos = getMousePos(x, y, left, top);
+        TEMP.x = pos.x;
+        TEMP.y = pos.y;
+        TEMP.add(curPos);
+        return TEMP;
     }
 
     private void setCursor(ImageCursor main) {
@@ -467,11 +516,11 @@ public class GameView extends CanvasView {
         double y = e.getY();
 
         Location location = controller.getCurrentLocation().getLocation();
-        modifiedCoords.x = x / Sizes.getMeter();
-        modifiedCoords.y = y / Sizes.getMeter();
-        modifiedCoords.add(curPos);
-        double finalX = modifiedCoords.x;
-        double finalY = modifiedCoords.y;
+        TEMP.x = x / Sizes.getMeter();
+        TEMP.y = y / Sizes.getMeter();
+        TEMP.add(curPos);
+        double finalX = TEMP.x;
+        double finalY = TEMP.y;
 
         if (button.equals(MouseButton.PRIMARY)) {
             if (gameController.getSettings().isShowBar()) {

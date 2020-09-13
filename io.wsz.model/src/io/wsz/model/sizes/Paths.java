@@ -32,12 +32,10 @@ public class Paths {
     public static final String BASIC_OPEN = BASIC + DIVIDER + OPEN;
     public static final String BASIC_OPEN_DIR = File.separator + BASIC_OPEN;
     public static final String OPERATING = "operating";
-    public static final String OPERATING_DIR = File.separator + OPERATING;
     public static final String INVENTORY = "inventory";
     public static final String INVENTORY_DIR = File.separator + INVENTORY;
     public static final String INVENTORY_OPEN = INVENTORY + DIVIDER + OPEN;
     public static final String PORTRAIT = "portrait";
-    public static final String PORTRAIT_DIR = File.separator + PORTRAIT;
     public static final String WALK = "walk";
     public static final String STOP = "stop";
     public static final String N = "N";
@@ -69,4 +67,8 @@ public class Paths {
     public static final String RIGHT_UP_DIR = File.separator + "right_up";
     public static final String LEFT_DOWN_DIR = File.separator + "left_down";
     public static final String RIGHT_DOWN_DIR = File.separator + "right_down";
+    public static final String DOOR_OPEN_DIR = File.separator + "door_open";
+    public static final String DOOR_CLOSED_DIR = File.separator + "door_closed";
+    public static final String CONTAINER_OPEN_DIR = File.separator + "container_open";
+    public static final String CONTAINER_CLOSED_DIR = File.separator + "container_closed";
 }

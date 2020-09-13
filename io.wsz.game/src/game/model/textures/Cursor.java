@@ -18,6 +18,10 @@ public class Cursor {
     private ImageCursor rightUpCursor;
     private ImageCursor rightDownCursor;
     private ImageCursor leftDownCursor;
+    private ImageCursor openDoorCursor;
+    private ImageCursor closedDoorCursor;
+    private ImageCursor openContainerCursor;
+    private ImageCursor closedContainerCursor;
 
     public void initCursorsImages(File programDir) {
         String cursorsDir = programDir + TEXTURES_DIR + CURSOR_DIR;
@@ -57,6 +61,22 @@ public class Cursor {
         ResolutionImage leftDown = new ResolutionImage(cursorsDir + LEFT_DOWN_DIR + PNG);
         Image leftDownFx = leftDown.getFxImage();
         leftDownCursor = new ImageCursor(leftDownFx, 0, leftDownFx.getHeight());
+
+        ResolutionImage doorOpen = new ResolutionImage(cursorsDir + DOOR_OPEN_DIR + PNG);
+        Image doorOpenFx = doorOpen.getFxImage();
+        openDoorCursor = new ImageCursor(doorOpenFx, doorOpenFx.getWidth()/2, doorOpenFx.getHeight()/2);
+
+        ResolutionImage doorClosed = new ResolutionImage(cursorsDir + DOOR_CLOSED_DIR + PNG);
+        Image doorClosedFx = doorClosed.getFxImage();
+        closedDoorCursor = new ImageCursor(doorClosedFx, doorClosedFx.getWidth()/2, doorClosedFx.getHeight()/2);
+
+        ResolutionImage containerOpen = new ResolutionImage(cursorsDir + CONTAINER_OPEN_DIR + PNG);
+        Image containerOpenFx = containerOpen.getFxImage();
+        openContainerCursor = new ImageCursor(containerOpenFx, containerOpenFx.getWidth()/2, containerOpenFx.getHeight()/2);
+
+        ResolutionImage containerClosed = new ResolutionImage(cursorsDir + CONTAINER_CLOSED_DIR + PNG);
+        Image containerClosedFx = containerClosed.getFxImage();
+        closedContainerCursor = new ImageCursor(containerClosedFx, containerClosedFx.getWidth()/2, containerClosedFx.getHeight()/2);
     }
 
     public ImageCursor getMain() {
@@ -93,5 +113,21 @@ public class Cursor {
 
     public ImageCursor getLeftDownCursor() {
         return leftDownCursor;
+    }
+
+    public ImageCursor getOpenDoorCursor() {
+        return openDoorCursor;
+    }
+
+    public ImageCursor getClosedDoorCursor() {
+        return closedDoorCursor;
+    }
+
+    public ImageCursor getOpenContainerCursor() {
+        return openContainerCursor;
+    }
+
+    public ImageCursor getClosedContainerCursor() {
+        return closedContainerCursor;
     }
 }

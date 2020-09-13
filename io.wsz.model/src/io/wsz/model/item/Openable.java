@@ -4,6 +4,8 @@ import io.wsz.model.stage.ResolutionImage;
 
 public interface Openable {
 
+    boolean isOpen();
+
     void open();
 
     void close();
