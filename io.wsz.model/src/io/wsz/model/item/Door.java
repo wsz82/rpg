@@ -14,6 +14,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimationPos> implements Openable {
     private static final long serialVersionUID = 1L;
 
@@ -103,7 +105,7 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
     @Override
     protected DoorAnimation getConcreteAnimation() {
         if (animation == null) {
-            return new DoorAnimation(getDir());
+            return new DoorAnimation(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -203,7 +205,7 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
         animationPos = (OpenableAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new DoorAnimation(getDir());
+            animation = new DoorAnimation(getDir(), IDLE);
         }
 
         isOpen = in.readBoolean();

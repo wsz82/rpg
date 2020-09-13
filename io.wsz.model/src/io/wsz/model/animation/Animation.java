@@ -18,10 +18,14 @@ public class Animation<A extends PosItem<?,?>> {
     private static final int MIN_IDLE_UPDATE_TIME_SEC = 2;
     private static final int MAX_IDLE_UPDATE_TIME_SEC = 4;
 
+    protected final Map<String, Map<String, List<File>>> idlesFiles = new HashMap<>(0);
     protected final Map<String, Map<String, List<ResolutionImage>>> idles = new HashMap<>(0);
     protected final String animationDir;
+    private final String idlesOrEquivalent;
 
-    public Animation(String animationDir) {
+    private ResolutionImage basicMain;
+
+    public Animation(String animationDir, String idlesOrEquivalent) {
         if (animationDir == null) {
             throw new NullPointerException();
         }
@@ -29,6 +33,7 @@ public class Animation<A extends PosItem<?,?>> {
             throw new IllegalArgumentException("Animation path is empty");
         }
         this.animationDir = animationDir;
+        this.idlesOrEquivalent = idlesOrEquivalent;
     }
 
     public void play(A item) {
@@ -39,19 +44,77 @@ public class Animation<A extends PosItem<?,?>> {
     }
 
     public final void initAllAnimations(File programDir) {
-        File[] animationsDirs = getAnimationFiles(programDir);
+        File[] animationsDirs = getHighestAnimationFiles(programDir);
         if (animationsDirs == null || animationsDirs.length == 0) return;
 
         for (File animationDir : animationsDirs) {
             String fileName = animationDir.getName();
-            if (fileName.equals(IDLE)) {
-                initAnimations(animationDir, idles);
+            if (fileName.equals(idlesOrEquivalent)) {
+                initAnimationFiles(animationDir, idlesFiles);
+                initIdlesOrEquivalent();
             }
             initOtherAnimations(animationDir, fileName);
         }
     }
 
     public void initOtherAnimations(File framesDir, String fileName) {}
+
+    public void initIdlesOrEquivalent() {
+        idles.clear();
+        for (String animationKey : idlesFiles.keySet()) {
+            Map<String, List<File>> animationFiles = idlesFiles.get(animationKey);
+            Map<String, List<ResolutionImage>> animation = new HashMap<>(1);
+            for (String sequenceKey : animationFiles.keySet()) {
+                List<File> files = animationFiles.get(sequenceKey);
+                List<ResolutionImage> sequence = new ArrayList<>(1);
+                for (File file : files) {
+                    initSequenceImage(sequence, file);
+                }
+                animation.put(sequenceKey, sequence);
+            }
+            idles.put(animationKey, animation);
+        }
+     }
+
+    protected void initSequenceImage(List<ResolutionImage> sequence, File file) {
+        ResolutionImage image = new ResolutionImage(file);
+        sequence.add(image);
+    }
+
+    private void initAnimationFiles(File animationDir, Map<String, Map<String, List<File>>> files) {
+        File[] animationFiles = animationDir.listFiles();
+        if (animationFiles == null || animationFiles.length == 0) return;
+
+        for (File subAnimationFile : animationFiles) {
+            String name = subAnimationFile.getName();
+            Map<String, List<File>> animation = getAnimationFiles(subAnimationFile);
+            files.put(name, animation);
+        }
+    }
+
+    private Map<String, List<File>> getAnimationFiles(File animationFile) {
+        Map<String, List<File>> animation = new HashMap<>(0);
+        File[] sequencesFiles = animationFile.listFiles();
+        if (sequencesFiles == null || sequencesFiles.length == 0) return null;
+
+        for (File sequenceFile : sequencesFiles) {
+            boolean isNotDirectory = !sequenceFile.isDirectory();
+            if (isNotDirectory) continue;
+            List<File> sequence = getLoadedFilesSequence(sequenceFile);
+            if (sequence == null || sequence.isEmpty()) continue;
+            String sequenceName = sequenceFile.getName();
+            animation.put(sequenceName, sequence);
+        }
+        return animation;
+    }
+
+    private List<File> getLoadedFilesSequence(File framesDir) {
+        File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
+        if (imagesFiles == null || imagesFiles.length == 0) return null;
+        List<File> sequence = new ArrayList<>(0);
+        sequence.addAll(Arrays.asList(imagesFiles));
+        return sequence;
+    }
 
     public void initAnimations(File animationDir, Map<String, Map<String, List<ResolutionImage>>> animations) {
         File[] animationFiles = animationDir.listFiles();
@@ -96,21 +159,20 @@ public class Animation<A extends PosItem<?,?>> {
         return curTime + randomTimeToStartIdleMillis;
     }
 
+    protected int getRandomMillis(int maxIdleUpdateTimeSec, int minIdleUpdateTimeSec) {
+        return (int) (Math.random() * (maxIdleUpdateTimeSec - minIdleUpdateTimeSec + 1) + minIdleUpdateTimeSec) * 1000;
+    }
+
     protected long getNextUpdate(int framesSize, Double speed) {
         long frameDif = getFrameDuration(speed, framesSize);
         return System.currentTimeMillis() + frameDif;
-    }
-
-    protected int getRandomMillis(int maxIdleUpdateTimeSec, int minIdleUpdateTimeSec) {
-        return (int) (Math.random() *
-                (maxIdleUpdateTimeSec - minIdleUpdateTimeSec + 1) + minIdleUpdateTimeSec) * 1000;
     }
 
     private long getFrameDuration(double speed, int framesSize) {
         return (long) (1 / speed * 1000 / framesSize);
     }
 
-    protected File[] getAnimationFiles(File programDir) {
+    private File[] getHighestAnimationFiles(File programDir) {
         String path = programDir + animationDir;
         File pathFile = new File(path);
         return pathFile.listFiles();
@@ -251,8 +313,14 @@ public class Animation<A extends PosItem<?,?>> {
     }
 
     public ResolutionImage getBasicMain(File programDir) {
-        Map<String, List<ResolutionImage>> basic = idles.get(BASIC);
+        if (basicMain == null) {
+            loadBasicMain(programDir);
+        }
+        return basicMain;
+    }
 
+    private void loadBasicMain(File programDir) {
+        Map<String, List<ResolutionImage>> basic = idles.get(BASIC);
         boolean basicNotLoaded = basic == null || basic.isEmpty();
         boolean mainNotLoaded = true;
         List<ResolutionImage> main = null;
@@ -270,7 +338,7 @@ public class Animation<A extends PosItem<?,?>> {
             String path = programDir + animationDir + IDLE_DIR + BASIC_DIR + MAIN_DIR;
             File idleDir = new File(path);
             File[] imagesFiles = idleDir.listFiles(PNG_FILE_FILTER);
-            if (imagesFiles == null || imagesFiles.length == 0) return null;
+            if (imagesFiles == null || imagesFiles.length == 0) return;
             File firstImageFile = imagesFiles[firstIndex];
             ResolutionImage loadedImage = new ResolutionImage(firstImageFile);
 
@@ -284,6 +352,6 @@ public class Animation<A extends PosItem<?,?>> {
             }
             main.add(loadedImage);
         }
-        return idles.get(BASIC).get(MAIN).get(firstIndex);
+        basicMain = idles.get(BASIC).get(MAIN).get(firstIndex);
     }
 }

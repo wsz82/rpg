@@ -1,8 +1,10 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.animation.creature.CreatureAnimationPos;
+import io.wsz.model.animation.creature.PortraitAnimation;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
@@ -20,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import static io.wsz.model.location.FogStatus.CLEAR;
+import static io.wsz.model.sizes.Paths.IDLE;
+import static io.wsz.model.sizes.Paths.PORTRAIT;
 
 public class Creature extends PosItem<Creature, CreatureAnimationPos> implements Containable {
     private static final long serialVersionUID = 1L;
@@ -30,9 +34,11 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private final Coords tempReversedCenterBottom = new Coords();
 
     private CreatureAnimation animation;
+    private PortraitAnimation portraitAnimation;
 
     private final Task task = new Task();
     private CreatureAnimationPos animationPos;
+    private AnimationPos portraitAnimationPos;
     private Coords middlePoint;
     private Inventory inventory;
     private CreatureSize size;
@@ -41,18 +47,21 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private Double visionRange;
     private Double range;
     private Integer strength;
+    private ResolutionImage portrait;
 
     public Creature() {}
 
     public Creature(Controller controller) {
         super(ItemType.CREATURE, controller);
         this.animationPos = new CreatureAnimationPos();
+        this.portraitAnimationPos = new AnimationPos();
         this.inventory = new Inventory(this);
     }
 
     public Creature(Creature prototype, Boolean visible) {
         super(prototype, visible);
         this.animationPos = new CreatureAnimationPos();
+        this.portraitAnimationPos = new AnimationPos();
     }
 
     @Override
@@ -471,7 +480,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     protected CreatureAnimation getConcreteAnimation() {
         if (animation == null) {
-            return new CreatureAnimation(getDir());
+            return new CreatureAnimation(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -480,6 +489,26 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public CreatureAnimationPos getAnimationPos() {
         return animationPos;
+    }
+
+    public PortraitAnimation getPortraitAnimation() {
+        if (isThisPrototype()) {
+            return portraitAnimation;
+        } else {
+            return prototype.getPortraitAnimation();
+        }
+    }
+
+    public AnimationPos getPortraitAnimationPos() {
+        return portraitAnimationPos;
+    }
+
+    public ResolutionImage getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(ResolutionImage portrait) {
+        this.portrait = portrait;
     }
 
     @Override
@@ -595,6 +624,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
         out.writeObject(animationPos);
 
+        out.writeObject(portraitAnimationPos);
+
         out.writeObject(task);
 
         out.writeObject(middlePoint);
@@ -621,8 +652,11 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
         animationPos = (CreatureAnimationPos) in.readObject();
 
+        portraitAnimationPos = (AnimationPos) in.readObject();
+
         if (isThisPrototype()) {
-            animation = new CreatureAnimation(getDir());
+            animation = new CreatureAnimation(getDir(), IDLE);
+            portraitAnimation = new PortraitAnimation(getDir(), PORTRAIT);
         }
 
         Task serTask = (Task) in.readObject();

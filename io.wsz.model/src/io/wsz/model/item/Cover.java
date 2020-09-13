@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public class Cover extends PosItem<Cover, AnimationPos> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +40,7 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
     @Override
     protected Animation<Cover> getConcreteAnimation() {
         if (animation == null) {
-            return new Animation<>(getDir());
+            return new Animation<>(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -65,7 +67,7 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new Animation<>(getDir());
+            animation = new Animation<>(getDir(), IDLE);
         }
     }
 }

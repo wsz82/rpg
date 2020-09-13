@@ -10,14 +10,13 @@ import io.wsz.model.stage.ResolutionImage;
 
 import java.io.File;
 
-import static io.wsz.model.sizes.Paths.BASIC;
-import static io.wsz.model.sizes.Paths.BASIC_OPEN;
+import static io.wsz.model.sizes.Paths.*;
 
 public class DoorAnimation extends Animation<Door<?>> {
-    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir);
+    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir, IDLE);
 
-    public DoorAnimation(String animationDir) {
-        super(animationDir);
+    public DoorAnimation(String animationDir, String idlesOrEquivalent) {
+        super(animationDir, idlesOrEquivalent);
     }
 
     @Override

@@ -341,6 +341,10 @@ public class GameRunner {
 
         private void reloadAssetImages(PosItem pi, File programDir) {
             pi.getAnimation().initAllAnimations(programDir);
+            if (pi instanceof Creature) {
+                Creature cr = (Creature) pi;
+                cr.getPortraitAnimation().initAllAnimations(programDir);
+            }
         }
     }
 }

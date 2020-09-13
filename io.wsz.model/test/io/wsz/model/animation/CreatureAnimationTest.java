@@ -10,7 +10,7 @@ class CreatureAnimationTest {
 
     @Test
     void getMoveSide() {
-        CreatureAnimation creatureAnimation = new CreatureAnimation("path");
+        CreatureAnimation creatureAnimation = new CreatureAnimation("path", IDLE);
         String moveDirection;
 
         double xFrom = 5;

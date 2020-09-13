@@ -7,8 +7,8 @@ import io.wsz.model.stage.ResolutionImage;
 
 public abstract class EquipmentAnimation<E extends Equipment<?,?>> extends Animation<E> {
 
-    public EquipmentAnimation(String animationDir) {
-        super(animationDir);
+    public EquipmentAnimation(String animationDir, String idlesOrEquivalent) {
+        super(animationDir, idlesOrEquivalent);
     }
 
     @Override

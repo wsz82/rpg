@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public class Landscape extends PosItem<Landscape, AnimationPos> {
     private static final long serialVersionUID = 1L;
 
@@ -37,7 +39,7 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     @Override
     protected Animation<Landscape> getConcreteAnimation() {
         if (animation == null) {
-            return new Animation<>(getDir());
+            return new Animation<>(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -64,7 +66,7 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new Animation<>(getDir());
+            animation = new Animation<>(getDir(), IDLE);
         }
     }
 }

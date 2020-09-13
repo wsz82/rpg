@@ -13,10 +13,10 @@ import java.io.File;
 import static io.wsz.model.sizes.Paths.*;
 
 public class ContainerAnimation extends EquipmentAnimation<Container> {
-    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir);
+    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir, IDLE);
 
-    public ContainerAnimation(String animationDir) {
-        super(animationDir);
+    public ContainerAnimation(String animationDir, String idlesOrEquivalent) {
+        super(animationDir, idlesOrEquivalent);
     }
 
     @Override

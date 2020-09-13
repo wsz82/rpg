@@ -16,6 +16,8 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public class Container extends Equipment<Container, ContainerAnimationPos> implements Containable, Openable {
     private static final long serialVersionUID = 1L;
 
@@ -295,7 +297,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     @Override
     protected ContainerAnimation getConcreteAnimation() {
         if (animation == null) {
-            return new ContainerAnimation(getDir());
+            return new ContainerAnimation(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -332,7 +334,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         animationPos = (ContainerAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new ContainerAnimation(getDir());
+            animation = new ContainerAnimation(getDir(), IDLE);
         }
 
         List<Equipment> serItems = (List<Equipment>) in.readObject();

@@ -14,6 +14,8 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public class Teleport extends PosItem<Teleport, AnimationPos> {
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +89,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     @Override
     protected Animation<Teleport> getConcreteAnimation() {
         if (animation == null) {
-            return new Animation<>(getDir());
+            return new Animation<>(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -118,7 +120,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         animationPos = (AnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new Animation<>(getDir());
+            animation = new Animation<>(getDir(), IDLE);
         }
 
         exit = (Coords) in.readObject();

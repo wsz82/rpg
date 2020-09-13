@@ -5,7 +5,6 @@ import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.InventoryPlaceType;
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 
@@ -15,21 +14,17 @@ import java.util.*;
 import static io.wsz.model.sizes.Paths.*;
 
 public class CreatureAnimation extends Animation<Creature> {
-    private static final int MIN_PORTRAIT_UPDATE_TIME_SEC = 1;
-    private static final int MAX_PORTRAIT_UPDATE_TIME_SEC = 4;
     private static final int MIN_STOP_WAIT_TIME_SEC = 2;
     private static final int MAX_STOP_WAIT_TIME_SEC = 3;
     private static final List<String> EQUIPPED_ITEMS_NAMES = new ArrayList<>(0);
     private static final StringBuilder BUILD_ANIMATION_NAME = new StringBuilder();
 
     private final Map<String, Map<String, List<ResolutionImage>>> walk = new HashMap<>(0);
-    private final List<File> portraitsFiles = new ArrayList<>(0);
-    private final List<ResolutionImage> portraits = new ArrayList<>(0);
     private final Map<String, File> creatureInventoryFiles = new HashMap<>(0);
     private final Map<String, ResolutionImage> creatureInventoryPictures = new HashMap<>(0);
 
-    public CreatureAnimation(String animationDir) {
-        super(animationDir);
+    public CreatureAnimation(String animationDir, String idlesOrEquivalent) {
+        super(animationDir, idlesOrEquivalent);
     }
 
     @Override
@@ -73,7 +68,6 @@ public class CreatureAnimation extends Animation<Creature> {
     @Override
     public void initOtherAnimations(File framesDir, String fileName) {
         switch (fileName) {
-            case PORTRAIT -> initPortraitPicturesFiles(framesDir, portraitsFiles);
             case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
             case WALK -> initAnimations(framesDir, walk);
         }
@@ -111,32 +105,6 @@ public class CreatureAnimation extends Animation<Creature> {
             creatureInventoryPictures.put(BASIC, basicInventoryImage);
         }
         return basicInventoryImage;
-    }
-
-    private void initPortraitPicturesFiles(File framesDir, List<File> portraitsFiles) {
-        portraitsFiles.clear();
-        File[] imagesFiles = framesDir.listFiles(PNG_FILE_FILTER);
-        if (imagesFiles == null || imagesFiles.length == 0) return;
-        for (File portraitFile : imagesFiles) {
-            boolean isNotPNGfile = !portraitFile.getName().endsWith(PNG);
-            if (isNotPNGfile) continue;
-            portraitsFiles.add(portraitFile);
-        }
-    }
-
-    public ResolutionImage getPortrait(Creature cr) {
-        CreatureAnimationPos animationPos = cr.getAnimationPos();
-        long curTime = System.currentTimeMillis();
-        if (curTime < animationPos.getNextPortraitUpdate()) return null;
-        int randomDifTimeMillis = getRandomMillis(MAX_PORTRAIT_UPDATE_TIME_SEC, MIN_PORTRAIT_UPDATE_TIME_SEC);
-        long nextPortraitUpdate = curTime + randomDifTimeMillis;
-        animationPos.setNextPortraitUpdate(nextPortraitUpdate);
-        List<ResolutionImage> portraits = getPortraits();
-        if (portraits == null) return null;
-        int portraitsSize = portraits.size();
-        if (portraitsSize == 0) return null;
-        int randomIndex = RANDOM.nextInt(portraitsSize);
-        return portraits.get(randomIndex);
     }
 
     private ResolutionImage getStop(Creature cr) {
@@ -251,20 +219,7 @@ public class CreatureAnimation extends Animation<Creature> {
         return super.getNextIdle(animationPos, speed);
     }
 
-    public List<ResolutionImage> getPortraits() {
-        int portraitSize = Sizes.getPortraitSize();
-        if (portraitSize <= 0) return null;
-        if (portraits.isEmpty()) {
-            for (File imageFile : portraitsFiles) {
-                ResolutionImage loadedFrame = new ResolutionImage(imageFile, portraitSize, portraitSize);
-                portraits.add(loadedFrame);
-            }
-        }
-        return portraits;
-    }
-
     public void clearResizablePictures() {
-        portraits.clear();
         creatureInventoryPictures.clear();
     }
 }

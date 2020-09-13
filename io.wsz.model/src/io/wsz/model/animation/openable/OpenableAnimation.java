@@ -14,8 +14,8 @@ public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
 
     private final Map<String, Map<String, List<ResolutionImage>>> operating = new HashMap<>(0);
 
-    public OpenableAnimation(String animationDir) {
-        super(animationDir);
+    public OpenableAnimation(String animationDir, String idlesOrEquivalent) {
+        super(animationDir, idlesOrEquivalent);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.wsz.model;
 
 import io.wsz.model.animation.creature.CreatureAnimation;
+import io.wsz.model.animation.creature.PortraitAnimation;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogItem;
@@ -340,11 +341,13 @@ public class Controller {
         assets.stream()
                 .filter(a -> a instanceof Creature)
                 .map(a -> (Creature) a)
-                .map(cr -> {
+                .forEach(cr -> {
                     CreatureAnimation anim = cr.getAnimation();
-                    return anim;
-                })
-                .forEach(CreatureAnimation::clearResizablePictures);
+                    anim.clearResizablePictures();
+                    PortraitAnimation portraitAnimation = cr.getPortraitAnimation();
+                    portraitAnimation.clearResizablePictures();
+                    portraitAnimation.initIdlesOrEquivalent();
+                });
     }
 
     public boolean isInventory() {

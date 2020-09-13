@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import static io.wsz.model.sizes.Paths.IDLE;
+
 public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
@@ -129,7 +131,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     @Override
     protected WeaponAnimation getConcreteAnimation() {
         if (animation == null) {
-            return new WeaponAnimation(getDir());
+            return new WeaponAnimation(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -162,7 +164,7 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
         animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new WeaponAnimation(getDir());
+            animation = new WeaponAnimation(getDir(), IDLE);
         }
 
         damage = (Double) in.readObject();
