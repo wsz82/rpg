@@ -149,6 +149,8 @@ public class GameView extends CanvasView {
                     removeRemovableEvents();
                     DialogMemento dialogMemento = controller.getDialogMemento();
                     dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
+                    ImageCursor main = gameController.getCursor().getMain();
+                    setCursor(main);
                 }
                 dialogView.refresh();
                 return true;
@@ -381,8 +383,21 @@ public class GameView extends CanvasView {
             return;
         }
         int level = controller.getCurrentLayer().getLevel();
+        pos.level = level;
         PosItem item = board.lookForItem(location, pos.x, pos.y, level, CURSOR_TYPES, false);
-        if (item instanceof Landscape || item instanceof Cover || item instanceof Teleport) {
+        if (item instanceof Creature) {
+            Creature creature = (Creature) item;
+            CreatureControl control = creature.getControl();
+            ImageCursor cursor;
+            if (control == CreatureControl.NEUTRAL) {
+                cursor = gameController.getCursor().getTalkCursor();
+            } else if (control == CreatureControl.ENEMY) {
+                cursor = gameController.getCursor().getAttackCursor();
+            } else {
+                cursor = gameController.getCursor().getMain();
+            }
+            setCursor(cursor);
+        } else if (item instanceof Landscape || item instanceof Cover || item instanceof Teleport) {
             boolean canGo = board.getObstacle(pos, selected, location, OBSTACLE_TYPES) == null;
             ImageCursor cursor;
             if (canGo) {

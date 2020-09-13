@@ -74,4 +74,6 @@ public class Paths {
     public static final String PICK_DIR = File.separator + "pick";
     public static final String GO_DIR = File.separator + "go";
     public static final String NOT_GO_DIR = File.separator + "not_go";
+    public static final String TALK_DIR = File.separator + "talk";
+    public static final String ATTACK_DIR = File.separator + "attack";
 }

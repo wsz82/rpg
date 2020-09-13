@@ -25,6 +25,8 @@ public class Cursor {
     private ImageCursor pickCursor;
     private ImageCursor goCursor;
     private ImageCursor notGoCursor;
+    private ImageCursor talkCursor;
+    private ImageCursor attackCursor;
 
     public void initCursorsImages(File programDir) {
         String cursorsDir = programDir + TEXTURES_DIR + CURSOR_DIR;
@@ -92,6 +94,14 @@ public class Cursor {
         ResolutionImage notGo = new ResolutionImage(cursorsDir + NOT_GO_DIR + PNG);
         Image notGoFx = notGo.getFxImage();
         notGoCursor = new ImageCursor(notGoFx, notGoFx.getWidth()/2, notGoFx.getHeight()/2);
+
+        ResolutionImage talk = new ResolutionImage(cursorsDir + TALK_DIR + PNG);
+        Image talkFx = talk.getFxImage();
+        talkCursor = new ImageCursor(talkFx, talkFx.getWidth()/2, talkFx.getHeight()/2);
+
+        ResolutionImage attack = new ResolutionImage(cursorsDir + ATTACK_DIR + PNG);
+        Image attackFx = attack.getFxImage();
+        attackCursor = new ImageCursor(attackFx, attackFx.getWidth()/2, attackFx.getHeight()/2);
     }
 
     public ImageCursor getMain() {
@@ -156,5 +166,13 @@ public class Cursor {
 
     public ImageCursor getNotGoCursor() {
         return notGoCursor;
+    }
+
+    public ImageCursor getTalkCursor() {
+        return talkCursor;
+    }
+
+    public ImageCursor getAttackCursor() {
+        return attackCursor;
     }
 }
