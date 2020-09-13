@@ -219,7 +219,7 @@ public class CreatureAnimation extends Animation<Creature> {
         return super.getNextIdle(animationPos, speed);
     }
 
-    public void clearResizablePictures() {
+    public void clearInventoryPictures() {
         creatureInventoryPictures.clear();
     }
 }

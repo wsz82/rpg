@@ -59,4 +59,10 @@ public class Paths {
     public static final String LOCALE_DIR = File.separator + LOCALE;
     public static final String DOT_PROPERTIES = ".properties";
     public static final String ENGLISH = "English";
+
+    public static final String CURSOR_DIR = File.separator + "cursor";
+    public static final String UP_DIR = File.separator + "up";
+    public static final String RIGHT_DIR = File.separator + "right";
+    public static final String DOWN_DIR = File.separator + "down";
+    public static final String LEFT_DIR = File.separator + "left";
 }

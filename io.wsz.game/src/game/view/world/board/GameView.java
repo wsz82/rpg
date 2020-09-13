@@ -16,6 +16,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
@@ -263,6 +264,8 @@ public class GameView extends CanvasView {
         int y = p.y;
 
         if (x < left || x > right || y < top || y > bottom) {
+            ImageCursor main = gameController.getCursor().getMain();
+            setCursor(main);
             return;
         }
 
@@ -299,23 +302,33 @@ public class GameView extends CanvasView {
 
         if (x >= left+OFFSET && x <= right-OFFSET
                 && y >= top+OFFSET && y <= bottom-OFFSET) {
+            ImageCursor main = gameController.getCursor().getMain();
+            setCursor(main);
             return;
         }
 
         if (x < left+OFFSET && x >= left
                 && y > top+OFFSET && y < bottom-OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getLeft();
+            setCursor(cursor);
             scrollLeft();
         } else
         if (x > right-OFFSET && x <= right
                 && y > top+OFFSET && y < bottom-OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getRight();
+            setCursor(cursor);
             scrollRight(locWidth);
         } else
         if (y < top+OFFSET && y >= top
                 && x > left+OFFSET && x < right-OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getUp();
+            setCursor(cursor);
             scrollUp();
         } else
         if (y > bottom-OFFSET && y <= bottom
                 && x > left+OFFSET && x < right-OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getDown();
+            setCursor(cursor);
             scrollDown(locHeight);
         } else
         if (x < left+OFFSET && x >= left
@@ -338,6 +351,10 @@ public class GameView extends CanvasView {
             scrollRight(locWidth);
             scrollDown(locHeight);
         }
+    }
+
+    private void setCursor(ImageCursor main) {
+        getCanvas().getScene().setCursor(main);
     }
 
     private void scrollDown(double locHeight) {
@@ -413,10 +430,10 @@ public class GameView extends CanvasView {
         });
 
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
-            controller.clearResizablePictures();
+            controller.reloadInventoryPictures();
         });
         canvas.heightProperty().addListener((observable, oldValue, newValue) -> {
-            controller.clearResizablePictures();
+            controller.reloadInventoryPictures();
         });
     }
 

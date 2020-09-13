@@ -124,7 +124,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     public boolean tryTake(Creature cr) {
         boolean doesFitInventory = !cr.getInventory().fitsInventory(this);
         if (doesFitInventory) {
-            controller.getLogger().logItemDoesNotFitInventory(getName(), cr.getName());
+            getController().getLogger().logItemDoesNotFitInventory(getName(), cr.getName());
             return false;
         }
         Coords crCenter = cr.getCenter();
@@ -137,12 +137,12 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
-            controller.getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
+            getController().getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
             return false;
         } else {
             setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
-            controller.getLogger().logItemAction(getName(), "taken");
+            getController().getLogger().logItemAction(getName(), "taken");
             return true;
         }
     }
@@ -187,11 +187,11 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             } else {
                 message += ": behind " + obstacleOnWay.getName();
             }
-            controller.getLogger().logItemAction(getName(), message);
+            getController().getLogger().logItemAction(getName(), message);
             return false;
         } else {
             l.getItemsToAdd().add(this);
-            controller.getLogger().logItemAction(getName(), "dropped");
+            getController().getLogger().logItemAction(getName(), "dropped");
             return true;
         }
     }

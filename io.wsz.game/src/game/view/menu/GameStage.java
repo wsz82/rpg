@@ -3,6 +3,7 @@ package game.view.menu;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
+import game.model.textures.Cursor;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.locale.LocaleKeys;
@@ -11,6 +12,7 @@ import io.wsz.model.stage.Coords;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -77,8 +79,16 @@ public class GameStage extends Stage {
         final Scene scene = new Scene(root);
         setScene(scene);
 
+        setCustomCursor(scene);
         hookUpCloseEvent();
         hookUpReturnEvent();
+    }
+
+    private void setCustomCursor(Scene scene) {
+        Cursor cursor = gameController.getCursor();
+        cursor.initCursorsImages(controller.getProgramDir());
+        ImageCursor imageCursor = cursor.getMain();
+        scene.setCursor(imageCursor);
     }
 
     private void hookUpCloseEvent() {

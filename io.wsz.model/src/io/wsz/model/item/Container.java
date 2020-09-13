@@ -286,12 +286,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
 
     private void onOperateActionFailure(PosItem collision, String message) {
         animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.IDLE);
-        controller.getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
+        getController().getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
     }
 
     private void onOperateActionSuccess(String message) {
         animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.OPERATING);
-        controller.getLogger().logItemAction(getName(), message);
+        getController().getLogger().logItemAction(getName(), message);
     }
 
     @Override

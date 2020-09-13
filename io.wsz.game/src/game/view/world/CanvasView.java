@@ -1,6 +1,7 @@
 package game.view.world;
 
 import game.model.GameController;
+import game.model.textures.CreatureBase;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
@@ -10,7 +11,6 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ItemsComparator;
-import io.wsz.model.textures.CreatureBase;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;

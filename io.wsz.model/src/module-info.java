@@ -24,6 +24,7 @@ module io.wsz.model {
     exports io.wsz.model.script.bool.has.item;
     exports io.wsz.model.script.variable;
     exports io.wsz.model.sizes;
+    exports io.wsz.model.textures;
     exports io.wsz.model.dialog;
     exports io.wsz.model.asset;
     exports io.wsz.model.item;
@@ -32,7 +33,6 @@ module io.wsz.model {
     exports io.wsz.model.location;
     exports io.wsz.model.logger;
     exports io.wsz.model.plugin;
-    exports io.wsz.model.textures;
     exports io.wsz.model.stage;
     exports io.wsz.model.world;
 }

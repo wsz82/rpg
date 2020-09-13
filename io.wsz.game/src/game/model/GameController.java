@@ -6,6 +6,7 @@ import game.model.save.SaveMemento;
 import game.model.setting.SettingCaretaker;
 import game.model.setting.SettingMemento;
 import game.model.setting.Settings;
+import game.model.textures.Cursor;
 import game.model.world.GameRunner;
 import game.view.menu.GameStage;
 import game.view.world.board.GameView;
@@ -39,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
     private final Controller controller;
+    private final Cursor cursor = new Cursor();
     private final ObservableList<String> saves = FXCollections.observableArrayList();
     private final AtomicBoolean isGame = new AtomicBoolean();
     private final AtomicBoolean isDialog = new AtomicBoolean();
@@ -350,5 +352,9 @@ public class GameController {
 
     public Settings getSettings() {
         return settings;
+    }
+
+    public Cursor getCursor() {
+        return cursor;
     }
 }

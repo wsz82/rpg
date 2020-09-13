@@ -365,6 +365,7 @@ class SettingsMenu extends StackPane {
         Coords current = controller.getCurPos();
         current.x = 0;
         current.y = 0;
+        controller.reloadInventoryPictures();
     }
 
     private void goBackToSettings(){

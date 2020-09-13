@@ -44,7 +44,7 @@ public class Sizes {
 
     public static void setMeter(int resWidth, Controller controller) {
         Sizes.meter = CONSTANT_METER * resWidth / ORIGIN_RESOLUTION_WIDTH;
-        controller.clearResizablePictures();
+        controller.reloadInventoryPictures();
     }
 
     public static int getTrueVerticalMeter() {
@@ -53,7 +53,7 @@ public class Sizes {
 
     public static void setVerticalMeter(int resHeight, Controller controller) {
         Sizes.verticalMeter = CONSTANT_METER * resHeight / ORIGIN_RESOLUTION_HEIGHT;
-        controller.clearResizablePictures();
+        controller.reloadInventoryPictures();
     }
 
     public static boolean isResizeWithResolution() {

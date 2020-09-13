@@ -2,6 +2,7 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
+import game.model.textures.CreatureBase;
 import io.wsz.model.Controller;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.*;
@@ -10,7 +11,6 @@ import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -275,9 +275,10 @@ public class GameRunner {
             int i = 0;
             updateProgress(0, total);
 
-            Fog fog = controller.getFog();
             File programDir = controller.getProgramDir();
+            gameController.getCursor().initCursorsImages(programDir);
 
+            Fog fog = controller.getFog();
             fog.initAllFogs(programDir);
             i++;
             updateProgress(i, total);

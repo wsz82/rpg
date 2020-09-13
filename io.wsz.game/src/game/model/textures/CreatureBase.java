@@ -1,4 +1,4 @@
-package io.wsz.model.textures;
+package game.model.textures;
 
 import io.wsz.model.item.CreatureControl;
 import io.wsz.model.item.CreatureSize;

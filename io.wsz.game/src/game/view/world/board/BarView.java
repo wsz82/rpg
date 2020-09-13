@@ -35,6 +35,7 @@ public class BarView {
     private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
     private int hoveredPortrait;
+    private double lastPortraitSize;
 
     public BarView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
@@ -59,7 +60,11 @@ public class BarView {
         if (portraitSize*9 > canvasHeight) {
             portraitSize = canvasHeight/9;
         }
-        Sizes.setPortraitSize((int) portraitSize);
+        if (lastPortraitSize != portraitSize) {
+            lastPortraitSize = portraitSize;
+            Sizes.setPortraitSize((int) portraitSize);
+            controller.reloadHeroesPortraits();
+        }
         double padding = portraitSize / 10;
 
         drawHeroes(leftX, padding, portraitSize);

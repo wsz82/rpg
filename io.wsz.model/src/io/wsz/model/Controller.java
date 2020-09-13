@@ -1,7 +1,6 @@
 package io.wsz.model;
 
 import io.wsz.model.animation.creature.CreatureAnimation;
-import io.wsz.model.animation.creature.PortraitAnimation;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogItem;
@@ -335,7 +334,7 @@ public class Controller {
         this.heroes.addAll(heroes);
     }
 
-    public void clearResizablePictures() {
+    public void reloadInventoryPictures() {
         List<Asset> assets = getAssets();
         if (assets == null || assets.isEmpty()) return;
         assets.stream()
@@ -343,11 +342,12 @@ public class Controller {
                 .map(a -> (Creature) a)
                 .forEach(cr -> {
                     CreatureAnimation anim = cr.getAnimation();
-                    anim.clearResizablePictures();
-                    PortraitAnimation portraitAnimation = cr.getPortraitAnimation();
-                    portraitAnimation.clearResizablePictures();
-                    portraitAnimation.initIdlesOrEquivalent();
+                    anim.clearInventoryPictures();
                 });
+    }
+
+    public void reloadHeroesPortraits() {
+        heroes.forEach(c -> c.getPortraitAnimation().initIdlesOrEquivalent());
     }
 
     public boolean isInventory() {
