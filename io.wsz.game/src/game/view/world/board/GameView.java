@@ -47,7 +47,7 @@ public class GameView extends CanvasView {
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
     private static final ItemType[] CURSOR_TYPES =
-            new ItemType[] {LANDSCAPE, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
+            new ItemType[] {LANDSCAPE, COVER, TELEPORT, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] OBSTACLE_TYPES =
             new ItemType[] {LANDSCAPE, COVER, TELEPORT};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
@@ -386,46 +386,13 @@ public class GameView extends CanvasView {
         pos.level = level;
         PosItem item = board.lookForItem(location, pos.x, pos.y, level, CURSOR_TYPES, false);
         if (item instanceof Creature) {
-            Creature creature = (Creature) item;
-            CreatureControl control = creature.getControl();
-            ImageCursor cursor;
-            if (control == CreatureControl.NEUTRAL) {
-                cursor = gameController.getCursor().getTalkCursor();
-            } else if (control == CreatureControl.ENEMY) {
-                cursor = gameController.getCursor().getAttackCursor();
-            } else {
-                cursor = gameController.getCursor().getMain();
-            }
-            setCursor(cursor);
+            setCursorForCreature((Creature) item);
         } else if (item instanceof Landscape || item instanceof Cover || item instanceof Teleport) {
-            boolean canGo = board.getObstacle(pos, selected, location, OBSTACLE_TYPES) == null;
-            ImageCursor cursor;
-            if (canGo) {
-                cursor = gameController.getCursor().getGoCursor();
-            } else {
-                cursor = gameController.getCursor().getNotGoCursor();
-            }
-            setCursor(cursor);
+            setCursorForWalkable(selected, pos, item);
         } else if (item instanceof InDoor || item instanceof OutDoor) {
-            Openable door = (Openable) item;
-            ImageCursor imageCursor;
-            Cursor cursor = gameController.getCursor();
-            if (door.isOpen()) {
-                imageCursor = cursor.getOpenDoorCursor();
-            } else {
-                imageCursor = cursor.getClosedDoorCursor();
-            }
-            setCursor(imageCursor);
+            setCursorForDoor((Openable) item);
         } else if (item instanceof Container) {
-            Openable container = (Openable) item;
-            ImageCursor imageCursor;
-            Cursor cursor = gameController.getCursor();
-            if (container.isOpen()) {
-                imageCursor = cursor.getOpenContainerCursor();
-            } else {
-                imageCursor = cursor.getClosedContainerCursor();
-            }
-            setCursor(imageCursor);
+            setCursorForContainer((Openable) item);
         } else if (item instanceof Equipment) {
             ImageCursor cursor = gameController.getCursor().getPickCursor();
             setCursor(cursor);
@@ -433,6 +400,55 @@ public class GameView extends CanvasView {
             ImageCursor cursor = gameController.getCursor().getMain();
             setCursor(cursor);
         }
+    }
+
+    private void setCursorForContainer(Openable item) {
+        Openable container = item;
+        ImageCursor imageCursor;
+        Cursor cursor = gameController.getCursor();
+        if (container.isOpen()) {
+            imageCursor = cursor.getOpenContainerCursor();
+        } else {
+            imageCursor = cursor.getClosedContainerCursor();
+        }
+        setCursor(imageCursor);
+    }
+
+    private void setCursorForDoor(Openable item) {
+        Openable door = item;
+        ImageCursor imageCursor;
+        Cursor cursor = gameController.getCursor();
+        if (door.isOpen()) {
+            imageCursor = cursor.getOpenDoorCursor();
+        } else {
+            imageCursor = cursor.getClosedDoorCursor();
+        }
+        setCursor(imageCursor);
+    }
+
+    private void setCursorForWalkable(Creature selected, Coords pos, PosItem item) {
+        boolean canGo = board.getObstacle(pos, selected, item) == null;
+        ImageCursor cursor;
+        if (canGo) {
+            cursor = gameController.getCursor().getGoCursor();
+        } else {
+            cursor = gameController.getCursor().getNotGoCursor();
+        }
+        setCursor(cursor);
+    }
+
+    private void setCursorForCreature(Creature item) {
+        Creature creature = item;
+        CreatureControl control = creature.getControl();
+        ImageCursor cursor;
+        if (control == CreatureControl.NEUTRAL) {
+            cursor = gameController.getCursor().getTalkCursor();
+        } else if (control == CreatureControl.ENEMY) {
+            cursor = gameController.getCursor().getAttackCursor();
+        } else {
+            cursor = gameController.getCursor().getMain();
+        }
+        setCursor(cursor);
     }
 
     private Coords getMapCoords(double x, double y, double left, double top) {

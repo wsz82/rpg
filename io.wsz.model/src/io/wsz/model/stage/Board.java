@@ -153,7 +153,7 @@ public class Board {
         return getObstacle(nextPos, item, location, allTypes);
     }
 
-    public PosItem getObstacle(Coords nextPos, PosItem i, Location location, ItemType[] types) {
+    public PosItem getObstacle(Coords nextPos, PosItem colliding, Location location, ItemType[] types) {
         items.clear();
         if (location == null) return null;
         location.getItems().stream()
@@ -173,29 +173,45 @@ public class Board {
                 })
                 .collect(Collectors.toCollection(() -> items));
         if (items.isEmpty()) return null;
-        List<List<Coords>> iPolygons = i.getActualCollisionPolygons();
-        if (iPolygons.isEmpty() && !(i instanceof Creature)) return null;
+        List<List<Coords>> iPolygons = colliding.getActualCollisionPolygons();
+        if (iPolygons.isEmpty() && !(colliding instanceof Creature)) return null;
 
-        double left = i.getCollisionLeft(iPolygons, nextPos);
-        double right = i.getCollisionRight(iPolygons, nextPos);
-        double top = i.getCollisionTop(iPolygons, nextPos);
-        double bottom = i.getCollisionBottom(iPolygons, nextPos);
+        double left = colliding.getCollisionLeft(iPolygons, nextPos);
+        double right = colliding.getCollisionRight(iPolygons, nextPos);
+        double top = colliding.getCollisionTop(iPolygons, nextPos);
+        double bottom = colliding.getCollisionBottom(iPolygons, nextPos);
 
-        for (PosItem o : items) {
-            if (o == i) continue;
-            boolean isDoorAgainstLandscapeChecked = i instanceof Door && o instanceof Landscape;
-            boolean isLandscapeAgainstDoorChecked = i instanceof Landscape && o instanceof Door;
-            boolean isDoorAgainstCoverChecked = i instanceof Door && o instanceof Cover;
-            boolean isCoverAgainstDoorChecked = i instanceof Cover && o instanceof Door;
-            boolean isLandscapeAgainstLandscapeChecked = i instanceof Landscape && o instanceof Landscape;
-            if (isDoorAgainstLandscapeChecked || isLandscapeAgainstDoorChecked
-                    || isDoorAgainstCoverChecked || isCoverAgainstDoorChecked
-                    || isLandscapeAgainstLandscapeChecked) continue;
-            List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
-            PosItem collision = getCollision(left, right, top, bottom, nextPos, i, iPolygons, o, oPolygons);
+        for (PosItem obstacle : items) {
+            PosItem collision = getObstacle(nextPos, colliding, iPolygons, left, right, top, bottom, obstacle);
             if (collision != null) return collision;
         }
         return null;
+    }
+
+    private PosItem getObstacle(Coords nextPos, PosItem colliding, List<List<Coords>> iPolygons,
+                                double left, double right, double top, double bottom, PosItem obstacle) {
+        if (obstacle == colliding) return null;
+        boolean isDoorAgainstLandscapeChecked = colliding instanceof Door && obstacle instanceof Landscape;
+        boolean isLandscapeAgainstDoorChecked = colliding instanceof Landscape && obstacle instanceof Door;
+        boolean isDoorAgainstCoverChecked = colliding instanceof Door && obstacle instanceof Cover;
+        boolean isCoverAgainstDoorChecked = colliding instanceof Cover && obstacle instanceof Door;
+        boolean isLandscapeAgainstLandscapeChecked = colliding instanceof Landscape && obstacle instanceof Landscape;
+        if (isDoorAgainstLandscapeChecked || isLandscapeAgainstDoorChecked
+                || isDoorAgainstCoverChecked || isCoverAgainstDoorChecked
+                || isLandscapeAgainstLandscapeChecked) return null;
+        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
+        PosItem collision = getCollision(left, right, top, bottom, nextPos, colliding, iPolygons, obstacle, oPolygons);
+        return collision;
+    }
+
+    public PosItem getObstacle(Coords nextPos, Creature colliding, PosItem obstacle) {
+        if (obstacle == colliding) return null;
+        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
+        if (getCreatureObstacleCollision(nextPos, colliding, oPolygons, obstacle)) {
+            return obstacle;
+        } else {
+            return null;
+        }
     }
 
     public PosItem getObstacleOnWay(Location location, int level, double fromX, double fromY, PosItem i, double toX, double toY) {
