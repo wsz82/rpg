@@ -139,7 +139,7 @@ public class Board {
     public List<Creature> getControlledCreatures(Location location) {
         creatures.clear();
         location.getItems().stream()
-                .filter(pi -> pi.getType().equals(ItemType.CREATURE))
+                .filter(pi -> pi instanceof Creature)
                 .filter(pi -> {
                     Creature cr = (Creature) pi;
                     return cr.getControl().equals(CreatureControl.CONTROL);

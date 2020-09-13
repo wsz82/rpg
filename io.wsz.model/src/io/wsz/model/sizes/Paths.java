@@ -71,4 +71,7 @@ public class Paths {
     public static final String DOOR_CLOSED_DIR = File.separator + "door_closed";
     public static final String CONTAINER_OPEN_DIR = File.separator + "container_open";
     public static final String CONTAINER_CLOSED_DIR = File.separator + "container_closed";
+    public static final String PICK_DIR = File.separator + "pick";
+    public static final String GO_DIR = File.separator + "go";
+    public static final String NOT_GO_DIR = File.separator + "not_go";
 }

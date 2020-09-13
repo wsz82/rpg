@@ -42,12 +42,14 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
-    private static final ItemType[] CURSOR_TYPES =
-            new ItemType[] {LANDSCAPE, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] PRIMARY_TYPES =
             new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
+    private static final ItemType[] CURSOR_TYPES =
+            new ItemType[] {LANDSCAPE, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
+    private static final ItemType[] OBSTACLE_TYPES =
+            new ItemType[] {LANDSCAPE, COVER, TELEPORT};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
     private static final Coords TEMP = new Coords();
 
@@ -292,7 +294,12 @@ public class GameView extends CanvasView {
             centerOnPC(meter, canvasMeterWidth, canvasMeterHeight, settings, location);
         }
 
-        drawAppropriateCursor(pos, location);
+        List<Creature> controlledCreatures = board.getControlledCreatures(location);
+        Creature selected = null;
+        if (!controlledCreatures.isEmpty()) {
+            selected = controlledCreatures.get(0);
+        }
+        drawAppropriateCursor(selected, pos, location);
 
         if (x >= left+OFFSET && x <= right-OFFSET
                 && y >= top+OFFSET && y <= bottom-OFFSET) {
@@ -367,11 +374,22 @@ public class GameView extends CanvasView {
         }
     }
 
-    private void drawAppropriateCursor(Coords pos, Location location) {
+    private void drawAppropriateCursor(Creature selected, Coords pos, Location location) {
+        if (selected == null) {
+            ImageCursor cursor = gameController.getCursor().getMain();
+            setCursor(cursor);
+            return;
+        }
         int level = controller.getCurrentLayer().getLevel();
         PosItem item = board.lookForItem(location, pos.x, pos.y, level, CURSOR_TYPES, false);
-        if (item instanceof Landscape) {
-            ImageCursor cursor = gameController.getCursor().getMain();
+        if (item instanceof Landscape || item instanceof Cover || item instanceof Teleport) {
+            boolean canGo = board.getObstacle(pos, selected, location, OBSTACLE_TYPES) == null;
+            ImageCursor cursor;
+            if (canGo) {
+                cursor = gameController.getCursor().getGoCursor();
+            } else {
+                cursor = gameController.getCursor().getNotGoCursor();
+            }
             setCursor(cursor);
         } else if (item instanceof InDoor || item instanceof OutDoor) {
             Openable door = (Openable) item;
@@ -394,7 +412,7 @@ public class GameView extends CanvasView {
             }
             setCursor(imageCursor);
         } else if (item instanceof Equipment) {
-            ImageCursor cursor = gameController.getCursor().getMain();
+            ImageCursor cursor = gameController.getCursor().getPickCursor();
             setCursor(cursor);
         } else {
             ImageCursor cursor = gameController.getCursor().getMain();

@@ -9,6 +9,7 @@ import static java.lang.Math.*;
 
 public class Geometry {
     static final Coords EXTREME = new Coords();
+
     private static final Coords temp1 = new Coords();
     private static final Coords temp2 = new Coords();
     private static final Coords temp3 = new Coords();

@@ -22,6 +22,9 @@ public class Cursor {
     private ImageCursor closedDoorCursor;
     private ImageCursor openContainerCursor;
     private ImageCursor closedContainerCursor;
+    private ImageCursor pickCursor;
+    private ImageCursor goCursor;
+    private ImageCursor notGoCursor;
 
     public void initCursorsImages(File programDir) {
         String cursorsDir = programDir + TEXTURES_DIR + CURSOR_DIR;
@@ -77,6 +80,18 @@ public class Cursor {
         ResolutionImage containerClosed = new ResolutionImage(cursorsDir + CONTAINER_CLOSED_DIR + PNG);
         Image containerClosedFx = containerClosed.getFxImage();
         closedContainerCursor = new ImageCursor(containerClosedFx, containerClosedFx.getWidth()/2, containerClosedFx.getHeight()/2);
+
+        ResolutionImage pick = new ResolutionImage(cursorsDir + PICK_DIR + PNG);
+        Image pickFx = pick.getFxImage();
+        pickCursor = new ImageCursor(pickFx, 0, pickFx.getHeight()/2);
+
+        ResolutionImage go = new ResolutionImage(cursorsDir + GO_DIR + PNG);
+        Image goFx = go.getFxImage();
+        goCursor = new ImageCursor(goFx, goFx.getWidth()/2, goFx.getHeight()/2);
+
+        ResolutionImage notGo = new ResolutionImage(cursorsDir + NOT_GO_DIR + PNG);
+        Image notGoFx = notGo.getFxImage();
+        notGoCursor = new ImageCursor(notGoFx, notGoFx.getWidth()/2, notGoFx.getHeight()/2);
     }
 
     public ImageCursor getMain() {
@@ -129,5 +144,17 @@ public class Cursor {
 
     public ImageCursor getClosedContainerCursor() {
         return closedContainerCursor;
+    }
+
+    public ImageCursor getPickCursor() {
+        return pickCursor;
+    }
+
+    public ImageCursor getGoCursor() {
+        return goCursor;
+    }
+
+    public ImageCursor getNotGoCursor() {
+        return notGoCursor;
     }
 }
