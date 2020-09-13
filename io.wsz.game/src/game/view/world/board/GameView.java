@@ -333,21 +333,29 @@ public class GameView extends CanvasView {
         } else
         if (x < left+OFFSET && x >= left
                 && y >= top && y < top+OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getLeftUpCursor();
+            setCursor(cursor);
             scrollLeft();
             scrollUp();
         } else
         if (x > right-OFFSET && x <= right
                 && y >= top && y < top+OFFSET) {
+            ImageCursor cursor = gameController.getCursor().getRightUpCursor();
+            setCursor(cursor);
             scrollRight(locWidth);
             scrollUp();
         } else
         if (x < left+OFFSET && x >= left
                 && y >= bottom-OFFSET && y < bottom) {
+            ImageCursor cursor = gameController.getCursor().getLeftDownCursor();
+            setCursor(cursor);
             scrollLeft();
             scrollDown(locHeight);
         } else
         if (x > right-OFFSET && x <= right
                 && y >= bottom-OFFSET && y < bottom) {
+            ImageCursor cursor = gameController.getCursor().getRightDownCursor();
+            setCursor(cursor);
             scrollRight(locWidth);
             scrollDown(locHeight);
         }

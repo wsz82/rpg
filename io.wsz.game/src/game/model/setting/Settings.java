@@ -83,9 +83,13 @@ public class Settings implements Externalizable {
     }
 
     public void setResolutionWidth(int resolutionWidth, Controller controller) {
+        setMeter(resolutionWidth, controller);
+        this.resolutionWidth = resolutionWidth;
+    }
+
+    public void setMeter(int resolutionWidth, Controller controller) {
         Sizes.setReloadImages(true);
         Sizes.setMeter(resolutionWidth, controller);
-        this.resolutionWidth = resolutionWidth;
     }
 
     public int getResolutionHeight() {
@@ -93,9 +97,13 @@ public class Settings implements Externalizable {
     }
 
     public void setResolutionHeight(int resolutionHeight, Controller controller) {
+        setVerticalMeter(resolutionHeight, controller);
+        this.resolutionHeight = resolutionHeight;
+    }
+
+    public void setVerticalMeter(int resolutionHeight, Controller controller) {
         Sizes.setReloadImages(true);
         Sizes.setVerticalMeter(resolutionHeight, controller);
-        this.resolutionHeight = resolutionHeight;
     }
 
     public boolean isShowBar() {

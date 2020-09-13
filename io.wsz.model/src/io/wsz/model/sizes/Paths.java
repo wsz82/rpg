@@ -65,4 +65,8 @@ public class Paths {
     public static final String RIGHT_DIR = File.separator + "right";
     public static final String DOWN_DIR = File.separator + "down";
     public static final String LEFT_DIR = File.separator + "left";
+    public static final String LEFT_UP_DIR = File.separator + "left_up";
+    public static final String RIGHT_UP_DIR = File.separator + "right_up";
+    public static final String LEFT_DOWN_DIR = File.separator + "left_down";
+    public static final String RIGHT_DOWN_DIR = File.separator + "right_down";
 }

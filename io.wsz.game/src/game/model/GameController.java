@@ -168,6 +168,8 @@ public class GameController {
         File programDir = controller.getProgramDir();
         SettingMemento memento = loadSettingsMemento(programDir);
         this.settings = memento.getSettings();
+        settings.setMeter(settings.getResolutionWidth(), controller);
+        settings.setVerticalMeter(settings.getResolutionHeight(), controller);
         Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
         setLocale(settings.getLanguage());
     }
