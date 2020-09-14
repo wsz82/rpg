@@ -99,7 +99,7 @@ public class HoldViewElement extends EquipmentViewElement {
             controller.getLogger().logItemDoesNotFitInventory(e.getName(), cr.getName());
             return false;
         } else {
-            e.setPos(x, y, null);
+            e.setPos(x, y, 0, null);
             controller.getLogger().logItemAddedToInventory(e.getName(), cr.getName());
             return true;
         }

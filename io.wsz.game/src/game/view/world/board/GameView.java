@@ -2,14 +2,12 @@ package game.view.world.board;
 
 import game.model.GameController;
 import game.model.setting.Settings;
-import game.model.textures.Cursor;
 import game.model.world.GameRunner;
 import game.view.world.CanvasView;
 import game.view.world.FoggableDelegate;
 import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
 import io.wsz.model.dialog.DialogMemento;
-import io.wsz.model.item.Container;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
@@ -46,10 +44,6 @@ public class GameView extends CanvasView {
             new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
-    private static final ItemType[] CURSOR_TYPES =
-            new ItemType[] {LANDSCAPE, COVER, TELEPORT, CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
-    private static final ItemType[] OBSTACLE_TYPES =
-            new ItemType[] {LANDSCAPE, COVER, TELEPORT};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
     private static final Coords TEMP = new Coords();
 
@@ -299,9 +293,9 @@ public class GameView extends CanvasView {
         List<Creature> controlledCreatures = board.getControlledCreatures(location);
         Creature selected = null;
         if (!controlledCreatures.isEmpty()) {
-            selected = controlledCreatures.get(0);
+            selected = controlledCreatures.get(0); //TODO selected creatures stand order
         }
-        drawAppropriateCursor(selected, pos, location);
+        setAppropriateCursor(selected, pos, 0, 0, locWidth, locHeight, location.getItems());
 
         if (x >= left+OFFSET && x <= right-OFFSET
                 && y >= top+OFFSET && y <= bottom-OFFSET) {
@@ -376,91 +370,13 @@ public class GameView extends CanvasView {
         }
     }
 
-    private void drawAppropriateCursor(Creature selected, Coords pos, Location location) {
-        if (selected == null) {
-            ImageCursor cursor = gameController.getCursor().getMain();
-            setCursor(cursor);
-            return;
-        }
-        int level = controller.getCurrentLayer().getLevel();
-        pos.level = level;
-        PosItem item = board.lookForItem(location, pos.x, pos.y, level, CURSOR_TYPES, false);
-        if (item instanceof Creature) {
-            setCursorForCreature((Creature) item);
-        } else if (item instanceof Landscape || item instanceof Cover || item instanceof Teleport) {
-            setCursorForWalkable(selected, pos, item);
-        } else if (item instanceof InDoor || item instanceof OutDoor) {
-            setCursorForDoor((Openable) item);
-        } else if (item instanceof Container) {
-            setCursorForContainer((Openable) item);
-        } else if (item instanceof Equipment) {
-            ImageCursor cursor = gameController.getCursor().getPickCursor();
-            setCursor(cursor);
-        } else {
-            ImageCursor cursor = gameController.getCursor().getMain();
-            setCursor(cursor);
-        }
-    }
-
-    private void setCursorForContainer(Openable item) {
-        Openable container = item;
-        ImageCursor imageCursor;
-        Cursor cursor = gameController.getCursor();
-        if (container.isOpen()) {
-            imageCursor = cursor.getOpenContainerCursor();
-        } else {
-            imageCursor = cursor.getClosedContainerCursor();
-        }
-        setCursor(imageCursor);
-    }
-
-    private void setCursorForDoor(Openable item) {
-        Openable door = item;
-        ImageCursor imageCursor;
-        Cursor cursor = gameController.getCursor();
-        if (door.isOpen()) {
-            imageCursor = cursor.getOpenDoorCursor();
-        } else {
-            imageCursor = cursor.getClosedDoorCursor();
-        }
-        setCursor(imageCursor);
-    }
-
-    private void setCursorForWalkable(Creature selected, Coords pos, PosItem item) {
-        boolean canGo = board.getObstacle(pos, selected, item) == null;
-        ImageCursor cursor;
-        if (canGo) {
-            cursor = gameController.getCursor().getGoCursor();
-        } else {
-            cursor = gameController.getCursor().getNotGoCursor();
-        }
-        setCursor(cursor);
-    }
-
-    private void setCursorForCreature(Creature item) {
-        Creature creature = item;
-        CreatureControl control = creature.getControl();
-        ImageCursor cursor;
-        if (control == CreatureControl.NEUTRAL) {
-            cursor = gameController.getCursor().getTalkCursor();
-        } else if (control == CreatureControl.ENEMY) {
-            cursor = gameController.getCursor().getAttackCursor();
-        } else {
-            cursor = gameController.getCursor().getMain();
-        }
-        setCursor(cursor);
-    }
-
     private Coords getMapCoords(double x, double y, double left, double top) {
         Coords pos = getMousePos(x, y, left, top);
         TEMP.x = pos.x;
         TEMP.y = pos.y;
+        TEMP.level = controller.getCurrentLayer().getLevel();
         TEMP.add(curPos);
         return TEMP;
-    }
-
-    private void setCursor(ImageCursor main) {
-        getCanvas().getScene().setCursor(main);
     }
 
     private void scrollDown(double locHeight) {
@@ -662,7 +578,7 @@ public class GameView extends CanvasView {
 
     private void onMapSecondaryButtonClick(Location location, double x, double y) {
         int level = controller.getCurrentLayer().getLevel();
-        PosItem pi = board.lookForItem(location, x, y, level, SECONDARY_TYPES, false);
+        PosItem pi = board.lookForItem(location.getItems(), x, y, level, SECONDARY_TYPES, false);
         if (pi == null) {
             board.looseCreaturesControl(location);
         } else {
@@ -680,9 +596,9 @@ public class GameView extends CanvasView {
         PosItem pi;
         int level = controller.getCurrentLayer().getLevel();
         if (controlled.isEmpty()) {
-            pi = board.lookForItem(location, x, y, level, CREATURE_TYPE, false);
+            pi = board.lookForItem(location.getItems(), x, y, level, CREATURE_TYPE, false);
         } else {
-            pi = board.lookForItem(location, x, y, level, PRIMARY_TYPES, false);
+            pi = board.lookForItem(location.getItems(), x, y, level, PRIMARY_TYPES, false);
         }
         if (pi == null) {
             commandControlledGoTo(x, y);

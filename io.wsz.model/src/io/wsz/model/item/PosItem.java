@@ -139,7 +139,9 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     }
 
     public PosItem getCollision(Coords nextPos, Location nextLocation) {
-        return getController().getBoard().getObstacle(nextPos, this, nextLocation);
+        if (nextLocation == null) return null;
+        List<PosItem> items = nextLocation.getItems();
+        return getController().getBoard().getObstacle(nextPos, this, items);
     }
 
     public double getCollisionLeft(List<List<Coords>> cp) {
@@ -241,9 +243,10 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.pos.setLocation(pos.getLocation());
     }
 
-    public void setPos(double x, double y, Location location) {
+    public void setPos(double x, double y, int level, Location location) {
         this.pos.x = x;
         this.pos.y = y;
+        this.pos.level = level;
         this.pos.setLocation(location);
     }
 

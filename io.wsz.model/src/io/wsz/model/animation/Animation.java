@@ -238,16 +238,10 @@ public class Animation<A extends PosItem<?,?>> {
 
         int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
         if (animationPos.isCycleFinished()) {
-            return getNextConstantIdleAfterTemporary(animationPos, speed);
+            animationPos.setCurIdleSequence(null);
+            animationPos.setTemporaryIdle(false);
         }
         return frames.get(nextFrameNumber);
-    }
-
-    private ResolutionImage getNextConstantIdleAfterTemporary(AnimationPos animationPos, double speed) {
-        animationPos.setCurIdleSequence(null);
-        animationPos.setTemporaryIdle(false);
-        animationPos.setFrameNumber(0);
-        return getNextConstantIdle(animationPos, speed);
     }
 
     private ResolutionImage getNextConstantIdle(AnimationPos animationPos, double speed) {
@@ -280,17 +274,11 @@ public class Animation<A extends PosItem<?,?>> {
             if (isTimeToPlayTemporary) {
                 boolean isIdleSequenceSet = animationPos.getCurIdleSequence() != null;
                 if (isIdleSequenceSet) {
-                    return playTemporaryIdleAfterConstant(animationPos, speed);
+                    animationPos.setTemporaryIdle(true);
                 }
             }
         }
         return frames.get(nextFrameNumber);
-    }
-
-    private ResolutionImage playTemporaryIdleAfterConstant(AnimationPos animationPos, double speed) {
-        animationPos.setTemporaryIdle(true);
-        animationPos.setFrameNumber(0);
-        return getNextTemporaryIdle(animationPos, speed);
     }
 
     private String getRandomIdleSequence(AnimationPos animationPos, long curTime) {

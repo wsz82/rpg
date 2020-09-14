@@ -149,7 +149,7 @@ public class InventoryView {
         if (ev == null) return;
         if (ev instanceof ContainerViewElement) return;
         origin = ev;
-        Coords translated = ev.getLocalCoords(mousePos);
+        Coords translated = ev.getLocalCoords();
         Equipment eq = ev.lookForEquipment(translated.x, translated.y, imgRelativeCoords);
         if (!(eq instanceof Container)) return;
         Container toOpen = (Container) eq;
@@ -167,7 +167,7 @@ public class InventoryView {
         InventoryViewElement viewElement = getView(mouseX, mouseY);
         if (viewElement == null) return;
         origin = viewElement;
-        Coords translated = viewElement.getLocalCoords(mousePos);
+        Coords translated = viewElement.getLocalCoords();
         Equipment selected = viewElement.lookForEquipment(translated.x, translated.y, imgRelativeCoords);
         if (selected == null) return;
         Container toOpen = controller.getContainerToOpen();

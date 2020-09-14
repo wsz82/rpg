@@ -345,7 +345,7 @@ public class EditorCanvas extends Canvas {
         double y = translated.y;
         ItemType[] types = ItemType.values();
         Location location = controller.getCurrentLocation().getLocation();
-        pi = controller.getBoard().lookForItem(location, x, y, level, types, true);
+        pi = controller.getBoard().lookForItem(location.getItems(), x, y, level, types, true);
         return pi;
     }
 

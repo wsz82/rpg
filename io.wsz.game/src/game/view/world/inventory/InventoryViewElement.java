@@ -49,12 +49,12 @@ public abstract class InventoryViewElement extends CanvasView {
 
     public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords,
                                      Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
-        return getLocalCoords(mousePos);
+        return getLocalCoords();
     }
 
-    public Coords getLocalCoords(Coords pos) {
-        TEMP_1.x = pos.x;
-        TEMP_1.y = pos.y;
+    public Coords getLocalCoords() {
+        TEMP_1.x = mousePos.x;
+        TEMP_1.y = mousePos.y;
         TEMP_1.subtract(viewPos);
         return TEMP_1;
     }

@@ -14,7 +14,7 @@ import java.util.Optional;
 import static io.wsz.model.item.CreatureControl.CONTROL;
 
 public class Teleportation {
-    private static final ItemType[] landscapeType = new ItemType[] {ItemType.LANDSCAPE};
+    private static final ItemType[] LANDSCAPE_TYPE = new ItemType[] {ItemType.LANDSCAPE};
 
     public static boolean teleport(Creature cr, Coords exit, Controller controller) {
         if (exit == null || exit.isEmpty()) {
@@ -43,7 +43,7 @@ public class Teleportation {
             return false;
         }
         Board board = controller.getBoard();
-        PosItem landscape = board.lookForItem(target, exit.x, exit.y, exit.level, landscapeType, false);
+        PosItem landscape = board.lookForItem(target.getItems(), exit.x, exit.y, exit.level, LANDSCAPE_TYPE, false);
         if (landscape == null) {
             return false;
         }

@@ -87,7 +87,7 @@ public class ContainerViewElement extends EquipmentViewElement {
             controller.getLogger().logItemDoesNotFit(e.getName(), container.getName());
             return false;
         } else {
-            e.setPos(x, y, null);
+            e.setPos(x, y, 0, null);
             controller.getLogger().logItemAddedTo(e.getName(), container.getName());
             return true;
         }

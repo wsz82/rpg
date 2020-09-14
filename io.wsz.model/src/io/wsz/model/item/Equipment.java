@@ -140,7 +140,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             getController().getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
             return false;
         } else {
-            setIsVisible(false);
+//            setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
             getController().getLogger().logItemAction(getName(), "taken");
             return true;

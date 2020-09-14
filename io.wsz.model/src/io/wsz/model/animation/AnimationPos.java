@@ -66,10 +66,14 @@ public class AnimationPos implements Externalizable {
             return 0;
         }
         int frameNumber = this.frameNumber;
-        if (frameNumber >= size - 1) {
+        int lastNumber = size - 1;
+        if (frameNumber > lastNumber) {
+            this.frameNumber = 1;
+            return 0;
+        } else if (frameNumber == lastNumber) {
             isCycleFinished = true;
             this.frameNumber = 0;
-            return size - 1;
+            return lastNumber;
         } else if (frameNumber >= 0) {
             isCycleFinished = false;
             this.frameNumber++;

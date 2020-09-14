@@ -2,6 +2,7 @@ package game.view.world;
 
 import game.model.GameController;
 import game.model.textures.CreatureBase;
+import game.model.textures.Cursor;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
@@ -9,8 +10,10 @@ import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
+import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ItemsComparator;
+import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -20,7 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.wsz.model.item.ItemType.*;
+
 public abstract class CanvasView {
+    private static final ItemType[] CURSOR_TYPES =
+            new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
+    private static final ItemType[] OBSTACLE_TYPES =
+            new ItemType[] {LANDSCAPE, COVER, TELEPORT};
+
     protected final Canvas canvas;
     protected final GraphicsContext gc;
     protected final GameController gameController;
@@ -142,5 +152,90 @@ public abstract class CanvasView {
     protected void setDropAnimationPos(Equipment e) {
         EquipmentAnimationPos animationPos = e.getAnimationPos();
         animationPos.setCurAnimation(EquipmentAnimationType.DROP);
+    }
+
+    protected <A extends PosItem> void setAppropriateCursor(Creature selected, Coords pos,
+                                                            double minX, double minY,
+                                                            double maxX, double maxY,
+                                                            List<A> items) {
+        if (pos.x < minX || pos.y < minY || pos.x > maxX || pos.y > maxY) {
+            return;
+        }
+        Cursor cursor = gameController.getCursor();
+        if (selected == null) {
+            ImageCursor cursorImg = cursor.getMain();
+            setCursor(cursorImg);
+            return;
+        }
+        PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
+
+        if (item == null) {
+            item = board.getObstacle(pos, selected, OBSTACLE_TYPES, items);
+            ImageCursor cursorImg;
+            if (item == null) {
+                if (controller.isInventory()) {
+                    cursorImg = cursor.getMain();
+                } else {
+                    cursorImg = cursor.getGoCursor();
+                }
+            } else {
+                cursorImg = cursor.getNotGoCursor();
+            }
+            setCursor(cursorImg);
+        } else if (item instanceof Creature) {
+            setCursorForCreature((Creature) item);
+        } else if (item instanceof InDoor || item instanceof OutDoor) {
+            setCursorForDoor((Openable) item);
+        } else if (item instanceof Container) {
+            setCursorForContainer((Openable) item);
+        } else if (item instanceof Equipment) {
+            ImageCursor cursorImg = cursor.getPickCursor();
+            setCursor(cursorImg);
+        } else {
+            ImageCursor cursorImg = cursor.getMain();
+            setCursor(cursorImg);
+        }
+    }
+
+    private void setCursorForContainer(Openable item) {
+        Openable container = item;
+        ImageCursor imageCursor;
+        Cursor cursor = gameController.getCursor();
+        if (container.isOpen()) {
+            imageCursor = cursor.getOpenContainerCursor();
+        } else {
+            imageCursor = cursor.getClosedContainerCursor();
+        }
+        setCursor(imageCursor);
+    }
+
+    private void setCursorForDoor(Openable item) {
+        Openable door = item;
+        ImageCursor imageCursor;
+        Cursor cursor = gameController.getCursor();
+        if (door.isOpen()) {
+            imageCursor = cursor.getOpenDoorCursor();
+        } else {
+            imageCursor = cursor.getClosedDoorCursor();
+        }
+        setCursor(imageCursor);
+    }
+
+    private void setCursorForCreature(Creature item) {
+        Creature creature = item;
+        CreatureControl control = creature.getControl();
+        ImageCursor cursor;
+        if (control == CreatureControl.NEUTRAL) {
+            cursor = gameController.getCursor().getTalkCursor();
+        } else if (control == CreatureControl.ENEMY) {
+            cursor = gameController.getCursor().getAttackCursor();
+        } else {
+            cursor = gameController.getCursor().getMain();
+        }
+        setCursor(cursor);
+    }
+
+    protected void setCursor(ImageCursor main) {
+        canvas.getScene().setCursor(main);
     }
 }

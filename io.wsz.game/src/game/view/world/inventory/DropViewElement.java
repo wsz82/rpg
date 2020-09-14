@@ -45,6 +45,23 @@ public class DropViewElement extends EquipmentViewElement {
         updateCurPos();
     }
 
+    @Override
+    protected void setAppropriateCursor() {
+        double mouseX = mousePos.x;
+        double viewX = viewPos.x;
+        double mouseY = mousePos.y;
+        double viewY = viewPos.y;
+        if (mouseX < viewX || mouseY < viewY || mouseX > viewX + viewWidth || mouseY > viewY + viewHeight) {
+            return;
+        }
+        Coords localCoords = getLocalCoords();
+        Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
+        CurrentLocation currentLocation = controller.getCurrentLocation();
+        double width = currentLocation.getWidth();
+        double height = currentLocation.getHeight();
+        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, 0, width, height, getItems());
+    }
+
     private void updateCurPos() {
         CurrentLocation currentLocation = controller.getCurrentLocation();
         double maxCurPosX = currentLocation.getWidth() - viewWidth;

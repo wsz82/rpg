@@ -71,11 +71,11 @@ public class Board {
         }
     }
 
-    public PosItem lookForItem(Location location, double x, double y, int lookedLevel, ItemType[] types, boolean includeLevelsBelow) {
+    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel, ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
-        if (location == null) return null;
-        allItems.addAll(location.getItems());
-        items.clear();
+        if (items == null || items.isEmpty()) return null;
+        allItems.addAll(items);
+        this.items.clear();
         allItems.stream()
                 .filter(PosItem::getIsVisible)
                 .filter(pi -> {
@@ -92,17 +92,17 @@ public class Board {
                         return level == lookedLevel;
                     }
                 })
-                .collect(Collectors.toCollection(() -> items));
-        if (items.isEmpty()) {
+                .collect(Collectors.toCollection(() -> this.items));
+        if (this.items.isEmpty()) {
             return null;
         }
-        this.sortPosItems(items);
-        Collections.reverse(items);
+        this.sortPosItems(this.items);
+        Collections.reverse(this.items);
 
         int pixelX = (int) (x * Sizes.getMeter());
         int pixelY = (int) (y * Sizes.getMeter());
 
-        for (PosItem pi : items) {
+        for (PosItem pi : this.items) {
             int cX = (int) (pi.getPos().x * Sizes.getMeter());
             int cWidth = (int) pi.getImage().getWidth();
             boolean fitX = pixelX >= cX && pixelX <= cX + cWidth;
@@ -149,14 +149,14 @@ public class Board {
         return creatures;
     }
 
-    public PosItem getObstacle(Coords nextPos, PosItem item, Location location) {
-        return getObstacle(nextPos, item, location, allTypes);
+    public PosItem getObstacle(Coords nextPos, PosItem item, List<PosItem> items) {
+        return getObstacle(nextPos, item, allTypes, items);
     }
 
-    public PosItem getObstacle(Coords nextPos, PosItem colliding, Location location, ItemType[] types) {
-        items.clear();
-        if (location == null) return null;
-        location.getItems().stream()
+    public <A extends PosItem> PosItem getObstacle(Coords nextPos, PosItem colliding, ItemType[] types, List<A> items) {
+        if (items == null || items.isEmpty()) return null;
+        this.items.clear();
+        items.stream()
                 .filter(PosItem::getIsVisible)
                 .filter(pi -> {
                     if (types == this.allTypes) return true;
@@ -171,8 +171,8 @@ public class Board {
                     int level = nextPos.level;
                     return pi.getPos().level == level;
                 })
-                .collect(Collectors.toCollection(() -> items));
-        if (items.isEmpty()) return null;
+                .collect(Collectors.toCollection(() -> this.items));
+        if (this.items.isEmpty()) return null;
         List<List<Coords>> iPolygons = colliding.getActualCollisionPolygons();
         if (iPolygons.isEmpty() && !(colliding instanceof Creature)) return null;
 
@@ -181,7 +181,7 @@ public class Board {
         double top = colliding.getCollisionTop(iPolygons, nextPos);
         double bottom = colliding.getCollisionBottom(iPolygons, nextPos);
 
-        for (PosItem obstacle : items) {
+        for (PosItem obstacle : this.items) {
             PosItem collision = getObstacle(nextPos, colliding, iPolygons, left, right, top, bottom, obstacle);
             if (collision != null) return collision;
         }

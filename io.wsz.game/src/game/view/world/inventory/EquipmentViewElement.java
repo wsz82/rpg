@@ -3,6 +3,7 @@ package game.view.world.inventory;
 import game.model.GameController;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
+import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -41,6 +42,14 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         drawBackground();
 
         drawVerScroll();
+
+        setAppropriateCursor();
+    }
+
+    protected void setAppropriateCursor() {
+        Coords localCoords = getLocalCoords();
+        Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
+        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, curPos.y, viewWidth, maxCurPosY, getItems());
     }
 
     protected abstract void drawEquipment();
@@ -99,9 +108,9 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
-    public Coords getLocalCoords(Coords pos) {
-        TEMP_1.x = pos.x;
-        TEMP_1.y = pos.y;
+    public Coords getLocalCoords() {
+        TEMP_1.x = mousePos.x;
+        TEMP_1.y = mousePos.y;
         TEMP_1.subtract(viewPos);
         TEMP_1.add(curPos);
         return TEMP_1;
