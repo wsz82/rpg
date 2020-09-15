@@ -24,6 +24,7 @@ public class EditorPluginsTable extends Stage {
     private final PluginSettingsStage pss;
     private final EditorController editorController;
     private final Controller controller;
+    private Label activePluginName;
 
     public EditorPluginsTable(PluginSettingsStage pss, EditorController editorController) {
         super(StageStyle.UTILITY);
@@ -32,10 +33,9 @@ public class EditorPluginsTable extends Stage {
         controller = editorController.getController();
         List<PluginMetadata> pluginMetadata = controller.getPluginMetadatas();
         metadatas.addAll(pluginMetadata);
-        initWindow();
     }
 
-    private void initWindow() {
+    public void initWindow() {
         final Group root = new Group();
         final VBox container = new VBox(10);
         container.setPadding(new Insets(10));
@@ -52,7 +52,7 @@ public class EditorPluginsTable extends Stage {
         buttons.getChildren().addAll(cancel, load);
         final HBox activePluginBox = new HBox(5);
         final Label activePluginLabel = new Label("Active plugin: ");
-        final Label activePluginName = new Label("");
+        activePluginName = new Label("");
         activePluginBox.getChildren().addAll(activePluginLabel, activePluginName);
 
         container.getChildren().addAll(table, activePluginBox, buttons);
@@ -62,10 +62,9 @@ public class EditorPluginsTable extends Stage {
 
         setUpTable(table, nameCol, startCol);
         setUpButtons(cancel, load);
-        setUpActivePluginText(activePluginName);
     }
 
-    private void setUpActivePluginText(Label activePluginName) {
+    public void setUpActivePluginText() {
         PluginMetadata active = controller.getModel().getActivePluginMetadata();
         if (active != null) {
             activePluginName.setText(active.getPluginName());

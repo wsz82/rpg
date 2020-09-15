@@ -286,7 +286,9 @@ class MainView {
     }
 
     private void openPluginsTable() {
-        final Stage plugins = new EditorPluginsTable(pss, editorController);
+        final EditorPluginsTable plugins = new EditorPluginsTable(pss, editorController);
+        plugins.initWindow();
+        plugins.setUpActivePluginText();
         plugins.initOwner(mainStage);
         plugins.show();
     }
