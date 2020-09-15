@@ -11,6 +11,7 @@ public class Paths {
     public static final String CONTAINERS = "Containers";
     public static final String INDOORS = "InDoors";
     public static final String OUTDOORS = "OutDoors";
+    public static final String MISC = "Miscellaneous";
 
     public static final String PLUGINS = "plugins";
     public static final String PLUGINS_DIR = File.separator + PLUGINS;

@@ -40,8 +40,6 @@ import static javafx.scene.input.KeyCode.*;
 
 public class GameView extends CanvasView {
     private static final double OFFSET = 0.3 * Sizes.getMeter();
-    private static final ItemType[] PRIMARY_TYPES =
-            new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
@@ -598,7 +596,7 @@ public class GameView extends CanvasView {
         if (controlled.isEmpty()) {
             pi = board.lookForItem(location.getItems(), x, y, level, CREATURE_TYPE, false);
         } else {
-            pi = board.lookForItem(location.getItems(), x, y, level, PRIMARY_TYPES, false);
+            pi = board.lookForItem(location.getItems(), x, y, level, CURSOR_TYPES, false);
         }
         if (pi == null) {
             commandControlledGoTo(x, y);

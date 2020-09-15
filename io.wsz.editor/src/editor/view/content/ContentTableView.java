@@ -6,6 +6,7 @@ import editor.view.asset.AssetStage;
 import editor.view.asset.cover.CoverAssetStage;
 import editor.view.asset.creature.CreatureAssetStage;
 import editor.view.asset.equipment.container.ContainerAssetStage;
+import editor.view.asset.equipment.misc.MiscAssetStage;
 import editor.view.asset.equipment.weapon.WeaponAssetStage;
 import editor.view.asset.indoor.InDoorAssetStage;
 import editor.view.asset.landscape.LandscapeAssetStage;
@@ -229,6 +230,8 @@ public class ContentTableView extends TableView<PosItem> {
                     parent, (InDoor) pi, true, editorCanvas, editorController);
             case OUTDOOR -> new OutDoorAssetStage(
                     parent, (OutDoor) pi, true, editorCanvas, editorController);
+            case MISC -> new MiscAssetStage(
+                    parent, (Misc) pi, true, editorCanvas, editorController);
         };
         itemStage.show();
     }

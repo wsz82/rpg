@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 import static io.wsz.model.item.ItemType.*;
 
 public abstract class CanvasView {
-    private static final ItemType[] CURSOR_TYPES =
-            new ItemType[] {CREATURE, CONTAINER, WEAPON, INDOOR, OUTDOOR};
-    private static final ItemType[] OBSTACLE_TYPES =
+    protected static final ItemType[] CURSOR_TYPES =
+            new ItemType[] {CREATURE, CONTAINER, WEAPON, MISC, INDOOR, OUTDOOR};
+    protected static final ItemType[] OBSTACLE_TYPES =
             new ItemType[] {LANDSCAPE, COVER, TELEPORT};
 
     protected final Canvas canvas;

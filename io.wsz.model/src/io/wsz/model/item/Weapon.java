@@ -111,24 +111,6 @@ public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
     }
 
     @Override
-    public boolean creaturePrimaryInteract(Creature cr) {
-        CreatureSize size = cr.getSize();
-        if (withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight())) {
-            if (getObstacleOnWay(cr) != null) return false;
-            boolean fits = cr.getIndividualInventory().fitsInventory(this);
-            if (fits) {
-                cr.getIndividualInventory().tryAdd(this);
-                if (tryTake(cr)) {
-                    pos.x = 0;
-                    pos.y = 0;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     protected WeaponAnimation getConcreteAnimation() {
         if (animation == null) {
             return new WeaponAnimation(getDir(), IDLE);

@@ -9,6 +9,7 @@ public enum ItemType {
     CREATURE,
     CONTAINER,
     WEAPON,
+    MISC,
     TELEPORT,
     LANDSCAPE
 }

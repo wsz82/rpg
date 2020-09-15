@@ -4,6 +4,7 @@ import editor.model.EditorController;
 import editor.view.asset.cover.CoverTableView;
 import editor.view.asset.creature.CreatureTableView;
 import editor.view.asset.equipment.container.ContainerTableView;
+import editor.view.asset.equipment.misc.MiscTableView;
 import editor.view.asset.equipment.weapon.WeaponsTableView;
 import editor.view.asset.indoor.InDoorTableView;
 import editor.view.asset.landscape.LandscapeTableView;
@@ -51,7 +52,6 @@ public class AssetsStage extends ChildStage {
     }
 
     private void createTabs() {
-        ItemType[] itemTypes = ItemType.values();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         ObservableAssets observableAssets = editorController.getObservableAssets();
@@ -87,6 +87,10 @@ public class AssetsStage extends ChildStage {
         ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
         AssetsTableView<OutDoor> outDoorTableView = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
         setUpTab(outDoorTableView, Paths.OUTDOORS);
+
+        ObservableList<Misc> miscs = observableAssets.getMiscs();
+        AssetsTableView<Misc> miscsTableView = new MiscTableView(this, miscs, editorCanvas, editorController);
+        setUpTab(miscsTableView, Paths.MISC);
 
         root.getChildren().add(tabPane);
     }

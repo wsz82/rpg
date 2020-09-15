@@ -19,6 +19,7 @@ public class ObservableAssets {
     private final ObservableList<Container> containers = FXCollections.observableArrayList();
     private final ObservableList<InDoor> inDoors = FXCollections.observableArrayList();
     private final ObservableList<OutDoor> outDoors = FXCollections.observableArrayList();
+    private final ObservableList<Misc> miscs = FXCollections.observableArrayList();
 
     public ObservableAssets() {}
 
@@ -32,6 +33,7 @@ public class ObservableAssets {
         assets.addAll(containers);
         assets.addAll(inDoors);
         assets.addAll(outDoors);
+        assets.addAll(miscs);
         return assets;
     }
 
@@ -39,6 +41,7 @@ public class ObservableAssets {
         ObservableList<Asset> equipments = FXCollections.observableArrayList();
         equipments.addAll(weapons);
         equipments.addAll(containers);
+        equipments.addAll(miscs);
         return equipments;
     }
 
@@ -51,6 +54,7 @@ public class ObservableAssets {
         containers.clear();
         inDoors.clear();
         outDoors.clear();
+        miscs.clear();
     }
 
     public void fillLists(List<Asset> assets) {
@@ -95,6 +99,11 @@ public class ObservableAssets {
                 .map(a -> (OutDoor) a)
                 .collect(Collectors.toList());
         outDoors.addAll(tempOutDoor);
+        List<Misc> tempMiscs = assets.stream()
+                .filter(a -> a.getType().equals(MISC))
+                .map(a -> (Misc) a)
+                .collect(Collectors.toList());
+        miscs.addAll(tempMiscs);
     }
 
     public ObservableList<Creature> getCreatures() {
@@ -127,5 +136,9 @@ public class ObservableAssets {
 
     public ObservableList<OutDoor> getOutDoors() {
         return outDoors;
+    }
+
+    public ObservableList<Misc> getMiscs() {
+        return miscs;
     }
 }
