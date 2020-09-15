@@ -2,7 +2,6 @@ package editor.view.asset.equipment;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
-import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Equipment;
@@ -23,7 +22,7 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
     protected final ChoiceBox<InventoryPlaceType> occupiedPlaceCB = new ChoiceBox<>();
     protected final ChoiceBox<EquipmentType> typeCB = new ChoiceBox<>();
     protected final DoubleField inputWeight = new DoubleField(0.0, isContent);
-    protected final IntegerField inputSize = new IntegerField(0, isContent);
+    protected final DoubleField inputSize = new DoubleField(0.0, isContent);
 
     protected HBox weightBox;
 
@@ -117,7 +116,7 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
             inputWeight.setText(String.valueOf(weight));
         }
 
-        Integer size = item.getIndividualSize();
+        Double size = item.getIndividualSize();
         if (size == null) {
             inputSize.setText(null);
         } else {
@@ -153,10 +152,10 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
             if (isContent) {
                 item.setSize(null);
             } else {
-                item.setSize(0);
+                item.setSize(0.0);
             }
         } else {
-            item.setSize(Integer.parseInt(size));
+            item.setSize(Double.parseDouble(size));
         }
     }
 }

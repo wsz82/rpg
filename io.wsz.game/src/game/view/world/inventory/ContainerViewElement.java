@@ -35,8 +35,8 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     private void drawContainerSize() {
-        int filledSpace = container.getFilledSpace();
-        int maxSize = container.getSize() - container.getNettoSize();
+        double filledSpace = container.getFilledSpace();
+        double maxSize = container.getSize() - container.getNettoSize();
         double columnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
         double viewHeight = this.viewHeight;
         double columnX = viewPos.x - columnWidth;

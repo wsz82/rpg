@@ -104,9 +104,9 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         }
     }
 
-    public int getFilledSpace() {
+    public double getFilledSpace() {
         return getItems().stream()
-                .mapToInt(Equipment::getSize)
+                .mapToDouble(Equipment::getSize)
                 .sum();
     }
 

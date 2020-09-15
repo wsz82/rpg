@@ -115,15 +115,15 @@ public class Inventory implements Externalizable {
         return owner.getStrength() * 3;
     }
 
-    public int getFilledSpace() {
+    public double getFilledSpace() {
         return getEquippedItemsSize() + getItems().stream()
-                .mapToInt(Equipment::getSize)
+                .mapToDouble(Equipment::getSize)
                 .sum();
     }
 
-    private int getEquippedItemsSize() {
+    private double getEquippedItemsSize() {
         return equippedItems.values().stream()
-                .mapToInt(Equipment::getSize)
+                .mapToDouble(Equipment::getSize)
                 .sum();
     }
 

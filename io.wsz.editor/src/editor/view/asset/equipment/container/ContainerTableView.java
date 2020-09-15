@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
-import javafx.util.converter.IntegerStringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +25,14 @@ public class ContainerTableView extends EquipmentTableView<Container> {
     }
 
     private void initContainersTable() {
-        TableColumn<Container, Integer> sizeCol = new TableColumn<>("Size");
+        TableColumn<Container, Double> sizeCol = new TableColumn<>("Size");
         sizeCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
-            protected Integer computeValue() {
+            protected Double computeValue() {
                 return p.getValue().getSize();
             }
         });
-        sizeCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        sizeCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         sizeCol.setEditable(false);
         getColumns().add(sizeCol);
     }

@@ -27,7 +27,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     protected InventoryPlaceType occupiedPlace;
     protected EquipmentType equipmentType;
     protected Double weight;
-    protected Integer size;
+    protected Double size;
 
     public Equipment() {}
 
@@ -102,21 +102,21 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         this.weight = weight;
     }
 
-    public Integer getIndividualSize() {
+    public Double getIndividualSize() {
         return size;
     }
 
-    public Integer getSize() {
+    public Double getSize() {
         if (size == null) {
             if (isThisPrototype()) {
-                return 0;
+                return 0.0;
             }
             return prototype.size;
         }
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 
@@ -140,7 +140,6 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             getController().getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
             return false;
         } else {
-//            setIsVisible(false);
             cr.getPos().getLocation().getItemsToRemove().add(this);
             getController().getLogger().logItemAction(getName(), "taken");
             return true;
@@ -259,6 +258,6 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
 
         weight = (Double) in.readObject();
 
-        size = (Integer) in.readObject();
+        size = (Double) in.readObject();
     }
 }

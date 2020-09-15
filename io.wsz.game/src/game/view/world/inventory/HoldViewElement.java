@@ -43,8 +43,8 @@ public class HoldViewElement extends EquipmentViewElement {
     }
 
     private void drawHoldSize() {
-        int filledSpace = inventory.getFilledSpace();
-        int maxSize = inventory.getMaxSize();
+        double filledSpace = inventory.getFilledSpace();
+        double maxSize = inventory.getMaxSize();
         double columnWidth = SIZE_COLUMN_WIDTH * inventoryWidth;
         double viewHeight = this.viewHeight;
         double columnX = viewPos.x - columnWidth;
