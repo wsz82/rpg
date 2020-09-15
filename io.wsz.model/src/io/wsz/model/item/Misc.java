@@ -11,7 +11,7 @@ import java.io.ObjectOutput;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
-public class Misc extends Equipment<Misc, EquipmentAnimationPos> {
+public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
     private EquipmentAnimation<Misc> animation;

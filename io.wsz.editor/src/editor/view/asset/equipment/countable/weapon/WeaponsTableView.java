@@ -1,4 +1,4 @@
-package editor.view.asset.equipment.weapon;
+package editor.view.asset.equipment.countable.weapon;
 
 import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;

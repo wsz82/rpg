@@ -4,8 +4,8 @@ import editor.model.EditorController;
 import editor.view.asset.cover.CoverTableView;
 import editor.view.asset.creature.CreatureTableView;
 import editor.view.asset.equipment.container.ContainerTableView;
-import editor.view.asset.equipment.misc.MiscTableView;
-import editor.view.asset.equipment.weapon.WeaponsTableView;
+import editor.view.asset.equipment.countable.misc.MiscTableView;
+import editor.view.asset.equipment.countable.weapon.WeaponsTableView;
 import editor.view.asset.indoor.InDoorTableView;
 import editor.view.asset.landscape.LandscapeTableView;
 import editor.view.asset.outdoor.OutDoorTableView;
@@ -56,21 +56,17 @@ public class AssetsStage extends ChildStage {
 
         ObservableAssets observableAssets = editorController.getObservableAssets();
 
-        ObservableList<Creature> creatures = observableAssets.getCreatures();
-        AssetsTableView<Creature> creatureTableView = new CreatureTableView(this, creatures, editorCanvas, editorController);
-        setUpTab(creatureTableView, Paths.CREATURES);
+        ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
+        AssetsTableView<Landscape> landscapeTableView = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
+        setUpTab(landscapeTableView, Paths.LANDSCAPES);
 
         ObservableList<Cover> covers = observableAssets.getCovers();
         AssetsTableView<Cover> coverTableView = new CoverTableView(this, covers, editorCanvas, editorController);
         setUpTab(coverTableView, Paths.COVERS);
 
-        ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
-        AssetsTableView<Landscape> landscapeTableView = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
-        setUpTab(landscapeTableView, Paths.LANDSCAPES);
-
-        ObservableList<Teleport> teleports = observableAssets.getTeleports();
-        AssetsTableView<Teleport> teleportTableView = new TeleportTableView(this, teleports, editorCanvas, editorController);
-        setUpTab(teleportTableView, Paths.TELEPORTS);
+        ObservableList<Creature> creatures = observableAssets.getCreatures();
+        AssetsTableView<Creature> creatureTableView = new CreatureTableView(this, creatures, editorCanvas, editorController);
+        setUpTab(creatureTableView, Paths.CREATURES);
 
         ObservableList<Weapon> weapons = observableAssets.getWeapons();
         AssetsTableView<Weapon> weaponsTableView = new WeaponsTableView(this, weapons, editorCanvas, editorController);
@@ -80,17 +76,21 @@ public class AssetsStage extends ChildStage {
         AssetsTableView<Container> containerTableView = new ContainerTableView(this, containers, editorCanvas, editorController);
         setUpTab(containerTableView, Paths.CONTAINERS);
 
-        ObservableList<InDoor> inDoors = observableAssets.getInDoors();
-        AssetsTableView<InDoor> inDoorTableView = new InDoorTableView(this, inDoors, editorCanvas, editorController);
-        setUpTab(inDoorTableView, Paths.INDOORS);
+        ObservableList<Misc> miscs = observableAssets.getMiscs();
+        AssetsTableView<Misc> miscsTableView = new MiscTableView(this, miscs, editorCanvas, editorController);
+        setUpTab(miscsTableView, Paths.MISC);
+
+        ObservableList<Teleport> teleports = observableAssets.getTeleports();
+        AssetsTableView<Teleport> teleportTableView = new TeleportTableView(this, teleports, editorCanvas, editorController);
+        setUpTab(teleportTableView, Paths.TELEPORTS);
 
         ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
         AssetsTableView<OutDoor> outDoorTableView = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
         setUpTab(outDoorTableView, Paths.OUTDOORS);
 
-        ObservableList<Misc> miscs = observableAssets.getMiscs();
-        AssetsTableView<Misc> miscsTableView = new MiscTableView(this, miscs, editorCanvas, editorController);
-        setUpTab(miscsTableView, Paths.MISC);
+        ObservableList<InDoor> inDoors = observableAssets.getInDoors();
+        AssetsTableView<InDoor> inDoorTableView = new InDoorTableView(this, inDoors, editorCanvas, editorController);
+        setUpTab(inDoorTableView, Paths.INDOORS);
 
         root.getChildren().add(tabPane);
     }

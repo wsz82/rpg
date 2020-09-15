@@ -1,12 +1,12 @@
-package editor.view.asset.equipment.misc;
+package editor.view.asset.equipment.countable.misc;
 
 import editor.model.EditorController;
-import editor.view.asset.equipment.EquipmentAssetStage;
+import editor.view.asset.equipment.countable.EquipmentMayCountableAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Misc;
 import javafx.stage.Stage;
 
-public class MiscAssetStage extends EquipmentAssetStage<Misc> {
+public class MiscAssetStage extends EquipmentMayCountableAssetStage<Misc> {
     private static final String TITLE = "Miscellaneous asset";
 
     public MiscAssetStage(Stage parent, Misc asset, boolean isContent,

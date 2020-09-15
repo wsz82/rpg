@@ -1,8 +1,8 @@
-package editor.view.asset.equipment.weapon;
+package editor.view.asset.equipment.countable.weapon;
 
 import editor.model.EditorController;
 import editor.view.DoubleField;
-import editor.view.asset.equipment.EquipmentAssetStage;
+import editor.view.asset.equipment.countable.EquipmentMayCountableAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Weapon;
 import javafx.geometry.Pos;
@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-public class WeaponAssetStage extends EquipmentAssetStage<Weapon> {
+public class WeaponAssetStage extends EquipmentMayCountableAssetStage<Weapon> {
     private static final String TITLE = "Weapon asset";
 
     private final DoubleField inputDamage = new DoubleField(0.0, isContent);

@@ -1,4 +1,4 @@
-package editor.view.asset.equipment.misc;
+package editor.view.asset.equipment.countable.misc;
 
 import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;

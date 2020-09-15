@@ -203,7 +203,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         item.setPath(path);
 
         String name = nameInput.getText();
-        if (!name.isEmpty()) {
+        if (name != null && !name.isEmpty()) {
             item.setName(name);
         }
 

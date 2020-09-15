@@ -12,7 +12,7 @@ import java.io.ObjectOutput;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
-public class Weapon extends Equipment<Weapon, EquipmentAnimationPos> {
+public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
     private WeaponAnimation animation;
