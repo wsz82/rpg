@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Editor" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="editor.view.stage.Main" />
+    <module name="io.wsz.editor" />
+    <option name="VM_PARAMETERS" value="--module-path C:\javafx-sdk-14.0.1\lib;C:\Users\Wojciech\IdeaProjects\rpg\out\production --add-modules javafx.controls,io.wsz.editor" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

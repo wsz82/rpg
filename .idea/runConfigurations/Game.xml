@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Game" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="game.view.launcher.Main" />
+    <module name="io.wsz.game" />
+    <option name="VM_PARAMETERS" value="--module-path C:\javafx-sdk-14.0.1\lib;C:\Users\Wojciech\IdeaProjects\rpg\out\production --add-modules javafx.controls,io.wsz.game" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

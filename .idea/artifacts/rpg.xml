@@ -25,8 +25,8 @@
       <element id="directory" name="javafx">
         <element id="dir-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-14.0.1" />
       </element>
-      <element id="file-copy" path="$APPLICATION_CONFIG_DIR$/scratches/run_editor.bat" />
-      <element id="file-copy" path="$APPLICATION_CONFIG_DIR$/scratches/run_game.bat" />
+      <element id="file-copy" path="$PROJECT_DIR$/io.wsz.editor/bat/run_editor.bat" />
+      <element id="file-copy" path="$PROJECT_DIR$/io.wsz.game/bat/run_game.bat" />
     </root>
   </artifact>
 </component>
