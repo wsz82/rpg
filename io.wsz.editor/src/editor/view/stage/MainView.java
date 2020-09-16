@@ -91,25 +91,25 @@ class MainView {
     }
 
     private void hookUpEvents() {
-        mainStage.setOnCloseRequest(event -> {
-            onCloseRequest();
-        });
+        mainStage.setOnCloseRequest(e -> onCloseRequest(e::consume));
     }
 
-    private void onCloseRequest() {
-        askForSave();
-        File programDir = editorController.getController().getProgramDir();
-        storeSettings(programDir);
+    private void onCloseRequest(ActionResolver onCancel) {
+        askForSave(onCancel);
     }
 
-    private void askForSave() {
+    private void askForSave(ActionResolver onCancel) {
         final Alert alert = new Alert(
-                Alert.AlertType.CONFIRMATION, "Would you like to save?", ButtonType.NO, ButtonType.YES);
-        alert.showAndWait()
-                .filter(r -> r == ButtonType.YES)
-                .ifPresent(r -> {
-                    saveFile();
-                    alert.close();
+                Alert.AlertType.CONFIRMATION, "Would you like to save?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+        alert.showAndWait().ifPresent(r -> {
+                    if (r == ButtonType.CANCEL) {
+                        onCancel.resolve();
+                    } else if (r == ButtonType.YES) {
+                        saveFile();
+                        File programDir = editorController.getController().getProgramDir();
+                        storeSettings(programDir);
+                        alert.close();
+                    }
                 });
     }
 
@@ -269,8 +269,15 @@ class MainView {
         plugins.setOnAction(event -> openPluginsTable());
         plugin.setOnAction(e -> openPluginSettings());
         exit.setOnAction(e -> {
-            onCloseRequest();
-            mainStage.close();
+            final boolean[] isCanceled = new boolean[1];
+            ActionResolver onCancel = () -> {
+                e.consume();
+                isCanceled[0] = true;
+            };
+            onCloseRequest(onCancel);
+            if (!isCanceled[0]) {
+                mainStage.close();
+            }
         });
         file.getItems().addAll(newPlugin, save, saveAs, plugins, plugin, exit);
         return file;
@@ -281,8 +288,12 @@ class MainView {
     }
 
     private void createNewPlugin() {
-        onCloseRequest();
-        editorController.initNewPlugin();
+        final boolean[] isCanceled = new boolean[1];
+        ActionResolver cancelResolver = () -> isCanceled[0] = true;
+        askForSave(cancelResolver);
+        if (!isCanceled[0]) {
+            editorController.initNewPlugin();
+        }
     }
 
     private void openPluginsTable() {
