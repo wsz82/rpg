@@ -235,7 +235,7 @@ public abstract class CanvasView {
         setCursor(cursor);
     }
 
-    protected void setCursor(ImageCursor main) {
-        canvas.getScene().setCursor(main);
+    protected void setCursor(ImageCursor imageCursor) {
+        canvas.getScene().setCursor(imageCursor);
     }
 }

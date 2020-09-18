@@ -524,7 +524,10 @@ public class GameView extends CanvasView {
         KeyCode hideOrShowPortraits = gameController.getSettings().getKey(KeyAction.HIDE_PORTRAITS);
         KeyCode layerUp = gameController.getSettings().getKey(KeyAction.LAYER_UP);
         KeyCode layerDown = gameController.getSettings().getKey(KeyAction.LAYER_DOWN);
-        if (key == hideOrShowPortraits) {
+        if (key == ESCAPE) {
+            ImageCursor main = gameController.getCursor().getMain();
+            setCursor(main);
+        } else if (key == hideOrShowPortraits) {
             e.consume();
             switchPortraits();
         } else if (key == inventory) {

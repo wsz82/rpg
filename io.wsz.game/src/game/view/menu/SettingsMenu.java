@@ -360,7 +360,7 @@ class SettingsMenu extends StackPane {
 
     private void hookUpResizeWithResolutionEvents(CheckBox cb) {
         cb.setSelected(Sizes.isResizeWithResolution());
-        cb.setOnAction(event -> {
+        cb.setOnAction(e -> {
             boolean isSelected = cb.isSelected();
             Sizes.setResizeWithResolution(isSelected, controller);
             if (isSelected) {
@@ -387,7 +387,7 @@ class SettingsMenu extends StackPane {
 
     private void hookUpFullScreenEvents(CheckBox cb) {
         cb.setSelected(gameStage.isFullScreen());
-        cb.setOnAction(event -> changeFullScreenSetting(cb.isSelected()));
+        cb.setOnAction(e -> changeFullScreenSetting(cb.isSelected()));
     }
 
     private void changeFullScreenSetting(boolean isSelected) {
