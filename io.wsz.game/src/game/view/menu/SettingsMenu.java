@@ -70,7 +70,7 @@ class SettingsMenu extends StackPane {
     }
 
     private void openControlSettings() {
-        StackPane controlSettingsContainer = getControlSettings();
+        final StackPane controlSettingsContainer = getControlSettings();
         root.setCenter(controlSettingsContainer);
     }
 
@@ -100,12 +100,12 @@ class SettingsMenu extends StackPane {
     }
 
     private void openGameSettings() {
-        StackPane gameSettingsContainer = getGameSettings();
+        final StackPane gameSettingsContainer = getGameSettings();
         root.setCenter(gameSettingsContainer);
     }
 
     private StackPane getGameSettings() {
-        StackPane gameContainer = new StackPane();
+        final StackPane gameContainer = new StackPane();
 
         final VBox container = new VBox(10);
         container.setAlignment(Pos.CENTER);
@@ -242,12 +242,12 @@ class SettingsMenu extends StackPane {
     }
 
     private void openGraphicsSettings() {
-        StackPane graphicsContainer = getGraphicsSettings();
+        final StackPane graphicsContainer = getGraphicsSettings();
         root.setCenter(graphicsContainer);
     }
 
     private StackPane getGraphicsSettings() {
-        StackPane graphicsContainer = new StackPane();
+        final StackPane graphicsContainer = new StackPane();
 
         stringConverter = new StringConverter<>() {
             @Override

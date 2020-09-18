@@ -79,7 +79,7 @@ public class KeysControlTableView {
             }
         });
         actionCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        actionCol.setSortable(false);
+        setColumnParams(actionCol);
         table.getColumns().add(actionCol);
 
         TableColumn<Key, String> keyCol = new TableColumn<>(locale.getProperty(LocaleKeys.KEY));
@@ -90,13 +90,25 @@ public class KeysControlTableView {
                 if (code == null) {
                     return "";
                 } else {
-                    return code.toString();
+                    return code.getName();
                 }
             }
         });
         keyCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        keyCol.setSortable(false);
+        setColumnParams(keyCol);
         table.getColumns().add(keyCol);
+
+        table.widthProperty().addListener((observable, oldWidth, newWidth) -> {
+            double keyColWidth = keyCol.getWidth();
+            double newActionColWidth = newWidth.doubleValue() - keyColWidth;
+            actionCol.setPrefWidth(newActionColWidth);
+        });
+    }
+
+    private void setColumnParams(TableColumn<Key, String> actionCol) {
+        actionCol.setSortable(false);
+        actionCol.setReorderable(false);
+        actionCol.setResizable(false);
     }
 
     public TableView<Key> getTable() {
