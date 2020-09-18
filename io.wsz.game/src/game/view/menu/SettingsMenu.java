@@ -1,6 +1,7 @@
 package game.view.menu;
 
 import game.model.GameController;
+import game.model.setting.Key;
 import game.model.setting.Settings;
 import io.wsz.model.Controller;
 import io.wsz.model.locale.LocaleKeys;
@@ -31,6 +32,7 @@ class SettingsMenu extends StackPane {
     private final SettingsParent parent;
     private final Button graphics;
     private final Button game;
+    private final Button control;
     private final Button back;
 
     private BorderPane root;
@@ -55,14 +57,42 @@ class SettingsMenu extends StackPane {
 
         Properties locale = controller.getLocale();
         graphics = new Button(locale.getProperty(LocaleKeys.GRAPHICS));
-        graphics.setOnAction(event -> openGraphicsSettings());
+        graphics.setOnAction(e -> openGraphicsSettings());
         game = new Button(locale.getProperty(LocaleKeys.GAME));
-        game.setOnAction(event -> openGameSettings());
+        game.setOnAction(e -> openGameSettings());
+        control = new Button(locale.getProperty(LocaleKeys.CONTROL));
+        control.setOnAction(e -> openControlSettings());
         back = new Button(locale.getProperty(LocaleKeys.BACK));
-        back.setOnAction(event -> goBackToMenu());
+        back.setOnAction(e -> goBackToMenu());
 
-        buttons.getChildren().addAll(graphics, game, back);
+        buttons.getChildren().addAll(graphics, game, control, back);
         getChildren().addAll(buttons);
+    }
+
+    private void openControlSettings() {
+        StackPane controlSettingsContainer = getControlSettings();
+        root.setCenter(controlSettingsContainer);
+    }
+
+    private StackPane getControlSettings() {
+        final StackPane controlContainer = new StackPane();
+
+        final VBox container = new VBox(10);
+        container.setAlignment(Pos.CENTER);
+
+        Properties locale = controller.getLocale();
+
+        KeysControlTableView keysControls = new KeysControlTableView(gameController);
+        keysControls.initTable();
+        TableView<Key> keys = keysControls.getTable();
+        keys.setMaxWidth(root.getWidth()/3);
+
+        final Button backToSettings = new Button(locale.getProperty(LocaleKeys.BACK));
+        backToSettings.setOnAction(event -> goBackToSettings());
+
+        container.getChildren().addAll(keys, backToSettings);
+        controlContainer.getChildren().add(container);
+        return controlContainer;
     }
 
     void open(BorderPane root){

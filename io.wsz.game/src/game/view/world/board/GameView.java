@@ -1,6 +1,7 @@
 package game.view.world.board;
 
 import game.model.GameController;
+import game.model.setting.KeyAction;
 import game.model.setting.Settings;
 import game.model.world.GameRunner;
 import game.view.world.CanvasView;
@@ -518,52 +519,51 @@ public class GameView extends CanvasView {
         if (barKeys.contains(key)) {
             return;
         }
-        switch (key) {
-            case P -> {
-                e.consume();
-                Settings settings = gameController.getSettings();
-                boolean isShowBar = settings.isShowBar();
-                settings.setShowBar(!isShowBar);
-                if (isShowBar) {
-                    updateCurPosForShowBarUpdate();
+        KeyCode pause = gameController.getSettings().getKey(KeyAction.PAUSE);
+        KeyCode inventory = gameController.getSettings().getKey(KeyAction.INVENTORY);
+        KeyCode hideOrShowPortraits = gameController.getSettings().getKey(KeyAction.HIDE_PORTRAITS);
+        KeyCode layerUp = gameController.getSettings().getKey(KeyAction.LAYER_UP);
+        KeyCode layerDown = gameController.getSettings().getKey(KeyAction.LAYER_DOWN);
+        if (key == hideOrShowPortraits) {
+            e.consume();
+            Settings settings = gameController.getSettings();
+            boolean isShowBar = settings.isShowBar();
+            settings.setShowBar(!isShowBar);
+            if (isShowBar) {
+                updateCurPosForShowBarUpdate();
+            }
+        } else if (key == inventory) {
+            e.consume();
+            GameRunner.runLater(this::openInventory);
+        } else if (key == pause) {
+            e.consume();
+            handlePause();
+        } else if (key == layerUp) {
+            e.consume();
+            GameRunner.runLater(() -> {
+                Layer layer = controller.getCurrentLayer().getLayer();
+                Layer next = layer;
+                for (int i = 0; i < layers.size() - 1; i++) {
+                    Layer current = layers.get(i);
+                    if (current == layer) {
+                        next = layers.get(i + 1);
+                    }
                 }
-            }
-            case I -> {
-                e.consume();
-                GameRunner.runLater(this::openInventory);
-            }
-            case SPACE -> {
-                e.consume();
-                handlePause();
-            }
-            case PAGE_UP -> {
-                e.consume();
-                GameRunner.runLater(() -> {
-                    Layer layer = controller.getCurrentLayer().getLayer();
-                    Layer next = layer;
-                    for (int i = 0; i < layers.size() - 1; i++) {
-                        Layer current = layers.get(i);
-                        if (current == layer) {
-                            next = layers.get(i + 1);
-                        }
+                controller.getCurrentLayer().setLayer(next);
+            });
+        } else if (key == layerDown) {
+            e.consume();
+            GameRunner.runLater(() -> {
+                Layer layer = controller.getCurrentLayer().getLayer();
+                Layer prev = layer;
+                for (int i = 1; i < layers.size(); i++) {
+                    Layer current = layers.get(i);
+                    if (current == layer) {
+                        prev = layers.get(i - 1);
                     }
-                    controller.getCurrentLayer().setLayer(next);
-                });
-            }
-            case PAGE_DOWN -> {
-                e.consume();
-                GameRunner.runLater(() -> {
-                    Layer layer = controller.getCurrentLayer().getLayer();
-                    Layer prev = layer;
-                    for (int i = 1; i < layers.size(); i++) {
-                        Layer current = layers.get(i);
-                        if (current == layer) {
-                            prev = layers.get(i - 1);
-                        }
-                    }
-                    controller.getCurrentLayer().setLayer(prev);
-                });
-            }
+                }
+                controller.getCurrentLayer().setLayer(prev);
+            });
         }
     }
 

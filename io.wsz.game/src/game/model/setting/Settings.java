@@ -4,11 +4,14 @@ import io.wsz.model.Controller;
 import io.wsz.model.sizes.FontSize;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
+import javafx.scene.input.KeyCode;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -23,6 +26,7 @@ public class Settings implements Externalizable {
     private boolean isShowBar;
     private String language;
     private boolean isFullScreen;
+    private List<Key> keys;
 
     public void initDefaultSettings() {
         gameScrollSpeed = 0.2;
@@ -35,6 +39,30 @@ public class Settings implements Externalizable {
         language = Paths.ENGLISH;
         fontSize = FontSize.M;
         isFullScreen = true;
+        keys = new ArrayList<>();
+        initDefaultKeys(keys);
+    }
+
+    private void initDefaultKeys(List<Key> keys) {
+        Key pause = new Key(KeyAction.PAUSE, KeyCode.SPACE);
+        keys.add(pause);
+        Key inventory = new Key(KeyAction.INVENTORY, KeyCode.I);
+        keys.add(inventory);
+        Key hidePortraits = new Key(KeyAction.HIDE_PORTRAITS, KeyCode.P);
+        keys.add(hidePortraits);
+        Key layerUp = new Key(KeyAction.LAYER_UP, KeyCode.PAGE_UP);
+        keys.add(layerUp);
+        Key layerDown = new Key(KeyAction.LAYER_DOWN, KeyCode.PAGE_DOWN);
+        keys.add(layerDown);
+    }
+
+    public KeyCode getKey(KeyAction pause) {
+        for (Key key : keys) {
+            if (pause == key.getAction()) {
+                return key.getCode();
+            }
+        }
+        return null;
     }
 
     public double getGameScrollSpeed() {
@@ -130,6 +158,14 @@ public class Settings implements Externalizable {
         isFullScreen = fullScreen;
     }
 
+    public List<Key> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(ArrayList<Key> keys) {
+        this.keys = keys;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(fontSize);
@@ -142,6 +178,7 @@ public class Settings implements Externalizable {
         out.writeBoolean(isShowBar);
         out.writeObject(language);
         out.writeBoolean(isFullScreen);
+        out.writeObject(keys);
     }
 
     @Override
@@ -156,5 +193,6 @@ public class Settings implements Externalizable {
         isShowBar = in.readBoolean();
         language = (String) in.readObject();
         isFullScreen = in.readBoolean();
+        keys = (List<Key>) in.readObject();
     }
 }

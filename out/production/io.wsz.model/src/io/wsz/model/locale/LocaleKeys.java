@@ -37,4 +37,7 @@ public class LocaleKeys {
     public static final String ACTIVE_PLUGIN = "active_plugin";
     public static final String NAME = "name";
     public static final String STARTING = "starting";
+    public static final String ACTION = "action";
+    public static final String KEY = "key";
+    public static final String CONTROL = "control";
 }
