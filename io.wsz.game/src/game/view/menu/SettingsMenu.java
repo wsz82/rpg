@@ -180,6 +180,7 @@ class SettingsMenu extends StackPane {
         Properties locale = controller.getLocale();
         graphics.setText(locale.getProperty(LocaleKeys.GRAPHICS));
         game.setText(locale.getProperty(LocaleKeys.GAME));
+        control.setText(locale.getProperty(LocaleKeys.CONTROL));
         back.setText(locale.getProperty(LocaleKeys.BACK));
         mapScrollLabel.setText(locale.getProperty(LocaleKeys.MAP_SCROLL_SPEED));
         dialogScrollLabel.setText(locale.getProperty(LocaleKeys.DIALOG_SCROLL_SPEED));

@@ -74,10 +74,12 @@ public class KeysControlTableView {
         actionCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                return p.getValue().getAction().toString();
+                String localeCode = p.getValue().getAction().getLocaleCode();
+                return locale.getProperty(localeCode);
             }
         });
         actionCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        actionCol.setSortable(false);
         table.getColumns().add(actionCol);
 
         TableColumn<Key, String> keyCol = new TableColumn<>(locale.getProperty(LocaleKeys.KEY));
@@ -93,6 +95,7 @@ public class KeysControlTableView {
             }
         });
         keyCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        keyCol.setSortable(false);
         table.getColumns().add(keyCol);
     }
 

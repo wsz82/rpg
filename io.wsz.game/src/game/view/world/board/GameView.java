@@ -526,12 +526,7 @@ public class GameView extends CanvasView {
         KeyCode layerDown = gameController.getSettings().getKey(KeyAction.LAYER_DOWN);
         if (key == hideOrShowPortraits) {
             e.consume();
-            Settings settings = gameController.getSettings();
-            boolean isShowBar = settings.isShowBar();
-            settings.setShowBar(!isShowBar);
-            if (isShowBar) {
-                updateCurPosForShowBarUpdate();
-            }
+            switchPortraits();
         } else if (key == inventory) {
             e.consume();
             GameRunner.runLater(this::openInventory);
@@ -540,31 +535,44 @@ public class GameView extends CanvasView {
             handlePause();
         } else if (key == layerUp) {
             e.consume();
-            GameRunner.runLater(() -> {
-                Layer layer = controller.getCurrentLayer().getLayer();
-                Layer next = layer;
-                for (int i = 0; i < layers.size() - 1; i++) {
-                    Layer current = layers.get(i);
-                    if (current == layer) {
-                        next = layers.get(i + 1);
-                    }
-                }
-                controller.getCurrentLayer().setLayer(next);
-            });
+            GameRunner.runLater(this::changeToLayerUp);
         } else if (key == layerDown) {
             e.consume();
-            GameRunner.runLater(() -> {
-                Layer layer = controller.getCurrentLayer().getLayer();
-                Layer prev = layer;
-                for (int i = 1; i < layers.size(); i++) {
-                    Layer current = layers.get(i);
-                    if (current == layer) {
-                        prev = layers.get(i - 1);
-                    }
-                }
-                controller.getCurrentLayer().setLayer(prev);
-            });
+            GameRunner.runLater(this::changeToLayerDown);
         }
+    }
+
+    private void switchPortraits() {
+        Settings settings = gameController.getSettings();
+        boolean isShowBar = settings.isShowBar();
+        settings.setShowBar(!isShowBar);
+        if (isShowBar) {
+            updateCurPosForShowBarUpdate();
+        }
+    }
+
+    private void changeToLayerDown() {
+        Layer layer = controller.getCurrentLayer().getLayer();
+        Layer prev = layer;
+        for (int i = 1; i < layers.size(); i++) {
+            Layer current = layers.get(i);
+            if (current == layer) {
+                prev = layers.get(i - 1);
+            }
+        }
+        controller.getCurrentLayer().setLayer(prev);
+    }
+
+    private void changeToLayerUp() {
+        Layer layer = controller.getCurrentLayer().getLayer();
+        Layer next = layer;
+        for (int i = 0; i < layers.size() - 1; i++) {
+            Layer current = layers.get(i);
+            if (current == layer) {
+                next = layers.get(i + 1);
+            }
+        }
+        controller.getCurrentLayer().setLayer(next);
     }
 
     private void updateCurPosForShowBarUpdate() {
