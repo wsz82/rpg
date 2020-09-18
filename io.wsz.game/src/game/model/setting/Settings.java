@@ -21,26 +21,34 @@ public class Settings implements Externalizable {
     private double dialogScrollSpeed;
     private boolean isCenterOnPC;
     private boolean isPauseOnInventory;
-    private int resolutionWidth;
-    private int resolutionHeight;
+    private int horizontalResolution;
+    private int verticalResolution;
     private boolean isShowBar;
     private String language;
     private boolean isFullScreen;
     private List<Key> keys;
+    private double windowX;
+    private double windowY;
+    private double windowWidth;
+    private double windowHeight;
+
+    public Settings() {}
 
     public void initDefaultSettings() {
         gameScrollSpeed = 0.2;
         dialogScrollSpeed = 0.2;
         isCenterOnPC = false;
         isPauseOnInventory = true;
-        resolutionWidth = 1600;
-        resolutionHeight = 900;
+        horizontalResolution = 1600;
+        verticalResolution = 900;
         isShowBar = true;
         language = Paths.ENGLISH;
         fontSize = FontSize.M;
         isFullScreen = true;
         keys = new ArrayList<>();
         initDefaultKeys(keys);
+        windowWidth = 800;
+        windowHeight = 600;
     }
 
     private void initDefaultKeys(List<Key> keys) {
@@ -97,13 +105,13 @@ public class Settings implements Externalizable {
         this.isPauseOnInventory = pauseOnInventory;
     }
 
-    public int getResolutionWidth() {
-        return resolutionWidth;
+    public int getHorizontalResolution() {
+        return horizontalResolution;
     }
 
     public void setResolutionWidth(int resolutionWidth, Controller controller) {
         setMeter(resolutionWidth, controller);
-        this.resolutionWidth = resolutionWidth;
+        this.horizontalResolution = resolutionWidth;
     }
 
     public void setMeter(int resolutionWidth, Controller controller) {
@@ -111,13 +119,13 @@ public class Settings implements Externalizable {
         Sizes.setMeter(resolutionWidth, controller);
     }
 
-    public int getResolutionHeight() {
-        return resolutionHeight;
+    public int getVerticalResolution() {
+        return verticalResolution;
     }
 
     public void setResolutionHeight(int resolutionHeight, Controller controller) {
         setVerticalMeter(resolutionHeight, controller);
-        this.resolutionHeight = resolutionHeight;
+        this.verticalResolution = resolutionHeight;
     }
 
     public void setVerticalMeter(int resolutionHeight, Controller controller) {
@@ -166,6 +174,38 @@ public class Settings implements Externalizable {
         this.keys = keys;
     }
 
+    public double getWindowX() {
+        return windowX;
+    }
+
+    public void setWindowX(double windowX) {
+        this.windowX = windowX;
+    }
+
+    public double getWindowY() {
+        return windowY;
+    }
+
+    public void setWindowY(double windowY) {
+        this.windowY = windowY;
+    }
+
+    public double getWindowWidth() {
+        return windowWidth;
+    }
+
+    public void setWindowWidth(double windowWidth) {
+        this.windowWidth = windowWidth;
+    }
+
+    public double getWindowHeight() {
+        return windowHeight;
+    }
+
+    public void setWindowHeight(double windowHeight) {
+        this.windowHeight = windowHeight;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(fontSize);
@@ -173,12 +213,16 @@ public class Settings implements Externalizable {
         out.writeDouble(dialogScrollSpeed);
         out.writeBoolean(isCenterOnPC);
         out.writeBoolean(isPauseOnInventory);
-        out.writeInt(resolutionWidth);
-        out.writeInt(resolutionHeight);
+        out.writeInt(horizontalResolution);
+        out.writeInt(verticalResolution);
         out.writeBoolean(isShowBar);
         out.writeObject(language);
         out.writeBoolean(isFullScreen);
         out.writeObject(keys);
+        out.writeDouble(windowX);
+        out.writeDouble(windowY);
+        out.writeDouble(windowWidth);
+        out.writeDouble(windowHeight);
     }
 
     @Override
@@ -188,11 +232,15 @@ public class Settings implements Externalizable {
         dialogScrollSpeed = in.readDouble();
         isCenterOnPC = in.readBoolean();
         isPauseOnInventory = in.readBoolean();
-        resolutionWidth = in.readInt();
-        resolutionHeight = in.readInt();
+        horizontalResolution = in.readInt();
+        verticalResolution = in.readInt();
         isShowBar = in.readBoolean();
         language = (String) in.readObject();
         isFullScreen = in.readBoolean();
         keys = (List<Key>) in.readObject();
+        windowX = in.readDouble();
+        windowY = in.readDouble();
+        windowWidth = in.readDouble();
+        windowHeight = in.readDouble();
     }
 }

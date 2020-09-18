@@ -678,8 +678,8 @@ public class GameView extends CanvasView {
         int locWidth = (int) (controller.getCurrentLocation().getWidth() * Sizes.getMeter());
         int locHeight = (int) (controller.getCurrentLocation().getHeight() * Sizes.getMeter());
         Settings settings = gameController.getSettings();
-        int resWidth = settings.getResolutionWidth();
-        int resHeight = settings.getResolutionHeight();
+        int resWidth = settings.getHorizontalResolution();
+        int resHeight = settings.getVerticalResolution();
         int sceneWidth = (int) canvas.getScene().getWidth();
         int sceneHeight = (int) canvas.getScene().getHeight();
         double maxWidth = sceneWidth;

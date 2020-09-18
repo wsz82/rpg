@@ -318,7 +318,7 @@ class SettingsMenu extends StackPane {
         widthSlider.setMin(Sizes.MIN_RESOLUTION_WIDTH);
         widthSlider.setMax(maxWidth);
         widthSlider.setBlockIncrement(1);
-        widthSlider.setValue(settings.getResolutionWidth());
+        widthSlider.setValue(settings.getHorizontalResolution());
         widthSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newWidthResolution = newValue.intValue();
             updateWidthResolution(newWidthResolution);
@@ -333,7 +333,7 @@ class SettingsMenu extends StackPane {
         heightSlider.setMin(Sizes.MIN_RESOLUTION_HEIGHT);
         heightSlider.setMax(maxHeight);
         heightSlider.setBlockIncrement(1);
-        heightSlider.setValue(settings.getResolutionHeight());
+        heightSlider.setValue(settings.getVerticalResolution());
         heightSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newHeightResolution = newValue.intValue();
             updateHeightResolution(newHeightResolution);

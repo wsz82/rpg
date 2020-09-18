@@ -30,7 +30,7 @@ public class SettingCaretaker {
         if (!mementoExists) {
             Settings settings = new Settings();
             settings.initDefaultSettings();
-            return new SettingMemento(true, settings, Sizes.isResizeWithResolution());
+            return new SettingMemento(settings, Sizes.isResizeWithResolution());
         }
         SettingMemento memento = new SettingMemento();
         try (
@@ -39,9 +39,7 @@ public class SettingCaretaker {
         ) {
             memento = (SettingMemento) os.readObject();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return memento;

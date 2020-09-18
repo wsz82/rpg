@@ -3,6 +3,7 @@ package game.view.menu;
 import game.model.GameController;
 import game.model.save.SaveMemento;
 import game.model.setting.SettingMemento;
+import game.model.setting.Settings;
 import game.model.textures.Cursor;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
@@ -374,13 +375,28 @@ public class GameStage extends Stage {
     }
 
     private void restoreSettings() {
-        boolean isFullScreen = gameController.getSettings().isFullScreen();
+        Settings settings = gameController.getSettings();
+        boolean isFullScreen = settings.isFullScreen();
         setFullScreen(isFullScreen);
+        if (!isFullScreen) {
+            setX(settings.getWindowX());
+            setY(settings.getWindowY());
+            setWidth(settings.getWindowWidth());
+            setHeight(settings.getWindowHeight());
+        }
     }
 
     private void storeSettings() {
         SettingMemento memento = new SettingMemento();
-        memento.setFullScreen(isFullScreen());
+        Settings settings = gameController.getSettings();
+        boolean isFullScreen = isFullScreen();
+        settings.setFullScreen(isFullScreen);
+        if (!isFullScreen) {
+            settings.setWindowX(getX());
+            settings.setWindowY(getY());
+            settings.setWindowWidth(getWidth());
+            settings.setWindowHeight(getHeight());
+        }
         gameController.saveSettings(controller.getProgramDir(), memento);
     }
 
