@@ -6,6 +6,7 @@ import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
@@ -219,6 +220,8 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         removeAssetFromList(assetsToRemove);
     }
 
+    protected abstract void removeAssetFromList(List<A> assetsToRemove);
+
     protected void clonePrototypePos(Coords rawPos, A p, A w) {
         Coords pos = rawPos.clonePos();
         if (!pos.is0()) {
@@ -228,21 +231,38 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         w.setPos(pos);
     }
 
-    protected abstract void removeAssetFromList(List<A> assetsToRemove);
-
     private void removeContent(List<A> assetsToRemove) {
         List<String> assetsNames = assetsToRemove.stream()
                 .map(Asset::getAssetId)
                 .collect(Collectors.toList());
-       editorController.getObservableLocations().forEach(l -> {
-           List<PosItem> contentToRemove = l.getItems().stream()
+       editorController.getObservableLocations().forEach(location -> {
+           List<PosItem> items = location.getItems();
+           List<PosItem> contentToRemove = items.stream()
                     .filter(p -> {
                         String name = p.getAssetId();
+                        if (p instanceof Containable) {
+                            Containable c = (Containable) p;
+                            removeItemsFromContainable(assetsNames, c);
+                        }
                         return assetsNames.contains(name);
                     })
                     .collect(Collectors.toList());
-           l.getItems().removeAll(contentToRemove);
+           items.removeAll(contentToRemove);
         });
+    }
+
+    private void removeItemsFromContainable(List<String> assetsNames, Containable c) {
+        List<Equipment> equipment = c.getItems();
+        if (equipment == null || equipment.isEmpty()) return;
+        List<Equipment> equipmentToRemove = equipment.stream()
+                .filter(e -> {
+                    if (e instanceof Containable) {
+                        removeItemsFromContainable(assetsNames, (Containable) e);
+                    }
+                    return assetsNames.contains(e.getAssetId());
+                })
+                .collect(Collectors.toList());
+        equipment.removeAll(equipmentToRemove);
     }
 
     protected abstract ItemType getType();

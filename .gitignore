@@ -1,5 +1,8 @@
 /target
 /out/artifacts
 /out/test
+/out/production/io.wsz.editor
+/out/production/io.wsz.game
+/out/production/io.wsz.model
 /out/production/editor_settings
 /out/production/game_settings
