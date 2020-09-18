@@ -2,21 +2,17 @@ package game.view.menu;
 
 import game.model.GameController;
 import game.model.setting.Key;
-import game.model.setting.KeyAction;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.locale.LocaleKeys;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 
 import java.util.Properties;
 
@@ -43,6 +39,9 @@ public class KeysControlTableView {
                 return;
             }
             if (isEditMode) {
+                boolean isCodeAlreadyAssigned = table.getItems().stream()
+                        .anyMatch(k -> k.getCode().equals(code));
+                if (isCodeAlreadyAssigned) return;
                 selected.setCode(code);
                 table.refresh();
                 escapeEditMode();
