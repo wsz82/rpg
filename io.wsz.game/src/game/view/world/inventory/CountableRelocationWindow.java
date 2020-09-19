@@ -2,10 +2,12 @@ package game.view.world.inventory;
 
 import io.wsz.model.item.EquipmentMayCountable;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -75,21 +77,36 @@ public class CountableRelocationWindow {
         isVisible = false;
     }
 
-    public void refresh() {
-        if (!isOpened) {
-            isOpened = true;
-            hookUpRemovableEvents();
-        }
-        clearBackground();
-        drawScrollBar();
-    }
-
     private void hookUpRemovableEvents() {
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
     }
 
     private void removeRemovableEvents() {
         canvas.removeEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
+    }
+
+    public void refresh() {
+        if (!isOpened) {
+            isOpened = true;
+            hookUpRemovableEvents();
+        }
+        int meter = Sizes.getMeter();
+        clearBackground();
+        drawMovedPicture(meter);
+        drawScrollBar();
+    }
+
+    private void drawMovedPicture(int meter) {
+        EquipmentMayCountable countable = toLeave[0];
+        countable.getAnimation().play(countable);
+        ResolutionImage image = countable.getImage();
+        if (image == null) return;
+        Image fxImage = image.getFxImage();
+        if (fxImage == null) return;
+        double imageWidth = fxImage.getWidth();
+        double windowHorCenter = (posX + width/2) * meter;
+        double x = windowHorCenter - imageWidth/2;
+        gc.drawImage(fxImage, x, posY * meter);
     }
 
     private void drawScrollBar() {
