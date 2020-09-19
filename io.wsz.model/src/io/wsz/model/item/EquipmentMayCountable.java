@@ -32,6 +32,8 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         this.amount = other.amount;
     }
 
+    public abstract EquipmentMayCountable cloneEquipment();
+
     @Override
     public Double getWeight() {
         int factor = 1;

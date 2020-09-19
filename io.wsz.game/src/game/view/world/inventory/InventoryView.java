@@ -42,6 +42,7 @@ public class InventoryView {
     private final DropViewElement dropView;
     private final ContainerViewElement containerView;
     private final CreatureViewElement creatureView;
+    private final CountableRelocationWindow countableRelocationWindow;
 
     private double draggedInitWidth;
     private double draggedInitHeight;
@@ -69,10 +70,14 @@ public class InventoryView {
         creatureView = new CreatureViewElement(canvas, gameController, mousePos);
         inventoryElements.add(creatureView);
 
-        hookupEvents();
+        countableRelocationWindow = new CountableRelocationWindow(canvas, gc);
+
+        hookUpEvents();
+        defineRemovableEvents();
+        hookUpRemovableEvents();
     }
 
-    private void hookupEvents() {
+    private void hookUpEvents() {
         closeEvent = e -> {
             KeyCode code = e.getCode();
             if (code.equals(KeyCode.I) || code.equals(KeyCode.ESCAPE)) {
@@ -83,7 +88,9 @@ public class InventoryView {
             }
         };
         canvas.addEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
+    }
 
+    private void defineRemovableEvents() {
         onClick = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
@@ -103,7 +110,6 @@ public class InventoryView {
                 }
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
 
         dragStop = e -> {
             MouseButton button = e.getButton();
@@ -112,8 +118,10 @@ public class InventoryView {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
                     mousePos.y = e.getY() / Sizes.getMeter();
+                    double x = mousePos.x;
+                    double y = mousePos.y;
                     synchronized (gameController.getGameRunner()) {
-                        stopEquipmentDrag(mousePos.x, mousePos.y);
+                        stopEquipmentDrag(x, y);
                     }
                 }
                 if (dragScrolledView != null) {
@@ -121,7 +129,6 @@ public class InventoryView {
                 }
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
 
         wheelScroll = e -> {
             e.consume();
@@ -136,7 +143,41 @@ public class InventoryView {
                 ev.scrollUp();
             }
         };
+    }
+
+    private void hookUpRemovableEvents() {
+        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
         canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
+    }
+
+    private void removeRemovableEvents() {
+        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
+        canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
+        canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
+    }
+
+    public void refresh() {
+        double width = canvas.getWidth();
+        if (width == 0) return;
+        double barViewWidth = gameController.getGameView().getBarView().getWidth();
+        double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
+
+        Creature cr = controller.getCreatureToOpenInventory();
+
+        drawBackground(inventoryWidth);
+
+        drawCreature(inventoryWidth, cr);
+
+        drawHold(inventoryWidth, cr);
+
+        drawDrop(inventoryWidth, cr);
+
+        drawContainer(inventoryWidth);
+
+        drawCountableRelocationWindow(inventoryWidth);
+
+        checkPos();
     }
 
     private void stopScrollDrag() {
@@ -186,18 +227,66 @@ public class InventoryView {
         dragged.getAnimationPos().setNextFrameUpdate(0);
         Creature hoveredHero = gameController.getHoveredHero();
         Creature cr = controller.getCreatureToOpenInventory();
-        boolean isMovedToAnotherHero = tryMoveToAnotherHero(hoveredHero, origin);
+
+        boolean mayBeCountable = dragged instanceof EquipmentMayCountable;
+        EquipmentMayCountable countable = null;
+        boolean isCountable = false;
+        if (mayBeCountable) {
+            countable = (EquipmentMayCountable) dragged;
+            isCountable = countable.isCountable();
+        }
+
+        Integer amount = countable.getAmount();
+        if (isCountable && amount != 1) {
+            dragged = null;
+            moveCountableEquipment(mouseX, mouseY, hoveredHero, cr, countable, amount);
+        } else {
+            resolveDraggedDestination(mouseX, mouseY, hoveredHero, cr, dragged);
+            dragged = null;
+        }
+    }
+
+    private void moveCountableEquipment(double mouseX, double mouseY, Creature hoveredHero, Creature cr, EquipmentMayCountable countable, Integer amount) {
+        EquipmentMayCountable[] toLeave = new EquipmentMayCountable[1];
+        toLeave[0] = countable.cloneEquipment();
+        toLeave[0].setAmount(0);
+        EquipmentMayCountable[] toMove = new EquipmentMayCountable[1];
+        toMove[0] = countable.cloneEquipment();
+        toMove[0].setAmount(amount);
+
+        InventoryMoveAction countableMoveAction = () -> {
+            hookUpRemovableEvents();
+
+            EquipmentMayCountable equipmentToLeave = toLeave[0];
+            if (equipmentToLeave.getAmount() > 0) {
+                moveDraggedBack(cr, equipmentToLeave);
+            }
+
+            EquipmentMayCountable equipmentToMove = toMove[0];
+            if (equipmentToMove.getAmount() > 0) {
+                resolveDraggedDestination(mouseX, mouseY, hoveredHero, cr, equipmentToMove);
+            }
+        };
+        countableRelocationWindow.setToLeave(toLeave);
+        countableRelocationWindow.setToMove(toMove);
+        countableRelocationWindow.setMaxAmount(amount);
+
+        countableRelocationWindow.setVisible(true);
+        countableRelocationWindow.setMoveAction(countableMoveAction);
+        removeRemovableEvents();
+    }
+
+    private void resolveDraggedDestination(double mouseX, double mouseY, Creature hoveredHero, Creature cr, Equipment equipmentToMove) {
+        boolean isMovedToAnotherHero = tryMoveToAnotherHero(hoveredHero, origin, equipmentToMove);
         if (isMovedToAnotherHero) {
-            dragged = null;
             return;
         }
-        boolean isMovedWithinInventory = tryMoveEquipmentWithinInventoryElements(mouseX, mouseY, cr);
+
+        boolean isMovedWithinInventory = tryMoveEquipmentWithinInventoryElements(mouseX, mouseY, cr, equipmentToMove);
         if (isMovedWithinInventory) {
-            dragged = null;
             return;
         }
-        moveDraggedBack(cr);
-        dragged = null;
+        moveDraggedBack(cr, equipmentToMove);
     }
 
     private void startDragScrollBar(double x, double y) {
@@ -214,7 +303,7 @@ public class InventoryView {
         dragScrolledView = element;
     }
 
-    private boolean tryMoveToAnotherHero(Creature hero, InventoryViewElement view) {
+    private boolean tryMoveToAnotherHero(Creature hero, InventoryViewElement view, Equipment dragged) {
         if (view == null) return false;
         if (hero == null) return false;
         Creature cr = controller.getCreatureToOpenInventory();
@@ -231,17 +320,19 @@ public class InventoryView {
         return false;
     }
 
-    private boolean tryMoveEquipmentWithinInventoryElements(double mouseX, double mouseY, Creature cr) {
+    private boolean tryMoveEquipmentWithinInventoryElements(double mouseX, double mouseY, Creature cr, Equipment dragged) {
         InventoryViewElement view = getView(mouseX, mouseY);
         if (view == null) {
             return false;
         }
-        Coords fixed = view.getFixedDraggedPos(mousePos, imgRelativeCoords, dragged, draggedInitWidth, draggedInitHeight);
-        boolean draggedEquipmentCannotBeAdded = !view.tryAdd(dragged, cr, fixed.x, fixed.y);
-        return !draggedEquipmentCannotBeAdded;
+        mousePos.x = mouseX;
+        mousePos.y = mouseY;
+        Coords elementLocalCoords =
+                view.getFixedDraggedPos(mousePos, imgRelativeCoords, dragged, draggedInitWidth, draggedInitHeight);
+        return view.tryAdd(dragged, cr, elementLocalCoords.x, elementLocalCoords.y);
     }
 
-    private void moveDraggedBack(Creature cr) {
+    private void moveDraggedBack(Creature cr, Equipment dragged) {
         Coords extreme = origin.getExtremePos(mousePos, imgRelativeCoords, dragged);
         double x = 0;
         double y = 0;
@@ -284,27 +375,6 @@ public class InventoryView {
         canvas.removeEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
         canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
         controller.closeInventory();
-    }
-
-    public void refresh() {
-        double width = canvas.getWidth();
-        if (width == 0) return;
-        double barViewWidth = gameController.getGameView().getBarView().getWidth();
-        double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
-
-        Creature cr = controller.getCreatureToOpenInventory();
-
-        drawBackground(inventoryWidth);
-
-        drawCreature(inventoryWidth, cr);
-
-        drawHold(inventoryWidth, cr);
-
-        drawDrop(inventoryWidth, cr);
-
-        drawContainer(inventoryWidth);
-
-        checkPos();
     }
 
     private void checkPos() {
@@ -454,6 +524,21 @@ public class InventoryView {
         containerView.setSize(width, height);
         containerView.setContainer(con);
         containerView.refresh();
+    }
+
+    private void drawCountableRelocationWindow(double inventoryWidth) {
+        boolean isNotVisible = !countableRelocationWindow.isVisible();
+        if (isNotVisible) return;
+        double width = inventoryWidth / 4;
+        countableRelocationWindow.setWidth(width);
+        double posX = (inventoryWidth-width) / 2;
+        countableRelocationWindow.setPosX(posX);
+        double canvasHeight = canvas.getHeight() / Sizes.getMeter();
+        double height = canvasHeight / 4;
+        countableRelocationWindow.setHeight(height);
+        double posY = (canvasHeight-height) / 2;
+        countableRelocationWindow.setPosY(posY);
+        countableRelocationWindow.refresh();
     }
 
     private void drawCreature(double inventoryWidth, Creature cr) {
