@@ -35,8 +35,8 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public void refresh() {
-        super.refresh();
+    public void refreshElement() {
+        super.refreshElement();
 
         drawHorScroll();
 
@@ -47,13 +47,7 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected void setAppropriateCursor() {
-        double mouseX = mousePos.x;
-        double viewX = viewPos.x;
-        double mouseY = mousePos.y;
-        double viewY = viewPos.y;
-        if (mouseX < viewX || mouseY < viewY || mouseX > viewX + viewWidth || mouseY > viewY + viewHeight) {
-            return;
-        }
+        if (isMouseNotWithinView()) return;
         Coords localCoords = getLocalCoords();
         Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
         CurrentLocation currentLocation = controller.getCurrentLocation();

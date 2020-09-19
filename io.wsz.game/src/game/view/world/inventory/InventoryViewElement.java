@@ -17,7 +17,6 @@ public abstract class InventoryViewElement extends CanvasView {
     protected final List<Equipment> lookedEquipment = new ArrayList<>(0);
     protected final Coords viewPos = new Coords();
 
-    protected Coords mousePos;
     protected double viewWidth;
     protected double viewHeight;
     protected boolean isScrollDragged;

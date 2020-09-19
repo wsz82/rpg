@@ -1,6 +1,7 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
+import game.model.setting.KeyAction;
 import io.wsz.model.item.EquipmentMayCountable;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -53,8 +54,9 @@ public class CountableRelocationWindow {
     private void resolveKeyPress(KeyEvent event) {
         event.consume();
         KeyCode code = event.getCode();
-        if (code.equals(KeyCode.ENTER) || code.equals(KeyCode.ESCAPE)) {
-            if (code.equals(KeyCode.ESCAPE)) {
+        KeyCode inventoryClose = gameController.getSettings().getKey(KeyAction.INVENTORY);
+        if (code.equals(KeyCode.ENTER) || code.equals(KeyCode.ESCAPE) || code.equals(inventoryClose)) {
+            if (!code.equals(KeyCode.ENTER)) {
                 toMove[0].setAmount(0);
                 toLeave[0].setAmount(maxAmount);
             }
@@ -155,6 +157,7 @@ public class CountableRelocationWindow {
         gc.setTextAlign(TextAlignment.RIGHT);
         gc.setTextBaseline(VPos.TOP);
         gc.setFill(Color.BLACK);
+
         String text = String.valueOf(toMove[0].getAmount());
         gc.fillText(text, barX * meter, barY * meter);
     }

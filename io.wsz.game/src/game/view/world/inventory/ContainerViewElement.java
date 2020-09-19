@@ -20,8 +20,8 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public void refresh() {
-        super.refresh();
+    public void refreshElement() {
+        super.refreshElement();
         drawEquipment();
     }
 

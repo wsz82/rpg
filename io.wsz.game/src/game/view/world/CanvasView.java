@@ -13,10 +13,13 @@ import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ItemsComparator;
+import javafx.geometry.VPos;
 import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,6 +40,10 @@ public abstract class CanvasView {
     protected final Controller controller;
     protected final Board board;
     protected final List<Creature> visibleControllables = new ArrayList<>(0);
+
+    protected Coords mousePos;
+    protected boolean isCursorOnCountable;
+    protected int countableAmount;
 
     public CanvasView(Canvas canvas, GameController gameController) {
         this.canvas = canvas;
@@ -191,6 +198,14 @@ public abstract class CanvasView {
         } else if (item instanceof Equipment) {
             ImageCursor cursorImg = cursor.getPickCursor();
             setCursor(cursorImg);
+            if (item instanceof EquipmentMayCountable) {
+                EquipmentMayCountable countable = (EquipmentMayCountable) item;
+                boolean isCountable = countable.isCountable();
+                if (isCountable) {
+                    isCursorOnCountable = true;
+                    countableAmount = countable.getAmount();
+                }
+            }
         } else {
             ImageCursor cursorImg = cursor.getMain();
             setCursor(cursorImg);
@@ -237,5 +252,15 @@ public abstract class CanvasView {
 
     protected void setCursor(ImageCursor imageCursor) {
         canvas.getScene().setCursor(imageCursor);
+    }
+
+    protected void drawCountableText() {
+        isCursorOnCountable = false;
+        gc.setFill(Color.BLANCHEDALMOND);
+        String text = String.valueOf(countableAmount);
+        int meter = Sizes.getMeter();
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setTextAlign(TextAlignment.RIGHT);
+        gc.fillText(text, mousePos.x * meter, mousePos.y * meter);
     }
 }

@@ -37,19 +37,37 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
-    public void refresh() {
+    public final void refresh() {
         super.refresh();
+
+        refreshElement();
+
+        setAppropriateCursor();
+
+        if (isCursorOnCountable) {
+            drawCountableText();
+        }
+    }
+
+    protected void refreshElement() {
         drawBackground();
 
         drawVerScroll();
-
-        setAppropriateCursor();
     }
 
     protected void setAppropriateCursor() {
+        if (isMouseNotWithinView()) return;
         Coords localCoords = getLocalCoords();
         Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
         setAppropriateCursor(creatureToOpenInventory, localCoords, 0, curPos.y, viewWidth, maxCurPosY, getItems());
+    }
+
+    protected boolean isMouseNotWithinView() {
+        double mouseX = mousePos.x;
+        double viewX = viewPos.x;
+        double mouseY = mousePos.y;
+        double viewY = viewPos.y;
+        return mouseX < viewX || mouseY < viewY || mouseX > viewX + viewWidth || mouseY > viewY + viewHeight;
     }
 
     protected abstract void drawEquipment();

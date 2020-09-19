@@ -48,7 +48,6 @@ public class GameView extends CanvasView {
 
     private final Stage parent;
     private final List<PosItem> items = new ArrayList<>(0);
-    private final Coords mousePos = new Coords();
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final BarView barView;
@@ -70,6 +69,7 @@ public class GameView extends CanvasView {
         super(new Canvas(), gameController);
         this.parent = parent;
         barView = new BarView(canvas, gameController);
+        mousePos = new Coords();
         curPos = controller.getCurPos();
         foggableDelegate = new FoggableDelegate(gameController, canvas, curPos);
         hookUpEvents();
@@ -98,6 +98,10 @@ public class GameView extends CanvasView {
         drawItems(heroes);
 
         drawFog();
+
+        if (isCursorOnCountable) {
+            drawCountableText();
+        }
 
         if (isSelectionMode) {
             drawSelection();

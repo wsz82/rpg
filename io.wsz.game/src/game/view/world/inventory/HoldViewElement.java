@@ -20,8 +20,8 @@ public class HoldViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public void refresh() {
-        super.refresh();
+    public void refreshElement() {
+        super.refreshElement();
 
         drawEquipment();
 

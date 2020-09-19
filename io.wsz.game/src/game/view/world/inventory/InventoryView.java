@@ -1,6 +1,7 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
+import game.model.setting.KeyAction;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
@@ -80,7 +81,8 @@ public class InventoryView {
     private void hookUpEvents() {
         closeEvent = e -> {
             KeyCode code = e.getCode();
-            if (code.equals(KeyCode.I) || code.equals(KeyCode.ESCAPE)) {
+            KeyCode inventoryClose = gameController.getSettings().getKey(KeyAction.INVENTORY);
+            if (code.equals(inventoryClose) || code.equals(KeyCode.ESCAPE)) {
                 e.consume();
                 synchronized (gameController.getGameRunner()) {
                     closeInventory();
