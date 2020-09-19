@@ -3,11 +3,13 @@ package game.view.world.inventory;
 import io.wsz.model.item.EquipmentMayCountable;
 import io.wsz.model.sizes.Sizes;
 import javafx.event.EventHandler;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 
 public class CountableRelocationWindow {
     private static final Double SCROLL_HOR_PART = 0.7;
@@ -43,26 +45,34 @@ public class CountableRelocationWindow {
         event.consume();
         KeyCode code = event.getCode();
         if (code.equals(KeyCode.ENTER)) {
-            moveAction.perform();
-            removeRemovableEvents();
-            isOpened = false;
-            isVisible = false;
+            leaveWindow();
         } else if (code.equals(KeyCode.RIGHT) || code.equals(KeyCode.LEFT)) {
-            EquipmentMayCountable toMove = this.toMove[0];
-            int amount = toMove.getAmount();
-            if (code.equals(KeyCode.RIGHT)) {
-                if (amount < maxAmount) {
-                    amount++;
-                    toMove.setAmount(amount);
-                }
-            } else {
-                if (amount > 0) {
-                    amount--;
-                    toMove.setAmount(amount);
-                }
-            }
-            this.toLeave[0].setAmount(maxAmount - amount);
+            adjustMovedAmount(code);
         }
+    }
+
+    private void adjustMovedAmount(KeyCode code) {
+        EquipmentMayCountable toMove = this.toMove[0];
+        int amount = toMove.getAmount();
+        if (code.equals(KeyCode.RIGHT)) {
+            if (amount < maxAmount) {
+                amount++;
+                toMove.setAmount(amount);
+            }
+        } else {
+            if (amount > 0) {
+                amount--;
+                toMove.setAmount(amount);
+            }
+        }
+        this.toLeave[0].setAmount(maxAmount - amount);
+    }
+
+    private void leaveWindow() {
+        moveAction.perform();
+        removeRemovableEvents();
+        isOpened = false;
+        isVisible = false;
     }
 
     public void refresh() {
@@ -91,6 +101,25 @@ public class CountableRelocationWindow {
         gc.setFill(Color.WHITE);
         gc.fillRect(barX * meter, barY * meter, barWidth * meter, barHeight * meter);
         drawScrollButton(barWidth, barX, barHeight, barY);
+        drawLeftAmount(meter, barX, barY);
+        drawMovedAmount(meter, barX, barWidth, barY);
+    }
+
+    private void drawMovedAmount(int meter, double barX, double barWidth, double barY) {
+        gc.setTextAlign(TextAlignment.LEFT);
+        gc.setTextBaseline(VPos.TOP);
+        gc.setFill(Color.BLACK);
+        String text = String.valueOf(toMove[0].getAmount());
+        double x = barX + barWidth;
+        gc.fillText(text, x * meter, barY * meter);
+    }
+
+    private void drawLeftAmount(int meter, double barX, double barY) {
+        gc.setTextAlign(TextAlignment.RIGHT);
+        gc.setTextBaseline(VPos.TOP);
+        gc.setFill(Color.BLACK);
+        String text = String.valueOf(toLeave[0].getAmount());
+        gc.fillText(text, barX * meter, barY * meter);
     }
 
     private void drawScrollButton(double barWidth, double barX, double barHeight, double barY) {
