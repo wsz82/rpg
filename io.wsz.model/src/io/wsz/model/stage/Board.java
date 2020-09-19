@@ -71,7 +71,22 @@ public class Board {
         }
     }
 
-    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel, ItemType[] types, boolean includeLevelsBelow) {
+    public <A extends PosItem> EquipmentMayCountable lookForMayCountableEquipment(List<A> items, double x, double y,
+                                                                                  int lookedLevel,
+                                                                                  double horTolerance, double verTolerance) {
+        return (EquipmentMayCountable) lookForItem(items, x, y, lookedLevel, horTolerance, verTolerance,
+                ItemType.EQUIPMENT_MAY_COUNTABLE_TYPES, false);
+    }
+
+    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel, ItemType[] types,
+                                                   boolean includeLevelsBelow) {
+        return lookForItem(items, x, y, lookedLevel, 0, 0, types, includeLevelsBelow);
+    }
+
+    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel,
+                                                   double horTolerance,
+                                                   double verTolerance,
+                                                   ItemType[] types, boolean includeLevelsBelow) {
         allItems.clear();
         if (items == null || items.isEmpty()) return null;
         allItems.addAll(items);
@@ -99,39 +114,45 @@ public class Board {
         this.sortPosItems(this.items);
         Collections.reverse(this.items);
 
-        int pixelX = (int) (x * Sizes.getMeter());
-        int pixelY = (int) (y * Sizes.getMeter());
+        int meter = Sizes.getMeter();
+        int pixelX = (int) (x * meter);
+        int pixelY = (int) (y * meter);
 
-        for (PosItem pi : this.items) {
-            int cX = (int) (pi.getPos().x * Sizes.getMeter());
-            int cWidth = (int) pi.getImage().getWidth();
-            boolean fitX = pixelX >= cX && pixelX <= cX + cWidth;
+        for (PosItem item : this.items) {
+            Coords pos = item.getPos();
+            int iX = (int) (pos.x * meter);
+            ResolutionImage image = item.getImage();
+            int iWidth = (int) image.getWidth();
+            int pixelHorTolerance = (int) (horTolerance * meter);
+            boolean fitX = pixelX >= iX - pixelHorTolerance && pixelX <= iX + iWidth + pixelHorTolerance;
             if (!fitX) {
                 continue;
             }
 
-            int cY = (int) (pi.getPos().y * Sizes.getMeter());
-            int cHeight = (int) pi.getImage().getHeight();
-            boolean fitY = pixelY >= cY && pixelY <= cY + cHeight;
+            int iY = (int) (pos.y * meter);
+            int iHeight = (int) image.getHeight();
+            int pixelVerTolerance = (int) (verTolerance * meter);
+            boolean fitY = pixelY >= iY - pixelVerTolerance && pixelY <= iY + iHeight + pixelVerTolerance;
             if (!fitY) {
                 continue;
             }
 
-            ResolutionImage resolutionImage = pi.getImage();
-            Image img = resolutionImage.getFxImage();
-            int imgX = pixelX - cX;
-            int imgY = pixelY - cY;
-            Color color;
-            try {
-                color = img.getPixelReader().getColor(imgX, imgY);
-            } catch (IndexOutOfBoundsException e) {
-                continue;
+            if (horTolerance == 0 && verTolerance == 0) {
+                Image img = image.getFxImage();
+                int imgX = pixelX - iX;
+                int imgY = pixelY - iY;
+                Color color;
+                try {
+                    color = img.getPixelReader().getColor(imgX, imgY);
+                } catch (IndexOutOfBoundsException e) {
+                    continue;
+                }
+                boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
+                if (isPixelTransparent) {
+                    continue;
+                }
             }
-            boolean isPixelTransparent = color.equals(Color.TRANSPARENT);
-            if (isPixelTransparent) {
-                continue;
-            }
-            return pi;
+            return item;
         }
         return null;
     }

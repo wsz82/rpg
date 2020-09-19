@@ -61,11 +61,28 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         return Paths.CONTAINERS;
     }
 
-    public boolean tryAdd(Equipment equipment) {
+    public boolean tryAdd(Equipment equipment, boolean doMergeCountable) { //TODO addable delegate for this and inventory
         if (!fitsContainer(equipment)) {
             return false;
         }
-        items.add(equipment);
+        if (equipment.isCountable() && doMergeCountable) {
+            EquipmentMayCountable countable = (EquipmentMayCountable) getItems().stream()
+                    .filter(e -> e.getAssetId().equals(equipment.getAssetId()))
+                    .filter(e -> e.isUnitIdentical(equipment))
+                    .findFirst()
+                    .orElse(null);
+            if (countable == null) {
+                items.add(equipment);
+            } else {
+                EquipmentMayCountable added = (EquipmentMayCountable) equipment;
+                Integer addedAmount = added.getAmount();
+                Integer alreadyInAmount = countable.getAmount();
+                int sum = alreadyInAmount + addedAmount;
+                countable.setAmount(sum);
+            }
+        } else {
+            items.add(equipment);
+        }
         return true;
     }
 

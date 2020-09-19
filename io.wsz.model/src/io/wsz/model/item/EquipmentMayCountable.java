@@ -105,6 +105,15 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
     }
 
     @Override
+    public boolean isUnitIdentical(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Equipment)) return false;
+        if (!super.isUnitIdentical(o)) return false;
+        EquipmentMayCountable<?, ?> that = (EquipmentMayCountable<?, ?>) o;
+        return isCountable() == that.isCountable();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EquipmentMayCountable)) return false;

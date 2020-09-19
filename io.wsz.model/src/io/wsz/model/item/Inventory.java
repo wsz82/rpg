@@ -30,13 +30,14 @@ public class Inventory implements Externalizable {
         this.equippedItems = new HashMap<>(0);
     }
 
-    public boolean tryAdd(Equipment equipment) {
+    public boolean tryAdd(Equipment equipment, boolean doMergeCountable) {
         if (!fitsInventory(equipment)) {
             return false;
         }
-        if (equipment.isCountable()) {
+        if (equipment.isCountable() && doMergeCountable) {
             EquipmentMayCountable countable = (EquipmentMayCountable) getItems().stream()
                     .filter(e -> e.getAssetId().equals(equipment.getAssetId()))
+                    .filter(e -> e.isUnitIdentical(equipment))
                     .findFirst()
                     .orElse(null);
             if (countable == null) {

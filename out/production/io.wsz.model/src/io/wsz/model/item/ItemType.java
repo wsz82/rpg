@@ -11,5 +11,8 @@ public enum ItemType {
     WEAPON,
     MISC,
     TELEPORT,
-    LANDSCAPE
+    LANDSCAPE;
+
+    public static final ItemType[] EQUIPMENT_MAY_COUNTABLE_TYPES = new ItemType[]
+            {WEAPON, MISC};
 }

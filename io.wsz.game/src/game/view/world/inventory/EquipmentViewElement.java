@@ -84,9 +84,10 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
-    public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords,
+    public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords, Coords translated,
                                      Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
-        Coords local = super.getFixedDraggedPos(mousePos, draggedCoords, dragged, draggedInitWidth, draggedInitHeight);
+        Coords local = super.getFixedDraggedPos(mousePos, draggedCoords, translated,
+                dragged, draggedInitWidth, draggedInitHeight);
         Coords resizedImageCorrection =
                 adjustCoordsForResizedImage(draggedInitWidth, draggedInitHeight, draggedCoords, dragged);
         local.subtract(resizedImageCorrection);
@@ -127,11 +128,16 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
 
     @Override
     public Coords getLocalCoords() {
-        TEMP_1.x = mousePos.x;
-        TEMP_1.y = mousePos.y;
-        TEMP_1.subtract(viewPos);
-        TEMP_1.add(curPos);
-        return TEMP_1;
+        return getLocalCoords(temp1);
+    }
+
+    @Override
+    public Coords getLocalCoords(Coords translated) {
+        translated.x = mousePos.x;
+        translated.y = mousePos.y;
+        translated.subtract(viewPos);
+        translated.add(curPos);
+        return translated;
     }
 
     @Override
@@ -368,9 +374,9 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     protected Coords currentPosCorrection(Coords pos) {
-        TEMP_1.x = pos.x;
-        TEMP_1.y = pos.y;
-        TEMP_1.subtract(curPos);
-        return TEMP_1;
+        temp1.x = pos.x;
+        temp1.y = pos.y;
+        temp1.subtract(curPos);
+        return temp1;
     }
 }

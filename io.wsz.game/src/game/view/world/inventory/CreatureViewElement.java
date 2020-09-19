@@ -74,7 +74,7 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
         if (cr.getInventory().tryWear(e, x, y)) {
             controller.getLogger().logItemEquipped(e.getName(), e.getOccupiedPlace().getId());
             return true;
@@ -95,7 +95,7 @@ public class CreatureViewElement extends InventoryViewElement {
         for (InventoryPlaceType type : inventoryPlaces.keySet()) {
             List<Coords> place = inventoryPlaces.get(type);
             Inventory inventory = drawnCreature.getInventory();
-            boolean isPointToPlace = inventory.fitsPlace(x, y, drawnCreature, TEMP_2, place);
+            boolean isPointToPlace = inventory.fitsPlace(x, y, drawnCreature, temp2, place);
             if (isPointToPlace) {
                 return inventory.getEquippedItems().get(type);
             }

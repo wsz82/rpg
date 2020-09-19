@@ -82,8 +82,8 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
-        if (!container.tryAdd(e)) {
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
+        if (!container.tryAdd(e, doMergeCountable)) {
             controller.getLogger().logItemDoesNotFit(e.getName(), container.getName());
             return false;
         } else {

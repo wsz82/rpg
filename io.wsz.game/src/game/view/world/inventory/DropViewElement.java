@@ -239,7 +239,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
         return e.tryDrop(cr, x, y);
     }
 

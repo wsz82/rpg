@@ -4,6 +4,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 
 import java.io.IOException;
@@ -90,6 +91,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             obstacle = getCollision();
         }
         PosItem obstacleOnWay = null;
+        Board board = getController().getBoard();
         if (obstacle == null) {
             Coords crCenter = cr.getCenter();
             double xFrom = crCenter.x;
@@ -97,7 +99,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             Coords toCoords = getInteractionPoint();
             double xTo = toCoords.x;
             double yTo = toCoords.y;
-            obstacleOnWay = getController().getBoard().getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);
+            obstacleOnWay = board.getObstacleOnWay(l, pos.level, xFrom, yFrom, this, xTo, yTo);
         }
         if (obstacle != null || outOfLocation || obstacleOnWay != null) {
             pos.x = tempX;
@@ -115,10 +117,36 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             getController().getLogger().logItemAction(getName(), message);
             return false;
         } else {
-            l.getItemsToAdd().add(this);
-            getController().getLogger().logItemAction(getName(), "dropped");
+            drop(x, y, l, board);
             return true;
         }
+    }
+
+    private void drop(double x, double y, Location l, Board board) {
+        boolean isToDropAsIndividual = false;
+        if (isCountable()) {
+            EquipmentMayCountable countable = getItemInDroppedPlace(x, y, board);
+            if (countable != null && countable.isCountable() && countable.isUnitIdentical(countable)) {
+                EquipmentMayCountable added = (EquipmentMayCountable) this;
+                Integer addedAmount = added.getAmount();
+                Integer alreadyInAmount = countable.getAmount();
+                int sum = alreadyInAmount + addedAmount;
+                countable.setAmount(sum);
+            } else {
+                isToDropAsIndividual = true;
+            }
+        } else {
+            isToDropAsIndividual = true;
+        }
+        if (isToDropAsIndividual) {
+            l.getItemsToAdd().add(this);
+            getController().getLogger().logItemAction(getName(), "dropped");
+        }
+    }
+
+    private EquipmentMayCountable getItemInDroppedPlace(double x, double y, Board board) {
+        return board.lookForMayCountableEquipment(pos.getLocation().getItems(), x, y, pos.level,
+                this.getImageWidth(), this.getImageHeight());
     }
 
     @Override
@@ -128,7 +156,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
             if (getObstacleOnWay(cr) != null) return false;
             boolean fits = cr.getIndividualInventory().fitsInventory(this);
             if (fits) {
-                cr.getIndividualInventory().tryAdd(this);
+                cr.getIndividualInventory().tryAdd(this, true);
                 if (tryTake(cr)) {
                     pos.x = 0;
                     pos.y = 0;
@@ -218,6 +246,16 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
 
     public void setSize(Double size) {
         this.size = size;
+    }
+
+    @Override
+    public boolean isUnitIdentical(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Equipment)) return false;
+        if (!super.isUnitIdentical(o)) return false;
+        Equipment equipment = (Equipment) o;
+        return Objects.equals(getIndividualWeight(), equipment.getIndividualWeight()) &&
+                Objects.equals(getIndividualSize(), equipment.getIndividualSize());
     }
 
     @Override

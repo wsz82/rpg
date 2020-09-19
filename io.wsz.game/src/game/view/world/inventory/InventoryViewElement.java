@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class InventoryViewElement extends CanvasView {
-    protected static final Coords TEMP_1 = new Coords();
-    protected static final Coords TEMP_2 = new Coords();
-
+    protected final Coords temp1 = new Coords();
+    protected final Coords temp2 = new Coords();
     protected final List<Equipment> lookedEquipment = new ArrayList<>(0);
     protected final Coords viewPos = new Coords();
 
@@ -42,20 +41,24 @@ public abstract class InventoryViewElement extends CanvasView {
 
     public abstract boolean tryRemove(Equipment e, Creature cr);
 
-    public abstract boolean tryAdd(Equipment e, Creature cr, double x, double y);
+    public abstract boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable);
 
     public abstract Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e);
 
-    public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords,
+    public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords, Coords translated,
                                      Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
-        return getLocalCoords();
+        return getLocalCoords(translated);
     }
 
     public Coords getLocalCoords() {
-        TEMP_1.x = mousePos.x;
-        TEMP_1.y = mousePos.y;
-        TEMP_1.subtract(viewPos);
-        return TEMP_1;
+        return getLocalCoords(temp1);
+    }
+
+    public Coords getLocalCoords(Coords translated) {
+        translated.x = mousePos.x;
+        translated.y = mousePos.y;
+        translated.subtract(viewPos);
+        return translated;
     }
 
     public abstract Equipment lookForEquipment(double x, double y, Coords draggedCoords);

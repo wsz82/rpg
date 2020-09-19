@@ -94,8 +94,8 @@ public class HoldViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y) {
-        if (!inventory.tryAdd(e)) {
+    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
+        if (!inventory.tryAdd(e, doMergeCountable)) {
             controller.getLogger().logItemDoesNotFitInventory(e.getName(), cr.getName());
             return false;
         } else {

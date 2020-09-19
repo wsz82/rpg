@@ -515,6 +515,20 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     public abstract B getAnimationPos();
 
+    public boolean isUnitIdentical(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PosItem)) return false;
+        if (!super.equals(o)) return false;
+        PosItem<?, ?> posItem = (PosItem<?, ?>) o;
+        return Objects.equals(getIsVisible(), posItem.getIsVisible()) &&
+                Objects.equals(getPrototype(), posItem.getPrototype()) &&
+                Objects.equals(getCoverLine(), posItem.getCoverLine()) &&
+                Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
+                Objects.equals(getDialog(), posItem.getDialog()) &&
+                Objects.equals(getIndividualInteractionPoint(), posItem.getIndividualInteractionPoint()) &&
+                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -527,7 +541,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
                 Objects.equals(getCoverLine(), posItem.getCoverLine()) &&
                 Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), posItem.getDialog()) &&
-                Objects.equals(getInteractionPoint(), posItem.getInteractionPoint()) &&
+                Objects.equals(getIndividualInteractionPoint(), posItem.getIndividualInteractionPoint()) &&
                 Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
     }
 
