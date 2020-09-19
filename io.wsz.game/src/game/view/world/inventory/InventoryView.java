@@ -70,7 +70,7 @@ public class InventoryView {
         creatureView = new CreatureViewElement(canvas, gameController, mousePos);
         inventoryElements.add(creatureView);
 
-        countableRelocationWindow = new CountableRelocationWindow(canvas, gc);
+        countableRelocationWindow = new CountableRelocationWindow(gameController, canvas, gc, mousePos);
 
         hookUpEvents();
         defineRemovableEvents();
