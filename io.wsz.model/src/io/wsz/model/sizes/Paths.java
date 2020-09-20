@@ -48,6 +48,10 @@ public class Paths {
     public static final String W = "W";
     public static final String NW = "NW";
     public static final String PNG = ".png";
+    public static final String BASIC_FEW = "basic_few";
+    public static final String BASIC_MANY = "basic_many";
+    public static final String INVENTORY_FEW = "inventory_few";
+    public static final String INVENTORY_MANY = "inventory_many";
 
     public static final String FOG = "fog";
     public static final String FOG_DIR = File.separator + FOG;

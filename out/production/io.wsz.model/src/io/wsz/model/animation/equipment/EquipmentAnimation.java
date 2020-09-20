@@ -26,7 +26,6 @@ public class EquipmentAnimation<E extends Equipment<?,?>> extends Animation<E> {
 
     private void playDrop(EquipmentAnimationPos animationPos) {
         animationPos.setCurIdleAnimation(Paths.BASIC);
-
     }
 
     private void playInventory(EquipmentAnimationPos animationPos) {

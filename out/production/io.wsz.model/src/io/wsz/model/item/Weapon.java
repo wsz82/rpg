@@ -2,7 +2,7 @@ package io.wsz.model.item;
 
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
-import io.wsz.model.animation.equipment.weapon.WeaponAnimation;
+import io.wsz.model.animation.equipment.countable.EquipmentMayCountableAnimation;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
@@ -15,7 +15,7 @@ import static io.wsz.model.sizes.Paths.IDLE;
 public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
-    private WeaponAnimation animation;
+    private EquipmentMayCountableAnimation<Weapon> animation;
 
     private EquipmentAnimationPos animationPos;
     private Double damage;
@@ -111,9 +111,9 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     }
 
     @Override
-    protected WeaponAnimation getConcreteAnimation() {
+    protected EquipmentMayCountableAnimation<Weapon> getConcreteAnimation() {
         if (animation == null) {
-            return new WeaponAnimation(getDir(), IDLE);
+            return new EquipmentMayCountableAnimation<>(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -146,7 +146,7 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
         animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new WeaponAnimation(getDir(), IDLE);
+            animation = new EquipmentMayCountableAnimation<>(getDir(), IDLE);
         }
 
         damage = (Double) in.readObject();

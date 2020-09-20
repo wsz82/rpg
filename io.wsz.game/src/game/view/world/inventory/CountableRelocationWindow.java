@@ -238,7 +238,7 @@ public class CountableRelocationWindow {
     }
 
     private void drawMovedPicture(int meter) {
-        EquipmentMayCountable countable = toLeave[0];
+        EquipmentMayCountable countable = toMove[0];
         countable.getAnimation().play(countable);
         ResolutionImage image = countable.getImage();
         if (image == null) return;
