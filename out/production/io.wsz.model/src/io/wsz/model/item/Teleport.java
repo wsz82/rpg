@@ -3,7 +3,6 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
-import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -21,6 +20,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     private Animation<Teleport> animation;
 
+    private TeleportableDelagate teleportableDelagate;
     private AnimationPos animationPos;
     private Coords exit;
     private List<List<Coords>> teleportCollisionPolygons;
@@ -37,6 +37,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     public Teleport(Teleport prototype, Boolean visible) {
         super(prototype, visible);
         this.animationPos = new AnimationPos();
+        this.teleportableDelagate = new TeleportableDelagate();
     }
 
     @Override
@@ -45,7 +46,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     public void enter(Creature cr) {
-        Teleportation.teleport(cr, getExit(), getController());
+        teleportableDelagate.teleport(cr, getExit(), getController());
     }
 
     public Coords getIndividualExit() {
@@ -105,6 +106,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(teleportableDelagate);
+
         out.writeObject(animationPos);
 
         out.writeObject(exit);
@@ -116,6 +119,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        teleportableDelagate = (TeleportableDelagate) in.readObject();
 
         animationPos = (AnimationPos) in.readObject();
 

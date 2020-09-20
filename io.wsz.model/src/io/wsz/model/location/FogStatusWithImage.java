@@ -1,6 +1,5 @@
 package io.wsz.model.location;
 
-import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 
 import java.io.Externalizable;
@@ -40,15 +39,11 @@ public class FogStatusWithImage implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(Sizes.VERSION);
-
         out.writeObject(status);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        long ver = in.readLong();
-
         status = (FogStatus) in.readObject();
     }
 }

@@ -212,7 +212,7 @@ public class GameRunner {
         }
         location.getItems().addAll(itemsToAdd);
         for (PosItem pi : itemsToAdd) {
-            pi.getPos().setLocation(location);
+            pi.onChangeLocationAction(location);
         }
         itemsToAdd.clear();
     }

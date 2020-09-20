@@ -48,6 +48,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private Double range;
     private Integer strength;
     private ResolutionImage portrait;
+    private OnTeleportAction onTeleportAction;
 
     public Creature() {}
 
@@ -296,6 +297,97 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         return height / 2;
     }
 
+    @Override
+    public boolean creaturePrimaryInteract(Creature cr) {
+        CreatureSize size = cr.getSize();
+        boolean outOfRange = !withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
+        if (outOfRange) return false;
+        if (getControl() == CreatureControl.ENEMY) return false;
+        if (getObstacleOnWay(cr) != null) return false;
+        if (cr == this) return false;
+        Controller controller = getController();
+        controller.setDialogNpc(cr);
+        controller.setAnswering(this);
+        controller.setPosToCenter(getCenter());
+        return true;
+    }
+
+    @Override
+    public void changeLocation(Location from, Coords exit) {
+        super.changeLocation(from, exit);
+        Coords reversed = getReversedCenter(exit);
+        this.pos.x = reversed.x;
+        this.pos.y = reversed.y;
+        this.pos.level = reversed.level;
+        task.clear();
+    }
+
+    @Override
+    public void onChangeLocationAction(Location location) {
+        super.onChangeLocationAction(location);
+        if (onTeleportAction != null) {
+            onTeleportAction.act();
+        }
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        updateFogVisibility();
+        checkSurrounding();
+        checkTask();
+    }
+
+    private void updateFogVisibility() {
+        CreatureControl control = getControl();
+        if (control != CreatureControl.CONTROL && control != CreatureControl.CONTROLLABLE) {
+            return;
+        }
+        Location creatureLocation = this.pos.getLocation();
+        List<List<FogStatusWithImage>> discoveredFog = creatureLocation.getDiscoveredFog();
+        if (discoveredFog == null) return;
+        double heightPieces = discoveredFog.size();
+        double widthPieces = discoveredFog.get(0).size();
+        double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
+        double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
+        Coords nextPieceCenterPos = TEMP_NEXT_FOG_PIECE_CENTER_POS;
+        Controller controller = getController();
+        if (controller == null) return;
+        Fog fog = controller.getFog();
+        double fogSize = fog.getFogSize();
+        double half = fog.getHalfFogSize();
+        double y = -fogSize;
+        for (int i = 0; i < heightPieces; i++) {
+            if (i != 0) {
+                y += half;
+            }
+            double x = -fogSize;
+            List<FogStatusWithImage> horStatuses = discoveredFog.get(i);
+            for (int j = 0; j < widthPieces; j++) {
+                if (j != 0) {
+                    x += half;
+                }
+                nextPieceCenterPos.x = x + half;
+                nextPieceCenterPos.y = y + half;
+
+                double visionRange = getVisionRange();
+                double visWidth = visionRange * horizontalVisionRangeFactor;
+                double visHeight = visionRange * verticalVisionRangeFactor;
+                boolean isPieceWithinHeroView = Geometry.isPointWithinOval(nextPieceCenterPos, getCenter(), visWidth, visHeight);
+
+                FogStatusWithImage statusWithImage = horStatuses.get(j);
+                if (isPieceWithinHeroView) {
+                    statusWithImage.setStatus(CLEAR);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Equipment> getItems() {
+        return inventory.getItems();
+    }
+
     public Task getTask() {
         return task;
     }
@@ -477,6 +569,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         pi.creatureSecondaryInteract(this);
     }
 
+    public OnTeleportAction getOnTeleportAction() {
+        return onTeleportAction;
+    }
+
+    public void setOnTeleportAction(OnTeleportAction onTeleportAction) {
+        this.onTeleportAction = onTeleportAction;
+    }
+
     @Override
     protected CreatureAnimation getConcreteAnimation() {
         if (animation == null) {
@@ -509,89 +609,6 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public void setPortrait(ResolutionImage portrait) {
         this.portrait = portrait;
-    }
-
-    @Override
-    public boolean creaturePrimaryInteract(Creature cr) {
-        CreatureSize size = cr.getSize();
-        boolean outOfRange = !withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
-        if (outOfRange) return false;
-        if (getControl() == CreatureControl.ENEMY) return false;
-        if (getObstacleOnWay(cr) != null) return false;
-        if (cr == this) return false;
-        Controller controller = getController();
-        controller.setDialogNpc(cr);
-        controller.setAnswering(this);
-        controller.setPosToCenter(getCenter());
-        return true;
-    }
-
-    @Override
-    public void changeLocation(Location from, Coords exit) {
-        super.changeLocation(from, exit);
-        Coords reversed = getReversedCenter(exit);
-        this.pos.x = reversed.x;
-        this.pos.y = reversed.y;
-        this.pos.level = reversed.level;
-        task.clear();
-    }
-
-    @Override
-    public void update() {
-        super.update();
-        updateFogVisibility();
-        checkSurrounding();
-        checkTask();
-    }
-
-    private void updateFogVisibility() {
-        CreatureControl control = getControl();
-        if (control != CreatureControl.CONTROL && control != CreatureControl.CONTROLLABLE) {
-            return;
-        }
-        Location creatureLocation = this.pos.getLocation();
-        List<List<FogStatusWithImage>> discoveredFog = creatureLocation.getDiscoveredFog();
-        if (discoveredFog == null) return;
-        double heightPieces = discoveredFog.size();
-        double widthPieces = discoveredFog.get(0).size();
-        double horizontalVisionRangeFactor = Sizes.HORIZONTAL_VISION_RANGE_FACTOR;
-        double verticalVisionRangeFactor = Sizes.VERTICAL_VISION_RANGE_FACTOR;
-        Coords nextPieceCenterPos = TEMP_NEXT_FOG_PIECE_CENTER_POS;
-        Controller controller = getController();
-        if (controller == null) return;
-        Fog fog = controller.getFog();
-        double fogSize = fog.getFogSize();
-        double half = fog.getHalfFogSize();
-        double y = -fogSize;
-        for (int i = 0; i < heightPieces; i++) {
-            if (i != 0) {
-                y += half;
-            }
-            double x = -fogSize;
-            List<FogStatusWithImage> horStatuses = discoveredFog.get(i);
-            for (int j = 0; j < widthPieces; j++) {
-                if (j != 0) {
-                    x += half;
-                }
-                nextPieceCenterPos.x = x + half;
-                nextPieceCenterPos.y = y + half;
-
-                double visionRange = getVisionRange();
-                double visWidth = visionRange * horizontalVisionRangeFactor;
-                double visHeight = visionRange * verticalVisionRangeFactor;
-                boolean isPieceWithinHeroView = Geometry.isPointWithinOval(nextPieceCenterPos, getCenter(), visWidth, visHeight);
-
-                FogStatusWithImage statusWithImage = horStatuses.get(j);
-                if (isPieceWithinHeroView) {
-                    statusWithImage.setStatus(CLEAR);
-                }
-            }
-        }
-    }
-
-    @Override
-    public List<Equipment> getItems() {
-        return inventory.getItems();
     }
 
     @Override

@@ -208,6 +208,10 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return nextPos.y + bottom;
     }
 
+    public void onChangeLocationAction(Location location) {
+        pos.setLocation(location);
+    }
+
     public Boolean getIsVisible() {
         return isVisible.get();
     }

@@ -3,7 +3,6 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.animation.openable.OpenableAnimationType;
-import io.wsz.model.effect.Teleportation;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -16,6 +15,7 @@ import java.io.ObjectOutput;
 public class OutDoor extends Door<OutDoor> {
     private static final long serialVersionUID = 1L;
 
+    private TeleportableDelagate teleportableDelagate;
     private Coords exit;
     private OutDoor connection;
 
@@ -28,6 +28,7 @@ public class OutDoor extends Door<OutDoor> {
 
     public OutDoor(OutDoor prototype, Boolean visible) {
         super(prototype, visible);
+        this.teleportableDelagate = new TeleportableDelagate();
     }
 
     @Override
@@ -36,7 +37,7 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     public boolean enter(Creature cr) {
-        return Teleportation.teleport(cr, getExit(), getController());
+        return teleportableDelagate.teleport(cr, getExit(), getController());
     }
 
     public Coords getIndividualExit() {
@@ -168,6 +169,8 @@ public class OutDoor extends Door<OutDoor> {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
 
+        out.writeObject(teleportableDelagate);
+
         out.writeObject(exit);
 
         String connectionName;
@@ -191,6 +194,8 @@ public class OutDoor extends Door<OutDoor> {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         long ver = in.readLong();
+
+        teleportableDelagate = (TeleportableDelagate) in.readObject();
 
         exit = (Coords) in.readObject();
 
