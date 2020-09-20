@@ -84,13 +84,13 @@ public class BarView {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
-                if (hoveredPortrait != -1) {
+                if (hoveredPortrait != -1 && gameController.getDragged() == null) {
                     int hoveredPortraitIndex = hoveredPortrait;
                     GameRunner.runLater(() -> resolveHeroControlAndLocation(e.isShiftDown(), hoveredPortraitIndex));
                 }
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, clickEvent);
 
         EventHandler<KeyEvent> keyboardEvent = e -> {
             KeyCode key = e.getCode();
