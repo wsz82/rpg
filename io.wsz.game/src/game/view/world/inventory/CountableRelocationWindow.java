@@ -39,8 +39,9 @@ public class CountableRelocationWindow {
     private boolean isVisible;
     private boolean isOpened;
     private int maxAmount;
-    private EventHandler<KeyEvent> keyEvent;
-    private EventHandler<MouseEvent> mouseEvent;
+    private EventHandler<KeyEvent> keyPressed;
+    private EventHandler<MouseEvent> mouseClick;
+    private EventHandler<MouseEvent> dragStop;
     private InventoryMoveAction moveAction;
     private EquipmentMayCountable[] toLeave;
     private EquipmentMayCountable[] toMove;
@@ -49,6 +50,13 @@ public class CountableRelocationWindow {
     private double buttonPixelHeight;
     private double acceptPixelX;
     private double cancelPixelX;
+    private double scrollButtonPixelWidth;
+    private double scrollButtonPixelX;
+    private double scrollButtonPixelHeight;
+    private double scrollButtonPixelY;
+    private boolean isScrollDragged;
+    private double barX;
+    private double barWidth;
 
     public CountableRelocationWindow(GameController gameController, Canvas canvas, GraphicsContext gc, Coords mousePos) {
         this.gameController = gameController;
@@ -59,11 +67,19 @@ public class CountableRelocationWindow {
     }
 
     private void defineRemovableEvents() {
-        keyEvent = this::resolveKeyPress;
-        mouseEvent = this::resolveMouseClick;
+        keyPressed = this::resolveKeyPress;
+        mouseClick = this::resolveMousePress;
+        dragStop = this::onDragStop;
     }
 
-    private void resolveMouseClick(MouseEvent event) {
+    private void onDragStop(MouseEvent e) {
+        MouseButton button = e.getButton();
+        if (button.equals(MouseButton.PRIMARY)) {
+            isScrollDragged = false;
+        }
+    }
+
+    private void resolveMousePress(MouseEvent event) {
         event.consume();
         MouseButton button = event.getButton();
         if (button.equals(MouseButton.PRIMARY)) {
@@ -80,7 +96,14 @@ public class CountableRelocationWindow {
         } else if (x > cancelPixelX && x < cancelPixelX + buttonPixelWidth
                 && y > buttonPixelY && y < buttonPixelY + buttonPixelHeight) {
             closeWindowWithCancel();
+        } else if (x > scrollButtonPixelX && x < scrollButtonPixelX + scrollButtonPixelWidth
+                && y > scrollButtonPixelY && y < scrollButtonPixelY + scrollButtonPixelHeight) {
+            startMouseScroll();
         }
+    }
+
+    private void startMouseScroll() {
+        isScrollDragged = true;
     }
 
     private void resolveKeyPress(KeyEvent event) {
@@ -129,13 +152,15 @@ public class CountableRelocationWindow {
     }
 
     private void hookUpRemovableEvents() {
-        canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent);
+        canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyPressed);
+        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseClick);
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
     }
 
     private void removeRemovableEvents() {
-        canvas.removeEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
-        canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent);
+        canvas.removeEventHandler(KeyEvent.KEY_PRESSED, keyPressed);
+        canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseClick);
+        canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
     }
 
     public void refresh() {
@@ -148,8 +173,33 @@ public class CountableRelocationWindow {
         drawMovedPicture(meter);
         drawScrollBar(meter);
         drawAcceptAndCancelButtons(meter);
-
+        updateScrollPos(meter);
         setMainCursor();
+    }
+
+    private void updateScrollPos(int meter) {
+        if (!isScrollDragged) return;
+        setScrollPos(meter);
+    }
+
+    private void setScrollPos(double meter) {
+        double pixelX = mousePos.x * meter;
+        EquipmentMayCountable toMove = this.toMove[0];
+        double pixelBarX = barX * meter;
+        if (pixelX <= pixelBarX) {
+            toMove.setAmount(0);
+        } else {
+            double pixelBarWidth = barWidth * meter;
+            if (pixelX >= pixelBarX + pixelBarWidth) {
+                toMove.setAmount(maxAmount);
+            } else {
+                double pixelRelPosX = pixelX - pixelBarX;
+                int newAmount = (int) ((pixelRelPosX * maxAmount) / pixelBarWidth);
+                toMove.setAmount(newAmount);
+            }
+        }
+        EquipmentMayCountable toLeave = this.toLeave[0];
+        toLeave.setAmount(maxAmount - toMove.getAmount());
     }
 
     private void drawAcceptAndCancelButtons(int meter) {
@@ -201,8 +251,8 @@ public class CountableRelocationWindow {
     }
 
     private void drawScrollBar(int meter) {
-        double barWidth = SCROLL_HOR_PART * width;
-        double barX = posX + (width-barWidth) / 2;
+        barWidth = SCROLL_HOR_PART * width;
+        barX = posX + (width- barWidth) / 2;
         double barHeight = SCROLL_VER_PART * height;
         double barY = posY + (height-barHeight) / 2;
         gc.setFill(Color.WHITE);
@@ -237,7 +287,11 @@ public class CountableRelocationWindow {
         double relPosX = ((barWidth - buttonWidth) * amount) / (maxAmount);
         double buttonX = barX + relPosX;
         gc.setFill(Color.GREEN);
-        gc.fillRect(buttonX * meter, barY * meter, buttonWidth * meter, barHeight * meter);
+        scrollButtonPixelWidth = buttonWidth * meter;
+        scrollButtonPixelX = buttonX * meter;
+        scrollButtonPixelHeight = barHeight * meter;
+        scrollButtonPixelY = barY * meter;
+        gc.fillRect(scrollButtonPixelX, scrollButtonPixelY, scrollButtonPixelWidth, scrollButtonPixelHeight);
     }
 
     private void clearBackground() {

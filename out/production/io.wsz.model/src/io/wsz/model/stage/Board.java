@@ -118,29 +118,29 @@ public class Board {
         int pixelX = (int) (x * meter);
         int pixelY = (int) (y * meter);
 
-        for (PosItem pi : this.items) {
-            Coords pos = pi.getPos();
-            int cX = (int) (pos.x * meter);
-            ResolutionImage image = pi.getImage();
-            int cWidth = (int) image.getWidth();
+        for (PosItem item : this.items) {
+            Coords pos = item.getPos();
+            int iX = (int) (pos.x * meter);
+            ResolutionImage image = item.getImage();
+            int iWidth = (int) image.getWidth();
             int pixelHorTolerance = (int) (horTolerance * meter);
-            boolean fitX = pixelX >= cX - pixelHorTolerance && pixelX <= cX + cWidth + pixelHorTolerance;
+            boolean fitX = pixelX >= iX - pixelHorTolerance && pixelX <= iX + iWidth + pixelHorTolerance;
             if (!fitX) {
                 continue;
             }
 
-            int cY = (int) (pos.y * meter);
-            int cHeight = (int) image.getHeight();
+            int iY = (int) (pos.y * meter);
+            int iHeight = (int) image.getHeight();
             int pixelVerTolerance = (int) (verTolerance * meter);
-            boolean fitY = pixelY >= cY - pixelVerTolerance && pixelY <= cY + cHeight + pixelVerTolerance;
+            boolean fitY = pixelY >= iY - pixelVerTolerance && pixelY <= iY + iHeight + pixelVerTolerance;
             if (!fitY) {
                 continue;
             }
 
             if (horTolerance == 0 && verTolerance == 0) {
                 Image img = image.getFxImage();
-                int imgX = pixelX - cX;
-                int imgY = pixelY - cY;
+                int imgX = pixelX - iX;
+                int imgY = pixelY - iY;
                 Color color;
                 try {
                     color = img.getPixelReader().getColor(imgX, imgY);
@@ -152,7 +152,7 @@ public class Board {
                     continue;
                 }
             }
-            return pi;
+            return item;
         }
         return null;
     }
