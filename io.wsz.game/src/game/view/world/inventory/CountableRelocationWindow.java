@@ -14,13 +14,18 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
 public class CountableRelocationWindow {
     private static final Double SCROLL_HOR_PART = 0.7;
-    private static final Double SCROLL_VER_PART = 0.3;
+    private static final Double SCROLL_VER_PART = 0.2;
     private static final Double SCROLL_BUTTON_HOR_PART = 0.1;
+    private static final Double BUTTON_HOR_PART = 0.3;
+    private static final Double BUTTON_VER_PART = 0.2;
+    private static final Double BUTTONS_PADDING = 0.1;
 
     private final GameController gameController;
     private final Canvas canvas;
@@ -35,9 +40,15 @@ public class CountableRelocationWindow {
     private boolean isOpened;
     private int maxAmount;
     private EventHandler<KeyEvent> keyEvent;
+    private EventHandler<MouseEvent> mouseEvent;
     private InventoryMoveAction moveAction;
     private EquipmentMayCountable[] toLeave;
     private EquipmentMayCountable[] toMove;
+    private double buttonPixelY;
+    private double buttonPixelWidth;
+    private double buttonPixelHeight;
+    private double acceptPixelX;
+    private double cancelPixelX;
 
     public CountableRelocationWindow(GameController gameController, Canvas canvas, GraphicsContext gc, Coords mousePos) {
         this.gameController = gameController;
@@ -49,6 +60,27 @@ public class CountableRelocationWindow {
 
     private void defineRemovableEvents() {
         keyEvent = this::resolveKeyPress;
+        mouseEvent = this::resolveMouseClick;
+    }
+
+    private void resolveMouseClick(MouseEvent event) {
+        event.consume();
+        MouseButton button = event.getButton();
+        if (button.equals(MouseButton.PRIMARY)) {
+            double x = event.getX();
+            double y = event.getY();
+            resolveClick(x, y);
+        }
+    }
+
+    private void resolveClick(double x, double y) {
+        if (x > acceptPixelX && x < acceptPixelX + buttonPixelWidth
+                && y > buttonPixelY && y < buttonPixelY + buttonPixelHeight) {
+            closeWindowWithAccept();
+        } else if (x > cancelPixelX && x < cancelPixelX + buttonPixelWidth
+                && y > buttonPixelY && y < buttonPixelY + buttonPixelHeight) {
+            closeWindowWithCancel();
+        }
     }
 
     private void resolveKeyPress(KeyEvent event) {
@@ -57,10 +89,10 @@ public class CountableRelocationWindow {
         KeyCode inventoryClose = gameController.getSettings().getKey(KeyAction.INVENTORY);
         if (code.equals(KeyCode.ENTER) || code.equals(KeyCode.ESCAPE) || code.equals(inventoryClose)) {
             if (!code.equals(KeyCode.ENTER)) {
-                toMove[0].setAmount(0);
-                toLeave[0].setAmount(maxAmount);
+                closeWindowWithCancel();
+            } else {
+                closeWindowWithAccept();
             }
-            leaveWindow();
         } else if (code.equals(KeyCode.RIGHT) || code.equals(KeyCode.LEFT)) {
             adjustMovedAmount(code);
         }
@@ -83,7 +115,13 @@ public class CountableRelocationWindow {
         this.toLeave[0].setAmount(maxAmount - amount);
     }
 
-    private void leaveWindow() {
+    private void closeWindowWithCancel() {
+        toMove[0].setAmount(0);
+        toLeave[0].setAmount(maxAmount);
+        closeWindowWithAccept();
+    }
+
+    private void closeWindowWithAccept() {
         moveAction.perform();
         removeRemovableEvents();
         isOpened = false;
@@ -92,10 +130,12 @@ public class CountableRelocationWindow {
 
     private void hookUpRemovableEvents() {
         canvas.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
+        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent);
     }
 
     private void removeRemovableEvents() {
         canvas.removeEventHandler(KeyEvent.KEY_PRESSED, keyEvent);
+        canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent);
     }
 
     public void refresh() {
@@ -107,7 +147,35 @@ public class CountableRelocationWindow {
         clearBackground();
         drawMovedPicture(meter);
         drawScrollBar(meter);
+        drawAcceptAndCancelButtons(meter);
+
         setMainCursor();
+    }
+
+    private void drawAcceptAndCancelButtons(int meter) {
+        double padding = BUTTONS_PADDING * width;
+        double buttonWidth = BUTTON_HOR_PART * width;
+        buttonPixelWidth = buttonWidth * meter;
+        double buttonHeight = BUTTON_VER_PART * height;
+        buttonPixelHeight = buttonHeight * meter;
+        double buttonY = posY + (height - padding - buttonHeight);
+        buttonPixelY = buttonY * meter;
+        drawAcceptButton(meter, padding, buttonWidth);
+        drawCancelButton(meter, padding);
+    }
+
+    private void drawAcceptButton(int meter, double padding, double acceptWidth) {
+        double acceptX = posX + (width - padding - acceptWidth);
+        acceptPixelX = acceptX * meter;
+        gc.setFill(Color.GREEN);
+        gc.fillRect(acceptPixelX, buttonPixelY, buttonPixelWidth, buttonPixelHeight);
+    }
+
+    private void drawCancelButton(int meter, double padding) {
+        double cancelX = posX + padding;
+        cancelPixelX = cancelX * meter;
+        gc.setFill(Color.RED);
+        gc.fillRect(cancelPixelX, buttonPixelY, buttonPixelWidth, buttonPixelHeight);
     }
 
     private void setMainCursor() {
