@@ -57,6 +57,7 @@ public class CountableRelocationWindow {
     private boolean isScrollDragged;
     private double barX;
     private double barWidth;
+    private double barY;
 
     public CountableRelocationWindow(GameController gameController, Canvas canvas, GraphicsContext gc, Coords mousePos) {
         this.gameController = gameController;
@@ -247,14 +248,25 @@ public class CountableRelocationWindow {
         double imageWidth = fxImage.getWidth();
         double windowHorCenter = (posX + width/2) * meter;
         double x = windowHorCenter - imageWidth/2;
-        gc.drawImage(fxImage, x, posY * meter);
+        double pixelPosY = posY * meter;
+        double pixelBarY = barY * meter;
+        double y;
+        double pixelFreeSpace = pixelBarY - pixelPosY;
+        double imageHeight = fxImage.getHeight();
+        if (imageHeight < pixelFreeSpace) {
+            double offset = (pixelFreeSpace - imageHeight) / 2;
+            y = pixelPosY + offset;
+        } else {
+            y = pixelPosY;
+        }
+        gc.drawImage(fxImage, x, y);
     }
 
     private void drawScrollBar(int meter) {
         barWidth = SCROLL_HOR_PART * width;
         barX = posX + (width- barWidth) / 2;
         double barHeight = SCROLL_VER_PART * height;
-        double barY = posY + (height-barHeight) / 2;
+        barY = posY + (height-barHeight) / 2;
         gc.setFill(Color.WHITE);
         gc.fillRect(barX * meter, barY * meter, barWidth * meter, barHeight * meter);
         drawScrollButton(barWidth, barX, barHeight, barY, meter);
