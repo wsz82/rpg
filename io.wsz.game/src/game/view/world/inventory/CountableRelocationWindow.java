@@ -130,7 +130,7 @@ public class CountableRelocationWindow {
                 toMove.setAmount(amount);
             }
         } else {
-            if (amount > 0) {
+            if (amount > 1) {
                 amount--;
                 toMove.setAmount(amount);
             }
@@ -187,7 +187,7 @@ public class CountableRelocationWindow {
         EquipmentMayCountable toMove = this.toMove[0];
         double pixelBarX = barX * meter;
         if (pixelX <= pixelBarX) {
-            toMove.setAmount(0);
+            toMove.setAmount(1);
         } else {
             double pixelBarWidth = barWidth * meter;
             if (pixelX >= pixelBarX + pixelBarWidth) {
@@ -284,7 +284,7 @@ public class CountableRelocationWindow {
         double buttonWidth = SCROLL_BUTTON_HOR_PART * barWidth;
         int amount = toMove[0].getAmount();
 
-        double relPosX = ((barWidth - buttonWidth) * amount) / (maxAmount);
+        double relPosX = ((barWidth - buttonWidth) * (amount - 1)) / (maxAmount - 1);
         double buttonX = barX + relPosX;
         gc.setFill(Color.GREEN);
         scrollButtonPixelWidth = buttonWidth * meter;

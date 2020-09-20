@@ -89,7 +89,7 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         return amount;
     }
 
-    public Integer getAmount() {
+    public int getAmount() {
         if (amount == null) {
             if (isThisPrototype()) {
                 return 1;

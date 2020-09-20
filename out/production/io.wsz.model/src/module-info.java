@@ -11,7 +11,7 @@ module io.wsz.model {
     exports io.wsz.model.animation.door;
     exports io.wsz.model.animation.equipment;
     exports io.wsz.model.animation.equipment.container;
-    exports io.wsz.model.animation.equipment.weapon;
+    exports io.wsz.model.animation.equipment.countable;
     exports io.wsz.model.animation.openable;
     exports io.wsz.model.script;
     exports io.wsz.model.script.bool;

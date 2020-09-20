@@ -1,8 +1,8 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
-import io.wsz.model.animation.equipment.EquipmentAnimation;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.countable.EquipmentMayCountableAnimation;
 import io.wsz.model.sizes.Paths;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import static io.wsz.model.sizes.Paths.IDLE;
 public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     private static final long serialVersionUID = 1L;
 
-    private EquipmentAnimation<Misc> animation;
+    private EquipmentMayCountableAnimation<Misc> animation;
 
     private EquipmentAnimationPos animationPos;
 
@@ -42,9 +42,9 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     }
 
     @Override
-    protected EquipmentAnimation<Misc> getConcreteAnimation() {
+    protected EquipmentMayCountableAnimation<Misc> getConcreteAnimation() {
         if (animation == null) {
-            return new EquipmentAnimation<>(getDir(), IDLE);
+            return new EquipmentMayCountableAnimation<>(getDir(), IDLE);
         } else {
             return animation;
         }
@@ -74,7 +74,7 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
         animationPos = (EquipmentAnimationPos) in.readObject();
 
         if (isThisPrototype()) {
-            animation = new EquipmentAnimation<>(getDir(), IDLE);
+            animation = new EquipmentMayCountableAnimation<>(getDir(), IDLE);
         }
     }
 }
