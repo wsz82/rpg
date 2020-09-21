@@ -2,8 +2,8 @@ package editor.model;
 
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
-import editor.view.asset.ItemsStage;
 import editor.view.asset.ObservableAssets;
+import editor.view.asset.items.ItemsStage;
 import editor.view.plugin.PluginSettingsStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
@@ -41,7 +41,7 @@ public class EditorController {
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
     private final ObservableList<Dialog> observableDialogs = FXCollections.observableArrayList();
     private final ObservableList<Variable<?>> observableGlobalVariables = FXCollections.observableArrayList();
-    private final Coords dragPos = new Coords();
+    private final Coords dragPos = new Coords(-1, -1);
 
     private PosItem activeItem;
     private ItemsStage activeItemsStage;

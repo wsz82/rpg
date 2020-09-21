@@ -3,7 +3,6 @@ package editor.view.asset.equipment.container;
 import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
-import editor.view.asset.ItemsStage;
 import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
@@ -57,7 +56,8 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     private void hookupContainerEvents() {
         itemsButton.setOnAction(e -> {
-            ItemsStage<Container> itemsStage = new ItemsStage<>(parent, item, editorController);
+            ContainerItemsStage itemsStage = new ContainerItemsStage(parent, item, editorController);
+            itemsStage.initWindow();
             itemsStage.show();
         });
     }

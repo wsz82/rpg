@@ -4,9 +4,9 @@ import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
-import editor.view.asset.ItemsStage;
 import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.PointSetter;
+import editor.view.asset.creature.inventory.InventoryItemsStage;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.animation.creature.CreatureAnimation;
@@ -156,7 +156,8 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private void hookUpItemsEditEvents() {
         itemsButton.setOnAction(e -> {
-            ItemsStage<Creature> itemsStage = new ItemsStage<>(parent, item, editorController);
+            InventoryItemsStage itemsStage = new InventoryItemsStage(parent, item, editorController);
+            itemsStage.initWindow();
             itemsStage.show();
         });
     }

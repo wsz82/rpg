@@ -5,4 +5,5 @@ module io.wsz.editor {
     requires javafx.controls;
 
     exports editor.view.stage;
+    exports editor.view.asset.creature.inventory;
 }

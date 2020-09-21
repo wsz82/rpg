@@ -1,6 +1,7 @@
 package editor.view.asset;
 
 import editor.model.EditorController;
+import editor.view.asset.items.ItemsStage;
 import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
