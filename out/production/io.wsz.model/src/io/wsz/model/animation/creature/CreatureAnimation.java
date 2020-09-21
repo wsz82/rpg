@@ -118,13 +118,17 @@ public class CreatureAnimation extends Animation<Creature> {
         String curMoveAnimation = animationPos.getCurMoveAnimation();
         String moveDirection = animationPos.getMoveDirection();
         String stopPath = moveDirection + DIVIDER + STOP;
-        List<ResolutionImage> frames = walk.get(curMoveAnimation).get(stopPath);
+        Map<String, List<ResolutionImage>> moveAnimations = walk.get(curMoveAnimation);
+        List<ResolutionImage> frames;
+        if (moveAnimations == null) {
+            frames = getBasicMoveDirection(stopPath);
+        } else {
+            frames = moveAnimations.get(stopPath);
+        }
 
         if (frames == null) {
-            frames = walk.get(BASIC).get(stopPath);
-            if (frames == null) {
-                return null;
-            }
+            frames = getBasicMoveDirection(stopPath);
+            if (frames == null) return null;
         }
 
         int framesSize = frames.size();
@@ -145,13 +149,17 @@ public class CreatureAnimation extends Animation<Creature> {
         animationPos.setMoveDirection(nextMoveDirection);
 
         String curMoveAnimation = animationPos.getCurMoveAnimation();
-        List<ResolutionImage> frames = walk.get(curMoveAnimation).get(nextMoveDirection);
+        Map<String, List<ResolutionImage>> moveAnimations = walk.get(curMoveAnimation);
+        List<ResolutionImage> frames;
+        if (moveAnimations == null) {
+            frames = getBasicMoveDirection(nextMoveDirection);
+        } else {
+            frames = moveAnimations.get(nextMoveDirection);
+        }
 
         if (frames == null) {
-            frames = walk.get(BASIC).get(nextMoveDirection);
-            if (frames == null) {
-                return null;
-            }
+            frames = getBasicMoveDirection(nextMoveDirection);
+            if (frames == null) return null;
         }
         int framesSize = frames.size();
         if (framesSize == 0) return null;
@@ -160,6 +168,10 @@ public class CreatureAnimation extends Animation<Creature> {
         animationPos.setNextFrameUpdate(nextUpdate);
         int nextFrameNumber = animationPos.getNextFrameNumber(framesSize);
         return frames.get(nextFrameNumber);
+    }
+
+    private List<ResolutionImage> getBasicMoveDirection(String nextMoveDirection) {
+        return walk.get(BASIC).get(nextMoveDirection);
     }
 
     public String getMoveDirection(Creature cr) {

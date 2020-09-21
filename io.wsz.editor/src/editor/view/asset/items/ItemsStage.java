@@ -2,7 +2,9 @@ package editor.view.asset.items;
 
 import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
+import editor.view.content.ContentEditDelegate;
 import editor.view.stage.ChildStage;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.EquipmentMayCountable;
@@ -11,9 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -33,15 +33,17 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
 
     protected TableView<I> table;
     protected ObservableList<I> tableItems;
-    protected TableColumn<I, Integer> countCol;
 
+    private final ContentEditDelegate contentEditDelegate = new ContentEditDelegate();
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
+    private final EditorCanvas editorCanvas;
     private final EditorController editorController;
 
-    public ItemsStage(Stage parent, C containable, EditorController editorController) {
+    public ItemsStage(Stage parent, C containable, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
         this.containable = containable;
+        this.editorCanvas = editorCanvas;
         this.editorController = editorController;
     }
 
@@ -61,6 +63,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         container.getChildren().addAll(table, buttons);
         scene.setRoot(container);
 
+        setUpContextMenu();
         hookupEvents();
     }
 
@@ -98,11 +101,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
             KeyCode code = e.getCode();
             if (code.equals(KeyCode.DELETE)) {
                 e.consume();
-                TableItem selTableItem = table.getSelectionModel().getSelectedItem();
-                if (selTableItem == null) return;
-                Equipment selEquipment = selTableItem.getEquipment();
-                if (selEquipment == null) return;
-                table.getItems().remove(selTableItem);
+                removeItem();
             }
         });
     }
@@ -145,7 +144,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         typeCol.setEditable(false);
         table.getColumns().add(typeCol);
 
-        countCol = new TableColumn<>("Count");
+        TableColumn<I, Integer> countCol = new TableColumn<>("Count");
         countCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected Integer computeValue() {
@@ -162,6 +161,34 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         });
         table.getColumns().add(countCol);
         return table;
+    }
+
+    private void setUpContextMenu() {
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem edit = new MenuItem("Edit");
+        final MenuItem remove = new MenuItem("Remove");
+        contextMenu.getItems().addAll(edit);
+        edit.setOnAction(event -> editItem());
+        remove.setOnAction(event -> removeItem());
+        table.setOnContextMenuRequested(event -> {
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
+        });
+    }
+
+    private void editItem() {
+        TableItem selTableItem = table.getSelectionModel().getSelectedItem();
+        if (selTableItem == null) return;
+        Equipment selEquipment = selTableItem.getEquipment();
+        if (selEquipment == null) return;
+        contentEditDelegate.openEditWindow(this, selEquipment, editorCanvas, editorController);
+    }
+
+    private void removeItem() {
+        TableItem selTableItem = table.getSelectionModel().getSelectedItem();
+        if (selTableItem == null) return;
+        Equipment selEquipment = selTableItem.getEquipment();
+        if (selEquipment == null) return;
+        table.getItems().remove(selTableItem);
     }
 
     protected void save() {

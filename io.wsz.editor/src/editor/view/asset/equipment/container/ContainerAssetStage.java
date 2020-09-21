@@ -56,7 +56,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     private void hookupContainerEvents() {
         itemsButton.setOnAction(e -> {
-            ContainerItemsStage itemsStage = new ContainerItemsStage(parent, item, editorController);
+            ContainerItemsStage itemsStage = new ContainerItemsStage(parent, item, editorCanvas, editorController);
             itemsStage.initWindow();
             itemsStage.show();
         });

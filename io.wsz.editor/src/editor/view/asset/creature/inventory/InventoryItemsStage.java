@@ -2,6 +2,7 @@ package editor.view.asset.creature.inventory;
 
 import editor.model.EditorController;
 import editor.view.asset.items.ItemsStage;
+import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.InventoryPlaceType;
@@ -18,8 +19,8 @@ import java.util.Set;
 
 public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem> {
 
-    public InventoryItemsStage(Stage parent, Creature creature, EditorController editorController) {
-        super(parent, creature, editorController);
+    public InventoryItemsStage(Stage parent, Creature creature, EditorCanvas editorCanvas, EditorController editorController) {
+        super(parent, creature, editorCanvas, editorController);
     }
 
     @Override

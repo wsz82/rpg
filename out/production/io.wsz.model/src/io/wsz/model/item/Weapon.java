@@ -9,6 +9,7 @@ import io.wsz.model.sizes.Sizes;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Objects;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
@@ -122,6 +123,33 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     @Override
     public EquipmentAnimationPos getAnimationPos() {
         return animationPos;
+    }
+
+    @Override
+    public boolean isUnitIdentical(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Weapon)) return false;
+        if (!super.isUnitIdentical(o)) return false;
+        Weapon weapon = (Weapon) o;
+        return Objects.equals(getDamage(), weapon.getDamage()) &&
+                Objects.equals(getRange(), weapon.getRange()) &&
+                Objects.equals(getSpeed(), weapon.getSpeed());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Weapon)) return false;
+        if (!super.equals(o)) return false;
+        Weapon weapon = (Weapon) o;
+        return Objects.equals(getDamage(), weapon.getDamage()) &&
+                Objects.equals(getRange(), weapon.getRange()) &&
+                Objects.equals(getSpeed(), weapon.getSpeed());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getDamage(), getRange(), getSpeed());
     }
 
     @Override

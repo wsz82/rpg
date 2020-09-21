@@ -12,6 +12,10 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         extends Equipment<E, A>{
     private static final long serialVersionUID = 1L;
 
+    public static void merge(EquipmentMayCountable from, EquipmentMayCountable to) {
+        to.setAmount(to.getAmount() + from.getAmount());
+    }
+
     private boolean isCountable;
     private Integer amount;
 

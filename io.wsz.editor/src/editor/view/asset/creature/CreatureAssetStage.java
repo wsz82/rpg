@@ -156,7 +156,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private void hookUpItemsEditEvents() {
         itemsButton.setOnAction(e -> {
-            InventoryItemsStage itemsStage = new InventoryItemsStage(parent, item, editorController);
+            InventoryItemsStage itemsStage = new InventoryItemsStage(parent, item, editorCanvas, editorController);
             itemsStage.initWindow();
             itemsStage.show();
         });
