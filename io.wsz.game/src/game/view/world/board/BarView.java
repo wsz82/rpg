@@ -223,12 +223,12 @@ public class BarView {
             return;
         }
 
-        if (!pointWithinPortraits(portraitSize, y, top)) {
+        if (!isPointWithinPortraits(portraitSize, y, top)) {
             hoveredPortrait = -1;
         }
     }
 
-    private boolean pointWithinPortraits(double portraitSize, double y, double top) {
+    private boolean isPointWithinPortraits(double portraitSize, double y, double top) {
         for (int i = 0; i < portraits.size(); i++) {
             Portrait cl = portraits.get(i);
             double portraitY = cl.y;

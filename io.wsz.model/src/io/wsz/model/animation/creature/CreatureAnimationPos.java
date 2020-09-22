@@ -14,7 +14,6 @@ public class CreatureAnimationPos extends AnimationPos {
     private CreatureAnimationType curCreatureAnimationType;
     private String curMoveAnimation;
     private String moveDirection;
-    private long nextPortraitUpdate;
     private long nextTimeToStartPlayIdleAfterStop;
 
     public CreatureAnimationPos() {
@@ -27,7 +26,6 @@ public class CreatureAnimationPos extends AnimationPos {
         this.curCreatureAnimationType = other.curCreatureAnimationType;
         this.curMoveAnimation = other.curMoveAnimation;
         this.moveDirection = other.moveDirection;
-        this.nextPortraitUpdate = other.nextPortraitUpdate;
         this.nextTimeToStartPlayIdleAfterStop = other.nextTimeToStartPlayIdleAfterStop;
     }
 
@@ -60,14 +58,6 @@ public class CreatureAnimationPos extends AnimationPos {
         this.moveDirection = moveDirection;
     }
 
-    public long getNextPortraitUpdate() {
-        return nextPortraitUpdate;
-    }
-
-    public void setNextPortraitUpdate(long nextPortraitUpdate) {
-        this.nextPortraitUpdate = nextPortraitUpdate;
-    }
-
     public long getNextTimeToStartPlayIdleAfterStop() {
         return nextTimeToStartPlayIdleAfterStop;
     }
@@ -88,12 +78,6 @@ public class CreatureAnimationPos extends AnimationPos {
 
         long menuOpenTime = Sizes.getTimeOfMenuOpen();
 
-        if (nextPortraitUpdate > menuOpenTime) {
-            out.writeLong(menuOpenTime - nextPortraitUpdate);
-        } else {
-            out.writeLong(0);
-        }
-
         if (nextTimeToStartPlayIdleAfterStop > menuOpenTime) {
             out.writeLong(menuOpenTime - nextTimeToStartPlayIdleAfterStop);
         } else {
@@ -113,13 +97,8 @@ public class CreatureAnimationPos extends AnimationPos {
 
         long curTime = System.currentTimeMillis();
 
-        long timeToNextPortraitUpdate = in.readLong();
-        if (timeToNextPortraitUpdate != 0) {
-            nextPortraitUpdate = curTime + timeToNextPortraitUpdate;
-        }
-
         long timeToStartPlayIdleAfterStop = in.readLong();
-        if (timeToNextPortraitUpdate != 0) {
+        if (timeToStartPlayIdleAfterStop != 0) {
             this.nextTimeToStartPlayIdleAfterStop = curTime + timeToStartPlayIdleAfterStop;
         }
     }

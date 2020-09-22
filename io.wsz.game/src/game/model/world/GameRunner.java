@@ -2,8 +2,8 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
-import game.model.textures.CreatureBase;
 import io.wsz.model.Controller;
+import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
@@ -11,6 +11,7 @@ import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -155,8 +156,17 @@ public class GameRunner {
             l.getItems().forEach(PosItem::update);
         }
 
+        updateHoveredHeroBaseAnimation();
+
         updateCurrentLocation();
         tryToStartDialog();
+    }
+
+    private void updateHoveredHeroBaseAnimation() {
+        Creature hoveredHero = gameController.getHoveredHero();
+        if (hoveredHero != null) {
+            hoveredHero.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
+        }
     }
 
     private void updateView() {
@@ -283,8 +293,7 @@ public class GameRunner {
             location.initDiscoveredFog(fog, fog.getHalfFogSize());
 
             for (CreatureBase base : bases) {
-                base.setImg(null);
-                base.getImage(programDir);
+                base.initAnimation(programDir);
                 i++;
                 updateProgress(i, total);
             }

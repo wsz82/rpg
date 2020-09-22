@@ -23,7 +23,7 @@ public class EquipmentMayCountableAnimation<E extends EquipmentMayCountable<?,?>
             case DROP -> playDrop(animationPos, amount);
             case INVENTORY -> playInventory(animationPos, amount);
         }
-        ResolutionImage nextIdle = getNextIdle(animationPos, e.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextAnimationImage(idles, animationPos, e.getAnimationSpeed());
         if (nextIdle == null) return;
         e.setImage(nextIdle);
     }

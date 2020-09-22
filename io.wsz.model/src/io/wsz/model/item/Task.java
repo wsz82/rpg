@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.animation.creature.CreatureAnimationType;
+import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -34,6 +35,7 @@ public class Task implements Externalizable {
     public void doTask(Creature cr) {
         if (isFinished) {
             cr.getAnimationPos().setCurAnimation(CreatureAnimationType.IDLE);
+            cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.IDLE);
             return;
         }
 
@@ -96,6 +98,7 @@ public class Task implements Externalizable {
             return;
         }
         cr.getAnimationPos().setCurAnimation(CreatureAnimationType.MOVE);
+        cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         pos.x = nextPos.x;
         pos.y = nextPos.y;
     }

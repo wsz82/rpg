@@ -8,6 +8,7 @@ import game.view.world.CanvasView;
 import game.view.world.FoggableDelegate;
 import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
+import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
@@ -15,6 +16,7 @@ import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.ImageCursor;
@@ -411,14 +413,19 @@ public class GameView extends CanvasView {
 
     private void drawCreatureBase(Creature cr) {
         CreatureControl control = cr.getControl();
-        if (control != CreatureControl.CONTROL
-                && control != CreatureControl.ENEMY) {
+        boolean isCreatureControllableOrNeutral = control == CONTROLLABLE || control == CreatureControl.NEUTRAL;
+        if (isCreatureControllableOrNeutral && isCreatureBaseNotOnAction(cr)) {
             return;
         }
-        CreatureSize size = cr.getSize();
         Coords centerBottomPos = cr.getCenter();
         Coords translatedPos = translateCoordsToScreenCoords(centerBottomPos);
-        drawCreatureBase(translatedPos.x, translatedPos.y, size, control);
+        ResolutionImage base = cr.getBase();
+        drawCreatureBase(translatedPos.x, translatedPos.y, base);
+    }
+
+    private boolean isCreatureBaseNotOnAction(Creature cr) {
+        CreatureBaseAnimationType curAnimation = cr.getBaseAnimationPos().getBaseAnimationType();
+        return curAnimation != CreatureBaseAnimationType.ACTION;
     }
 
     private void hookUpEvents() {

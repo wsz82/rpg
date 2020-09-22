@@ -20,9 +20,9 @@ public class DoorAnimation extends Animation<Door<?>> {
     }
 
     @Override
-    public void initOtherAnimations(File framesDir, String fileName) {
-        super.initOtherAnimations(framesDir, fileName);
-        openableAnimation.initOtherAnimations(framesDir, fileName);
+    public void initOtherAnimations(File animationDir, String fileName) {
+        super.initOtherAnimations(animationDir, fileName);
+        openableAnimation.initOtherAnimations(animationDir, fileName);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DoorAnimation extends Animation<Door<?>> {
     }
 
     private ResolutionImage getIdle(Door d, OpenableAnimationPos animationPos) {
-        return getNextIdle(animationPos, d.getAnimationSpeed());
+        return getNextAnimationImage(idles, animationPos, d.getAnimationSpeed());
     }
 
     private ResolutionImage getOperating(Door d, OpenableAnimationPos animationPos) {

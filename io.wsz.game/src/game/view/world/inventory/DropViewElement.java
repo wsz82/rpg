@@ -2,11 +2,14 @@ package game.view.world.inventory;
 
 import game.model.GameController;
 import game.view.world.FoggableDelegate;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.Equipment;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -201,13 +204,12 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     private void drawCreatureBase(Creature cr) {
-        CreatureSize size = cr.getSize();
-        CreatureControl control = cr.getControl();
         Coords pos = cr.getCenter();
         Coords corrected = currentPosCorrection(pos);
         double x = (corrected.x + viewPos.x);
         double y = (corrected.y + viewPos.y);
-        drawCreatureBase(x, y, size, control);
+        ResolutionImage base = cr.getBase();
+        drawCreatureBase(x, y, base);
     }
 
     private void sortItems() {

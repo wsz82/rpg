@@ -37,6 +37,7 @@ public class Paths {
     public static final String INVENTORY_DIR = File.separator + INVENTORY;
     public static final String INVENTORY_OPEN = INVENTORY + DIVIDER + OPEN;
     public static final String PORTRAIT = "portrait";
+    public static final String ACTION = "action";
     public static final String WALK = "walk";
     public static final String STOP = "stop";
     public static final String N = "N";

@@ -66,10 +66,10 @@ public class CreatureAnimation extends Animation<Creature> {
     }
 
     @Override
-    public void initOtherAnimations(File framesDir, String fileName) {
+    public void initOtherAnimations(File animationDir, String fileName) {
         switch (fileName) {
-            case INVENTORY -> initInventoryCreaturePicturesFiles(framesDir, creatureInventoryFiles);
-            case WALK -> initAnimations(framesDir, walk);
+            case INVENTORY -> initInventoryCreaturePicturesFiles(animationDir, creatureInventoryFiles);
+            case WALK -> initAnimations(animationDir, walk);
         }
     }
 
@@ -219,16 +219,17 @@ public class CreatureAnimation extends Animation<Creature> {
 
     protected ResolutionImage getIdle(Creature cr) {
         CreatureAnimationPos animationPos = cr.getAnimationPos();
-        return getNextIdle(animationPos, cr.getAnimationSpeed());
+        return getNextAnimationImage(idles, animationPos, cr.getAnimationSpeed());
     }
 
     @Override
-    protected ResolutionImage getNextIdle(AnimationPos animationPos, double speed) {
+    protected ResolutionImage getNextAnimationImage(Map<String, Map<String, List<ResolutionImage>>> animation,
+                                                    AnimationPos animationPos, double speed) {
         long curTime = System.currentTimeMillis();
 
         long timeToStartPlayIdleAfterStop = ((CreatureAnimationPos) animationPos).getNextTimeToStartPlayIdleAfterStop();
         if (curTime < timeToStartPlayIdleAfterStop) return null;
-        return super.getNextIdle(animationPos, speed);
+        return super.getNextAnimationImage(animation, animationPos, speed);
     }
 
     public void clearInventoryPictures() {

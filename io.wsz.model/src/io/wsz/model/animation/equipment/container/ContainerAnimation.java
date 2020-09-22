@@ -20,9 +20,9 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
     }
 
     @Override
-    public void initOtherAnimations(File framesDir, String fileName) {
-        super.initOtherAnimations(framesDir, fileName);
-        openableAnimation.initOtherAnimations(framesDir, fileName);
+    public void initOtherAnimations(File animationDir, String fileName) {
+        super.initOtherAnimations(animationDir, fileName);
+        openableAnimation.initOtherAnimations(animationDir, fileName);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ContainerAnimation extends EquipmentAnimation<Container> {
     }
 
     private ResolutionImage getIdle(Container c, ContainerAnimationPos animationPos) {
-        return getNextIdle(animationPos, c.getAnimationSpeed());
+        return getNextAnimationImage(idles, animationPos, c.getAnimationSpeed());
     }
 
     private ResolutionImage getOperating(Container c, OpenableAnimationPos openableAnimationPos) {

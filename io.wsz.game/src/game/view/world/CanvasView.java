@@ -1,18 +1,15 @@
 package game.view.world;
 
 import game.model.GameController;
-import game.model.textures.CreatureBase;
 import game.model.textures.Cursor;
 import io.wsz.model.Controller;
+import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
-import io.wsz.model.stage.Board;
-import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.Geometry;
-import io.wsz.model.stage.ItemsComparator;
+import io.wsz.model.stage.*;
 import javafx.geometry.VPos;
 import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
@@ -21,7 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -145,15 +141,13 @@ public abstract class CanvasView {
         gc.drawImage(img, startX, startY, width, height, destX + viewX, destY + viewY, width, height);
     }
 
-    protected void drawCreatureBase(double x, double y, CreatureSize size, CreatureControl control) {
-        int meter = Sizes.getMeter();
-        x -= size.getWidth() / 2.0;
-        y -= size.getHeight() / 2.0;
-        CreatureBase base = CreatureBase.getCreatureBase(size, control);
+    protected void drawCreatureBase(double x, double y, ResolutionImage base) {
         if (base == null) return;
-        File programDir = controller.getProgramDir();
-        Image img = base.getImage(programDir).getFxImage();
-        gc.drawImage(img, x * meter, y * meter);
+        Image img = base.getFxImage();
+        int meter = Sizes.getMeter();
+        x = x*meter - img.getWidth()/2.0;
+        y = y*meter - img.getHeight()/2.0;
+        gc.drawImage(img, x, y);
     }
 
     protected void setDropAnimationPos(Equipment e) {
@@ -169,12 +163,17 @@ public abstract class CanvasView {
             return;
         }
         Cursor cursor = gameController.getCursor();
+        PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
+
         if (selected == null) {
             ImageCursor cursorImg = cursor.getMain();
             setCursor(cursorImg);
+            if (item instanceof Creature) {
+                Creature cr = (Creature) item;
+                setCursorForControllableCreature(cr);
+            }
             return;
         }
-        PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
 
         if (item == null) {
             item = board.getObstacle(pos, selected, OBSTACLE_TYPES, items);
@@ -190,7 +189,9 @@ public abstract class CanvasView {
             }
             setCursor(cursorImg);
         } else if (item instanceof Creature) {
-            setCursorForCreature((Creature) item);
+            Creature cr = (Creature) item;
+            setCursorForCreature(cr);
+            cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         } else if (item instanceof InDoor || item instanceof OutDoor) {
             setCursorForDoor((Openable) item);
         } else if (item instanceof Container) {
@@ -209,6 +210,15 @@ public abstract class CanvasView {
         } else {
             ImageCursor cursorImg = cursor.getMain();
             setCursor(cursorImg);
+        }
+    }
+
+    private void setCursorForControllableCreature(Creature cr) {
+        CreatureControl control = cr.getControl();
+        if (control == CreatureControl.CONTROLLABLE) {
+            ImageCursor imageCursor = gameController.getCursor().getMain();
+            setCursor(imageCursor);
+            cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         }
     }
 

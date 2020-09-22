@@ -19,7 +19,7 @@ public class EquipmentAnimation<E extends Equipment<?,?>> extends Animation<E> {
             case DROP -> playDrop(animationPos);
             case INVENTORY -> playInventory(animationPos);
         }
-        ResolutionImage nextIdle = getNextIdle(animationPos, e.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextAnimationImage(idles, animationPos, e.getAnimationSpeed());
         if (nextIdle == null) return;
         e.setImage(nextIdle);
     }

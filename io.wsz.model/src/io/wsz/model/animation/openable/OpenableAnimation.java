@@ -19,9 +19,10 @@ public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
     }
 
     @Override
-    public void initOtherAnimations(File framesDir, String fileName) {
+    public void initOtherAnimations(File animationDir, String fileName) {
         if (fileName.equals(OPERATING)) {
-            initAnimations(framesDir, operating);
+            operating.clear();
+            initAnimations(animationDir, operating);
         }
     }
 

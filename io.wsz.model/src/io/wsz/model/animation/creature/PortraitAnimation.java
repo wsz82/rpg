@@ -21,7 +21,7 @@ public class PortraitAnimation extends Animation<Creature> {
             initIdlesOrEquivalent();
         }
         AnimationPos animationPos = cr.getPortraitAnimationPos();
-        ResolutionImage nextIdle = getNextIdle(animationPos, cr.getAnimationSpeed());
+        ResolutionImage nextIdle = getNextAnimationImage(idles, animationPos, cr.getAnimationSpeed());
         if (nextIdle == null) return;
         cr.setPortrait(nextIdle);
     }
@@ -39,9 +39,5 @@ public class PortraitAnimation extends Animation<Creature> {
         if (portraitSize == 0) return;
         ResolutionImage image = new ResolutionImage(file, portraitSize, portraitSize);
         sequence.add(image);
-    }
-
-    public void clearResizablePictures() {
-        idles.clear();
     }
 }
