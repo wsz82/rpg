@@ -38,7 +38,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private CreatureAnimation animation;
     private PortraitAnimation portraitAnimation;
 
-    private final Task task = new Task();
+    private Task task;
     private CreatureAnimationPos animationPos;
     private AnimationPos portraitAnimationPos;
     private CreatureBaseAnimationPos baseAnimationPos;
@@ -69,6 +69,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.animationPos = new CreatureAnimationPos();
         this.portraitAnimationPos = new AnimationPos();
         this.baseAnimationPos = new CreatureBaseAnimationPos();
+        this.task = new Task(new Coords(-1, -1));
     }
 
     @Override
@@ -228,14 +229,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     public void goTo(double x, double y) {
         this.task.setFinished(false);
-        this.task.setItem(this, null);
+        this.task.setItem(null);
         this.task.setDestX(reverseCenterBottomPosX(x));
         this.task.setDestY(reverseCenterBottomPosY(y));
     }
 
     private void setItemTask(PosItem e) {
         this.task.setFinished(false);
-        this.task.setItem(this, e);
+        this.task.setItem(e);
     }
 
     @Override
@@ -705,10 +706,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
             portraitAnimation = new PortraitAnimation(getDir(), PORTRAIT);
         }
 
-        Task serTask = (Task) in.readObject();
-        task.setDest(serTask.getDest());
-        task.setItem(this, serTask.getItem());
-        task.setFinished(serTask.isFinished());
+        task = (Task) in.readObject();
+        task.setOwner(this);
 
         middlePoint = (Coords) in.readObject();
 

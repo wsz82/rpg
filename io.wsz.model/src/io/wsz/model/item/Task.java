@@ -19,17 +19,23 @@ public class Task implements Externalizable {
 
     private final Coords nextPos = new Coords(-1, -1);
 
-    private final Coords dest = new Coords(-1, -1);
-
+    private Coords dest;
     private PosItem item;
     private boolean isFinished = true;
+    private Creature owner;
 
-    public Task() {}
+    public Task() {
+    }
+
+    public Task(Coords dest) {
+        this.dest = dest;
+    }
 
     public void cloneTo(Creature cr) {
         Task task = cr.getTask();
-        task.setItem(cr, this.item);
+        task.setItem(this.item);
         task.setDest(this.dest);
+        task.setOwner(cr);
     }
 
     public void doTask(Creature cr) {
@@ -113,16 +119,16 @@ public class Task implements Externalizable {
         return item;
     }
 
-    public void setItem(Creature cr, PosItem item) {
+    public void setItem(PosItem item) {
         this.item = item;
         if (item == null) {
             return;
         }
         Coords dest;
         if (item instanceof Creature) {
-            dest = cr.getReversedCenter(item.getCenter());
+            dest = owner.getReversedCenter(item.getCenter());
         } else {
-            dest = cr.getReversedCenter(item.getInteractionPoint());
+            dest = owner.getReversedCenter(item.getInteractionPoint());
         }
         setDest(dest);
     }
@@ -151,6 +157,10 @@ public class Task implements Externalizable {
 
     public void setFinished(boolean finished) {
         this.isFinished = finished;
+    }
+
+    public void setOwner(Creature owner) {
+        this.owner = owner;
     }
 
     @Override
@@ -192,9 +202,7 @@ public class Task implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         long ver = in.readLong();
 
-        Coords pos = (Coords) in.readObject();
-        dest.x = pos.x;
-        dest.y = pos.y;
+        dest = (Coords) in.readObject();
 
         item = (PosItem) in.readObject();
 
