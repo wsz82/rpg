@@ -89,7 +89,10 @@ public class Task implements Externalizable {
         nextPos.level = pos.level;
         PosItem pi = cr.getCollision(cr.getCenterFrom(nextPos));
         if (pi != null) {
-            dest.x = -1;
+            boolean isNotCreatureCollision = !(pi instanceof Creature);
+            if (isNotCreatureCollision) {
+                dest.x = -1;
+            }
             return;
         }
         cr.getAnimationPos().setCurAnimation(CreatureAnimationType.MOVE);
