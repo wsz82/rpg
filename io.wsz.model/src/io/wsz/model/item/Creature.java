@@ -48,7 +48,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     private Double range;
     private Integer strength;
     private ResolutionImage portrait;
-    private OnTeleportAction onTeleportAction;
+    private OnTeleportAction onChangeLocationAction;
 
     public Creature() {}
 
@@ -313,8 +313,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public void changeLocation(Location from, Coords exit) {
-        super.changeLocation(from, exit);
+    public void changePosition(Location from, Coords exit) {
+        changeLocation(from, exit);
         Coords reversed = getReversedCenter(exit);
         this.pos.x = reversed.x;
         this.pos.y = reversed.y;
@@ -325,8 +325,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public void onChangeLocationAction(Location location) {
         super.onChangeLocationAction(location);
-        if (onTeleportAction != null) {
-            onTeleportAction.act();
+        if (onChangeLocationAction != null) {
+            onChangeLocationAction.act();
         }
     }
 
@@ -569,12 +569,12 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         pi.creatureSecondaryInteract(this);
     }
 
-    public OnTeleportAction getOnTeleportAction() {
-        return onTeleportAction;
+    public OnTeleportAction getOnChangeLocationAction() {
+        return onChangeLocationAction;
     }
 
-    public void setOnTeleportAction(OnTeleportAction onTeleportAction) {
-        this.onTeleportAction = onTeleportAction;
+    public void setOnChangeLocationAction(OnTeleportAction onChangeLocationAction) {
+        this.onChangeLocationAction = onChangeLocationAction;
     }
 
     @Override

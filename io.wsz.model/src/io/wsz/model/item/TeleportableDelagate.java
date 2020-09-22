@@ -25,7 +25,9 @@ public class TeleportableDelagate implements Externalizable {
         if (isBeingUsed) {
             return false;
         }
+        isBeingUsed = true;
         if (exit == null || exit.isEmpty()) {
+            isBeingUsed = false;
             return false;
         }
         Optional<Location> optLocation = controller.getLocations().stream()
@@ -33,6 +35,7 @@ public class TeleportableDelagate implements Externalizable {
                 .findFirst();
         Location target = optLocation.orElse(null);
         if (target == null) {
+            isBeingUsed = false;
             return false;
         }
         int targetLevel = exit.level;
@@ -41,6 +44,7 @@ public class TeleportableDelagate implements Externalizable {
                 .findFirst();
         Layer targetLayer = optLayer.orElse(null);
         if (targetLayer == null) {
+            isBeingUsed = false;
             return false;
         }
         double targetX = exit.x;
@@ -48,28 +52,35 @@ public class TeleportableDelagate implements Externalizable {
         double targetY = exit.y;
         double targetHeight = target.getHeight();
         if (targetX > targetWidth || targetY > targetHeight) {
+            isBeingUsed = false;
             return false;
         }
         Board board = controller.getBoard();
         PosItem landscape = board.lookForItem(target.getItems(), exit.x, exit.y, exit.level, LANDSCAPE_TYPE, false);
         if (landscape == null) {
+            isBeingUsed = false;
             return false;
         }
         PosItem collided = cr.getCollision(exit, target);
         if (collided != null) {
+            isBeingUsed = false;
             return false;
         }
         Location from = cr.getPos().getLocation();
-        cr.changeLocation(from, exit);
+        cr.changePosition(from, exit);
         if (cr.getControl().equals(CONTROL)) {
             controller.setLocationToUpdate(target);
             controller.getCurrentLayer().setLayer(targetLayer);
             controller.setPosToCenter(exit);
         }
-        isBeingUsed = true;
-        cr.setOnTeleportAction(() -> {
+        boolean isNotTeleportingToTheSameLocation = !from.equals(exit.getLocation());
+        if (isNotTeleportingToTheSameLocation) {
+            cr.setOnChangeLocationAction(() -> {
+                isBeingUsed = false;
+            });
+        } else {
             isBeingUsed = false;
-        });
+        }
         return true;
     }
 

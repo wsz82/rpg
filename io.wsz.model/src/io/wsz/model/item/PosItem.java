@@ -110,16 +110,19 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return pos.y + getImageHeight();
     }
 
-    public void changeLocation(Location from, Coords exit) {
+    public void changePosition(Location from, Coords exit) {
+        changeLocation(from, exit);
+        pos.x = exit.x;
+        pos.y = exit.y;
+        pos.level = exit.level;
+    }
+
+    protected void changeLocation(Location from, Coords exit) {
         Location target = exit.getLocation();
         if (!from.equals(target)) {
             from.getItemsToRemove().add(this);
             target.getItemsToAdd().add(this);
         }
-
-        pos.x = exit.x;
-        pos.y = exit.y;
-        pos.level = exit.level;
     }
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {

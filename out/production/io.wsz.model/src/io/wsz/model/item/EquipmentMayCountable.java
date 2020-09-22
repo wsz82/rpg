@@ -41,7 +41,7 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
     @Override
     public Double getWeight() {
         int factor = 1;
-        if (isCountable) {
+        if (isCountable()) {
             factor = getAmount();
         }
         return getUnitWeight() * factor;
