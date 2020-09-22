@@ -128,9 +128,8 @@ public class DropViewElement extends EquipmentViewElement {
     protected final void drawEquipment() {
         sortItems();
 
+        Creature cr = controller.getCreatureToOpenInventory();
         for (PosItem pi : allItmes) {
-            Creature cr = controller.getCreatureToOpenInventory();
-
             adjustCoverOpacity(cr, pi);
 
             if (pi == cr) {
