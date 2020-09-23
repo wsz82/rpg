@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.location.Location;
@@ -242,6 +243,10 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     public void onChangeLocationAction(Location location) {
         pos.setLocation(location);
+    }
+
+    public void setCursor(CursorSetter cursorSetter) {
+        cursorSetter.set(CursorType.MAIN);
     }
 
     public String getItemId() {

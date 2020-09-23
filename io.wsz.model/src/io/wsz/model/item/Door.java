@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.animation.openable.OpenableAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
@@ -61,6 +62,17 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
                 return prototype.getInitialImage();
             }
         }
+    }
+
+    @Override
+    public void setCursor(CursorSetter cursorSetter) {
+        CursorType type;
+        if (isOpen()) {
+            type = CursorType.DOOR_OPEN;
+        } else {
+            type = CursorType.DOOR_CLOSED;
+        }
+        cursorSetter.set(type);
     }
 
     public boolean isOpen() {

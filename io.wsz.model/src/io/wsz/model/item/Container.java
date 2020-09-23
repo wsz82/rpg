@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
 import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
@@ -135,6 +136,17 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     public void restoreReferences(Controller controller, List<Asset> assets, World world) {
         super.restoreReferences(controller, assets, world);
         getItems().forEach(e -> e.restoreReferences(controller, assets, world));
+    }
+
+    @Override
+    public void setCursor(CursorSetter cursorSetter) {
+        CursorType type;
+        if (isOpen()) {
+            type = CursorType.CONTAINER_OPEN;
+        } else {
+            type = CursorType.CONTAINER_CLOSED;
+        }
+        cursorSetter.set(type);
     }
 
     public Double getIndividualNettoWeight() {

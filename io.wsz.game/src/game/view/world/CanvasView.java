@@ -36,6 +36,7 @@ public abstract class CanvasView {
     protected final Controller controller;
     protected final Board board;
     protected final List<Creature> visibleControllables = new ArrayList<>(0);
+    protected final CursorSetter cursorSetter;
 
     protected Coords mousePos;
     protected boolean isCursorOnCountable;
@@ -47,6 +48,14 @@ public abstract class CanvasView {
         controller = gameController.getController();
         board = controller.getBoard();
         gc = canvas.getGraphicsContext2D();
+        cursorSetter = type -> {
+            ImageCursor imageCursor = gameController.getCursor().getCursor(type);
+            setCursor(imageCursor);
+            if (type.isShowAmount()) {
+                isCursorOnCountable = true;
+                countableAmount = type.getAmount();
+            }
+        };
     }
 
     protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem> items, int level) {
@@ -182,34 +191,14 @@ public abstract class CanvasView {
                 if (controller.isInventory()) {
                     cursorImg = cursor.getMain();
                 } else {
-                    cursorImg = cursor.getGoCursor();
+                    cursorImg = cursor.getGo();
                 }
             } else {
-                cursorImg = cursor.getNotGoCursor();
+                cursorImg = cursor.getNotGo();
             }
             setCursor(cursorImg);
-        } else if (item instanceof Creature) {
-            Creature cr = (Creature) item;
-            setCursorForCreature(cr);
-            cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
-        } else if (item instanceof InDoor || item instanceof OutDoor) {
-            setCursorForDoor((Openable) item);
-        } else if (item instanceof Container) {
-            setCursorForContainer((Openable) item);
-        } else if (item instanceof Equipment) {
-            ImageCursor cursorImg = cursor.getPickCursor();
-            setCursor(cursorImg);
-            if (item instanceof EquipmentMayCountable) {
-                EquipmentMayCountable countable = (EquipmentMayCountable) item;
-                boolean isCountable = countable.isCountable();
-                if (isCountable) {
-                    isCursorOnCountable = true;
-                    countableAmount = countable.getAmount();
-                }
-            }
         } else {
-            ImageCursor cursorImg = cursor.getMain();
-            setCursor(cursorImg);
+            item.setCursor(cursorSetter);
         }
     }
 
@@ -220,44 +209,6 @@ public abstract class CanvasView {
             setCursor(imageCursor);
             cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         }
-    }
-
-    private void setCursorForContainer(Openable item) {
-        Openable container = item;
-        ImageCursor imageCursor;
-        Cursor cursor = gameController.getCursor();
-        if (container.isOpen()) {
-            imageCursor = cursor.getOpenContainerCursor();
-        } else {
-            imageCursor = cursor.getClosedContainerCursor();
-        }
-        setCursor(imageCursor);
-    }
-
-    private void setCursorForDoor(Openable item) {
-        Openable door = item;
-        ImageCursor imageCursor;
-        Cursor cursor = gameController.getCursor();
-        if (door.isOpen()) {
-            imageCursor = cursor.getOpenDoorCursor();
-        } else {
-            imageCursor = cursor.getClosedDoorCursor();
-        }
-        setCursor(imageCursor);
-    }
-
-    private void setCursorForCreature(Creature item) {
-        Creature creature = item;
-        CreatureControl control = creature.getControl();
-        ImageCursor cursor;
-        if (control == CreatureControl.NEUTRAL) {
-            cursor = gameController.getCursor().getTalkCursor();
-        } else if (control == CreatureControl.ENEMY) {
-            cursor = gameController.getCursor().getAttackCursor();
-        } else {
-            cursor = gameController.getCursor().getMain();
-        }
-        setCursor(cursor);
     }
 
     protected void setCursor(ImageCursor imageCursor) {

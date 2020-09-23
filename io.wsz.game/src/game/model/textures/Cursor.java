@@ -1,5 +1,6 @@
 package game.model.textures;
 
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.scene.ImageCursor;
 import javafx.scene.image.Image;
@@ -105,6 +106,29 @@ public class Cursor {
         attackCursor = new ImageCursor(attackFx, attackFx.getWidth()/2, attackFx.getHeight()/2);
     }
 
+    public ImageCursor getCursor(CursorType type) {
+        return switch (type) {
+            case MAIN -> getMain();
+            case UP -> getUp();
+            case RIGHT -> getRight();
+            case DOWN -> getDown();
+            case LEFT -> getLeft();
+            case LEFT_UP -> getLeftUp();
+            case RIGHT_UP -> getRightUp();
+            case RIGHT_DOWN -> getRightDown();
+            case LEFT_DOWN -> getLeftDown();
+            case DOOR_OPEN -> getOpenDoor();
+            case DOOR_CLOSED -> getClosedDoor();
+            case CONTAINER_OPEN -> getOpenContainer();
+            case CONTAINER_CLOSED -> getClosedContainer();
+            case PICK -> getPick();
+            case GO -> getGo();
+            case NOT_GO -> getNotGo();
+            case TALK -> getTalk();
+            case ATTACK -> getAttack();
+        };
+    }
+
     public ImageCursor getActive() {
         return active;
     }
@@ -134,67 +158,67 @@ public class Cursor {
         return leftCursor;
     }
 
-    public ImageCursor getLeftUpCursor() {
+    public ImageCursor getLeftUp() {
         active = leftUpCursor;
         return leftUpCursor;
     }
 
-    public ImageCursor getRightUpCursor() {
+    public ImageCursor getRightUp() {
         active = rightUpCursor;
         return rightUpCursor;
     }
 
-    public ImageCursor getRightDownCursor() {
+    public ImageCursor getRightDown() {
         active = rightDownCursor;
         return rightDownCursor;
     }
 
-    public ImageCursor getLeftDownCursor() {
+    public ImageCursor getLeftDown() {
         active = leftDownCursor;
         return leftDownCursor;
     }
 
-    public ImageCursor getOpenDoorCursor() {
+    public ImageCursor getOpenDoor() {
         active = openDoorCursor;
         return openDoorCursor;
     }
 
-    public ImageCursor getClosedDoorCursor() {
+    public ImageCursor getClosedDoor() {
         active = closedDoorCursor;
         return closedDoorCursor;
     }
 
-    public ImageCursor getOpenContainerCursor() {
+    public ImageCursor getOpenContainer() {
         active = openContainerCursor;
         return openContainerCursor;
     }
 
-    public ImageCursor getClosedContainerCursor() {
+    public ImageCursor getClosedContainer() {
         active = closedContainerCursor;
         return closedContainerCursor;
     }
 
-    public ImageCursor getPickCursor() {
+    public ImageCursor getPick() {
         active = pickCursor;
         return pickCursor;
     }
 
-    public ImageCursor getGoCursor() {
+    public ImageCursor getGo() {
         active = goCursor;
         return goCursor;
     }
 
-    public ImageCursor getNotGoCursor() {
+    public ImageCursor getNotGo() {
         active = notGoCursor;
         return notGoCursor;
     }
 
-    public ImageCursor getTalkCursor() {
+    public ImageCursor getTalk() {
         active = talkCursor;
         return talkCursor;
     }
 
-    public ImageCursor getAttackCursor() {
+    public ImageCursor getAttack() {
         active = attackCursor;
         return attackCursor;
     }

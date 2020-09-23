@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 
 import java.io.IOException;
@@ -82,6 +83,18 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
             return isCountable;
         } else {
             return prototype.isCountable();
+        }
+    }
+
+    @Override
+    public void setCursor(CursorSetter cursorSetter) {
+        if (isCountable()) {
+            CursorType type = CursorType.PICK;
+            type.setShowAmount(true);
+            type.setAmount(getAmount());
+            cursorSetter.set(type);
+        } else {
+            super.setCursor(cursorSetter);
         }
     }
 

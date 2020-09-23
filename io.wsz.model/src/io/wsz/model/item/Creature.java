@@ -2,10 +2,8 @@ package io.wsz.model.item;
 
 import io.wsz.model.Controller;
 import io.wsz.model.animation.AnimationPos;
-import io.wsz.model.animation.creature.CreatureAnimation;
-import io.wsz.model.animation.creature.CreatureAnimationPos;
-import io.wsz.model.animation.creature.CreatureBaseAnimationPos;
-import io.wsz.model.animation.creature.PortraitAnimation;
+import io.wsz.model.animation.creature.*;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
@@ -425,6 +423,21 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
             restored.put(typeWithRef, equippedItems.get(serType));
         }
         inventory.setEquippedItems(restored);
+    }
+
+    @Override
+    public void setCursor(CursorSetter cursorSetter) {
+        CreatureControl control = getControl();
+        CursorType type;
+        if (control == CreatureControl.NEUTRAL) {
+            type = CursorType.TALK;
+        } else if (control == CreatureControl.ENEMY) {
+            type = CursorType.ATTACK;
+        } else {
+            type = CursorType.MAIN;
+        }
+        cursorSetter.set(type);
+        getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
     }
 
     public Task getTask() {

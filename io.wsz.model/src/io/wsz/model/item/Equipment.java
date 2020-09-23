@@ -1,6 +1,7 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
@@ -206,6 +207,11 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         InventoryPlaceType place = controller.getReferencedPlaceType(places, serOccupiedPlace);
         if (place == null) return;
         setOccupiedPlace(place);
+    }
+
+    @Override
+    public void setCursor(CursorSetter cursorSetter) {
+        cursorSetter.set(CursorType.PICK);
     }
 
     public InventoryPlaceType getIndividualOccupiedPlace() {

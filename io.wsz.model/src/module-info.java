@@ -8,6 +8,7 @@ module io.wsz.model {
     exports io.wsz.model;
     exports io.wsz.model.animation;
     exports io.wsz.model.animation.creature;
+    exports io.wsz.model.animation.cursor;
     exports io.wsz.model.animation.door;
     exports io.wsz.model.animation.equipment;
     exports io.wsz.model.animation.equipment.container;
