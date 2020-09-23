@@ -221,10 +221,7 @@ public class EditorController {
 
         List<Location> locations = world.getLocations();
         List<Asset> assets = world.getAssets();
-        List<InventoryPlaceType> inventoryPlaces = world.getInventoryPlaces();
-        List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
-        List<Dialog> dialogs = world.getDialogs();
-        controller.restoreItemsReferences(assets, locations, inventoryPlaces, equipmentTypes, dialogs);
+        controller.restoreItemsReferences(assets, locations, world);
 
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, metadata, loadedPlugin);

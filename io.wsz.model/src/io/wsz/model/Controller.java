@@ -2,10 +2,12 @@ package io.wsz.model;
 
 import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogItem;
 import io.wsz.model.dialog.DialogMemento;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Container;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.InventoryPlaceType;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.Location;
@@ -16,6 +18,7 @@ import io.wsz.model.plugin.PluginMetadataCaretaker;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.textures.Fog;
+import io.wsz.model.world.World;
 
 import java.io.File;
 import java.util.*;
@@ -59,107 +62,19 @@ public class Controller {
 
     public void restoreItemsReferences(List<Asset> assets,
                                        List<Location> locations,
-                                       List<InventoryPlaceType> inventoryPlaces,
-                                       List<EquipmentType> equipmentTypes,
-                                       List<Dialog> dialogs) {
+                                       World world) {
         for (Asset a : getAssets()) {
-            restoreItemReferences(a, dialogs, equipmentTypes, inventoryPlaces);
-
-            if (a instanceof PosItem) {
-                PosItem pi = (PosItem) a;
-                pi.setController(this);
-            }
+            a.restoreReferences(this, assets, world);
+            a.setController(this);
         }
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
-                restorePrototype(assets, pi);
-
-                restoreItemReferences(pi, dialogs, equipmentTypes, inventoryPlaces);
+                pi.restoreReferences(this, assets, world);
             }
         }
     }
 
-    private void restorePrototype(List<Asset> assets, PosItem pi) {
-        PosItem prototype = pi.getPrototype();
-        if (prototype != null) {
-            String prototypeName = prototype.getAssetId();
-
-            Optional<Asset> optAsset = assets.stream()
-                    .filter(a -> a.getAssetId().equals(prototypeName))
-                    .findFirst();
-            Asset p = optAsset.orElse(null);
-            if (p == null) {
-                throw new NullPointerException(prototypeName + " reference is not found");
-            }
-            pi.setPrototype((PosItem) p);
-        }
-    }
-
-    void restoreItemReferences(Asset a,
-                               List<Dialog> dialogs,
-                               List<EquipmentType> equipmentTypes,
-                               List<InventoryPlaceType> inventoryPlaces) {
-        if (a instanceof PosItem) {
-            PosItem pi = (PosItem) a;
-            Coords pos = pi.getPos();
-            restoreLocationOfCoords(pos);
-            restoreDialog(pi, dialogs);
-        }
-        if (a instanceof Creature) {
-            Creature cr = (Creature) a;
-            restoreCreatureEquippedItemsPlaces(cr, inventoryPlaces);
-        }
-        if (a instanceof Teleport) {
-            Teleport t = (Teleport) a;
-            Coords exit = t.getExit();
-            restoreLocationOfCoords(exit);
-        }
-        if (a instanceof OutDoor) {
-            OutDoor od = (OutDoor) a;
-            Coords exit = od.getExit();
-            restoreLocationOfCoords(exit);
-            restoreOutDoorConnection(od);
-        }
-        if (a instanceof Equipment) {
-            Equipment e = (Equipment) a;
-            restoreEquipmentType(e, equipmentTypes);
-            restoreOccupiedPlace(e, inventoryPlaces);
-        }
-    }
-
-    private void restoreDialog(PosItem pi, List<Dialog> dialogs) {
-        Dialog serDialog = pi.getDialog();
-        if (serDialog == null) return;
-        String serID = serDialog.getID();
-        Optional<Dialog> optDialog = dialogs.stream()
-                .filter(d -> d.getID().equals(serID))
-                .findFirst();
-        Dialog dialog = optDialog.orElse(null);
-        if (dialog == null) {
-            throw new NullPointerException(pi.getAssetId() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
-        }
-        pi.setDialog(dialog);
-    }
-
-    private void restoreCreatureEquippedItemsPlaces(Creature cr, List<InventoryPlaceType> places) {
-        Inventory inventory = cr.getInventory();
-        Map<InventoryPlaceType, Equipment> equippedItems = inventory.getEquippedItems();
-        Map<InventoryPlaceType,Equipment> restored = new HashMap<>(equippedItems.size());
-        for (InventoryPlaceType serType : equippedItems.keySet()) {
-            InventoryPlaceType typeWithRef = getReferencedPlaceType(places, serType);
-            restored.put(typeWithRef, equippedItems.get(serType));
-        }
-        inventory.setEquippedItems(restored);
-    }
-
-    private void restoreOccupiedPlace(Equipment e, List<InventoryPlaceType> places) {
-        InventoryPlaceType serOccupiedPlace = e.getIndividualOccupiedPlace();
-        InventoryPlaceType place = getReferencedPlaceType(places, serOccupiedPlace);
-        if (place == null) return;
-        e.setOccupiedPlace(place);
-    }
-
-    private InventoryPlaceType getReferencedPlaceType(List<InventoryPlaceType> places, InventoryPlaceType serType) {
+    public InventoryPlaceType getReferencedPlaceType(List<InventoryPlaceType> places, InventoryPlaceType serType) {
         if (serType == null) {
             return null;
         }
@@ -171,41 +86,6 @@ public class Controller {
             throw new NullPointerException("Inventory place \"" + serType.getId() + "\" should be in list of inventory places");
         }
         return place;
-    }
-
-    private void restoreEquipmentType(Equipment e, List<EquipmentType> types) {
-        EquipmentType serEquipmentType = e.getIndividualEquipmentType();
-        if (serEquipmentType == null) {
-            return;
-        }
-        Optional<EquipmentType> optType = types.stream()
-                .filter(t -> t.getId().equals(serEquipmentType.getId()))
-                .findFirst();
-        EquipmentType equipmentType = optType.orElse(null);
-        if (equipmentType == null) {
-            throw new NullPointerException("Equipment type \"" + serEquipmentType.getId() + "\" should be in list of equipment types");
-        }
-        e.setEquipmentType(equipmentType);
-    }
-
-    private void restoreOutDoorConnection(OutDoor od) {
-        OutDoor serConnection = od.getIndividualConnection();
-        if (serConnection == null) return;
-        String name = serConnection.getAssetId();
-        Coords pos = serConnection.getPos();
-        restoreLocationOfCoords(pos);
-        Location location = pos.getLocation();
-        Optional<OutDoor> optConnection = location.getItems().stream()
-                .filter(o -> o instanceof OutDoor)
-                .map(o -> (OutDoor) o)
-                .filter(o -> o.getAssetId().equals(name))
-                .filter(o -> o.getPos().equals(pos))
-                .findFirst();
-        OutDoor connection = optConnection.orElse(null);
-        if (connection == null) {
-            throw new NullPointerException("OutDoor connection \"" + serConnection.getAssetId() + "\" should be in location outDoors list");
-        }
-        od.setConnection(connection);
     }
 
     public void restoreLocationOfCoords(Coords pos) {

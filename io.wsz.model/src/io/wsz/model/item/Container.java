@@ -4,10 +4,12 @@ import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
 import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
+import io.wsz.model.world.World;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,18 +43,18 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         this.items = new ArrayList<>(0);
     }
 
-    public Container(Container prototype, Boolean visible) {
-        super(prototype, visible);
+    public Container(Container prototype) {
+        super(prototype);
         this.animationPos = new ContainerAnimationPos();
         this.items = new ArrayList<>(0);
         getItems().addAll(prototype.getItems());
         setOpen(prototype.isOpen());
     }
 
-    public Container(Container other) {
-        super(other);
+    public Container(Container other, boolean keepId) {
+        super(other, keepId);
         this.animationPos = new ContainerAnimationPos(other.animationPos);
-        this.items = Equipment.cloneEquipmentList(other.items);
+        this.items = Equipment.cloneEquipmentList(other.items, keepId);
         this.nettoWeight = other.weight;
         this.nettoSize = other.nettoSize;
         this.isOpen = other.isOpen;
@@ -127,6 +129,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         return getItems().stream()
                 .mapToDouble(Equipment::getSize)
                 .sum();
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        super.restoreReferences(controller, assets, world);
+        getItems().forEach(e -> e.restoreReferences(controller, assets, world));
     }
 
     public Double getIndividualNettoWeight() {
@@ -236,8 +244,8 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public Container cloneEquipment() {
-        return new Container(this);
+    public Container cloneEquipment(boolean keepId) {
+        return new Container(this, keepId);
     }
 
     @Override

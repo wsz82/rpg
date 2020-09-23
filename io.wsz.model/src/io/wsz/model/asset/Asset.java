@@ -4,8 +4,10 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.world.World;
 
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Asset implements Externalizable {
@@ -55,6 +57,10 @@ public abstract class Asset implements Externalizable {
         String fileName = file.getName();
         return File.separator + fileName;
     }
+
+    public abstract void setController(Controller controller);
+
+    public abstract void restoreReferences(Controller controller, List<Asset> assets, World world);
 
     public String getAssetId() {
         if (assetId == null) {

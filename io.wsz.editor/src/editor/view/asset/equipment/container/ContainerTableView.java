@@ -60,7 +60,7 @@ public class ContainerTableView extends EquipmentTableView<Container> {
         List<Container> output = new ArrayList<>(1);
         for (Container p
                 : selectedAssets) {
-            Container c = new Container(p, true);
+            Container c = new Container(p);
             clonePrototypePos(rawPos, p, c);
             output.add(c);
         }

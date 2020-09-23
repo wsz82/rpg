@@ -69,7 +69,7 @@ public class CreatureTableView extends AssetsTableView<Creature> {
         List<Creature> selectedAssets = getSelectionModel().getSelectedItems();
         List<Creature> output = new ArrayList<>(1);
         for (Creature p : selectedAssets) {
-            Creature cr = new Creature(p, true);
+            Creature cr = new Creature(p);
             clonePrototypePos(rawPos, p, cr);
             output.add(cr);
         }

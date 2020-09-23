@@ -27,8 +27,8 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
         this.animationPos = new AnimationPos();
     }
 
-    public Cover(Cover prototype, Boolean visible) {
-        super(prototype, visible);
+    public Cover(Cover prototype) {
+        super(prototype);
         this.animationPos = new AnimationPos();
     }
 

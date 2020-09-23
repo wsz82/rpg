@@ -41,7 +41,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         List<InDoor> selectedAssets = getSelectionModel().getSelectedItems();
         List<InDoor> output = new ArrayList<>(1);
         for (InDoor p : selectedAssets) {
-            InDoor id = new InDoor(p, true);
+            InDoor id = new InDoor(p);
             clonePrototypePos(rawPos, p, id);
             output.add(id);
         }

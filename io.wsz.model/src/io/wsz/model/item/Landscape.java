@@ -26,8 +26,8 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
         this.animationPos = new AnimationPos();
     }
 
-    public Landscape(Landscape prototype, Boolean visible) {
-        super(prototype, visible);
+    public Landscape(Landscape prototype) {
+        super(prototype);
         this.animationPos = new AnimationPos();
     }
 

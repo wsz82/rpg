@@ -2,10 +2,7 @@ package io.wsz.model.script;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.script.command.Executable;
-import io.wsz.model.script.command.GiveToAdversary;
-import io.wsz.model.script.command.GlobalVariableSet;
-import io.wsz.model.script.command.add.AddNew;
+import io.wsz.model.script.command.*;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -36,6 +33,8 @@ public class Script implements Externalizable {
                 executable = GiveToAdversary.parseCommand(commandToParse);
             } else if (commandToParse.startsWith(ADD_NEW)) {
                 executable = AddNew.parseCommand(commandToParse);
+            } else if (commandToParse.startsWith(REMOVE)) {
+                executable = Remove.parseCommand(commandToParse);
             }
 
             if (executable != null) {

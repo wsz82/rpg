@@ -215,7 +215,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
             output.add(countable);
         } else {
             for (int i = 0; i < count; i++) {
-                Equipment cloned = toClone.cloneEquipment();
+                Equipment cloned = toClone.cloneEquipment(false);
                 output.add(cloned);
             }
         }

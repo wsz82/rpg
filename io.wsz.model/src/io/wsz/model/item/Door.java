@@ -34,8 +34,8 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
         openableItem = new OpenableItem();
     }
 
-    public Door(I prototype, Boolean visible) {
-        super(prototype, visible);
+    public Door(I prototype) {
+        super(prototype);
         this.animationPos = new OpenableAnimationPos();
     }
 

@@ -41,7 +41,7 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
         List<Landscape> selectedAssets = getSelectionModel().getSelectedItems();
         List<Landscape> output = new ArrayList<>(1);
         for (Landscape p : selectedAssets) {
-            Landscape l = new Landscape(p, true);
+            Landscape l = new Landscape(p);
             clonePrototypePos(rawPos, p, l);
             output.add(l);
         }

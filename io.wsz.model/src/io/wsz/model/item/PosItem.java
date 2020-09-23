@@ -10,6 +10,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
+import io.wsz.model.world.World;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -20,6 +21,7 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> extends Asset implements Updatable, Interactable, Animable {
     private static final long serialVersionUID = 1L;
@@ -28,6 +30,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     protected Controller controller;
 
+    protected String itemId;
     protected BooleanProperty isVisible;
     protected BooleanProperty isBlocked;
     protected Coords pos;
@@ -55,19 +58,24 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.collisionPolygons = new ArrayList<>(0);
     }
 
-    public PosItem(A prototype, Boolean isVisible) {
+    public PosItem(A prototype) {
         this.prototype = prototype;
-        this.isVisible = new SimpleBooleanProperty(this, "isVisible", isVisible);
+        this.isVisible = new SimpleBooleanProperty(this, "isVisible", true);
         this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", false);
         this.pos = new Coords();
     }
 
-    public PosItem(PosItem<A, B> other) {
+    public PosItem(PosItem<A, B> other, boolean keepId) {
         super(other);
+        this.prototype = other.prototype;
+        if (keepId) {
+            this.itemId = other.itemId;
+        } else {
+            this.itemId = getUniqueId(other.itemId);
+        }
         this.isVisible = new SimpleBooleanProperty(this, "isVisible", other.isVisible.get());
         this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", other.isBlocked.get());
         this.pos = other.pos.clonePos();
-        this.prototype = other.prototype;
         this.coverLine = Geometry.cloneCoordsList(other.coverLine);
         this.collisionPolygons = Geometry.cloneCoordsPolygons(other.collisionPolygons);
         this.dialog = other.dialog;
@@ -78,6 +86,27 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
             this.interactionPoint = interactionCoords.clonePos();
         }
         this.image = other.image;
+    }
+
+    private String getUniqueId(String itemId) {
+        if (doesItemIdAlreadyExist(itemId)) {
+            itemId += 1;
+            return getUniqueId(itemId);
+        } else {
+            return itemId;
+        }
+    }
+
+    private boolean doesItemIdAlreadyExist(String itemId) {
+        return getController().getLocations().stream()
+                .anyMatch(l -> l.getItems().stream().anyMatch(i -> {
+                    String id = i.getItemId();
+                    if (id == null) {
+                        return false;
+                    } else {
+                        return id.equals(itemId);
+                    }
+                }));
     }
 
     public Coords getImageCenter() {
@@ -213,6 +242,14 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     public void onChangeLocationAction(Location location) {
         pos.setLocation(location);
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
     public Boolean getIsVisible() {
@@ -362,6 +399,43 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     public void setController(Controller controller) {
         this.controller = controller;
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        restorePrototype(assets);
+        controller.restoreLocationOfCoords(pos);
+        restoreDialog(world.getDialogs());
+    }
+
+    private void restorePrototype(List<Asset> assets) {
+        A serPrototype = getPrototype();
+        if (serPrototype != null) {
+            String prototypeName = serPrototype.getAssetId();
+
+            Optional<Asset> optAsset = assets.stream()
+                    .filter(a -> a.getAssetId().equals(prototypeName))
+                    .findFirst();
+            A p = (A) optAsset.orElse(null);
+            if (p == null) {
+                throw new NullPointerException(prototypeName + " reference is not found");
+            }
+            setPrototype(p);
+        }
+    }
+
+    private void restoreDialog(List<Dialog> dialogs) {
+        Dialog serDialog = dialog;
+        if (serDialog == null) return;
+        String serID = serDialog.getID();
+        Optional<Dialog> optDialog = dialogs.stream()
+                .filter(d -> d.getID().equals(serID))
+                .findFirst();
+        Dialog dialog = optDialog.orElse(null);
+        if (dialog == null) {
+            throw new NullPointerException(getAssetId() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
+        }
+        setDialog(dialog);
     }
 
     @Override
@@ -564,6 +638,8 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         out.writeObject(prototype);
 
+        out.writeObject(itemId);
+
         out.writeObject(animationSpeed);
 
         out.writeBoolean(isVisible.get());
@@ -591,6 +667,8 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         long ver = in.readLong();
 
         prototype = (A) in.readObject();
+
+        itemId = (String) in.readObject();
 
         animationSpeed = (Double) in.readObject();
 

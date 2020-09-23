@@ -3,9 +3,11 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -34,8 +36,8 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         this.teleportCollisionPolygons = new ArrayList<>(0);
     }
 
-    public Teleport(Teleport prototype, Boolean visible) {
-        super(prototype, visible);
+    public Teleport(Teleport prototype) {
+        super(prototype);
         this.animationPos = new AnimationPos();
         this.teleportableDelagate = new TeleportableDelagate();
     }
@@ -47,6 +49,13 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
 
     public void enter(Creature cr) {
         teleportableDelagate.teleport(cr, getExit(), getController());
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        super.restoreReferences(controller, assets, world);
+        Coords exit = getExit();
+        controller.restoreLocationOfCoords(exit);
     }
 
     public Coords getIndividualExit() {

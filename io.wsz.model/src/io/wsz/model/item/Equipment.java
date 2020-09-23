@@ -2,10 +2,12 @@ package io.wsz.model.item;
 
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -13,14 +15,15 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Takeable {
     private static final long serialVersionUID = 1L;
 
-    public static List<Equipment> cloneEquipmentList(List<Equipment> equipment) {
+    public static List<Equipment> cloneEquipmentList(List<Equipment> equipment, boolean keepId) {
         List<Equipment> clone = new ArrayList<>(equipment.size());
         for (Equipment e : equipment) {
-            clone.add(e.cloneEquipment());
+            clone.add(e.cloneEquipment(keepId));
         }
         return clone;
     }
@@ -36,12 +39,12 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         super(type, controller);
     }
 
-    public Equipment(E prototype, Boolean visible) {
-        super(prototype, visible);
+    public Equipment(E prototype) {
+        super(prototype);
     }
 
-    public Equipment(Equipment other) {
-        super(other);
+    public Equipment(Equipment other, boolean keepId) {
+        super(other, keepId);
         this.occupiedPlace = other.occupiedPlace;
         this.weight = other.weight;
         this.size = other.size;
@@ -170,10 +173,39 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     @Override
     public abstract B getAnimationPos();
 
-    public abstract Equipment cloneEquipment();
+    public abstract Equipment cloneEquipment(boolean keepId);
 
     public boolean isCountable() {
         return false;
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        super.restoreReferences(controller, assets, world);
+        restoreEquipmentType(world.getEquipmentTypes());
+        restoreOccupiedPlace(controller, world.getInventoryPlaces());
+    }
+
+    private void restoreEquipmentType(List<EquipmentType> types) {
+        EquipmentType serEquipmentType = equipmentType;
+        if (serEquipmentType == null) {
+            return;
+        }
+        Optional<EquipmentType> optType = types.stream()
+                .filter(t -> t.getId().equals(serEquipmentType.getId()))
+                .findFirst();
+        EquipmentType equipmentType = optType.orElse(null);
+        if (equipmentType == null) {
+            throw new NullPointerException("Equipment type \"" + serEquipmentType.getId() + "\" should be in list of equipment types");
+        }
+        setEquipmentType(equipmentType);
+    }
+
+    private void restoreOccupiedPlace(Controller controller, List<InventoryPlaceType> places) {
+        InventoryPlaceType serOccupiedPlace = occupiedPlace;
+        InventoryPlaceType place = controller.getReferencedPlaceType(places, serOccupiedPlace);
+        if (place == null) return;
+        setOccupiedPlace(place);
     }
 
     public InventoryPlaceType getIndividualOccupiedPlace() {

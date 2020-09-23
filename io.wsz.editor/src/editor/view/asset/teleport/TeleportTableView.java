@@ -86,7 +86,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         List<Teleport> selectedAssets = getSelectionModel().getSelectedItems();
         List<Teleport> output = new ArrayList<>(1);
         for (Teleport p : selectedAssets) {
-            Teleport t = new Teleport(p, true);
+            Teleport t = new Teleport(p);
             clonePrototypePos(rawPos, p, t);
             output.add(t);
         }

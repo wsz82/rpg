@@ -1,10 +1,9 @@
-package io.wsz.model.script.command.add;
+package io.wsz.model.script.command;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
-import io.wsz.model.script.command.Executable;
 import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
@@ -83,31 +82,31 @@ public class AddNew implements Executable, Externalizable {
         double toY = Double.parseDouble(posY);
 
         if (prototype instanceof Container) {
-            Container container = new Container((Container) prototype, true);
+            Container container = new Container((Container) prototype);
             setUpItem(container, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Cover) {
-            Cover cover = new Cover((Cover) prototype, true);
+            Cover cover = new Cover((Cover) prototype);
             setUpItem(cover, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Creature) {
-            Creature creature = new Creature((Creature) prototype, true);
+            Creature creature = new Creature((Creature) prototype);
             setUpCreatureItem(creature, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof InDoor) {
-            InDoor inDoor = new InDoor((InDoor) prototype, true);
+            InDoor inDoor = new InDoor((InDoor) prototype);
             setUpItem(inDoor, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Landscape) {
-            Landscape landscape = new Landscape((Landscape) prototype, true);
+            Landscape landscape = new Landscape((Landscape) prototype);
             setUpItem(landscape, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Misc){
-            Misc misc = new Misc((Misc) prototype, true);
+            Misc misc = new Misc((Misc) prototype);
             setUpItem(misc, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof OutDoor) {
-            OutDoor outDoor = new OutDoor((OutDoor) prototype, true);
+            OutDoor outDoor = new OutDoor((OutDoor) prototype);
             setUpItem(outDoor, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Teleport) {
-            Teleport teleport = new Teleport((Teleport) prototype, true);
+            Teleport teleport = new Teleport((Teleport) prototype);
             setUpItem(teleport, toLocation, toLevel, toX, toY);
         } else if (prototype instanceof Weapon) {
-            Weapon weapon = new Weapon((Weapon) prototype, true);
+            Weapon weapon = new Weapon((Weapon) prototype);
             setUpItem(weapon, toLocation, toLevel, toX, toY);
         }
     }

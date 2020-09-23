@@ -219,7 +219,7 @@ public class InventoryView {
         Creature creature = controller.getCreatureToOpenInventory();
         boolean canEquipmentBeRemoved = viewElement.tryRemove(selected, creature);
         if (canEquipmentBeRemoved) {
-            Equipment dragged = selected.cloneEquipment();
+            Equipment dragged = selected.cloneEquipment(true);
             gameController.setDragged(dragged);
             draggedInitWidth = dragged.getImageWidth();
             draggedInitHeight = dragged.getImageHeight();
@@ -255,10 +255,10 @@ public class InventoryView {
 
     private void moveCountableEquipment(double mouseX, double mouseY, Creature hoveredHero, Creature cr, EquipmentMayCountable countable, Integer amount) {
         EquipmentMayCountable[] toLeave = new EquipmentMayCountable[1];
-        toLeave[0] = countable.cloneEquipment();
+        toLeave[0] = countable.cloneEquipment(true);
         toLeave[0].setAmount(0);
         EquipmentMayCountable[] toMove = new EquipmentMayCountable[1];
-        toMove[0] = countable.cloneEquipment();
+        toMove[0] = countable.cloneEquipment(false);
         toMove[0].setAmount(amount);
 
         InventoryMoveAction countableMoveAction = () -> {

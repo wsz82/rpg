@@ -41,7 +41,7 @@ public class MiscTableView extends EquipmentTableView<Misc> {
         List<Misc> selectedAssets = getSelectionModel().getSelectedItems();
         List<Misc> output = new ArrayList<>(1);
         for (Misc p : selectedAssets) {
-            Misc m = new Misc(p, true);
+            Misc m = new Misc(p);
             clonePrototypePos(rawPos, p, m);
             output.add(m);
         }

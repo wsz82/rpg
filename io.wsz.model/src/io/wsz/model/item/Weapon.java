@@ -30,13 +30,13 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Weapon(Weapon prototype, Boolean visible) {
-        super(prototype, visible);
+    public Weapon(Weapon prototype) {
+        super(prototype);
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Weapon(Weapon other) {
-        super(other);
+    public Weapon(Weapon other, boolean keepId) {
+        super(other, keepId);
         this.animationPos = new EquipmentAnimationPos(other.getAnimationPos());
         this.damage = other.damage;
         this.range = other.range;
@@ -50,8 +50,8 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     }
 
     @Override
-    public Weapon cloneEquipment() {
-        return new Weapon(this);
+    public Weapon cloneEquipment(boolean keepId) {
+        return new Weapon(this, keepId);
     }
 
     public Double getIndividualDamage() {

@@ -42,7 +42,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
         List<Cover> output = new ArrayList<>(1);
         for (Cover p
                 : selectedAssets) {
-            Cover cover = new Cover(p, true);
+            Cover cover = new Cover(p);
             clonePrototypePos(rawPos, p, cover);
             output.add(cover);
         }

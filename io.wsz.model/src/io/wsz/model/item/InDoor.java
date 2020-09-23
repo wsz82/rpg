@@ -12,8 +12,8 @@ public class InDoor extends Door<InDoor> {
         super(ItemType.INDOOR, controller);
     }
 
-    public InDoor(InDoor prototype, Boolean visible) {
-        super(prototype, visible);
+    public InDoor(InDoor prototype) {
+        super(prototype);
         setOpen(prototype.isOpen());
     }
 

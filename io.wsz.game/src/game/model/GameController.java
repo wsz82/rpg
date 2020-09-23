@@ -13,9 +13,10 @@ import game.view.world.board.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.Equipment;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
@@ -240,10 +241,7 @@ public class GameController {
 
         List<Asset> assets = world.getAssets();
         List<Location> locations = world.getLocations();
-        List<InventoryPlaceType> inventoryPlaces = world.getInventoryPlaces();
-        List<EquipmentType> equipmentTypes = world.getEquipmentTypes();
-        List<Dialog> dialogs = world.getDialogs();
-        controller.restoreItemsReferences(assets, locations, inventoryPlaces, equipmentTypes, dialogs);
+        controller.restoreItemsReferences(assets, locations, world);
     }
 
     public void restoreActivePlugin() {

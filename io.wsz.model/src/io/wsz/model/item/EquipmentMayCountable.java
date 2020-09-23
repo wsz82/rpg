@@ -26,17 +26,17 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         super(type, controller);
     }
 
-    public EquipmentMayCountable(E prototype, Boolean visible) {
-        super(prototype, visible);
+    public EquipmentMayCountable(E prototype) {
+        super(prototype);
     }
 
-    public EquipmentMayCountable(EquipmentMayCountable<E,A> other) {
-        super(other);
+    public EquipmentMayCountable(EquipmentMayCountable<E,A> other, boolean keepId) {
+        super(other, keepId);
         this.isCountable = other.isCountable;
         this.amount = other.amount;
     }
 
-    public abstract EquipmentMayCountable cloneEquipment();
+    public abstract EquipmentMayCountable cloneEquipment(boolean keepId);
 
     @Override
     public Double getWeight() {

@@ -146,6 +146,10 @@ public class CountableRelocationWindow {
     }
 
     private void closeWindowWithAccept() {
+        if (toLeave[0].getAmount() == 0) {
+            String itemId = toLeave[0].getItemId();
+            toMove[0].setItemId(itemId);
+        }
         moveAction.perform();
         removeRemovableEvents();
         isOpened = false;

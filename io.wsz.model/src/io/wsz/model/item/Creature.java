@@ -6,6 +6,7 @@ import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.animation.creature.CreatureAnimationPos;
 import io.wsz.model.animation.creature.CreatureBaseAnimationPos;
 import io.wsz.model.animation.creature.PortraitAnimation;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
@@ -15,10 +16,12 @@ import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
+import io.wsz.model.world.World;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,8 +67,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.inventory = new Inventory(this);
     }
 
-    public Creature(Creature prototype, Boolean visible) {
-        super(prototype, visible);
+    public Creature(Creature prototype) {
+        super(prototype);
         this.animationPos = new CreatureAnimationPos();
         this.portraitAnimationPos = new AnimationPos();
         this.baseAnimationPos = new CreatureBaseAnimationPos();
@@ -404,6 +407,24 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public List<Equipment> getItems() {
         return inventory.getItems();
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        super.restoreReferences(controller, assets, world);
+        restoreCreatureEquippedItemsPlaces(controller, world.getInventoryPlaces());
+        getItems().forEach(e -> e.restoreReferences(controller, assets, world));
+    }
+
+    private void restoreCreatureEquippedItemsPlaces(Controller controller, List<InventoryPlaceType> places) {
+        Inventory inventory = getInventory();
+        Map<InventoryPlaceType, Equipment> equippedItems = inventory.getEquippedItems();
+        Map<InventoryPlaceType,Equipment> restored = new HashMap<>(equippedItems.size());
+        for (InventoryPlaceType serType : equippedItems.keySet()) {
+            InventoryPlaceType typeWithRef = controller.getReferencedPlaceType(places, serType);
+            restored.put(typeWithRef, equippedItems.get(serType));
+        }
+        inventory.setEquippedItems(restored);
     }
 
     public Task getTask() {

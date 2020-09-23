@@ -25,20 +25,20 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Misc(Misc prototype, Boolean visible) {
-        super(prototype, visible);
+    public Misc(Misc prototype) {
+        super(prototype);
         this.animationPos = new EquipmentAnimationPos();
     }
 
-    public Misc(Misc other) {
-        super(other);
+    public Misc(Misc other, boolean keepId) {
+        super(other, keepId);
         this.animationPos = new EquipmentAnimationPos(other.getAnimationPos());
         this.equipmentType = other.equipmentType;
     }
 
     @Override
-    public Misc cloneEquipment() {
-        return new Misc(this);
+    public Misc cloneEquipment(boolean keepId) {
+        return new Misc(this, keepId);
     }
 
     @Override

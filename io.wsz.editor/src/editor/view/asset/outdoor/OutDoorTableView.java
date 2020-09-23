@@ -58,7 +58,7 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         List<OutDoor> selectedAssets = getSelectionModel().getSelectedItems();
         List<OutDoor> output = new ArrayList<>(1);
         for (OutDoor p : selectedAssets) {
-            OutDoor od = new OutDoor(p, true);
+            OutDoor od = new OutDoor(p);
             clonePrototypePos(rawPos, p, od);
             output.add(od);
         }

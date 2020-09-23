@@ -3,14 +3,19 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.animation.openable.OpenableAnimationType;
+import io.wsz.model.asset.Asset;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
+import io.wsz.model.world.World;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
+import java.util.Optional;
 
 public class OutDoor extends Door<OutDoor> {
     private static final long serialVersionUID = 1L;
@@ -26,8 +31,8 @@ public class OutDoor extends Door<OutDoor> {
         this.exit = new Coords();
     }
 
-    public OutDoor(OutDoor prototype, Boolean visible) {
-        super(prototype, visible);
+    public OutDoor(OutDoor prototype) {
+        super(prototype);
         this.teleportableDelagate = new TeleportableDelagate();
         setOpen(prototype.isOpen());
     }
@@ -39,6 +44,34 @@ public class OutDoor extends Door<OutDoor> {
 
     public boolean enter(Creature cr) {
         return teleportableDelagate.teleport(cr, getExit(), getController());
+    }
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        super.restoreReferences(controller, assets, world);
+        Coords exit = getExit();
+        controller.restoreLocationOfCoords(exit);
+        restoreOutDoorConnection(controller);
+    }
+
+    private void restoreOutDoorConnection(Controller controller) {
+        OutDoor serConnection = connection;
+        if (serConnection == null) return;
+        String name = serConnection.getAssetId();
+        Coords pos = serConnection.getPos();
+        controller.restoreLocationOfCoords(pos);
+        Location location = pos.getLocation();
+        Optional<OutDoor> optConnection = location.getItems().stream()
+                .filter(o -> o instanceof OutDoor)
+                .map(o -> (OutDoor) o)
+                .filter(o -> o.getAssetId().equals(name))
+                .filter(o -> o.getPos().equals(pos))
+                .findFirst();
+        OutDoor connection = optConnection.orElse(null);
+        if (connection == null) {
+            throw new NullPointerException("OutDoor connection \"" + serConnection.getAssetId() + "\" should be in location outDoors list");
+        }
+        setConnection(connection);
     }
 
     public Coords getIndividualExit() {
