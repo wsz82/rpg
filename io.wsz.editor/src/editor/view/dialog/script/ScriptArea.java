@@ -34,7 +34,7 @@ public class ScriptArea {
 
     public Script getScript() {
         String text = textArea.getText();
-        return Script.parseScript(text);
+        return Script.parseScript(text, editorController.getController());
     }
 
     public VBox getScriptArea() {

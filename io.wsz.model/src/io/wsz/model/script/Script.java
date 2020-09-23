@@ -9,21 +9,39 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import static io.wsz.model.script.ScriptKeyWords.*;
 
-public class Script implements Externalizable {
+public class Script implements Externalizable, Executable {
     private static final long serialVersionUID = 1L;
 
+    public static Script parseScript(String s, Controller controller) {
+        if (s == null || s.isEmpty()) return null;
+        Script script = new Script();
+        script.fillScript(s, controller);
+        return script;
+    }
+
+    private String id;
     private String initialText;
     private ArrayDeque<Executable> executables;
 
-    public static Script parseScript(String s) {
-        if (s == null || s.isEmpty()) return null;
-        Script script = new Script();
-        script.initialText = s;
-        s = s.replaceAll("\\s+", "");
-        String[] commandsToParse = s.split(";");
+    public Script() {
+    }
+
+    public Script(String id) {
+        this.id = id;
+    }
+
+    public void fillScript(String initialText, Controller controller) {
+        if (executables != null) {
+            executables.clear();
+        }
+        if (initialText == null) return;
+        this.initialText = initialText;
+        initialText = initialText.replaceAll("\\s+", "");
+        String[] commandsToParse = initialText.split(";");
 
         for (String commandToParse : commandsToParse) {
             Executable executable = null;
@@ -35,16 +53,25 @@ public class Script implements Externalizable {
                 executable = AddNew.parseCommand(commandToParse);
             } else if (commandToParse.startsWith(REMOVE)) {
                 executable = Remove.parseCommand(commandToParse);
+            } else if (commandToParse.startsWith(RUN)) {
+                executable = getScriptToRun(controller, commandToParse);
             }
 
             if (executable != null) {
-                if (script.executables == null) {
-                    script.executables = new ArrayDeque<>(1);
+                if (executables == null) {
+                    executables = new ArrayDeque<>(1);
                 }
-                script.executables.addFirst(executable);
+                executables.addFirst(executable);
             }
         }
-        return script;
+    }
+
+    private Executable getScriptToRun(Controller controller, String commandToParse) {
+        String scriptToRunId = commandToParse.replaceFirst(RUN, "");
+        Executable scriptToRun = controller.getModel().getActivePlugin().getWorld().getScripts().stream()
+                .filter(s -> s.getId().equals(scriptToRunId))
+                .findFirst().orElse(null);
+        return scriptToRun;
     }
 
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
@@ -53,18 +80,50 @@ public class Script implements Externalizable {
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getInitialText() {
         return initialText;
     }
 
+    public ArrayDeque<Executable> getExecutables() {
+        return executables;
+    }
+
+    @Override
+    public String toString() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Script)) return false;
+        Script script = (Script) o;
+        return Objects.equals(getId(), script.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(id);
         out.writeObject(initialText);
-        out.writeObject(executables);
+        out.writeObject(executables); //TODO write only id of script if is in executables
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = (String) in.readObject();
         initialText = (String) in.readObject();
         executables = (ArrayDeque<Executable>) in.readObject();
     }

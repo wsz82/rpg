@@ -21,6 +21,7 @@ import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.plugin.PluginFileCaretaker;
 import io.wsz.model.plugin.PluginMetadata;
+import io.wsz.model.script.Script;
 import io.wsz.model.script.variable.Variable;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.world.World;
@@ -41,6 +42,7 @@ public class EditorController {
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
     private final ObservableList<Dialog> observableDialogs = FXCollections.observableArrayList();
     private final ObservableList<Variable<?>> observableGlobalVariables = FXCollections.observableArrayList();
+    private final ObservableList<Script> observableScripts = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords(-1, -1);
 
     private PosItem activeItem;
@@ -89,6 +91,12 @@ public class EditorController {
         initInventoryPlaceTypes(newWorld);
         initDialogs(newWorld);
         initGlobalVariables(newWorld);
+        initScripts(newWorld);
+    }
+
+    private void initScripts(World newWorld) {
+        List<Script> scripts = new ArrayList<>(0);
+        newWorld.setScripts(scripts);
     }
 
     private void initGlobalVariables(World newWorld) {
@@ -119,6 +127,7 @@ public class EditorController {
         observableInventoryPlaceTypes.clear();
         observableDialogs.clear();
         observableGlobalVariables.clear();
+        observableScripts.clear();
     }
 
     private void initEquipmentTypes(World newWorld) {
@@ -172,6 +181,12 @@ public class EditorController {
         loadObservableInventoryPlaceTypesToPlugin(world);
         loadObservableDialogsToPlugin(world);
         loadObservableGlobalVariablesToPlugin(world);
+        loadObservableScriptsToPlugin(world);
+    }
+
+    private void loadObservableScriptsToPlugin(World world) {
+        List<Script> variables = new ArrayList<>(observableScripts);
+        world.setScripts(variables);
     }
 
     private void loadObservableGlobalVariablesToPlugin(World world) {
@@ -234,6 +249,13 @@ public class EditorController {
         restoreObservableInventoryPlaces(world);
         restoreObservableDialogs(world);
         restoreObservableGlobalVariables(world);
+        restoreObservableScripts(world);
+    }
+
+    private void restoreObservableScripts(World world) {
+        observableScripts.clear();
+        List<Script> scripts = world.getScripts();
+        observableScripts.addAll(scripts);
     }
 
     private void restoreObservableGlobalVariables(World world) {
@@ -362,5 +384,9 @@ public class EditorController {
 
     public ObservableList<Variable<?>> getObservableGlobalVariables() {
         return observableGlobalVariables;
+    }
+
+    public ObservableList<Script> getObservableScripts() {
+        return observableScripts;
     }
 }

@@ -14,6 +14,7 @@ import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import editor.view.script.GlobalVariablesEditStage;
+import editor.view.script.ScriptsEditStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.plugin.PluginMetadata;
@@ -175,7 +176,28 @@ class MainView {
         final Menu view = getMenuView();
         final Menu location = getMenuLocation();
         final Menu world = getMenuWorld();
-        return new MenuBar(file, view, location, world);
+        final Menu script = getMenuScript();
+        return new MenuBar(file, view, location, world, script);
+    }
+
+    private Menu getMenuScript() {
+        final Menu script = new Menu("Script");
+
+        final MenuItem scripts = getScriptsMenuItem();
+        final MenuItem globalVariables = getGlobalVariablesMenuItem();
+
+        script.getItems().addAll(scripts, globalVariables);
+        return script;
+    }
+
+    private MenuItem getScriptsMenuItem() {
+        final MenuItem scripts = new MenuItem("Scripts");
+        scripts.setOnAction(event -> {
+            ScriptsEditStage scriptsEditStage = new ScriptsEditStage(mainStage, editorController);
+            scriptsEditStage.initStage();
+            scriptsEditStage.show();
+        });
+        return scripts;
     }
 
     private Menu getMenuWorld() {
@@ -184,9 +206,8 @@ class MainView {
         final MenuItem weaponTypes = getEquipmentTypesMenuItem();
         final MenuItem inventoryPlaces = getInventoryPlacesMenuItem();
         final MenuItem dialogs = getDialogsMenuItem();
-        final MenuItem globalVariables = getGlobalVariablesMenuItem();
 
-        world.getItems().addAll(weaponTypes, inventoryPlaces, dialogs, globalVariables);
+        world.getItems().addAll(weaponTypes, inventoryPlaces, dialogs);
         return world;
     }
 
