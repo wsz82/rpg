@@ -45,6 +45,8 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         super(prototype, visible);
         this.animationPos = new ContainerAnimationPos();
         this.items = new ArrayList<>(0);
+        getItems().addAll(prototype.getItems());
+        setOpen(prototype.isOpen());
     }
 
     public Container(Container other) {

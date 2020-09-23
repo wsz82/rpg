@@ -80,8 +80,7 @@ public class WeaponsTableView extends EquipmentTableView<Weapon> {
     protected List<Weapon> createItems(Coords rawPos) {
         List<Weapon> selectedAssets = getSelectionModel().getSelectedItems();
         List<Weapon> output = new ArrayList<>(1);
-        for (Weapon p
-                : selectedAssets) {
+        for (Weapon p : selectedAssets) {
             Weapon w = new Weapon(p, true);
             clonePrototypePos(rawPos, p, w);
             output.add(w);

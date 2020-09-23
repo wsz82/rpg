@@ -60,8 +60,6 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         for (OutDoor p : selectedAssets) {
             OutDoor od = new OutDoor(p, true);
             clonePrototypePos(rawPos, p, od);
-            od.setOpen(p.isOpen());
-
             output.add(od);
         }
         return output;

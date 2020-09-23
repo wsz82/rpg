@@ -62,9 +62,6 @@ public class ContainerTableView extends EquipmentTableView<Container> {
                 : selectedAssets) {
             Container c = new Container(p, true);
             clonePrototypePos(rawPos, p, c);
-            c.getItems().addAll(p.getItems());
-            c.setOpen(p.isOpen());
-
             output.add(c);
         }
         return output;

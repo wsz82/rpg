@@ -70,6 +70,10 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.portraitAnimationPos = new AnimationPos();
         this.baseAnimationPos = new CreatureBaseAnimationPos();
         this.task = new Task(new Coords(-1, -1));
+        Task pTasks = prototype.getTask();
+        pTasks.cloneTo(this);
+        setInventory(new Inventory(this));
+        getInventory().getItems().addAll(prototype.getInventory().getItems());
     }
 
     @Override

@@ -29,6 +29,7 @@ public class OutDoor extends Door<OutDoor> {
     public OutDoor(OutDoor prototype, Boolean visible) {
         super(prototype, visible);
         this.teleportableDelagate = new TeleportableDelagate();
+        setOpen(prototype.isOpen());
     }
 
     @Override

@@ -14,6 +14,7 @@ public class InDoor extends Door<InDoor> {
 
     public InDoor(InDoor prototype, Boolean visible) {
         super(prototype, visible);
+        setOpen(prototype.isOpen());
     }
 
     @Override

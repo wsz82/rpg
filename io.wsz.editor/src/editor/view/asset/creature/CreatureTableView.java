@@ -4,9 +4,7 @@ import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
-import io.wsz.model.item.Inventory;
 import io.wsz.model.item.ItemType;
-import io.wsz.model.item.Task;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -70,17 +68,9 @@ public class CreatureTableView extends AssetsTableView<Creature> {
     protected List<Creature> createItems(Coords rawPos) {
         List<Creature> selectedAssets = getSelectionModel().getSelectedItems();
         List<Creature> output = new ArrayList<>(1);
-        for (Creature p
-                : selectedAssets) {
+        for (Creature p : selectedAssets) {
             Creature cr = new Creature(p, true);
             clonePrototypePos(rawPos, p, cr);
-
-            Task pTasks = p.getTask();
-            pTasks.cloneTo(cr);
-
-            cr.setInventory(new Inventory(cr));
-            cr.getInventory().getItems().addAll(p.getInventory().getItems());
-
             output.add(cr);
         }
         return output;
