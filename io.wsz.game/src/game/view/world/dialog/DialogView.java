@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.*;
 
 public class DialogView {
-    private static final double MAX_HEIGHT = 1.0/2;
-    private static final double TEXT_FIELD_WIDTH = 3.0/5;
-    private static final double SCROLL_BAR_PART = 1.0/50;
+    private static final double MAX_HEIGHT = 0.5;
+    private static final double TEXT_FIELD_WIDTH = 0.6;
+    private static final double SCROLL_BAR_PART = 0.02;
+    private static final double END_BUTTON_WIDTH_PART = 0.5;
+    private static final double END_BUTTON_HEIGHT_PART = 0.1;
 
     private final Canvas canvas;
     private final GameController gameController;
@@ -94,6 +96,10 @@ public class DialogView {
 
         clear();
 
+        if (dialogMemento.isFinished()) {
+            drawEndButton();
+        }
+
         if (dialogs.isEmpty()) {
             initConversation();
         }
@@ -102,6 +108,10 @@ public class DialogView {
         drawQuestions(lastPos);
 
         drawScrollBar(dialogTop);
+    }
+
+    private void drawEndButton() {
+
     }
 
     private void reloadDialogPictures(List<DialogItem> dialogs) {

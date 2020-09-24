@@ -95,6 +95,7 @@ public class GameController {
         DialogMemento dialogMemento = memento.getDialogMemento();
         if (dialogMemento != null) {
             controller.setDialogMemento(dialogMemento);
+            setDialog(true);
             restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getNpc());
         }
         return memento;

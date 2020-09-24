@@ -26,18 +26,17 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 public class GameRunner {
     private static final ArrayDeque<Runnable> LATER_RUN_BUFFER = new ArrayDeque<>(0);
 
-    private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
+    public static void runLater(Runnable laterRunner) {
+        LATER_RUN_BUFFER.addLast(laterRunner);
+    }
 
+    private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
     private final GameController gameController;
     private final Controller controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
     private final AtomicBoolean areImagesReloaded = new AtomicBoolean(false);
 
     private Thread gameThread;
-
-    public static void runLater(Runnable laterRunner) {
-        LATER_RUN_BUFFER.addLast(laterRunner);
-    }
 
     public GameRunner(GameController gameController) {
         this.gameController = gameController;
@@ -113,6 +112,9 @@ public class GameRunner {
     }
 
     private void updateModel() {
+        if (!gameController.isGame()) {
+            return;
+        }
         if (gameController.isDialog()) {
             return;
         }
@@ -257,12 +259,14 @@ public class GameRunner {
     }
 
     private void loadSave(SaveMemento memento) {
+        LATER_RUN_BUFFER.clear();
         gameController.restoreSaveMemento(memento);
         gameController.initLoadedGameSettings(memento);
         controller.initLoadGameHeroes(memento.getHeroes());
     }
 
     private void loadNewGame() {
+        LATER_RUN_BUFFER.clear();
         gameController.restoreActivePlugin();
         gameController.initNewGameSettings();
         controller.initNewGameHeroes();
