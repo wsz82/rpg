@@ -205,19 +205,9 @@ public class AnswersCenterView {
     private void startEditAnswerDetails(AnswerItem newAnswerItem) {
         Answer answer = newAnswerItem.answer;
         answerTextArea.setText(answer.getText());
-        String questionsListID = answer.getQuestionsListID();
-        QuestionsList questionsList = getAnswerWithID(questionsListID);
         answerRequirementsListView.clear();
         answerRequirementsListView.populate(answer.getRequirements());
         scriptArea.restoreScript(answer.getBeginScript());
-    }
-
-    private QuestionsList getAnswerWithID(String questionsListID) {
-        Optional<QuestionsList> optQuestionsList = questionsLists.stream()
-                .filter(Objects::nonNull)
-                .filter(a -> a.getID().equals(questionsListID))
-                .findFirst();
-        return optQuestionsList.orElse(null);
     }
 
     private void setUpAnswersTableContextMenu() {

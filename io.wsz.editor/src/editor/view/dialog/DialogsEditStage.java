@@ -368,6 +368,7 @@ public class DialogsEditStage extends ChildStage {
     }
 
     private void saveDialog(Dialog dialog) {
+        saveCurrentAnswersList();
         List<AnswersList> answersLists = new ArrayList<>(observableAnswersList);
         answersLists.remove(null);
         dialog.setAnswersLists(answersLists);
@@ -382,8 +383,15 @@ public class DialogsEditStage extends ChildStage {
         }
     }
 
+    private void saveCurrentAnswersList() {
+        AnswersList selectedAnswersList = answersListView.getSelectionModel().getSelectedItem();
+        if (selectedAnswersList == null) return;
+        answersCenter.saveAnswersList(selectedAnswersList);
+    }
+
     private void saveCurrentQuestionsList() {
         QuestionsList selectedQuestionsList = questionsListsView.getSelectionModel().getSelectedItem();
+        if (selectedQuestionsList == null) return;
         questionsCenter.saveCurrentQuestionsList(selectedQuestionsList);
     }
 
