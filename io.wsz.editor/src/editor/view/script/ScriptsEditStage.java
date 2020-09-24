@@ -5,12 +5,12 @@ import editor.view.stage.ChildStage;
 import io.wsz.model.script.Script;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -20,7 +20,10 @@ import java.util.stream.Collectors;
 public class ScriptsEditStage extends ChildStage {
     private final EditorController editorController;
     private ListView<Script> scriptListView;
+    private VBox center;
+    private Button validate;
     private TextArea textArea;
+    private Label invalidInfo;
 
     public ScriptsEditStage(Stage mainStage, EditorController editorController) {
         super(mainStage);
@@ -30,8 +33,8 @@ public class ScriptsEditStage extends ChildStage {
     public void initStage() {
         final BorderPane root = new BorderPane();
 
-        initTextArea();
-        root.setCenter(textArea);
+        initCenter();
+        root.setCenter(center);
 
         initScriptsListView();
         root.setLeft(scriptListView);
@@ -82,18 +85,40 @@ public class ScriptsEditStage extends ChildStage {
                 saveScript(oldScript);
             }
             if (newScript != null) {
-                textArea.setVisible(true);
+                center.setVisible(true);
                 textArea.setText(newScript.getInitialText());
+                invalidInfo.setText(newScript.getValidatorMessage());
             } else {
-                textArea.setVisible(false);
+                center.setVisible(false);
                 textArea.setText(null);
+                invalidInfo.setText(null);
             }
+        });
+    }
+
+    private void initCenter() {
+        center = new VBox(5);
+        initValidateButton();
+        HBox topBar = new HBox(5);
+        topBar.getChildren().add(validate);
+        initTextArea();
+        HBox bottomInfo = new HBox(5);
+        invalidInfo = new Label();
+        setUpInvalidInfoLabel();
+        bottomInfo.getChildren().add(invalidInfo);
+        center.getChildren().addAll(topBar, textArea, bottomInfo);
+        center.setVisible(false);
+    }
+
+    private void initValidateButton() {
+        validate = new Button("Validate");
+        validate.setOnAction(e -> {
+            saveSelectedScript();
         });
     }
 
     private void initTextArea() {
         textArea = new TextArea();
-        textArea.setVisible(false);
     }
 
     private void setUpContextMenu() {
@@ -143,12 +168,17 @@ public class ScriptsEditStage extends ChildStage {
     }
 
     private void saveSelectedScript() {
-        Script selectedItem = scriptListView.getSelectionModel().getSelectedItem();
-        if (selectedItem == null) return;
-        saveScript(selectedItem);
+        Script selected = scriptListView.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        saveScript(selected);
+        invalidInfo.setText(selected.getValidatorMessage());
     }
 
     private void saveScript(Script script) {
         script.fillScript(textArea.getText(), editorController.getController());
+    }
+
+    private void setUpInvalidInfoLabel() {
+        invalidInfo.setTextFill(Color.RED);
     }
 }

@@ -4,6 +4,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.*;
 import io.wsz.model.location.Location;
+import io.wsz.model.script.ScriptValidator;
 import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
@@ -16,7 +17,7 @@ import static io.wsz.model.script.ScriptKeyWords.ADD_NEW;
 public class AddNew implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
-    public static Executable parseCommand(String s) {
+    public static Executable parseCommand(String s, ScriptValidator validator) {
         AddNew command = new AddNew();
         String quote = "\"";
         String comma = ",";
@@ -26,6 +27,7 @@ public class AddNew implements Executable, Externalizable {
         if (nextIndex != -1) {
             String assetId = s.substring(1, nextIndex - 1);
             command.assetId = assetId;
+            validator.validateAsset(assetId);
             String toRemove = quote + assetId + quote + comma;
             s = s.replace(toRemove, "");
 
@@ -33,6 +35,7 @@ public class AddNew implements Executable, Externalizable {
             if (nextIndex != -1) {
                 String locationId = s.substring(1, nextIndex - 1);
                 command.locationId = locationId;
+                validator.validateLocation(locationId);
                 toRemove = quote + locationId + quote + comma;
                 s = s.replace(toRemove, "");
 
@@ -59,6 +62,7 @@ public class AddNew implements Executable, Externalizable {
                 }
             }
         }
+        validator.setSyntaxInvalid(true, s);
         return null;
     }
 

@@ -8,6 +8,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.locale.LocaleKeys;
+import io.wsz.model.script.ScriptValidator;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import static io.wsz.model.script.ScriptKeyWords.GIVE_TO_ADVERSARY;
 public class GiveToAdversary implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
-    public static Executable parseCommand(String s) {
+    public static Executable parseCommand(String s, ScriptValidator validator) {
         GiveToAdversary command = new GiveToAdversary();
         s = s.replaceFirst(GIVE_TO_ADVERSARY + "\\(\"", "");
         String comma = "\",";
@@ -39,14 +40,12 @@ public class GiveToAdversary implements Executable, Externalizable {
                 return command;
             }
         }
+        validator.setSyntaxInvalid(true, s);
         return null;
     }
 
     private String itemID;
     private String amount;
-
-    public GiveToAdversary() {
-    }
 
     @Override
     public void execute(Controller controller, PosItem giving, PosItem receiving) {

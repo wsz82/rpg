@@ -25,6 +25,7 @@ public class Script implements Externalizable, Executable {
 
     private String id;
     private String initialText;
+    private ScriptValidator validator;
     private ArrayDeque<Executable> executables;
 
     public Script() {
@@ -38,6 +39,7 @@ public class Script implements Externalizable, Executable {
         if (executables != null) {
             executables.clear();
         }
+        validator = new ScriptValidator(controller);
         if (initialText == null) return;
         this.initialText = initialText;
         initialText = initialText.replaceAll("\\s+", "");
@@ -46,15 +48,23 @@ public class Script implements Externalizable, Executable {
         for (String commandToParse : commandsToParse) {
             Executable executable = null;
             if (commandToParse.startsWith(GLOBAL + DOT)) {
-                executable = GlobalVariableSet.parseCommand(commandToParse);
+                executable = GlobalVariableSet.parseCommand(commandToParse, validator);
             } else if (commandToParse.startsWith(GIVE_TO_ADVERSARY)) {
-                executable = GiveToAdversary.parseCommand(commandToParse);
+                executable = GiveToAdversary.parseCommand(commandToParse, validator);
             } else if (commandToParse.startsWith(ADD_NEW)) {
-                executable = AddNew.parseCommand(commandToParse);
+                executable = AddNew.parseCommand(commandToParse, validator);
             } else if (commandToParse.startsWith(REMOVE)) {
-                executable = Remove.parseCommand(commandToParse);
+                executable = Remove.parseCommand(commandToParse, validator);
             } else if (commandToParse.startsWith(RUN)) {
-                executable = getScriptToRun(controller, commandToParse);
+                executable = getScriptToRun(controller, commandToParse, validator);
+            } else {
+                validator.setSyntaxInvalid(true, "empty");
+            }
+
+            if (validator.isInvalid()) {
+                validator.buildMessage();
+                System.out.println(validator.getMessage());
+                return;
             }
 
             if (executable != null) {
@@ -66,11 +76,12 @@ public class Script implements Externalizable, Executable {
         }
     }
 
-    private Executable getScriptToRun(Controller controller, String commandToParse) {
+    private Executable getScriptToRun(Controller controller, String commandToParse, ScriptValidator validator) {
         String scriptToRunId = commandToParse.replaceFirst(RUN, "");
-        Executable scriptToRun = controller.getModel().getActivePlugin().getWorld().getScripts().stream()
-                .filter(s -> s.getId().equals(scriptToRunId))
-                .findFirst().orElse(null);
+        Executable scriptToRun = controller.getScriptById(scriptToRunId);
+        if (scriptToRun == null) {
+            validator.setScriptIdInvalid(true, scriptToRunId);
+        }
         return scriptToRun;
     }
 
@@ -92,8 +103,12 @@ public class Script implements Externalizable, Executable {
         return initialText;
     }
 
-    public ArrayDeque<Executable> getExecutables() {
-        return executables;
+    public String getValidatorMessage() {
+        if (validator != null) {
+            return validator.getMessage();
+        } else {
+            return null;
+        }
     }
 
     @Override

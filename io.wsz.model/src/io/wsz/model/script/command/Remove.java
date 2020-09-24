@@ -5,6 +5,7 @@ import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
+import io.wsz.model.script.ScriptValidator;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import static io.wsz.model.script.ScriptKeyWords.REMOVE;
 public class Remove implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
-    public static Executable parseCommand(String s) {
+    public static Executable parseCommand(String s, ScriptValidator validator) {
         Remove command = new Remove();
         String closeBracket = ")";
         s = s.replaceFirst(REMOVE + "\\(", "");
@@ -28,6 +29,7 @@ public class Remove implements Executable, Externalizable {
             command.itemId = assetId;
             return command;
         }
+        validator.setSyntaxInvalid(true, s);
         return null;
     }
 

@@ -15,6 +15,8 @@ import io.wsz.model.logger.Logger;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.plugin.PluginMetadataCaretaker;
+import io.wsz.model.script.Script;
+import io.wsz.model.script.variable.Variable;
 import io.wsz.model.stage.Board;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.textures.Fog;
@@ -270,6 +272,30 @@ public class Controller {
         Plugin activePlugin = model.getActivePlugin();
         if (activePlugin == null) return null;
         return activePlugin.getWorld().getAssets();
+    }
+
+    public Script getScriptById(String id) {
+        return model.getActivePlugin().getWorld().getScripts().stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    public Variable<?> getGlobalVariableById(String id) {
+        return model.getActivePlugin().getWorld().getGlobalVariables().stream()
+                .filter(g -> g.getID().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    public Asset getAssetById(String id) {
+        return model.getActivePlugin().getWorld().getAssets().stream()
+                .filter(a -> a.getAssetId().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    public Location getLocationById(String id) {
+        return model.getActivePlugin().getWorld().getLocations().stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst().orElse(null);
     }
 
     public CurrentLocation getCurrentLocation() {
