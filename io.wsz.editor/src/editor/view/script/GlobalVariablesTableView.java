@@ -105,11 +105,20 @@ public class GlobalVariablesTableView extends TableView<GlobalVariablesTableView
 
     private String getCorrectValue(String value, VariableType type) {
         value = switch (type) {
+            case BOOLEAN -> getBooleanValue(value);
             case INTEGER -> getIntegerValue(value);
             case DECIMAL -> getDoubleValue(value);
             case STRING -> value;
         };
         return value;
+    }
+
+    private String getBooleanValue(String newValue) {
+        if (newValue.equals("true")) {
+            return "true";
+        } else {
+            return "false";
+        }
     }
 
     private String getDoubleValue(String newValue) {
@@ -182,6 +191,7 @@ public class GlobalVariablesTableView extends TableView<GlobalVariablesTableView
             String ID = item.getID();
             String value = item.getValue();
             Variable<?> variable = switch (item.getType()) {
+                case BOOLEAN -> new Variable<>(ID, Boolean.parseBoolean(value));
                 case INTEGER -> new Variable<>(ID, Integer.parseInt(value));
                 case DECIMAL -> new Variable<>(ID, Double.parseDouble(value));
                 case STRING -> new Variable<>(ID, value);
@@ -192,7 +202,9 @@ public class GlobalVariablesTableView extends TableView<GlobalVariablesTableView
     }
 
     private VariableType getVariableType(Object value) {
-        if (value instanceof Integer) {
+        if (value instanceof Boolean) {
+            return VariableType.BOOLEAN;
+        } else if (value instanceof Integer) {
             return VariableType.INTEGER;
         } else if (value instanceof Double) {
             return VariableType.DECIMAL;

@@ -28,13 +28,20 @@ public class GlobalVariableRequirementView extends AfterMethodRequirementView {
 
     private void setUpSpecificRequirement(Variable<?> newVar) {
         Object value = newVar.getValue();
-        if (value instanceof Integer) {
+        if (value instanceof Boolean) {
+            setUpBooleanGlobalVariableRequirement();
+        } else if (value instanceof Integer) {
             setUpIntegerGlobalVariableRequirement();
         } else if (value instanceof Double) {
             setUpDecimalGlobalVariableRequirement();
         } else if (value instanceof String) {
             setUpStringGlobalVariableRequirement();
         }
+    }
+
+    private void setUpBooleanGlobalVariableRequirement() {
+        this.specificRequirement = new GlobalBooleanVariableRequirementView(editorController, this);
+        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     private void setUpIntegerGlobalVariableRequirement() {

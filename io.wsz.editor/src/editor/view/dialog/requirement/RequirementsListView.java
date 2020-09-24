@@ -9,6 +9,7 @@ import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.variable.Variable;
@@ -77,6 +78,13 @@ public class RequirementsListView {
         List<BooleanStringVariableEquals> booleanStringGlobalVariablesExpressions = input.getBooleanStringGlobalVariablesExpressions();
         if (booleanStringGlobalVariablesExpressions != null) {
             for (BooleanStringVariableEquals expression : booleanStringGlobalVariablesExpressions) {
+                populateWithGlobalVariableExpression(expression, GlobalVariable);
+            }
+        }
+
+        List<BooleanTrueFalseGlobalVariable> booleanTrueFalseGlobalVariablesExpressions = input.getBooleanTrueFalseGlobalVariablesExpressions();
+        if (booleanTrueFalseGlobalVariablesExpressions != null) {
+            for (BooleanTrueFalseGlobalVariable expression : booleanTrueFalseGlobalVariablesExpressions) {
                 populateWithGlobalVariableExpression(expression, GlobalVariable);
             }
         }
@@ -154,11 +162,25 @@ public class RequirementsListView {
     private void addGlobalVariableExpression(Requirements output, RequirementView requirementView) {
         GlobalVariableRequirementView secondaryView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
         Object value = secondaryView.getVariable().getValue();
-        if (value instanceof Integer || value instanceof Double) {
+        if (value instanceof Boolean) {
+            addGlobalBooleanExpression(output, secondaryView);
+        } else if (value instanceof Integer || value instanceof Double) {
             addGlobalNumberExpression(output, secondaryView);
         } else if (value instanceof String) {
             addGlobalStringExpression(output, secondaryView);
         }
+    }
+
+    private void addGlobalBooleanExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
+        SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
+        BooleanTrueFalseGlobalVariable expression = (BooleanTrueFalseGlobalVariable) specificRequirement.getExpression();
+
+        List<BooleanTrueFalseGlobalVariable> expressions = output.getBooleanTrueFalseGlobalVariablesExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setBooleanTrueFalseGlobalVariablesExpressions(expressions);
+        }
+        expressions.add(expression);
     }
 
     private void addGlobalNumberExpression(Requirements output, GlobalVariableRequirementView secondaryView) {

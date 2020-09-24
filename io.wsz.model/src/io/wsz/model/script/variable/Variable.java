@@ -37,13 +37,19 @@ public class Variable<V> implements Externalizable {
     }
 
     public void setValue(String newVal) {
-        if (value instanceof Integer) {
+        if (value instanceof Boolean) {
+            value = (V) getBooleanValue(newVal);
+        } else if (value instanceof Integer) {
             value = (V) getIntegerValue(newVal);
         } else if (value instanceof Double) {
             value = (V) getDoubleValue(newVal);
         } else if (value instanceof String) {
             value = (V) newVal;
         }
+    }
+
+    private Boolean getBooleanValue(String newValue) {
+        return Boolean.parseBoolean(newValue);
     }
 
     private Double getDoubleValue(String newValue) {

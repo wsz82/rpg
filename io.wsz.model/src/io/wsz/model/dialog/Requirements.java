@@ -6,6 +6,7 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.script.bool.BooleanItemExpression;
 import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
 import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.variable.Variable;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class Requirements implements Externalizable {
     private static final long serialVersionUID = 1L;
     private static final Collection<Variable<String>> GLOBAL_STRING_VARIABLES = new ArrayList<>(0);
+    private static final Collection<Variable<Boolean>> GLOBAL_BOOLEAN_VARIABLES = new ArrayList<>(0);
 
     private List<BooleanCountableItem> booleanPChasItemExpressions;
     private List<BooleanCountableItem> booleanNPChasItemExpressions;
@@ -28,6 +30,7 @@ public class Requirements implements Externalizable {
     private List<BooleanItemExpression> booleanNPChasExpressions;
     private List<BooleanNumberGlobalVariable> booleanNumberGlobalVariablesExpressions;
     private List<BooleanStringVariableEquals> booleanStringGlobalVariablesExpressions;
+    private List<BooleanTrueFalseGlobalVariable> booleanTrueFalseGlobalVariablesExpressions;
 
     public boolean doMatch(Controller controller, Creature pc, PosItem npc) {
         return doMatchItemHasCountableRequirements(pc, booleanPChasItemExpressions)
@@ -35,7 +38,27 @@ public class Requirements implements Externalizable {
                 && doMatchItemHasRequirements(pc, booleanPChasExpressions)
                 && doMatchItemHasRequirements(npc, booleanNPChasExpressions)
                 && doMatchNumberGlobalVariablesExpressions(booleanNumberGlobalVariablesExpressions, controller)
-                && doMatchStringGlobalVariablesExpressions(booleanStringGlobalVariablesExpressions, controller);
+                && doMatchStringGlobalVariablesExpressions(booleanStringGlobalVariablesExpressions, controller)
+                && doMatchBooleanGlobalVariablesExpressions(booleanTrueFalseGlobalVariablesExpressions, controller);
+    }
+
+    private boolean doMatchBooleanGlobalVariablesExpressions(List<BooleanTrueFalseGlobalVariable> expressions, Controller controller) {
+        GLOBAL_BOOLEAN_VARIABLES.clear();
+        controller.getModel().getActivePlugin().getWorld().getGlobalVariables().stream()
+                .filter(v -> v.getValue() instanceof Boolean)
+                .map(v -> (Variable<Boolean>) v)
+                .collect(Collectors.toCollection(() -> GLOBAL_BOOLEAN_VARIABLES));
+        return expressions == null || expressions.stream()
+                .allMatch(b -> {
+                    Variable<Boolean> variable = GLOBAL_BOOLEAN_VARIABLES.stream()
+                            .filter(v -> {
+                                String variableID = b.getCheckedID();
+                                return v.getID().equals(variableID);
+                            })
+                            .findFirst()
+                            .orElse(null);
+                    return variable == null || b.isTrue(variable);
+                });
     }
 
     private boolean doMatchStringGlobalVariablesExpressions(List<BooleanStringVariableEquals> expressions, Controller controller) {
@@ -88,7 +111,8 @@ public class Requirements implements Externalizable {
                 && (booleanPChasExpressions == null || booleanPChasExpressions.isEmpty())
                 && (booleanNPChasExpressions == null || booleanNPChasExpressions.isEmpty())
                 && (booleanNumberGlobalVariablesExpressions == null || booleanNumberGlobalVariablesExpressions.isEmpty())
-                && (booleanStringGlobalVariablesExpressions == null || booleanStringGlobalVariablesExpressions.isEmpty());
+                && (booleanStringGlobalVariablesExpressions == null || booleanStringGlobalVariablesExpressions.isEmpty())
+                && (booleanTrueFalseGlobalVariablesExpressions == null || booleanTrueFalseGlobalVariablesExpressions.isEmpty());
     }
 
     public List<BooleanCountableItem> getBooleanPChasItemExpressions() {
@@ -139,6 +163,14 @@ public class Requirements implements Externalizable {
         this.booleanStringGlobalVariablesExpressions = booleanStringGlobalVariablesExpressions;
     }
 
+    public List<BooleanTrueFalseGlobalVariable> getBooleanTrueFalseGlobalVariablesExpressions() {
+        return booleanTrueFalseGlobalVariablesExpressions;
+    }
+
+    public void setBooleanTrueFalseGlobalVariablesExpressions(List<BooleanTrueFalseGlobalVariable> booleanTrueFalseGlobalVariablesExpressions) {
+        this.booleanTrueFalseGlobalVariablesExpressions = booleanTrueFalseGlobalVariablesExpressions;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(booleanPChasItemExpressions);
@@ -147,6 +179,7 @@ public class Requirements implements Externalizable {
         out.writeObject(booleanNPChasExpressions);
         out.writeObject(booleanNumberGlobalVariablesExpressions);
         out.writeObject(booleanStringGlobalVariablesExpressions);
+        out.writeObject(booleanTrueFalseGlobalVariablesExpressions);
     }
 
     @Override
@@ -157,5 +190,6 @@ public class Requirements implements Externalizable {
         booleanNPChasExpressions = (List<BooleanItemExpression>) in.readObject();
         booleanNumberGlobalVariablesExpressions = (List<BooleanNumberGlobalVariable>) in.readObject();
         booleanStringGlobalVariablesExpressions = (List<BooleanStringVariableEquals>) in.readObject();
+        booleanTrueFalseGlobalVariablesExpressions = (List<BooleanTrueFalseGlobalVariable>) in.readObject();
     }
 }

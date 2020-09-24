@@ -10,8 +10,6 @@ import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
 import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.ChoiceBox;
 
-import java.util.Optional;
-
 public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
     private final IntegerField argumentInput = new IntegerField(false);
@@ -54,10 +52,10 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanExpression<?> expression) {
         if (!(expression instanceof BooleanIntegerGlobalVariable)) return;
         BooleanIntegerGlobalVariable specificExpression = (BooleanIntegerGlobalVariable) expression;
-        Optional<Variable<?>> optAsset = editorController.getObservableGlobalVariables().stream()
+        Variable<?> variable = editorController.getObservableGlobalVariables().stream()
                 .filter(a -> a.getID().equals(expression.getCheckedID()))
-                .findFirst();
-        previousView.setVariable(optAsset.orElse(null));
+                .findFirst().orElse(null);
+        previousView.setVariable(variable);
         Countable<Integer> countable = specificExpression.getCountable();
         if (countable == null) return;
         setCompareOperator(countable.getCompareOperator());
