@@ -32,8 +32,8 @@ public class DialogView {
     private static final double MAX_HEIGHT = 0.5;
     private static final double TEXT_FIELD_WIDTH = 0.6;
     private static final double SCROLL_BAR_PART = 0.02;
-    private static final double END_BUTTON_WIDTH_PART = 0.5;
-    private static final double END_BUTTON_HEIGHT_PART = 0.1;
+    private static final double END_BUTTON_WIDTH_PART = 0.6;
+    private static final double END_BUTTON_HEIGHT_PART = 0.15;
 
     private final Canvas canvas;
     private final GameController gameController;
@@ -57,6 +57,10 @@ public class DialogView {
     private int scrollPos;
     private int scrollButtonHeight;
     private boolean scrollWithButton;
+    private int endButtonX;
+    private int endButtonWidth;
+    private int endButtonHeight;
+    private int endButtonY;
 
     public DialogView(Canvas canvas, GameController gameController, double offset, DialogMemento dialogMemento) {
         this.canvas = canvas;
@@ -64,16 +68,16 @@ public class DialogView {
         this.offset = offset;
         this.dialogMemento = dialogMemento;
         gc = canvas.getGraphicsContext2D();
-        hookupEvents();
+        hookUpEvents();
     }
 
     public void refresh() {
-        double width = canvas.getWidth();
-        double height = canvas.getHeight();
-        fontSize = width / gameController.getSettings().getFontSize().getSize();
-        dialogTop = (int) height - getViewHeight();
+        int width = (int) canvas.getWidth();
+        int height = (int) canvas.getHeight();
+        fontSize = (double) width / gameController.getSettings().getFontSize().getSize();
+        dialogTop = height - getViewHeight();
         dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
-        dialogLeft = (int) ((width - dialogWidth) / 2);
+        dialogLeft = (width - dialogWidth) / 2;
         caretPos = 0;
 
         if (dialogMemento == null) {
@@ -94,10 +98,11 @@ public class DialogView {
             isToRefresh = false;
         }
 
-        clear();
+        clearBackground(width);
 
         if (dialogMemento.isFinished()) {
-            drawEndButton();
+            int dialogRight = dialogLeft + dialogWidth;
+            drawEndButton(dialogRight, width, height, dialogTop);
         }
 
         if (dialogs.isEmpty()) {
@@ -110,8 +115,18 @@ public class DialogView {
         drawScrollBar(dialogTop);
     }
 
-    private void drawEndButton() {
-
+    private void drawEndButton(int dialogRight, int canvasWidth, int bottom, int top) {
+        int rightSideWidth = canvasWidth - dialogRight;
+        endButtonWidth = (int) (END_BUTTON_WIDTH_PART * rightSideWidth);
+        int paddingLeft = (rightSideWidth-endButtonWidth) / 2;
+        endButtonX = dialogRight + paddingLeft;
+        int rightSideHeight = bottom - top;
+        endButtonHeight = (int) (END_BUTTON_HEIGHT_PART * rightSideHeight);
+        int paddingBottom = endButtonHeight / 2;
+        int buttonBottom = bottom - paddingBottom;
+        endButtonY = buttonBottom - endButtonHeight;
+        gc.setFill(Color.BROWN);
+        gc.fillRect(endButtonX, endButtonY, endButtonWidth, endButtonHeight);
     }
 
     private void reloadDialogPictures(List<DialogItem> dialogs) {
@@ -130,6 +145,7 @@ public class DialogView {
         Answer greeting = dialog.getGreeting(gameController.getController(), pc, npc);
         if (greeting == null) {
             dialogMemento.setFinished(true);
+            isToRefresh = true;
             return;
         }
         addDialogItem(npc, greeting.getText());
@@ -140,15 +156,13 @@ public class DialogView {
         dialogMemento.setLastAnswer(greeting);
     }
 
-    private void hookupEvents() {
+    private void hookUpEvents() {
         clickEvent = e -> {
             synchronized (gameController.getGameRunner()) {
                 MouseButton button = e.getButton();
                 if (button.equals(MouseButton.PRIMARY)) {
                     e.consume();
-                    if (activeQuestion != null) {
-                        addQuestionAndAnswer();
-                    }
+                    handlePrimaryClick(e);
                 } else if (button.equals(MouseButton.SECONDARY)) {
                     e.consume();
                     if (dialogMemento.isFinished()) {
@@ -181,6 +195,18 @@ public class DialogView {
             scrollWithWheel(e);
         };
         canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
+    }
+
+    private void handlePrimaryClick(MouseEvent e) {
+        if (activeQuestion != null) {
+            addQuestionAndAnswer();
+        } else {
+            int x = (int) e.getX();
+            int y = (int) e.getY();
+            if (isPointWithinEndButton(x, y)) {
+                endDialog();
+            }
+        }
     }
 
     private void scrollWithWheel(ScrollEvent e) {
@@ -457,7 +483,8 @@ public class DialogView {
         }
         int left = (int) b.getMinX() + dialogLeft;
         int top = (int) b.getMinY() + dialogTop;
-        int right = (int) b.getMaxX() - dialogLeft;
+        int canvasRight = (int) b.getMaxX();
+        int right = canvasRight - dialogLeft;
         int bottom = (int) b.getMaxY();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
@@ -468,17 +495,17 @@ public class DialogView {
             setCurPos(y - top);
         }
 
-        if (x < left
-                || x > right
-                || y < top
-                || y > bottom) {
+        boolean isPointWithinDialog = x < left || x > right || y < top || y > bottom;
+        if (isPointWithinDialog) {
             if (activeQuestion != null) {
                 isToRefresh = true;
             }
             activeQuestion = null;
             return;
         }
-        if (!pointWithinQuestions(top, y)) {
+
+        boolean isPointNotWithinQuestions = !isPointWithinQuestions(top, y);
+        if (isPointNotWithinQuestions) {
             if (activeQuestion != null) {
                 isToRefresh = true;
             }
@@ -495,7 +522,11 @@ public class DialogView {
         }
     }
 
-    private boolean pointWithinQuestions(int top, int y) {
+    private boolean isPointWithinEndButton(int x, int y) {
+        return x > endButtonX && x < endButtonX + endButtonWidth && y > endButtonY && y < endButtonY + endButtonHeight;
+    }
+
+    private boolean isPointWithinQuestions(int top, int y) {
         Collection<VerticalPos> values = questionsPos.values();
         OptionalDouble optMin = values.stream()
                 .mapToDouble(q -> q.top)
@@ -557,10 +588,11 @@ public class DialogView {
         isToRefresh = true;
     }
 
-    private void clear() {
-        gc.setFill(Color.LIGHTGREY);
-        double width = canvas.getWidth();
+    private void clearBackground(int width) {
+        gc.setFill(Color.LIGHTGRAY);
         gc.fillRect(0, dialogTop, width, getViewHeight());
+        gc.setFill(Color.GREY);
+        gc.fillRect(dialogLeft, dialogTop, dialogWidth, getViewHeight());
     }
 
     private int getScrollSpeed() {
