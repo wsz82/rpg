@@ -7,6 +7,7 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.location.Location;
+import io.wsz.model.script.Script;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -42,6 +43,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     protected Coords interactionPoint;
     protected Double animationSpeed;
     protected ResolutionImage image;
+    protected Script script;
 
     public PosItem() {
         this.isVisible = new SimpleBooleanProperty(this, "isVisible");
@@ -254,6 +256,168 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         cursorSetter.set(CursorType.MAIN);
     }
 
+    protected boolean isThisPrototype() {
+        return prototype == null;
+    }
+
+    @Override
+    public boolean creaturePrimaryInteract(Creature cr) {
+        return getObstacleOnWay(cr) == null;
+    }
+
+    @Override
+    public boolean creatureSecondaryInteract(Creature cr) {
+        return getObstacleOnWay(cr) == null;
+    }
+
+    protected PosItem getObstacleOnWay(Creature cr) {
+        Coords crCenter = cr.getCenter();
+        double xFrom = crCenter.x;
+        double yFrom = crCenter.y;
+        Coords toCoords = getInteractionPoint();
+        double xTo = toCoords.x;
+        double yTo = toCoords.y;
+        return getController().getBoard().getObstacleOnWay(
+                pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
+    }
+
+    @Override
+    public void update() {
+        playAnimation();
+        runScript();
+    }
+
+    private void runScript() {
+        if (script != null) {
+            script.execute(getController(), null, null);
+        }
+    }
+
+    private void playAnimation() {
+        Animation animation = getAnimation();
+        if (animation == null) return;
+        animation.play(this);
+    }
+
+    @Override
+    public <M extends Animation<?>> M getAnimation() {
+        M animation;
+        if (isThisPrototype()) {
+            animation = getConcreteAnimation();
+        } else {
+            animation = prototype.getAnimation();
+        }
+        if (animation == null) {
+            if (path == null) return null;
+            animation = getConcreteAnimation();
+        }
+        return animation;
+    }
+
+    protected abstract <M extends Animation<?>> M getConcreteAnimation();
+
+    public abstract B getAnimationPos();
+
+    @Override
+    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+        restorePrototype(assets);
+        controller.restoreLocationOfCoords(pos);
+        restoreScript(world.getScripts());
+        restoreDialog(world.getDialogs());
+    }
+
+    private void restoreScript(List<Script> scripts) {
+        Script serScript = this.script;
+        if (serScript == null) return;
+        String scriptId = serScript.getId();
+        Script script = scripts.stream()
+                .filter(s -> s.getId().equals(scriptId))
+                .findFirst().orElse(null);
+        if (script == null) {
+            throw new NullPointerException(scriptId + " reference is not found");
+        }
+        setScript(script);
+    }
+
+    private void restorePrototype(List<Asset> assets) {
+        A serPrototype = getPrototype();
+        if (serPrototype == null) return;
+        String prototypeName = serPrototype.getAssetId();
+        Asset asset = assets.stream()
+                .filter(a -> a.getAssetId().equals(prototypeName))
+                .findFirst().orElse(null);
+        A p = (A) asset;
+        if (p == null) {
+            throw new NullPointerException(prototypeName + " reference is not found");
+        }
+        setPrototype(p);
+    }
+
+    private void restoreDialog(List<Dialog> dialogs) {
+        Dialog serDialog = dialog;
+        if (serDialog == null) return;
+        String serID = serDialog.getID();
+        Optional<Dialog> optDialog = dialogs.stream()
+                .filter(d -> d.getID().equals(serID))
+                .findFirst();
+        Dialog dialog = optDialog.orElse(null);
+        if (dialog == null) {
+            throw new NullPointerException(getAssetId() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
+        }
+        setDialog(dialog);
+    }
+
+    public boolean tryAddToLocation(Location location, List<PosItem> locationItems) {
+        boolean itemWillCollide = getCollision(location) != null;
+        if (itemWillCollide) return false;
+        addToLocation(location, locationItems);
+        return true;
+    }
+
+    public void addToLocation(Location location, List<PosItem> locationItems) {
+        locationItems.add(this);
+        onChangeLocationAction(location);
+    }
+
+    @Override
+    public String getAssetId() {
+        if (prototype != null) {
+            return prototype.getAssetId();
+        } else {
+            return super.getAssetId();
+        }
+    }
+
+    @Override
+    public String getName() {
+        if (name == null) {
+            if (prototype == null) {
+                return super.getName();
+            } else {
+                return prototype.getName();
+            }
+        } else {
+            return name;
+        }
+    }
+
+    @Override
+    public ItemType getType() {
+        if (prototype != null) {
+            return prototype.getType();
+        } else {
+            return super.getType();
+        }
+    }
+
+    @Override
+    public String getPath() {
+        if (prototype != null) {
+            return prototype.getPath();
+        }
+        return super.getPath();
+    }
+
     public String getItemId() {
         return itemId;
     }
@@ -411,94 +575,6 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.controller = controller;
     }
 
-    @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
-        restorePrototype(assets);
-        controller.restoreLocationOfCoords(pos);
-        restoreDialog(world.getDialogs());
-    }
-
-    private void restorePrototype(List<Asset> assets) {
-        A serPrototype = getPrototype();
-        if (serPrototype != null) {
-            String prototypeName = serPrototype.getAssetId();
-
-            Optional<Asset> optAsset = assets.stream()
-                    .filter(a -> a.getAssetId().equals(prototypeName))
-                    .findFirst();
-            A p = (A) optAsset.orElse(null);
-            if (p == null) {
-                throw new NullPointerException(prototypeName + " reference is not found");
-            }
-            setPrototype(p);
-        }
-    }
-
-    private void restoreDialog(List<Dialog> dialogs) {
-        Dialog serDialog = dialog;
-        if (serDialog == null) return;
-        String serID = serDialog.getID();
-        Optional<Dialog> optDialog = dialogs.stream()
-                .filter(d -> d.getID().equals(serID))
-                .findFirst();
-        Dialog dialog = optDialog.orElse(null);
-        if (dialog == null) {
-            throw new NullPointerException(getAssetId() + " dialog \"" + serDialog.getID() + "\" should be in list of dialogs");
-        }
-        setDialog(dialog);
-    }
-
-    public boolean tryAddToLocation(Location location, List<PosItem> locationItems) {
-        boolean itemWillCollide = getCollision(location) != null;
-        if (itemWillCollide) return false;
-        addToLocation(location, locationItems);
-        return true;
-    }
-
-    public void addToLocation(Location location, List<PosItem> locationItems) {
-        locationItems.add(this);
-        onChangeLocationAction(location);
-    }
-
-    @Override
-    public String getAssetId() {
-        if (prototype != null) {
-            return prototype.getAssetId();
-        } else {
-            return super.getAssetId();
-        }
-    }
-
-    @Override
-    public String getName() {
-        if (name == null) {
-            if (prototype == null) {
-                return super.getName();
-            } else {
-                return prototype.getName();
-            }
-        } else {
-            return name;
-        }
-    }
-
-    @Override
-    public ItemType getType() {
-        if (prototype != null) {
-            return prototype.getType();
-        } else {
-            return super.getType();
-        }
-    }
-
-    @Override
-    public String getPath() {
-        if (prototype != null) {
-            return prototype.getPath();
-        }
-        return super.getPath();
-    }
-
     public Double getIndividualAnimationSpeed() {
         return animationSpeed;
     }
@@ -563,60 +639,25 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.image = image;
     }
 
-    protected boolean isThisPrototype() {
-        return prototype == null;
+    public Script getIndividualScript() {
+        return script;
     }
 
-    @Override
-    public boolean creaturePrimaryInteract(Creature cr) {
-        return getObstacleOnWay(cr) == null;
-    }
-
-    @Override
-    public boolean creatureSecondaryInteract(Creature cr) {
-        return getObstacleOnWay(cr) == null;
-    }
-
-    protected PosItem getObstacleOnWay(Creature cr) {
-        Coords crCenter = cr.getCenter();
-        double xFrom = crCenter.x;
-        double yFrom = crCenter.y;
-        Coords toCoords = getInteractionPoint();
-        double xTo = toCoords.x;
-        double yTo = toCoords.y;
-        return getController().getBoard().getObstacleOnWay(
-                pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
-    }
-
-    @Override
-    public void update() {
-        playAnimation();
-    }
-
-    private void playAnimation() {
-        Animation animation = getAnimation();
-        if (animation == null) return;
-        animation.play(this);
-    }
-
-    @Override
-    public <M extends Animation<?>> M getAnimation() {
-        M animation;
-        if (isThisPrototype()) {
-            animation = getConcreteAnimation();
+    public Script getScript() {
+        if (script == null) {
+            if (prototype == null) {
+                return null;
+            } else {
+                return prototype.getScript();
+            }
         } else {
-            animation = prototype.getAnimation();
+            return script;
         }
-        if (animation == null) {
-            if (path == null) return null;
-            animation = getConcreteAnimation();
-        }
-        return animation;
     }
 
-    protected abstract <M extends Animation<?>> M getConcreteAnimation();
-
-    public abstract B getAnimationPos();
+    public void setScript(Script script) {
+        this.script = script;
+    }
 
     public boolean isUnitIdentical(Object o) {
         if (this == o) return true;
@@ -629,7 +670,8 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
                 Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), posItem.getDialog()) &&
                 Objects.equals(getIndividualInteractionPoint(), posItem.getIndividualInteractionPoint()) &&
-                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
+                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed()) &&
+                Objects.equals(getScript(), posItem.getScript());
     }
 
     @Override
@@ -645,12 +687,14 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
                 Objects.equals(getCollisionPolygons(), posItem.getCollisionPolygons()) &&
                 Objects.equals(getDialog(), posItem.getDialog()) &&
                 Objects.equals(getIndividualInteractionPoint(), posItem.getIndividualInteractionPoint()) &&
-                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed());
+                Objects.equals(getAnimationSpeed(), posItem.getAnimationSpeed()) &&
+                Objects.equals(getScript(), posItem.getScript());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getIsVisible(), getPos(), getPrototype(), getCoverLine(), getCollisionPolygons(), getDialog(), getInteractionPoint(), getAnimationSpeed());
+        return Objects.hash(super.hashCode(), getIsVisible(), getPos(), getPrototype(), getCoverLine(),
+                getCollisionPolygons(), getDialog(), getInteractionPoint(), getAnimationSpeed(), getScript());
     }
 
     @Override
@@ -681,6 +725,12 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         out.writeUTF(id);
 
         out.writeObject(interactionPoint);
+
+        String scriptId = "";
+        if (script != null) {
+            scriptId = script.getId();
+        }
+        out.writeUTF(scriptId);
     }
 
     @Override
@@ -708,11 +758,16 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         collisionPolygons = (List<List<Coords>>) in.readObject();
 
-        String dialogID = in.readUTF();
-        if (!dialogID.isEmpty()) {
-            dialog = new Dialog(dialogID);
+        String dialogId = in.readUTF();
+        if (!dialogId.isEmpty()) {
+            dialog = new Dialog(dialogId);
         }
 
         interactionPoint = (Coords) in.readObject();
+
+        String scriptId = in.readUTF();
+        if (!scriptId.isEmpty()) {
+            script = new Script(scriptId);
+        }
     }
 }

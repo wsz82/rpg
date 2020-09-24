@@ -9,6 +9,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.script.Script;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.FXCollections;
@@ -43,13 +44,14 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     private final TextField assetIdInput = new TextField();
     private final TextField itemIdInput = new TextField();
     private final TextField nameInput = new TextField();
-    private final Button ok = new Button("OK");
-    private final Button create = new Button("Create");
-    private final Button cancel = new Button("Cancel");
     private final DoubleField animationSpeedInput = new DoubleField(true);
     private final Button animationButton = new Button("Animation");
     private final Label pathLabel = new Label();
+    private final ChoiceBox<Script> scriptCB = new ChoiceBox<>();
     private final ChoiceBox<Dialog> dialogsCB = new ChoiceBox<>();
+    private final Button ok = new Button("OK");
+    private final Button create = new Button("Create");
+    private final Button cancel = new Button("Cancel");
 
     public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
@@ -69,7 +71,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     }
 
     protected void initWindow() {
-        setTitle(item.getType().toString().toLowerCase() + " asset");
+        setTitle(item.getType().getDisplay() + " asset");
 
         final StackPane root = new StackPane();
         final VBox containerWithButtons = new VBox(5);
@@ -119,6 +121,12 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
             container.getChildren().addAll(coverButton, collisionButton);
         }
 
+        final HBox scriptBox = new HBox(10);
+        final Label scriptLabel = new Label("Script");
+        scriptBox.getChildren().addAll(scriptLabel, scriptCB);
+        setUpScriptCB();
+        container.getChildren().add(scriptBox);
+
         final HBox dialogBox = new HBox(10);
         final Label dialogLabel = new Label("Dialog");
         dialogBox.getChildren().addAll(dialogLabel, dialogsCB);
@@ -131,6 +139,13 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
             assetIdInput.setDisable(true);
         }
         hookUpAssetEvents();
+    }
+
+    private void setUpScriptCB() {
+        ObservableList<Script> scripts = editorController.getObservableScripts();
+        ObservableList<Script> scriptsWithNull = FXCollections.observableArrayList(scripts);
+        scriptsWithNull.add(null);
+        scriptCB.setItems(scriptsWithNull);
     }
 
     private boolean isItemBeingInitialized() {
@@ -181,6 +196,9 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         } else {
             animationSpeedInput.setText(String.valueOf(animationSpeed));
         }
+
+        Script script = item.getIndividualScript();
+        scriptCB.setValue(script);
 
         Dialog dialog = item.getIndividualDialog();
         dialogsCB.setValue(dialog);
@@ -233,6 +251,9 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         } else {
             item.setAnimationSpeed(Double.parseDouble(animationSpeed));
         }
+
+        Script script = scriptCB.getValue();
+        item.setScript(script);
 
         Dialog dialog = dialogsCB.getValue();
         item.setDialog(dialog);
