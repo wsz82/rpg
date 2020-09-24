@@ -447,6 +447,18 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         setDialog(dialog);
     }
 
+    public boolean tryAddToLocation(Location location, List<PosItem> locationItems) {
+        boolean itemWillCollide = getCollision(location) != null;
+        if (itemWillCollide) return false;
+        addToLocation(location, locationItems);
+        return true;
+    }
+
+    public void addToLocation(Location location, List<PosItem> locationItems) {
+        locationItems.add(this);
+        onChangeLocationAction(location);
+    }
+
     @Override
     public String getAssetId() {
         if (prototype != null) {

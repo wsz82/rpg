@@ -3,10 +3,13 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.location.Location;
+import io.wsz.model.stage.Board;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>, A extends EquipmentAnimationPos>
@@ -96,6 +99,41 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         } else {
             super.setCursor(cursorSetter);
         }
+    }
+
+    @Override
+    public void addToLocation(Location location, List<PosItem> locationItems) {
+        if (isCountable()) {
+            drop(pos.x, pos.y, location, getController().getBoard());
+        }
+        onChangeLocationAction(location);
+    }
+
+    @Override
+    protected void drop(double x, double y, Location l, Board board) {
+        boolean isToDropAsIndividual = false;
+        if (isCountable()) {
+            EquipmentMayCountable countable = getItemInDroppedPlace(x, y, board);
+            if (countable != null && countable.isCountable() && countable.isUnitIdentical(countable)) {
+                Integer addedAmount = this.getAmount();
+                Integer alreadyInAmount = countable.getAmount();
+                int sum = alreadyInAmount + addedAmount;
+                countable.setAmount(sum);
+            } else {
+                isToDropAsIndividual = true;
+            }
+        } else {
+            isToDropAsIndividual = true;
+        }
+        if (isToDropAsIndividual) {
+            l.getItems().add(this);
+            getController().getLogger().logItemAction(getName(), "dropped");
+        }
+    }
+
+    private EquipmentMayCountable getItemInDroppedPlace(double x, double y, Board board) {
+        return board.lookForMayCountableEquipment(pos.getLocation().getItems(), x, y, pos.level,
+                this.getImageWidth(), this.getImageHeight());
     }
 
     public void setCountable(boolean isCountable) {

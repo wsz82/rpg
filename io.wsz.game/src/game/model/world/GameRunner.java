@@ -219,15 +219,12 @@ public class GameRunner {
         if (itemsToAdd.isEmpty()) {
             return;
         }
-        List<PosItem> items = location.getItems();
+        List<PosItem> locationItems = location.getItems();
         tempItemsToAdd.clear();
         for (PosItem item : itemsToAdd) {
-            boolean itemWillCollide = item.getCollision(location) != null;
-            if (itemWillCollide) continue;
+            if (!item.tryAddToLocation(location, locationItems)) continue;
             tempItemsToAdd.add(item);
-            item.onChangeLocationAction(location);
         }
-        items.addAll(tempItemsToAdd);
         itemsToAdd.removeAll(tempItemsToAdd);
     }
 

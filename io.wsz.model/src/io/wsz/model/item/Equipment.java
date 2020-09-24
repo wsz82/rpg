@@ -126,31 +126,9 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         }
     }
 
-    private void drop(double x, double y, Location l, Board board) {
-        boolean isToDropAsIndividual = false;
-        if (isCountable()) {
-            EquipmentMayCountable countable = getItemInDroppedPlace(x, y, board);
-            if (countable != null && countable.isCountable() && countable.isUnitIdentical(countable)) {
-                EquipmentMayCountable added = (EquipmentMayCountable) this;
-                Integer addedAmount = added.getAmount();
-                Integer alreadyInAmount = countable.getAmount();
-                int sum = alreadyInAmount + addedAmount;
-                countable.setAmount(sum);
-            } else {
-                isToDropAsIndividual = true;
-            }
-        } else {
-            isToDropAsIndividual = true;
-        }
-        if (isToDropAsIndividual) {
-            l.getItemsToAdd().add(this);
-            getController().getLogger().logItemAction(getName(), "dropped");
-        }
-    }
-
-    private EquipmentMayCountable getItemInDroppedPlace(double x, double y, Board board) {
-        return board.lookForMayCountableEquipment(pos.getLocation().getItems(), x, y, pos.level,
-                this.getImageWidth(), this.getImageHeight());
+    protected void drop(double x, double y, Location l, Board board) {
+        l.getItemsToAdd().add(this);
+        getController().getLogger().logItemAction(getName(), "dropped");
     }
 
     @Override
