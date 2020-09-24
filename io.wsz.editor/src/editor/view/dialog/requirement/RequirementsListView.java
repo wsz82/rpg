@@ -47,45 +47,45 @@ public class RequirementsListView {
         List<BooleanCountableItem> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
         if (booleanPCItemExpressions != null) {
             for (BooleanCountableItem expression : booleanPCItemExpressions) {
-                populateWithCreatureItemExpression(expression, PChas);
+                populateWithCreatureItemExpression(expression, PC_HAS);
             }
         }
         List<BooleanCountableItem> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
         if (booleanNPCItemExpressions != null) {
             for (BooleanCountableItem expression : booleanNPCItemExpressions) {
-                populateWithCreatureItemExpression(expression, NPChas);
+                populateWithCreatureItemExpression(expression, NPC_HAS);
             }
         }
         List<BooleanItemExpression> booleanPChasExpressions = input.getBooleanPChasExpressions();
         if (booleanPChasExpressions != null) {
             for (BooleanItemExpression expression : booleanPChasExpressions) {
-                populateWithCreatureHasInventoryPlaceExpression(expression, PChas);
+                populateWithCreatureHasInventoryPlaceExpression(expression, PC_HAS);
             }
         }
         List<BooleanItemExpression> booleanNPChasExpressions = input.getBooleanNPChasExpressions();
         if (booleanNPChasExpressions != null) {
             for (BooleanItemExpression expression : booleanNPChasExpressions) {
-                populateWithCreatureHasInventoryPlaceExpression(expression, NPChas);
+                populateWithCreatureHasInventoryPlaceExpression(expression, NPC_HAS);
             }
         }
 
         List<BooleanNumberGlobalVariable> booleanNumberGlobalVariablesExpressions = input.getBooleanNumberGlobalVariablesExpressions();
         if (booleanNumberGlobalVariablesExpressions != null) {
             for (BooleanNumberGlobalVariable expression : booleanNumberGlobalVariablesExpressions) {
-                populateWithGlobalVariableExpression(expression, GlobalVariable);
+                populateWithGlobalVariableExpression(expression, GLOBAL);
             }
         }
         List<BooleanStringVariableEquals> booleanStringGlobalVariablesExpressions = input.getBooleanStringGlobalVariablesExpressions();
         if (booleanStringGlobalVariablesExpressions != null) {
             for (BooleanStringVariableEquals expression : booleanStringGlobalVariablesExpressions) {
-                populateWithGlobalVariableExpression(expression, GlobalVariable);
+                populateWithGlobalVariableExpression(expression, GLOBAL);
             }
         }
 
         List<BooleanTrueFalseGlobalVariable> booleanTrueFalseGlobalVariablesExpressions = input.getBooleanTrueFalseGlobalVariablesExpressions();
         if (booleanTrueFalseGlobalVariablesExpressions != null) {
             for (BooleanTrueFalseGlobalVariable expression : booleanTrueFalseGlobalVariablesExpressions) {
-                populateWithGlobalVariableExpression(expression, GlobalVariable);
+                populateWithGlobalVariableExpression(expression, GLOBAL);
             }
         }
     }
@@ -148,8 +148,8 @@ public class RequirementsListView {
             Method method = requirementView.getMethod();
             if (method == null) continue;
             switch (method) {
-                case PChas, NPChas -> addItemHasExpression(method, output, requirementView);
-                case GlobalVariable -> addGlobalVariableExpression(output, requirementView);
+                case PC_HAS, NPC_HAS -> addItemHasExpression(method, output, requirementView);
+                case GLOBAL -> addGlobalVariableExpression(output, requirementView);
             }
         }
         if (output.isEmpty()) {
@@ -212,8 +212,8 @@ public class RequirementsListView {
         ArgumentType argumentType = argumentTypeRequirementView.getArgumentType();
         if (argumentType == null) return;
         switch (method) {
-            case PChas -> switchBetweenArgumentTypesPChas(argumentType, output, argumentTypeRequirementView);
-            case NPChas -> switchBetweenArgumentTypesNPChas(argumentType, output, argumentTypeRequirementView);
+            case PC_HAS -> switchBetweenArgumentTypesPChas(argumentType, output, argumentTypeRequirementView);
+            case NPC_HAS -> switchBetweenArgumentTypesNPChas(argumentType, output, argumentTypeRequirementView);
         }
     }
 
