@@ -17,10 +17,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import java.io.File;
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -28,6 +25,8 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
     private static final ArrayDeque<Runnable> LATER_RUN_BUFFER = new ArrayDeque<>(0);
+
+    private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
 
     private final GameController gameController;
     private final Controller controller;
@@ -220,11 +219,16 @@ public class GameRunner {
         if (itemsToAdd.isEmpty()) {
             return;
         }
-        location.getItems().addAll(itemsToAdd);
-        for (PosItem pi : itemsToAdd) {
-            pi.onChangeLocationAction(location);
+        List<PosItem> items = location.getItems();
+        tempItemsToAdd.clear();
+        for (PosItem item : itemsToAdd) {
+            boolean itemWillCollide = item.getCollision(location) != null;
+            if (itemWillCollide) continue;
+            tempItemsToAdd.add(item);
+            item.onChangeLocationAction(location);
         }
-        itemsToAdd.clear();
+        items.addAll(tempItemsToAdd);
+        itemsToAdd.removeAll(tempItemsToAdd);
     }
 
     private void removeItems(Location location) {

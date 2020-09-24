@@ -171,6 +171,10 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return getCollision(nextPos, pos.getLocation());
     }
 
+    public PosItem getCollision(Location location) {
+        return getCollision(getCoordsForCollisionCheck(), location);
+    }
+
     public PosItem getCollision(Coords nextPos, Location nextLocation) {
         if (nextLocation == null) return null;
         List<PosItem> items = nextLocation.getItems();
