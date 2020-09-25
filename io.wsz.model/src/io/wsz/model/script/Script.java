@@ -58,7 +58,7 @@ public class Script implements Externalizable, Executable {
             } else if (commandToParse.startsWith(RUN)) {
                 executable = getScriptToRun(controller, commandToParse, validator);
             } else {
-                validator.setSyntaxInvalid(true, "empty");
+                validator.setSyntaxInvalid("empty");
             }
 
             if (validator.isInvalid()) {
@@ -80,7 +80,7 @@ public class Script implements Externalizable, Executable {
         String scriptToRunId = commandToParse.replaceFirst(RUN, "");
         Executable scriptToRun = controller.getScriptById(scriptToRunId);
         if (scriptToRun == null) {
-            validator.setScriptIdInvalid(true, scriptToRunId);
+            validator.setScriptIdInvalid(scriptToRunId);
         }
         return scriptToRun;
     }
@@ -133,7 +133,7 @@ public class Script implements Externalizable, Executable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(id);
         out.writeObject(initialText);
-        out.writeObject(executables); //TODO write only id of script if is in executables
+        out.writeObject(executables); //TODO write only id of script if is in executables?
     }
 
     @Override

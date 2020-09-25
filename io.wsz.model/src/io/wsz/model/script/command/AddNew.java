@@ -42,6 +42,7 @@ public class AddNew implements Executable, Externalizable {
                 if (nextIndex != -1) {
                     String level = s.substring(0, nextIndex);
                     command.level = level;
+                    validator.validateInteger(level);
                     toRemove = level + comma;
                     s = s.replace(toRemove, "");
 
@@ -49,19 +50,21 @@ public class AddNew implements Executable, Externalizable {
                     if (nextIndex != -1) {
                         String posX = s.substring(0, nextIndex);
                         command.posX = posX;
+                        validator.validateDecimal(posX);
                         toRemove = posX + comma;
                         s = s.replace(toRemove, "");
 
                         int closeIndex = s.indexOf(")");
                         if (closeIndex != -1) {
                             command.posY = s.substring(0, closeIndex);
+                            validator.validateDecimal(command.posY);
                             return command;
                         }
                     }
                 }
             }
         }
-        validator.setSyntaxInvalid(true, s);
+        validator.setSyntaxInvalid(s);
         return null;
     }
 

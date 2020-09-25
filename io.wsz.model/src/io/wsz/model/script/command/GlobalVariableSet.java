@@ -31,7 +31,7 @@ public class GlobalVariableSet implements Executable, Externalizable {
             command.value = value;
             return command;
         }
-        validator.setSyntaxInvalid(true, s);
+        validator.setSyntaxInvalid(s);
         return null;
     }
 

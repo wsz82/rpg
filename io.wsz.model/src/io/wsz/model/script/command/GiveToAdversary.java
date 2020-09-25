@@ -40,7 +40,7 @@ public class GiveToAdversary implements Executable, Externalizable {
                 return command;
             }
         }
-        validator.setSyntaxInvalid(true, s);
+        validator.setSyntaxInvalid(s);
         return null;
     }
 

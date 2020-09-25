@@ -21,6 +21,10 @@ public class ScriptValidator {
     private String assetId;
     private boolean isLocationIdInvalid;
     private String locationId;
+    private boolean isIntegerInvalid;
+    private String shouldBeInteger;
+    private boolean isDecimalInvalid;
+    private String shouldBeDecimal;
 
     public ScriptValidator(Controller controller) {
         this.controller = controller;
@@ -29,53 +33,58 @@ public class ScriptValidator {
     public void validateScript(String id) {
         Executable scriptToRun = controller.getScriptById(id);
         if (scriptToRun == null) {
-            setScriptIdInvalid(true, id);
+            setScriptIdInvalid(id);
         }
     }
 
     public void validateGlobalVariable(String globalVarID) {
         Variable<?> global = controller.getGlobalVariableById(globalVarID);
         if (global == null) {
-            setGlobalVariableInvalid(true, globalVarID);
+            setGlobalVariableInvalid(globalVarID);
         }
     }
 
     public void validateAsset(String assetId) {
         Asset asset = controller.getAssetById(assetId);
         if (asset == null) {
-            setAssetIdInvalid(true, assetId);
+            setAssetIdInvalid(assetId);
         }
     }
 
     public void validateLocation(String id) {
         Location location = controller.getLocationById(id);
         if (location == null) {
-            setLocationIdInvalid(true, id);
+            setLocationIdInvalid(id);
         }
     }
 
     public void buildMessage() {
-        boolean isValid = !isInvalid;
-        if (isValid) {
-            message = "";
-        } else {
-            message = "INVALID";
+        StringBuilder builder = new StringBuilder();
+        if (isInvalid) {
+            builder.append("INVALID");
             if (isSyntaxInvalid) {
-                message += "\n SYNTAX: " + code;
+                builder.append("\n SYNTAX: ").append(code);
             }
             if (isScriptIdInvalid) {
-                message += "\n SCRIPT ID: " + scriptId;
+                builder.append("\n SCRIPT ID: ").append(scriptId);
             }
             if (isGlobalVariableIdInvalid) {
-                message += "\n GLOBAL VARIABLE ID: " + globalVariableId;
+                builder.append("\n GLOBAL VARIABLE ID: ").append(globalVariableId);
             }
             if (isAssetIdInvalid) {
-                message += "\n ASSET ID: " + assetId;
+                builder.append("\n ASSET ID: ").append(assetId);
             }
             if (isLocationIdInvalid) {
-                message += "\n LOCATION ID: " + locationId;
+                builder.append("\n LOCATION ID: ").append(locationId);
+            }
+            if (isIntegerInvalid) {
+                builder.append("\n INTEGER: ").append(shouldBeInteger);
+            }
+            if (isDecimalInvalid) {
+                builder.append("\n DECIMAL: ").append(shouldBeDecimal);
             }
         }
+        message = builder.toString();
     }
 
     public boolean isInvalid() {
@@ -94,43 +103,53 @@ public class ScriptValidator {
         this.message = message;
     }
 
-    public void setSyntaxInvalid(boolean syntaxInvalid, String code) {
-        if (syntaxInvalid) {
-            isInvalid = true;
-        }
+    public void setSyntaxInvalid(String code) {
+        isInvalid = true;
         this.code = code;
-        isSyntaxInvalid = syntaxInvalid;
+        isSyntaxInvalid = true;
     }
 
-    public void setScriptIdInvalid(boolean scriptIdInvalid, String id) {
-        if (scriptIdInvalid) {
-            isInvalid = true;
-        }
+    public void setScriptIdInvalid(String id) {
+        isInvalid = true;
         this.scriptId = id;
-        isScriptIdInvalid = scriptIdInvalid;
+        isScriptIdInvalid = true;
     }
 
-    public void setGlobalVariableInvalid(boolean globalVariableInvalid, String id) {
-        if (globalVariableInvalid) {
-            isInvalid = true;
-        }
+    public void setGlobalVariableInvalid(String id) {
+        isInvalid = true;
         this.globalVariableId = id;
-        isGlobalVariableIdInvalid = globalVariableInvalid;
+        isGlobalVariableIdInvalid = true;
     }
 
-    public void setAssetIdInvalid(boolean assetIdInvalid, String id) {
-        if (assetIdInvalid) {
-            isInvalid = true;
-        }
+    public void setAssetIdInvalid(String id) {
+        isInvalid = true;
         this.assetId = id;
-        isAssetIdInvalid = assetIdInvalid;
+        isAssetIdInvalid = true;
     }
 
-    public void setLocationIdInvalid(boolean locationIdInvalid, String id) {
-        if (locationIdInvalid) {
-            isInvalid = true;
-        }
+    public void setLocationIdInvalid(String id) {
+        isInvalid = true;
         this.locationId = id;
-        isLocationIdInvalid = locationIdInvalid;
+        isLocationIdInvalid = true;
+    }
+
+    public void validateInteger(String integer) {
+        try {
+            Integer.parseInt(integer);
+        } catch (NumberFormatException e) {
+            isInvalid = true;
+            isIntegerInvalid = true;
+            shouldBeInteger = integer;
+        }
+    }
+
+    public void validateDecimal(String decimal) {
+        try {
+            Double.parseDouble(decimal);
+        } catch (NumberFormatException e) {
+            isInvalid = true;
+            isDecimalInvalid = true;
+            shouldBeDecimal = decimal;
+        }
     }
 }

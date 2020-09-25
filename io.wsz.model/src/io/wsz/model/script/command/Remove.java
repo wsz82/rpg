@@ -29,7 +29,7 @@ public class Remove implements Executable, Externalizable {
             command.itemId = assetId;
             return command;
         }
-        validator.setSyntaxInvalid(true, s);
+        validator.setSyntaxInvalid(s);
         return null;
     }
 
