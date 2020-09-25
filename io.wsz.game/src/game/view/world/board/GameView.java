@@ -3,12 +3,14 @@ package game.view.world.board;
 import game.model.GameController;
 import game.model.setting.KeyAction;
 import game.model.setting.Settings;
+import game.model.textures.Cursor;
 import game.model.world.GameRunner;
 import game.view.world.CanvasView;
 import game.view.world.FoggableDelegate;
 import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
@@ -127,8 +129,6 @@ public class GameView extends CanvasView {
                 canOpenInventory = false;
                 removeRemovableEvents();
                 inventoryView = new InventoryView(canvas, gameController);
-                ImageCursor main = gameController.getCursor().getMain();
-                setCursor(main);
             }
             inventoryView.refresh();
             return true;
@@ -148,8 +148,6 @@ public class GameView extends CanvasView {
                     removeRemovableEvents();
                     DialogMemento dialogMemento = controller.getDialogMemento();
                     dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
-                    ImageCursor main = gameController.getCursor().getMain();
-                    setCursor(main);
                 }
                 dialogView.refresh();
                 return true;
@@ -273,8 +271,6 @@ public class GameView extends CanvasView {
         int y = p.y;
 
         if (x < left || x > right || y < top || y > bottom) {
-            ImageCursor main = gameController.getCursor().getMain();
-            setCursor(main);
             return;
         }
 
@@ -307,55 +303,48 @@ public class GameView extends CanvasView {
             return;
         }
 
+        Cursor cursor = gameController.getCursor();
         if (x < left+OFFSET && x >= left
                 && y > top+OFFSET && y < bottom-OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getLeft();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.LEFT);
             scrollLeft();
         } else
         if (x > right-OFFSET && x <= right
                 && y > top+OFFSET && y < bottom-OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getRight();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.RIGHT);
             scrollRight(locWidth);
         } else
         if (y < top+OFFSET && y >= top
                 && x > left+OFFSET && x < right-OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getUp();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.UP);
             scrollUp();
         } else
         if (y > bottom-OFFSET && y <= bottom
                 && x > left+OFFSET && x < right-OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getDown();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.DOWN);
             scrollDown(locHeight);
         } else
         if (x < left+OFFSET && x >= left
                 && y >= top && y < top+OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getLeftUp();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.LEFT_UP);
             scrollLeft();
             scrollUp();
         } else
         if (x > right-OFFSET && x <= right
                 && y >= top && y < top+OFFSET) {
-            ImageCursor cursor = gameController.getCursor().getRightUp();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.RIGHT_UP);
             scrollRight(locWidth);
             scrollUp();
         } else
         if (x < left+OFFSET && x >= left
                 && y >= bottom-OFFSET && y < bottom) {
-            ImageCursor cursor = gameController.getCursor().getLeftDown();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.LEFT_DOWN);
             scrollLeft();
             scrollDown(locHeight);
         } else
         if (x > right-OFFSET && x <= right
                 && y >= bottom-OFFSET && y < bottom) {
-            ImageCursor cursor = gameController.getCursor().getRightDown();
-            setCursor(cursor);
+            cursor.setCursor(CursorType.RIGHT_DOWN);
             scrollRight(locWidth);
             scrollDown(locHeight);
         }
@@ -537,7 +526,7 @@ public class GameView extends CanvasView {
         KeyCode layerDown = gameController.getSettings().getKey(KeyAction.LAYER_DOWN);
         if (key == ESCAPE) {
             ImageCursor main = gameController.getCursor().getMain();
-            setCursor(main);
+            gameController.setCursor(main);
         } else if (key == hideOrShowPortraits) {
             e.consume();
             switchPortraits();

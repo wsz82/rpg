@@ -4,6 +4,7 @@ import game.model.GameController;
 import game.model.textures.Cursor;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.*;
@@ -11,7 +12,6 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.*;
 import javafx.geometry.VPos;
-import javafx.scene.ImageCursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -49,8 +49,7 @@ public abstract class CanvasView {
         board = controller.getBoard();
         gc = canvas.getGraphicsContext2D();
         cursorSetter = type -> {
-            ImageCursor imageCursor = gameController.getCursor().getCursor(type);
-            setCursor(imageCursor);
+            gameController.getCursor().setCursor(type);
             if (type.isShowAmount()) {
                 isCursorOnCountable = true;
                 countableAmount = type.getAmount();
@@ -175,44 +174,38 @@ public abstract class CanvasView {
         PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
 
         if (selected == null) {
-            ImageCursor cursorImg = cursor.getMain();
-            setCursor(cursorImg);
+            cursor.setCursor(CursorType.MAIN);
             if (item instanceof Creature) {
                 Creature cr = (Creature) item;
-                setCursorForControllableCreature(cr);
+                setCursorForControllableCreature(cursor, cr);
             }
             return;
         }
 
         if (item == null) {
             item = board.getObstacle(pos, selected, OBSTACLE_TYPES, items);
-            ImageCursor cursorImg;
+            CursorType type;
             if (item == null) {
                 if (controller.isInventory()) {
-                    cursorImg = cursor.getMain();
+                    type = CursorType.MAIN;
                 } else {
-                    cursorImg = cursor.getGo();
+                    type = CursorType.GO;
                 }
             } else {
-                cursorImg = cursor.getNotGo();
+                type = CursorType.NOT_GO;
             }
-            setCursor(cursorImg);
+            cursor.setCursor(type);
         } else {
             item.setCursor(cursorSetter);
         }
     }
 
-    private void setCursorForControllableCreature(Creature cr) {
+    private void setCursorForControllableCreature(Cursor cursor, Creature cr) {
         CreatureControl control = cr.getControl();
         if (control == CreatureControl.CONTROLLABLE) {
-            ImageCursor imageCursor = gameController.getCursor().getMain();
-            setCursor(imageCursor);
+            cursor.setCursor(CursorType.MAIN);
             cr.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         }
-    }
-
-    protected void setCursor(ImageCursor imageCursor) {
-        canvas.getScene().setCursor(imageCursor);
     }
 
     protected void drawCountableText() {

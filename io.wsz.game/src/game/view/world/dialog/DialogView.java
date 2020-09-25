@@ -2,6 +2,7 @@ package game.view.world.dialog;
 
 import game.model.GameController;
 import io.wsz.model.Controller;
+import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.*;
 import io.wsz.model.item.Creature;
@@ -86,9 +87,11 @@ public class DialogView {
 
         List<DialogItem> dialogs = dialogMemento.getDialogs();
         if (Sizes.isReloadDialogImages()) {
-            reloadDialogPictures(dialogs);
+            reloadDialogImages(dialogs);
             return;
         }
+
+        gameController.getCursor().setCursor(CursorType.MAIN);
 
         updatePos();
 
@@ -129,7 +132,7 @@ public class DialogView {
         gc.fillRect(endButtonX, endButtonY, endButtonWidth, endButtonHeight);
     }
 
-    private void reloadDialogPictures(List<DialogItem> dialogs) {
+    private void reloadDialogImages(List<DialogItem> dialogs) {
         Sizes.setReloadDialogImages(false);
         isToRefresh = true;
         setCurPos(0);
@@ -212,9 +215,9 @@ public class DialogView {
     private void scrollWithWheel(ScrollEvent e) {
         double dY = e.getDeltaY();
         if (dY < 0) {
-            scrollDown();
+            scrollDown(true);
         } else {
-            scrollUp();
+            scrollUp(true);
         }
     }
 
@@ -515,10 +518,10 @@ public class DialogView {
         updateActiveQuestion(top, y);
 
         if (y < top+offset && y >= top) {
-            scrollUp();
+            scrollUp(false);
         } else
         if (y > bottom-offset && y <= bottom) {
-            scrollDown();
+            scrollDown(false);
         }
     }
 
@@ -563,12 +566,15 @@ public class DialogView {
         }
     }
 
-    private void scrollDown() {
+    private void scrollDown(boolean isWheelScroll) {
         int curPos = dialogMemento.getCurPos();
         int newY = curPos + getScrollSpeed();
         int maxPos = getMaxPos();
         if (curPos >= maxPos) {
             return;
+        }
+        if (!isWheelScroll) {
+            gameController.getCursor().setCursor(CursorType.DOWN);
         }
         dialogMemento.setCurPos(Math.min(newY, maxPos));
         isToRefresh = true;
@@ -578,10 +584,13 @@ public class DialogView {
         return dialogHeight - getViewHeight();
     }
 
-    private void scrollUp() {
+    private void scrollUp(boolean isWheelScroll) {
         int curPos = dialogMemento.getCurPos();
         if (curPos == 0) {
             return;
+        }
+        if (!isWheelScroll) {
+            gameController.getCursor().setCursor(CursorType.UP);
         }
         int newY = curPos - getScrollSpeed();
         dialogMemento.setCurPos(Math.max(newY, 0));

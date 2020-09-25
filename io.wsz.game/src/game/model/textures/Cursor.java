@@ -10,6 +10,7 @@ import java.io.File;
 import static io.wsz.model.sizes.Paths.*;
 
 public class Cursor {
+    private CursorType active = CursorType.MAIN;
     private ImageCursor mainCursor;
     private ImageCursor upCursor;
     private ImageCursor rightCursor;
@@ -28,6 +29,7 @@ public class Cursor {
     private ImageCursor notGoCursor;
     private ImageCursor talkCursor;
     private ImageCursor attackCursor;
+    private boolean hasChanged;
 
     public void initCursorsImages(File programDir) {
         String cursorsDir = programDir + TEXTURES_DIR + CURSOR_DIR;
@@ -105,8 +107,8 @@ public class Cursor {
         attackCursor = new ImageCursor(attackFx, attackFx.getWidth()/2, attackFx.getHeight()/2);
     }
 
-    public ImageCursor getCursor(CursorType type) {
-        return switch (type) {
+    public ImageCursor getActiveCursorImage() {
+        return switch (active) {
             case MAIN -> getMain();
             case UP -> getUp();
             case RIGHT -> getRight();
@@ -126,6 +128,12 @@ public class Cursor {
             case TALK -> getTalk();
             case ATTACK -> getAttack();
         };
+    }
+
+    public void setCursor(CursorType type) {
+        if (active == type) return;
+        hasChanged = true;
+        active = type;
     }
 
     public ImageCursor getMain() {
@@ -198,5 +206,9 @@ public class Cursor {
 
     public ImageCursor getAttack() {
         return attackCursor;
+    }
+
+    public boolean hasChanged() {
+        return hasChanged;
     }
 }

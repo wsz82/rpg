@@ -29,6 +29,7 @@ import io.wsz.model.world.World;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.scene.ImageCursor;
 
 import java.io.*;
 import java.util.List;
@@ -299,7 +300,14 @@ public class GameController {
     }
 
     public void refreshGame() {
+        if (cursor.hasChanged()) {
+            setCursor(cursor.getActiveCursorImage());
+        }
         gameView.refresh();
+    }
+
+    public void setCursor(ImageCursor imageCursor) {
+        gameView.getCanvas().getScene().setCursor(imageCursor);
     }
 
     public GameView getGameView() {
