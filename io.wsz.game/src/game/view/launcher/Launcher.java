@@ -3,6 +3,7 @@ package game.view.launcher;
 import game.model.GameController;
 import game.view.menu.GameStage;
 import io.wsz.model.locale.LocaleKeys;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -30,6 +31,7 @@ class Launcher {
 
     private void initLauncher(GameController gameController) {
         final StackPane root = new StackPane();
+        root.setPadding(new Insets(10));
 
         Properties locale = gameController.getController().getLocale();
         final VBox menu = new VBox(10);
