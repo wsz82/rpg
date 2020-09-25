@@ -322,21 +322,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     public void restoreReferences(Controller controller, List<Asset> assets, World world) {
         restorePrototype(assets);
         controller.restoreLocationOfCoords(pos);
-        restoreScript(world.getScripts());
         restoreDialog(world.getDialogs());
-    }
-
-    private void restoreScript(List<Script> scripts) {
-        Script serScript = this.script;
-        if (serScript == null) return;
-        String scriptId = serScript.getId();
-        Script script = scripts.stream()
-                .filter(s -> s.getId().equals(scriptId))
-                .findFirst().orElse(null);
-        if (script == null) {
-            throw new NullPointerException(scriptId + " reference is not found");
-        }
-        setScript(script);
     }
 
     private void restorePrototype(List<Asset> assets) {
@@ -757,11 +743,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         out.writeObject(interactionPoint);
 
-        String scriptId = "";
-        if (script != null) {
-            scriptId = script.getId();
-        }
-        out.writeUTF(scriptId);
+        out.writeObject(script);
     }
 
     @Override
@@ -796,9 +778,6 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         interactionPoint = (Coords) in.readObject();
 
-        String scriptId = in.readUTF();
-        if (!scriptId.isEmpty()) {
-            script = new Script(scriptId);
-        }
+        script = (Script) in.readObject();
     }
 }

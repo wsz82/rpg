@@ -134,7 +134,7 @@ public class Script implements Externalizable, Executable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(id);
         out.writeObject(initialText);
-        out.writeObject(executables); //TODO write only id of script if is in executables?
+        out.writeObject(executables);
     }
 
     @Override
