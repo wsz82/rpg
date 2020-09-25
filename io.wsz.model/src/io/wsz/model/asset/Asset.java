@@ -2,6 +2,7 @@ package io.wsz.model.asset;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.world.World;
@@ -10,7 +11,7 @@ import java.io.*;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Asset implements Externalizable {
+public abstract class Asset<A extends Asset> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     protected String assetId;
@@ -61,6 +62,8 @@ public abstract class Asset implements Externalizable {
     public abstract void setController(Controller controller);
 
     public abstract void restoreReferences(Controller controller, List<Asset> assets, World world);
+
+    public abstract void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY);
 
     public String getAssetId() {
         if (assetId == null) {

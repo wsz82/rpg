@@ -126,6 +126,11 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     }
 
     @Override
+    protected Weapon getNewItemFromPrototype() {
+        return new Weapon(this);
+    }
+
+    @Override
     public boolean isUnitIdentical(Object o) {
         if (this == o) return true;
         if (!(o instanceof Weapon)) return false;

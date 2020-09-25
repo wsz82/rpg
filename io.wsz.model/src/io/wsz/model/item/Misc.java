@@ -56,6 +56,11 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     }
 
     @Override
+    protected Misc getNewItemFromPrototype() {
+        return new Misc(this);
+    }
+
+    @Override
     protected String getAssetDirName() {
         return Paths.MISC;
     }

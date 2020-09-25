@@ -51,6 +51,11 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     }
 
     @Override
+    protected Landscape getNewItemFromPrototype() {
+        return new Landscape(this);
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

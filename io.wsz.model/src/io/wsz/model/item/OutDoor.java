@@ -54,6 +54,11 @@ public class OutDoor extends Door<OutDoor> {
         restoreOutDoorConnection(controller);
     }
 
+    @Override
+    protected OutDoor getNewItemFromPrototype() {
+        return new OutDoor(this);
+    }
+
     private void restoreOutDoorConnection(Controller controller) {
         OutDoor serConnection = connection;
         if (serConnection == null) return;

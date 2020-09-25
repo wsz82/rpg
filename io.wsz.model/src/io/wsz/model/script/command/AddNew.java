@@ -2,10 +2,9 @@ package io.wsz.model.script.command;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.item.*;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.ScriptValidator;
-import io.wsz.model.stage.Coords;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -84,46 +83,7 @@ public class AddNew implements Executable, Externalizable {
         int toLevel = Integer.parseInt(level);
         double toX = Double.parseDouble(posX);
         double toY = Double.parseDouble(posY);
-
-        if (prototype instanceof Container) {
-            Container container = new Container((Container) prototype);
-            setUpItem(container, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Cover) {
-            Cover cover = new Cover((Cover) prototype);
-            setUpItem(cover, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Creature) {
-            Creature creature = new Creature((Creature) prototype);
-            setUpCreatureItem(creature, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof InDoor) {
-            InDoor inDoor = new InDoor((InDoor) prototype);
-            setUpItem(inDoor, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Landscape) {
-            Landscape landscape = new Landscape((Landscape) prototype);
-            setUpItem(landscape, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Misc){
-            Misc misc = new Misc((Misc) prototype);
-            setUpItem(misc, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof OutDoor) {
-            OutDoor outDoor = new OutDoor((OutDoor) prototype);
-            setUpItem(outDoor, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Teleport) {
-            Teleport teleport = new Teleport((Teleport) prototype);
-            setUpItem(teleport, toLocation, toLevel, toX, toY);
-        } else if (prototype instanceof Weapon) {
-            Weapon weapon = new Weapon((Weapon) prototype);
-            setUpItem(weapon, toLocation, toLevel, toX, toY);
-        }
-    }
-
-    private void setUpCreatureItem(Creature creature, Location toLocation, int toLevel, double toX, double toY) {
-        Coords centered = creature.getReversedCenter(toX, toY, toLevel, toLocation);
-        creature.setPos(centered);
-        toLocation.getItemsToAdd().add(creature);
-    }
-
-    private void setUpItem(PosItem item, Location toLocation, int toLevel, double toX, double toY) {
-        item.setPos(toX, toY, toLevel, toLocation);
-        toLocation.getItemsToAdd().add(item);
+        prototype.addNewItemToLocation(toLocation, toLevel, toX, toY);
     }
 
     public String getAssetId() {

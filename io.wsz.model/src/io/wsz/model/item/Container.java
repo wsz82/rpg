@@ -139,6 +139,11 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
+    protected Container getNewItemFromPrototype() {
+        return new Container(this);
+    }
+
+    @Override
     public void setCursor(CursorSetter cursorSetter) {
         CursorType type;
         if (isOpen()) {

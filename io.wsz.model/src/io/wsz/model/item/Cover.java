@@ -52,6 +52,11 @@ public class Cover extends PosItem<Cover, AnimationPos> implements Externalizabl
     }
 
     @Override
+    protected Cover getNewItemFromPrototype() {
+        return new Cover(this);
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

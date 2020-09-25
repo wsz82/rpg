@@ -26,4 +26,9 @@ public class InDoor extends Door<InDoor> {
     public boolean creaturePrimaryInteract(Creature cr) {
         return creatureSecondaryInteract(cr);
     }
+
+    @Override
+    protected InDoor getNewItemFromPrototype() {
+        return new InDoor(this);
+    }
 }

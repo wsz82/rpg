@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> extends Asset implements Updatable, Interactable, Animable {
+public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> extends Asset<A> implements Updatable, Interactable, Animable {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
@@ -372,6 +372,19 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         if (itemWillCollide) return false;
         addToLocation(location, locationItems);
         return true;
+    }
+
+    @Override
+    public final void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY) {
+        A item = getNewItemFromPrototype();
+        addNewItemToLocation(toLocation, toLevel, toX, toY, item);
+    }
+
+    protected abstract A getNewItemFromPrototype();
+
+    protected void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, A item) {
+        item.setPos(toX, toY, toLevel, toLocation);
+        toLocation.getItemsToAdd().add(item);
     }
 
     public void addToLocation(Location location, List<PosItem> locationItems) {

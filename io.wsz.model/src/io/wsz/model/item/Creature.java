@@ -414,6 +414,18 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         getItems().forEach(e -> e.restoreReferences(controller, assets, world));
     }
 
+    @Override
+    protected Creature getNewItemFromPrototype() {
+        return new Creature(this);
+    }
+
+    @Override
+    protected void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, Creature item) {
+        Coords centered = item.getReversedCenter(toX, toY, toLevel, toLocation);
+        item.setPos(centered);
+        toLocation.getItemsToAdd().add(item);
+    }
+
     private void restoreCreatureEquippedItemsPlaces(Controller controller, List<InventoryPlaceType> places) {
         Inventory inventory = getInventory();
         Map<InventoryPlaceType, Equipment> equippedItems = inventory.getEquippedItems();

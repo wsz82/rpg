@@ -58,6 +58,11 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
         controller.restoreLocationOfCoords(exit);
     }
 
+    @Override
+    protected Teleport getNewItemFromPrototype() {
+        return new Teleport(this);
+    }
+
     public Coords getIndividualExit() {
         return exit;
     }
