@@ -23,7 +23,7 @@ public class GiveToAdversary implements Executable, Externalizable {
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         GiveToAdversary command = new GiveToAdversary();
-        s = s.replaceFirst(GIVE_TO_ADVERSARY + OPEN_BRACKET + QUOTE, "");
+        s = s.replaceFirst(GIVE_TO_ADVERSARY + REGEX_OPEN_BRACKET + QUOTE, "");
         int nextIndex = s.indexOf(QUOTE);
 
         if (nextIndex != -1) {
@@ -31,14 +31,14 @@ public class GiveToAdversary implements Executable, Externalizable {
             command.itemOrAssetId = itemOrAssetId;
             validator.validateItemOrAsset(itemOrAssetId);
             String toRemove = itemOrAssetId + QUOTE + COMMA;
-            s = s.replace(toRemove, "");
+            s = s.replaceFirst(toRemove, "");
 
             nextIndex = s.indexOf(CLOSE_BRACKET);
             if (nextIndex != -1) {
                 String amount = s.substring(0, nextIndex);
                 command.amount = amount;
                 validator.validateInteger(amount);
-                s = s.replace(amount + CLOSE_BRACKET, "");
+                s = s.replaceFirst(amount + REGEX_CLOSE_BRACKET, "");
                 validator.validateIsEmpty(s);
                 return command;
             }

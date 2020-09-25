@@ -375,8 +375,9 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     }
 
     @Override
-    public final void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY) {
+    public final void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, String newItemId) {
         A item = getNewItemFromPrototype();
+        item.setItemId(newItemId);
         addNewItemToLocation(toLocation, toLevel, toX, toY, item);
     }
 

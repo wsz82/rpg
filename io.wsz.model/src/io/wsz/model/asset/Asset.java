@@ -63,7 +63,7 @@ public abstract class Asset<A extends Asset> implements Externalizable {
 
     public abstract void restoreReferences(Controller controller, List<Asset> assets, World world);
 
-    public abstract void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY);
+    public abstract void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, String newItemId);
 
     public String getAssetId() {
         if (assetId == null) {

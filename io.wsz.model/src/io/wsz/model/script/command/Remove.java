@@ -20,14 +20,14 @@ public class Remove implements Executable, Externalizable {
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         Remove command = new Remove();
-        s = s.replaceFirst(REMOVE + OPEN_BRACKET + QUOTE, "");
+        s = s.replaceFirst(REMOVE + REGEX_OPEN_BRACKET + QUOTE, "");
         int nextIndex = s.indexOf(QUOTE);
 
         if (nextIndex != -1) {
             String itemId = s.substring(0, nextIndex);
             command.itemId = itemId;
             validator.validateItem(itemId);
-            s = s.replace(itemId + QUOTE + CLOSE_BRACKET, "");
+            s = s.replaceFirst(itemId + QUOTE + REGEX_CLOSE_BRACKET, "");
             validator.validateIsEmpty(s);
             return command;
         }

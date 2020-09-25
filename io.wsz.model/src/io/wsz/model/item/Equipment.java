@@ -189,7 +189,9 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
 
     @Override
     public void setCursor(CursorSetter cursorSetter) {
-        cursorSetter.set(CursorType.PICK);
+        CursorType pick = CursorType.PICK;
+        pick.setShowAmount(false);
+        cursorSetter.set(pick);
     }
 
     public InventoryPlaceType getIndividualOccupiedPlace() {

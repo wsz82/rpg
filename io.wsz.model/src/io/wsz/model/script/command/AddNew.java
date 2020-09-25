@@ -18,7 +18,7 @@ public class AddNew implements Executable, Externalizable {
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         AddNew command = new AddNew();
-        s = s.replaceFirst(ADD_NEW + OPEN_BRACKET, "");
+        s = s.replaceFirst(ADD_NEW + REGEX_OPEN_BRACKET, "");
         int nextIndex = s.indexOf(COMMA);
 
         if (nextIndex != -1) {
@@ -26,7 +26,7 @@ public class AddNew implements Executable, Externalizable {
             command.assetId = assetId;
             validator.validateAsset(assetId);
             String toRemove = QUOTE + assetId + QUOTE + COMMA;
-            s = s.replace(toRemove, "");
+            s = s.replaceFirst(toRemove, "");
 
             nextIndex = s.indexOf(COMMA);
             if (nextIndex != -1) {
@@ -34,7 +34,7 @@ public class AddNew implements Executable, Externalizable {
                 command.locationId = locationId;
                 validator.validateLocation(locationId);
                 toRemove = QUOTE + locationId + QUOTE + COMMA;
-                s = s.replace(toRemove, "");
+                s = s.replaceFirst(toRemove, "");
 
                 nextIndex = s.indexOf(COMMA);
                 if (nextIndex != -1) {
@@ -42,7 +42,7 @@ public class AddNew implements Executable, Externalizable {
                     command.level = level;
                     validator.validateInteger(level);
                     toRemove = level + COMMA;
-                    s = s.replace(toRemove, "");
+                    s = s.replaceFirst(toRemove, "");
 
                     nextIndex = s.indexOf(COMMA);
                     if (nextIndex != -1) {
@@ -50,14 +50,35 @@ public class AddNew implements Executable, Externalizable {
                         command.posX = posX;
                         validator.validateDecimal(posX);
                         toRemove = posX + COMMA;
-                        s = s.replace(toRemove, "");
+                        s = s.replaceFirst(toRemove, "");
 
-                        int closeIndex = s.indexOf(CLOSE_BRACKET);
-                        if (closeIndex != -1) {
-                            command.posY = s.substring(0, closeIndex);
+                        nextIndex = s.indexOf(COMMA);
+                        if (nextIndex == -1) {
+                            nextIndex = s.indexOf(CLOSE_BRACKET);
+                        }
+
+                        if (nextIndex != -1) {
+                            String posY = s.substring(0, nextIndex);
+                            command.posY = posY;
                             validator.validateDecimal(command.posY);
-                            s = s.replace(command.posY + CLOSE_BRACKET, "");
-                            validator.validateIsEmpty(s);
+                            toRemove = posY;
+                            s = s.replaceFirst(toRemove, "");
+
+                            if (s.startsWith(COMMA)) {
+                                s = s.replaceFirst(COMMA + QUOTE, "");
+                                nextIndex = s.indexOf(QUOTE);
+                                if (nextIndex != -1) {
+                                    String newItemId = s.substring(0, nextIndex);
+                                    command.newItemId = newItemId;
+                                    validator.validateNewItemId(newItemId);
+                                    s = s.replaceFirst(newItemId + QUOTE + REGEX_CLOSE_BRACKET, "");
+                                    validator.validateIsEmpty(s);
+                                } else {
+                                    parseWithoutNewItemId(s, validator, command);
+                                }
+                            } else {
+                                parseWithoutNewItemId(s, validator, command);
+                            }
                             return command;
                         }
                     }
@@ -68,11 +89,18 @@ public class AddNew implements Executable, Externalizable {
         return null;
     }
 
+    public static void parseWithoutNewItemId(String s, ScriptValidator validator, AddNew command) {
+        command.newItemId = null;
+        s = s.replaceFirst(REGEX_CLOSE_BRACKET, "");
+        validator.validateIsEmpty(s);
+    }
+
     private String assetId;
     private String locationId;
     private String level;
     private String posX;
     private String posY;
+    private String newItemId;
 
     @Override
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
@@ -86,7 +114,7 @@ public class AddNew implements Executable, Externalizable {
         int toLevel = Integer.parseInt(level);
         double toX = Double.parseDouble(posX);
         double toY = Double.parseDouble(posY);
-        prototype.addNewItemToLocation(toLocation, toLevel, toX, toY);
+        prototype.addNewItemToLocation(toLocation, toLevel, toX, toY, newItemId);
     }
 
     public String getAssetId() {

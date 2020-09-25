@@ -10,7 +10,6 @@ import java.io.File;
 import static io.wsz.model.sizes.Paths.*;
 
 public class Cursor {
-    private ImageCursor active;
     private ImageCursor mainCursor;
     private ImageCursor upCursor;
     private ImageCursor rightCursor;
@@ -129,97 +128,75 @@ public class Cursor {
         };
     }
 
-    public ImageCursor getActive() {
-        return active;
-    }
-
     public ImageCursor getMain() {
-        active = mainCursor;
         return mainCursor;
     }
 
     public ImageCursor getUp() {
-        active = upCursor;
         return upCursor;
     }
 
     public ImageCursor getRight() {
-        active = rightCursor;
         return rightCursor;
     }
 
     public ImageCursor getDown() {
-        active = downCursor;
         return downCursor;
     }
 
     public ImageCursor getLeft() {
-        active = leftCursor;
         return leftCursor;
     }
 
     public ImageCursor getLeftUp() {
-        active = leftUpCursor;
         return leftUpCursor;
     }
 
     public ImageCursor getRightUp() {
-        active = rightUpCursor;
         return rightUpCursor;
     }
 
     public ImageCursor getRightDown() {
-        active = rightDownCursor;
         return rightDownCursor;
     }
 
     public ImageCursor getLeftDown() {
-        active = leftDownCursor;
         return leftDownCursor;
     }
 
     public ImageCursor getOpenDoor() {
-        active = openDoorCursor;
         return openDoorCursor;
     }
 
     public ImageCursor getClosedDoor() {
-        active = closedDoorCursor;
         return closedDoorCursor;
     }
 
     public ImageCursor getOpenContainer() {
-        active = openContainerCursor;
         return openContainerCursor;
     }
 
     public ImageCursor getClosedContainer() {
-        active = closedContainerCursor;
         return closedContainerCursor;
     }
 
     public ImageCursor getPick() {
-        active = pickCursor;
         return pickCursor;
     }
 
     public ImageCursor getGo() {
-        active = goCursor;
         return goCursor;
     }
 
     public ImageCursor getNotGo() {
-        active = notGoCursor;
         return notGoCursor;
     }
 
     public ImageCursor getTalk() {
-        active = talkCursor;
         return talkCursor;
     }
 
     public ImageCursor getAttack() {
-        active = attackCursor;
         return attackCursor;
     }
 }

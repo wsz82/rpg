@@ -34,6 +34,8 @@ public class ScriptValidator {
     private String itemId;
     private boolean isItemOrAssetIdInvalid;
     private String itemOrAssetId;
+    private boolean isNewItemIdInvalid;
+    private String newItemId;
 
     public ScriptValidator(Controller controller) {
         this.controller = controller;
@@ -95,10 +97,45 @@ public class ScriptValidator {
         }
     }
 
+    public void validateNewItemId(String id) { //TODO read also ids in scripts (include dialogs scripts)
+        if (controller.getItemByItemId(id) != null || controller.getItemByAssetId(id) != null) {
+            setNewItemIdInvalid(id);
+        }
+    }
+
     public void validateLocation(String id) {
         Location location = controller.getLocationById(id);
         if (location == null) {
             setLocationIdInvalid(id);
+        }
+    }
+
+    public void validateInteger(String integer) {
+        try {
+            Integer.parseInt(integer);
+        } catch (NumberFormatException e) {
+            isInvalid = true;
+            isIntegerInvalid = true;
+            shouldBeInteger = integer;
+        }
+    }
+
+    public void validateDecimal(String decimal) {
+        try {
+            Double.parseDouble(decimal);
+        } catch (NumberFormatException e) {
+            isInvalid = true;
+            isDecimalInvalid = true;
+            shouldBeDecimal = decimal;
+        }
+    }
+
+    public void validateIsEmpty(String s) {
+        boolean isNotRecognized = !s.isEmpty();
+        if (isNotRecognized) {
+            isInvalid = true;
+            isUnrecognized = true;
+            shouldBeCode = s;
         }
     }
 
@@ -123,6 +160,9 @@ public class ScriptValidator {
             }
             if (isItemOrAssetIdInvalid) {
                 builder.append("\n ITEM OR ASSET ID: ").append(itemOrAssetId);
+            }
+            if (isNewItemIdInvalid) {
+                builder.append("\n NEW ITEM ID ALREADY EXISTS: ").append(newItemId);
             }
             if (isLocationIdInvalid) {
                 builder.append("\n LOCATION ID: ").append(locationId);
@@ -195,38 +235,15 @@ public class ScriptValidator {
         isItemOrAssetIdInvalid = true;
     }
 
+    private void setNewItemIdInvalid(String id) {
+        isInvalid = true;
+        this.newItemId = id;
+        isNewItemIdInvalid = true;
+    }
+
     public void setLocationIdInvalid(String id) {
         isInvalid = true;
         this.locationId = id;
         isLocationIdInvalid = true;
-    }
-
-    public void validateInteger(String integer) {
-        try {
-            Integer.parseInt(integer);
-        } catch (NumberFormatException e) {
-            isInvalid = true;
-            isIntegerInvalid = true;
-            shouldBeInteger = integer;
-        }
-    }
-
-    public void validateDecimal(String decimal) {
-        try {
-            Double.parseDouble(decimal);
-        } catch (NumberFormatException e) {
-            isInvalid = true;
-            isDecimalInvalid = true;
-            shouldBeDecimal = decimal;
-        }
-    }
-
-    public void validateIsEmpty(String s) {
-        boolean isNotRecognized = !s.isEmpty();
-        if (isNotRecognized) {
-            isInvalid = true;
-            isUnrecognized = true;
-            shouldBeCode = s;
-        }
     }
 }
