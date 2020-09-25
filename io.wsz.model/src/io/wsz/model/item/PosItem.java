@@ -392,6 +392,23 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         onChangeLocationAction(location);
     }
 
+    public PosItem getItemByAssetId(String lookedId) {
+        String assetId = this.getAssetId();
+        if (assetId != null && assetId.equals(lookedId)) {
+            return this;
+        } else {
+            return null;
+        }
+    }
+
+    public PosItem getItemById(String lookedId) {
+        if (this.itemId != null && this.itemId.equals(lookedId)) {
+            return this;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String getAssetId() {
         if (prototype != null) {

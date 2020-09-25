@@ -2,6 +2,7 @@ package io.wsz.model.script;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.command.Executable;
 import io.wsz.model.script.variable.Variable;
@@ -25,6 +26,14 @@ public class ScriptValidator {
     private String shouldBeInteger;
     private boolean isDecimalInvalid;
     private String shouldBeDecimal;
+    private boolean isBooleanInvalid;
+    private String shouldBeBoolean;
+    private boolean isUnrecognized;
+    private String shouldBeCode;
+    private boolean isItemIdInvalid;
+    private String itemId;
+    private boolean isItemOrAssetIdInvalid;
+    private String itemOrAssetId;
 
     public ScriptValidator(Controller controller) {
         this.controller = controller;
@@ -37,10 +46,28 @@ public class ScriptValidator {
         }
     }
 
-    public void validateGlobalVariable(String globalVarID) {
+    public void validateGlobalVariable(String globalVarID, String value) {
         Variable<?> global = controller.getGlobalVariableById(globalVarID);
         if (global == null) {
             setGlobalVariableInvalid(globalVarID);
+        } else {
+            Object variableValue = global.getValue();
+            if (variableValue instanceof Boolean) {
+                validateBoolean(value);
+            } else if (variableValue instanceof Integer) {
+                validateInteger(value);
+            } else if (variableValue instanceof Double) {
+                validateDecimal(value);
+            }
+        }
+    }
+
+    private void validateBoolean(String value) {
+        boolean isNotTrueOrFalse = !value.equals("true") && !value.equals("false");
+        if (isNotTrueOrFalse) {
+            isInvalid = true;
+            isBooleanInvalid = true;
+            shouldBeBoolean = value;
         }
     }
 
@@ -48,6 +75,23 @@ public class ScriptValidator {
         Asset asset = controller.getAssetById(assetId);
         if (asset == null) {
             setAssetIdInvalid(assetId);
+        }
+    }
+
+    public void validateItem(String itemID) {
+        PosItem item = controller.getItemByItemId(itemID);
+        if (item == null) {
+            setItemIdInvalid(itemID);
+        }
+    }
+
+    public void validateItemOrAsset(String id) {
+        PosItem item = controller.getItemByItemId(id);
+        if (item == null) {
+            item = controller.getItemByAssetId(id);
+            if (item == null) {
+                setItemOrAssetIdInvalid(id);
+            }
         }
     }
 
@@ -74,6 +118,12 @@ public class ScriptValidator {
             if (isAssetIdInvalid) {
                 builder.append("\n ASSET ID: ").append(assetId);
             }
+            if (isItemIdInvalid) {
+                builder.append("\n ITEM ID: ").append(itemId);
+            }
+            if (isItemOrAssetIdInvalid) {
+                builder.append("\n ITEM OR ASSET ID: ").append(itemOrAssetId);
+            }
             if (isLocationIdInvalid) {
                 builder.append("\n LOCATION ID: ").append(locationId);
             }
@@ -82,6 +132,12 @@ public class ScriptValidator {
             }
             if (isDecimalInvalid) {
                 builder.append("\n DECIMAL: ").append(shouldBeDecimal);
+            }
+            if (isBooleanInvalid) {
+                builder.append("\n BOOLEAN: ").append(shouldBeBoolean);
+            }
+            if (isUnrecognized) {
+                builder.append("\n UNRECOGNIZED: ").append(shouldBeCode);
             }
         }
         message = builder.toString();
@@ -127,6 +183,18 @@ public class ScriptValidator {
         isAssetIdInvalid = true;
     }
 
+    private void setItemIdInvalid(String id) {
+        isInvalid = true;
+        this.itemId = id;
+        isItemIdInvalid = true;
+    }
+
+    private void setItemOrAssetIdInvalid(String id) {
+        isInvalid = true;
+        this.itemOrAssetId = id;
+        isItemOrAssetIdInvalid = true;
+    }
+
     public void setLocationIdInvalid(String id) {
         isInvalid = true;
         this.locationId = id;
@@ -150,6 +218,15 @@ public class ScriptValidator {
             isInvalid = true;
             isDecimalInvalid = true;
             shouldBeDecimal = decimal;
+        }
+    }
+
+    public void validateIsEmpty(String s) {
+        boolean isNotRecognized = !s.isEmpty();
+        if (isNotRecognized) {
+            isInvalid = true;
+            isUnrecognized = true;
+            shouldBeCode = s;
         }
     }
 }

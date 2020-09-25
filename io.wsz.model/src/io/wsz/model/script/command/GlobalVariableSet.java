@@ -25,10 +25,12 @@ public class GlobalVariableSet implements Executable, Externalizable {
         if (setIndex != -1) {
             String globalVarID = s.substring(0, setIndex);
             command.globalVarID = globalVarID;
-            validator.validateGlobalVariable(globalVarID);
             s = s.replace(globalVarID + SET, "");
             String value = s;
             command.value = value;
+            validator.validateGlobalVariable(globalVarID, value);
+            s = s.replace(value, "");
+            validator.validateIsEmpty(s);
             return command;
         }
         validator.setSyntaxInvalid(s);

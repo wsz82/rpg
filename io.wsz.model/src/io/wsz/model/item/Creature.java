@@ -452,6 +452,16 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
     }
 
+    @Override
+    public PosItem getItemByAssetId(String lookedId) {
+        return getItemByAssetId(this, lookedId);
+    }
+
+    @Override
+    public PosItem getItemById(String lookedId) {
+        return getItemByItemId(this, lookedId);
+    }
+
     public Task getTask() {
         return task;
     }

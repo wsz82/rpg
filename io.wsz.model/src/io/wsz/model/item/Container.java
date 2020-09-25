@@ -154,6 +154,16 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         cursorSetter.set(type);
     }
 
+    @Override
+    public PosItem getItemByAssetId(String lookedId) {
+        return getItemByAssetId(this, lookedId);
+    }
+
+    @Override
+    public PosItem getItemById(String lookedId) {
+        return getItemByItemId(this, lookedId);
+    }
+
     public Double getIndividualNettoWeight() {
         return nettoWeight;
     }

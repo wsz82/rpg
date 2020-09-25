@@ -16,27 +16,30 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Properties;
 
-import static io.wsz.model.script.ScriptKeyWords.GIVE_TO_ADVERSARY;
+import static io.wsz.model.script.ScriptKeyWords.*;
 
 public class GiveToAdversary implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         GiveToAdversary command = new GiveToAdversary();
-        s = s.replaceFirst(GIVE_TO_ADVERSARY + "\\(\"", "");
-        String comma = "\",";
-        int commaIndex = s.indexOf(comma);
+        s = s.replaceFirst(GIVE_TO_ADVERSARY + OPEN_BRACKET + QUOTE, "");
+        int nextIndex = s.indexOf(QUOTE);
 
-        if (commaIndex != -1) {
-            String itemID = s.substring(0, commaIndex);
-            command.itemID = itemID;
-            String toRemove = itemID + comma;
+        if (nextIndex != -1) {
+            String itemOrAssetId = s.substring(0, nextIndex);
+            command.itemOrAssetId = itemOrAssetId;
+            validator.validateItemOrAsset(itemOrAssetId);
+            String toRemove = itemOrAssetId + QUOTE + COMMA;
             s = s.replace(toRemove, "");
 
-            int closeIndex = s.indexOf(")");
-            if (closeIndex != -1) {
-                String amount = s.substring(0, closeIndex);
+            nextIndex = s.indexOf(CLOSE_BRACKET);
+            if (nextIndex != -1) {
+                String amount = s.substring(0, nextIndex);
                 command.amount = amount;
+                validator.validateInteger(amount);
+                s = s.replace(amount + CLOSE_BRACKET, "");
+                validator.validateIsEmpty(s);
                 return command;
             }
         }
@@ -44,71 +47,88 @@ public class GiveToAdversary implements Executable, Externalizable {
         return null;
     }
 
-    private String itemID;
+    private String itemOrAssetId;
     private String amount;
 
     @Override
-    public void execute(Controller controller, PosItem giving, PosItem receiving) {
+    public void execute(Controller controller, PosItem giving, PosItem receiving) { //TODO dropping item when does not fits inventory (Problem: items with collision)
         if (giving == null || receiving == null) return;
+        boolean receivingOrGivingIsNotContainable = !(receiving instanceof Containable) || !(giving instanceof Containable);
+        if (receivingOrGivingIsNotContainable) return;
+        Containable givingCo = (Containable) giving;
+        Containable receivingCo = (Containable) receiving;
 
-        Equipment equipment;
-        if (giving instanceof Containable) {
-            Containable givingCo = (Containable) giving;
-            equipment = givingCo.getItems().stream()
-                    .filter(e -> e.getAssetId().equals(itemID))
-                    .findFirst()
-                    .orElse(null);
-            if (equipment == null) return;
-            if (receiving instanceof Containable) { //TODO dropping item when does not fits inventory (Problem: items with collision)
-                Containable receivingCo = (Containable) receiving;
-                equipment.getPos().reset();
+        int amount;
+        try {
+            amount = Integer.parseInt(this.amount);
+        } catch (NumberFormatException e) {
+            System.out.println(this.amount + " must be int");
+            e.printStackTrace();
+            return;
+        }
+        if (amount < 0) {
+            amount = -amount;
+            Containable temp = givingCo;
+            givingCo = receivingCo;
+            receivingCo = temp;
+        }
 
-                int amount;
-                try {
-                    amount = Integer.parseInt(this.amount);
-                } catch (NumberFormatException e) {
-                    System.out.println(this.amount + " must be int");
-                    e.printStackTrace();
-                    return;
-                }
-                if (amount < 1) {
-                    System.out.println(amount + " must be positive");
-                    return;
-                }
-                int availableAmount = 0;
-                for (int i = 0; i < amount; i++) {
-                    if (givingCo.getItems().remove(equipment)) {
-                        availableAmount++;
+        Equipment equipment = givingCo.getItems().stream()
+                .filter(e -> {
+                    String id = e.getItemId();
+                    if (id != null) {
+                        boolean equals = id.equals(itemOrAssetId);
+                        if (equals) {
+                            return true;
+                        } else {
+                            return areIdsEqual(e);
+                        }
+                    } else {
+                        return areIdsEqual(e);
                     }
-                }
-                for (int i = 0; i < availableAmount; i++) {
-                    receivingCo.getItems().add(equipment);
-                }
+                })
+                .findFirst().orElse(null);
+        if (equipment == null) return;
+        equipment.getPos().reset();
 
-                Creature pc = controller.getDialogMemento().getPc();
-                String message;
-                Properties locale = controller.getLocale();
-                if (giving == pc) {
-                    message = locale.getProperty(LocaleKeys.RETURNED);
-                } else {
-                    message = locale.getProperty(LocaleKeys.RECEIVED);
-                }
-                message = message + " " + availableAmount + " " + equipment.getName();
-                DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
-                controller.getDialogMemento().getDialogs().add(di);
+        int availableAmount = 0;
+        for (int i = 0; i < amount; i++) {
+            if (givingCo.getItems().remove(equipment)) {
+                availableAmount++;
             }
         }
+        for (int i = 0; i < availableAmount; i++) {
+            receivingCo.getItems().add(equipment);
+        }
+
+        Creature pc = controller.getDialogMemento().getPc();
+        String message;
+        Properties locale = controller.getLocale();
+        if (givingCo == pc) {
+            message = locale.getProperty(LocaleKeys.RETURNED);
+        } else {
+            message = locale.getProperty(LocaleKeys.RECEIVED);
+        }
+        message = message + " " + availableAmount + " " + equipment.getName();
+        DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
+        controller.getDialogMemento().getDialogs().add(di);
+    }
+
+    public boolean areIdsEqual(Equipment e) {
+        String id;
+        id = e.getAssetId();
+        return id.equals(itemOrAssetId);
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeObject(itemID);
+        out.writeObject(itemOrAssetId);
         out.writeObject(amount);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        itemID = (String) in.readObject();
+        itemOrAssetId = (String) in.readObject();
         amount = (String) in.readObject();
     }
 }

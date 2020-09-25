@@ -11,53 +11,53 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import static io.wsz.model.script.ScriptKeyWords.ADD_NEW;
+import static io.wsz.model.script.ScriptKeyWords.*;
 
 public class AddNew implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         AddNew command = new AddNew();
-        String quote = "\"";
-        String comma = ",";
-        s = s.replaceFirst(ADD_NEW + "\\(", "");
-        int nextIndex = s.indexOf(comma);
+        s = s.replaceFirst(ADD_NEW + OPEN_BRACKET, "");
+        int nextIndex = s.indexOf(COMMA);
 
         if (nextIndex != -1) {
             String assetId = s.substring(1, nextIndex - 1);
             command.assetId = assetId;
             validator.validateAsset(assetId);
-            String toRemove = quote + assetId + quote + comma;
+            String toRemove = QUOTE + assetId + QUOTE + COMMA;
             s = s.replace(toRemove, "");
 
-            nextIndex = s.indexOf(comma);
+            nextIndex = s.indexOf(COMMA);
             if (nextIndex != -1) {
                 String locationId = s.substring(1, nextIndex - 1);
                 command.locationId = locationId;
                 validator.validateLocation(locationId);
-                toRemove = quote + locationId + quote + comma;
+                toRemove = QUOTE + locationId + QUOTE + COMMA;
                 s = s.replace(toRemove, "");
 
-                nextIndex = s.indexOf(comma);
+                nextIndex = s.indexOf(COMMA);
                 if (nextIndex != -1) {
                     String level = s.substring(0, nextIndex);
                     command.level = level;
                     validator.validateInteger(level);
-                    toRemove = level + comma;
+                    toRemove = level + COMMA;
                     s = s.replace(toRemove, "");
 
-                    nextIndex = s.indexOf(comma);
+                    nextIndex = s.indexOf(COMMA);
                     if (nextIndex != -1) {
                         String posX = s.substring(0, nextIndex);
                         command.posX = posX;
                         validator.validateDecimal(posX);
-                        toRemove = posX + comma;
+                        toRemove = posX + COMMA;
                         s = s.replace(toRemove, "");
 
-                        int closeIndex = s.indexOf(")");
+                        int closeIndex = s.indexOf(CLOSE_BRACKET);
                         if (closeIndex != -1) {
                             command.posY = s.substring(0, closeIndex);
                             validator.validateDecimal(command.posY);
+                            s = s.replace(command.posY + CLOSE_BRACKET, "");
+                            validator.validateIsEmpty(s);
                             return command;
                         }
                     }

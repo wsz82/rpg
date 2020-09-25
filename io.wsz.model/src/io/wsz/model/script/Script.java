@@ -42,8 +42,9 @@ public class Script implements Externalizable, Executable {
         validator = new ScriptValidator(controller);
         if (initialText == null) return;
         this.initialText = initialText;
-        initialText = initialText.replaceAll("\\s+", "");
-        String[] commandsToParse = initialText.split(";");
+        String whiteSpace = "\\s+";
+        initialText = initialText.replaceAll(whiteSpace, "");
+        String[] commandsToParse = initialText.split(COMMAND_END);
 
         for (String commandToParse : commandsToParse) {
             Executable executable = null;
@@ -58,7 +59,7 @@ public class Script implements Externalizable, Executable {
             } else if (commandToParse.startsWith(RUN)) {
                 executable = getScriptToRun(controller, commandToParse, validator);
             } else {
-                validator.setSyntaxInvalid("empty");
+                validator.setSyntaxInvalid(commandToParse);
             }
 
             if (validator.isInvalid()) {

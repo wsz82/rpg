@@ -13,20 +13,22 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-import static io.wsz.model.script.ScriptKeyWords.REMOVE;
+import static io.wsz.model.script.ScriptKeyWords.*;
 
 public class Remove implements Executable, Externalizable {
     private static final long serialVersionUID = 1L;
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         Remove command = new Remove();
-        String closeBracket = ")";
-        s = s.replaceFirst(REMOVE + "\\(", "");
-        int nextIndex = s.indexOf(closeBracket);
+        s = s.replaceFirst(REMOVE + OPEN_BRACKET + QUOTE, "");
+        int nextIndex = s.indexOf(QUOTE);
 
         if (nextIndex != -1) {
-            String assetId = s.substring(1, nextIndex - 1);
-            command.itemId = assetId;
+            String itemId = s.substring(0, nextIndex);
+            command.itemId = itemId;
+            validator.validateItem(itemId);
+            s = s.replace(itemId + QUOTE + CLOSE_BRACKET, "");
+            validator.validateIsEmpty(s);
             return command;
         }
         validator.setSyntaxInvalid(s);

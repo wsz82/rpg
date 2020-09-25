@@ -287,9 +287,33 @@ public class Controller {
     }
 
     public Asset getAssetById(String id) {
-        return model.getActivePlugin().getWorld().getAssets().stream()
+        return getAssets().stream()
                 .filter(a -> a.getAssetId().equals(id))
                 .findFirst().orElse(null);
+    }
+
+    public PosItem getItemByAssetId(String itemId) {
+        for (Location l : getLocations()) {
+            for (PosItem i : l.getItems()) {
+                PosItem item = i.getItemByAssetId(itemId);
+                if (item != null) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    public PosItem getItemByItemId(String itemId) {
+        for (Location l : getLocations()) {
+            for (PosItem i : l.getItems()) {
+                PosItem item = i.getItemById(itemId);
+                if (item != null) {
+                    return item;
+                }
+            }
+        }
+        return null;
     }
 
     public Location getLocationById(String id) {

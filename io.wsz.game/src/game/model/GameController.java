@@ -141,7 +141,7 @@ public class GameController {
         savedPos.setLocation(controller.getCurrentLocation().getLocation());
         savedPos.level = controller.getCurrentLayer().getLevel();
         SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes(), controller.getDialogMemento());
-        memento.setLocations(controller.getLocations());
+        memento.setWorld(controller.getActivePlugin().getWorld());
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.makeSave(memento);
     }
@@ -213,8 +213,6 @@ public class GameController {
     }
 
     public void restoreSaveMemento(SaveMemento m) {
-        List<Location> locations = m.getLocations();
-
         Model model = controller.getModel();
         Plugin activePlugin = model.getActivePlugin();
         if (activePlugin == null) {
@@ -222,8 +220,8 @@ public class GameController {
             model.setActivePlugin(activePlugin);
         }
         if (activePlugin == null) return;
-        World world = activePlugin.getWorld();
-        world.setLocations(locations);
+        World world = m.getWorld();
+        activePlugin.setWorld(world);
 
         Coords lastPos = m.getLastPos();
         setCurPos(lastPos);
