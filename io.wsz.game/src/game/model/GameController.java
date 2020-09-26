@@ -299,11 +299,11 @@ public class GameController {
         gameStage.setLoaderViewToCenter(loader);
     }
 
-    public void refreshGame() {
+    public void refreshGame(List<PosItem> sortedItems) {
         if (cursor.hasChanged()) {
             setCursor(cursor.getActiveCursorImage());
         }
-        gameView.refresh();
+        gameView.refresh(sortedItems);
     }
 
     public void setCursor(ImageCursor imageCursor) {

@@ -7,24 +7,21 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
-import io.wsz.model.stage.Geometry;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.OptionalDouble;
-import java.util.stream.Collectors;
 
 public abstract class EquipmentViewElement extends InventoryViewElement {
     protected static final double SIZE_COLUMN_WIDTH = 0.01;
     protected static final double WEIGHT_COLUMN_WIDTH = 0.01;
 
-    protected final List<Equipment> items = new ArrayList<>(0);
     protected final Coords curPos = new Coords();
 
+    protected List<Equipment> sortedEquipment;
     protected double inventoryWidth;
     protected double scrollWidth;
     protected double yScrollPos;
@@ -59,22 +56,14 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         if (isMouseNotWithinView()) return;
         Coords localCoords = getLocalCoords();
         Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
-        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, curPos.y, viewWidth, maxCurPosY, getItems());
-    }
-
-    protected boolean isMouseNotWithinView() {
-        double mouseX = mousePos.x;
-        double viewX = viewPos.x;
-        double mouseY = mousePos.y;
-        double viewY = viewPos.y;
-        return mouseX < viewX || mouseY < viewY || mouseX > viewX + viewWidth || mouseY > viewY + viewHeight;
+        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, curPos.y, viewWidth, maxCurPosY, getSortedEquipment());
     }
 
     protected abstract void drawEquipment();
 
     protected abstract void drawBackground();
 
-    public abstract List<Equipment> getItems();
+    public abstract List<Equipment> getSortedEquipment();
 
     @Override
     protected void scrollScrollBar() {
@@ -146,7 +135,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         if (x < currentPos.x || x > currentPos.x + getViewWidth()) return null;
         if (y < currentPos.y || y > currentPos.y + getViewHeight()) return null;
         lookedEquipment.clear();
-        lookedEquipment.addAll(getItems());
+        lookedEquipment.addAll(getSortedEquipment());
         Collections.reverse(lookedEquipment);
         for (Equipment eq : lookedEquipment) {
             double cX = eq.getLeft();
@@ -215,7 +204,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     protected void drawVerScrollButton(double x) {
-        OptionalDouble optMaxHeight = getItems().stream()
+        OptionalDouble optMaxHeight = getSortedEquipment().stream()
                 .mapToDouble(i -> i.getPos().y)
                 .max();
         if (dragged != null) {
@@ -241,26 +230,6 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         gc.setFill(Color.BLUE);
         int meter = Sizes.getMeter();
         gc.fillRect(x, viewPos.y * meter, scrollWidth * meter, viewHeight * meter);
-    }
-
-    protected void sortEquipment() {
-        double left = curPos.x;
-        double right = left + viewWidth;
-        double top = curPos.y;
-        double bottom = top + viewHeight;
-
-        items.clear();
-        getItems().stream()
-                .filter(e -> {
-                    double eLeft = e.getLeft();
-                    double eRight = e.getRight();
-                    double eTop = e.getTop();
-                    double eBottom = e.getBottom();
-                    return Geometry.doOverlap(
-                            left, top, right, bottom,
-                            eLeft, eTop, eRight, eBottom);
-                })
-                .collect(Collectors.toCollection(() -> items));
     }
 
     protected void playInventoryAnimation(Equipment e) {
@@ -378,5 +347,9 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         temp1.y = pos.y;
         temp1.subtract(curPos);
         return temp1;
+    }
+
+    public void setSortedEquipment(List<Equipment> sortedEquipment) {
+        this.sortedEquipment = sortedEquipment;
     }
 }

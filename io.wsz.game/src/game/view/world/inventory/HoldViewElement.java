@@ -55,10 +55,8 @@ public class HoldViewElement extends EquipmentViewElement {
 
     @Override
     protected final void drawEquipment() {
-
-        sortEquipment();
-
-        for (Equipment e : items) {
+        if (sortedEquipment == null) return;
+        for (Equipment e : sortedEquipment) {
             Coords pos = e.getPos();
             Coords corrected = currentPosCorrection(pos);
             int meter = Sizes.getMeter();
@@ -106,7 +104,7 @@ public class HoldViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public List<Equipment> getItems() {
+    public List<Equipment> getSortedEquipment() {
         return inventory.getItems();
     }
 }

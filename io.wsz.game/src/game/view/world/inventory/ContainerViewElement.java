@@ -27,8 +27,6 @@ public class ContainerViewElement extends EquipmentViewElement {
 
     @Override
     protected final void drawEquipment() {
-        sortEquipment();
-
         drawContainerEquipment();
 
         drawContainerSize();
@@ -46,7 +44,8 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     private void drawContainerEquipment() {
-        for (Equipment e : items) {
+        if (sortedEquipment == null) return;
+        for (Equipment e : sortedEquipment) {
             Coords pos = e.getPos();
             Coords corrected = currentPosCorrection(pos);
             int meter = Sizes.getMeter();
@@ -76,7 +75,7 @@ public class ContainerViewElement extends EquipmentViewElement {
 
     @Override
     public boolean tryRemove(Equipment e, Creature cr) {
-        getItems().remove(e);
+        getSortedEquipment().remove(e);
         controller.getLogger().logItemRemoved(e.getName(), container.getName());
         return true;
     }
@@ -94,7 +93,7 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public List<Equipment> getItems() {
+    public List<Equipment> getSortedEquipment() {
         return container.getItems();
     }
 }

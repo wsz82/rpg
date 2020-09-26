@@ -6,7 +6,6 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentLocation;
-import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -14,14 +13,13 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DropViewElement extends EquipmentViewElement {
-    private final List<PosItem> allItmes = new ArrayList<>(0);
     private final Coords creaturePos = new Coords();
     private final FoggableDelegate foggableDelegate;
 
+    private List<PosItem> sortedItems;
     private List<Equipment> droppedEquipment;
     private double visionWidthDiameter;
     private double visionHeightDiameter;
@@ -56,7 +54,7 @@ public class DropViewElement extends EquipmentViewElement {
         CurrentLocation currentLocation = controller.getCurrentLocation();
         double width = currentLocation.getWidth();
         double height = currentLocation.getHeight();
-        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, 0, width, height, getItems());
+        setAppropriateCursor(creatureToOpenInventory, localCoords, 0, 0, width, height, getSortedEquipment());
     }
 
     private void updateCurPos() {
@@ -129,10 +127,8 @@ public class DropViewElement extends EquipmentViewElement {
 
     @Override
     protected final void drawEquipment() {
-        sortItems();
-
         Creature cr = controller.getCreatureToOpenInventory();
-        for (PosItem pi : allItmes) {
+        for (PosItem pi : sortedItems) {
             adjustCoverOpacity(cr, pi);
 
             if (pi == cr) {
@@ -212,13 +208,6 @@ public class DropViewElement extends EquipmentViewElement {
         drawCreatureBase(x, y, base);
     }
 
-    private void sortItems() {
-        Creature cr = controller.getCreatureToOpenInventory();
-        Location loc = cr.getPos().getLocation();
-
-        sortItems(loc, curPos.x, curPos.y, viewWidth, viewHeight, allItmes, cr.getPos().level);
-    }
-
     public void setDroppedEquipment(List<Equipment> droppedEquipment) {
         this.droppedEquipment = droppedEquipment;
     }
@@ -279,7 +268,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public List<Equipment> getItems() {
+    public List<Equipment> getSortedEquipment() {
         return droppedEquipment;
     }
 
@@ -329,5 +318,9 @@ public class DropViewElement extends EquipmentViewElement {
 
     public double getMinCurPosY() {
         return minCurPosY;
+    }
+
+    public void setSortedItems(List<PosItem> sortedItems) {
+        this.sortedItems = sortedItems;
     }
 }

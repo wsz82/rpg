@@ -37,6 +37,14 @@ public abstract class InventoryViewElement extends CanvasView {
         return viewWidth < 0 || viewHeight < 0;
     }
 
+    protected boolean isMouseNotWithinView() {
+        double mouseX = mousePos.x;
+        double viewX = viewPos.x;
+        double mouseY = mousePos.y;
+        double viewY = viewPos.y;
+        return mouseX < viewX || mouseY < viewY || mouseX > viewX + viewWidth || mouseY > viewY + viewHeight;
+    }
+
     protected abstract void scrollScrollBar();
 
     public abstract boolean tryRemove(Equipment e, Creature cr);

@@ -2,6 +2,11 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
+import game.view.world.board.GameView;
+import game.view.world.inventory.ContainerViewElement;
+import game.view.world.inventory.DropViewElement;
+import game.view.world.inventory.HoldViewElement;
+import game.view.world.inventory.InventoryView;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
@@ -11,6 +16,8 @@ import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
+import io.wsz.model.stage.Coords;
+import io.wsz.model.stage.Geometry;
 import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
 import javafx.application.Platform;
@@ -30,6 +37,9 @@ public class GameRunner {
         LATER_RUN_BUFFER.addLast(laterRunner);
     }
 
+    private final List<PosItem> sortedMapItems = new ArrayList<>(0);
+    private final List<Equipment> sortedHoldEquipment = new ArrayList<>(0);
+    private final List<Equipment> sortedContainerEquipment = new ArrayList<>(0);
     private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
     private final GameController gameController;
     private final Controller controller;
@@ -83,7 +93,7 @@ public class GameRunner {
                     continue;
                 }
                 synchronized (this) {
-                    updateModel();
+                    updateModel(); //TODO try catch excepiton with continue?
                 }
 
                 Platform.runLater(() -> {
@@ -130,8 +140,16 @@ public class GameRunner {
             LATER_RUN_BUFFER.pop().run();
         }
 
-        if (controller.isInventory() && gameController.getSettings().isPauseOnInventory()) {
-            return;
+        if (controller.isInventory()) {
+
+            sortHoldViewEquipment();
+
+            sortContainerViewEquipment();
+
+            if (gameController.getSettings().isPauseOnInventory()) {
+                sortDropViewItems();
+                return;
+            }
         }
 
         heroesLocations.clear();
@@ -161,13 +179,34 @@ public class GameRunner {
 
         updateCurrentLocation();
         tryToStartDialog();
+
+        if (!controller.isInventory()) {
+            sortMapItems();
+        }
     }
 
-    private void updateHoveredHeroBaseAnimation() {
-        Creature hoveredHero = gameController.getHoveredHero();
-        if (hoveredHero != null) {
-            hoveredHero.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
-        }
+    private void sortContainerViewEquipment() {
+        Container containerToOpen = controller.getContainerToOpen();
+        if (containerToOpen == null) return;
+        ContainerViewElement containerView = gameController.getGameView().getInventoryView().getContainerView();
+        Coords curPos = containerView.getCurPos();
+        double viewWidth = containerView.getViewWidth();
+        double viewHeight = containerView.getViewHeight();
+
+        List<Equipment> items = containerToOpen.getItems();
+
+        sortEquipment(curPos, viewWidth, viewHeight, sortedContainerEquipment, items);
+    }
+
+    private void sortHoldViewEquipment() {
+        HoldViewElement holdView = gameController.getGameView().getInventoryView().getHoldView();
+        Coords curPos = holdView.getCurPos();
+        double viewWidth = holdView.getViewWidth();
+        double viewHeight = holdView.getViewHeight();
+
+        List<Equipment> items = controller.getCreatureToOpenInventory().getItems();
+
+        sortEquipment(curPos, viewWidth, viewHeight, sortedHoldEquipment, items);
     }
 
     private void updateView() {
@@ -177,6 +216,76 @@ public class GameRunner {
             Sizes.setReloadImages(false);
         }
         refreshGame();
+    }
+
+    private void sortMapItems() {
+        Location location = controller.getCurrentLocation().getLocation();
+        int level = controller.getCurrentLayer().getLevel();
+        GameView gameView = gameController.getGameView();
+        double screenWidth = gameView.getWidth();
+        double screenHeight = gameView.getHeight();
+        Coords curPos = controller.getCurPos();
+        sortItems(location, curPos.x, curPos.y, screenWidth, screenHeight, sortedMapItems, level);
+    }
+
+    protected void sortEquipment(Coords curPos, double viewWidth, double viewHeight, List<Equipment> sorted, List<Equipment> toSort) {
+        double left = curPos.x;
+        double right = left + viewWidth;
+        double top = curPos.y;
+        double bottom = top + viewHeight;
+
+        sorted.clear();
+        toSort.stream()
+                .filter(e -> {
+                    double eLeft = e.getLeft();
+                    double eRight = e.getRight();
+                    double eTop = e.getTop();
+                    double eBottom = e.getBottom();
+                    return Geometry.doOverlap(
+                            left, top, right, bottom,
+                            eLeft, eTop, eRight, eBottom);
+                })
+                .collect(Collectors.toCollection(() -> sorted));
+    }
+
+    private void sortDropViewItems() {
+        Creature cr = controller.getCreatureToOpenInventory();
+        Location loc = cr.getPos().getLocation();
+        DropViewElement dropView = gameController.getGameView().getInventoryView().getDropView();
+        Coords curPos = dropView.getCurPos();
+        double viewWidth = dropView.getViewWidth();
+        double viewHeight = dropView.getViewHeight();
+        sortItems(loc, curPos.x, curPos.y, viewWidth, viewHeight, sortedMapItems, cr.getPos().level);
+    }
+
+    protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem> items, int level) {
+        double right = left + width;
+        double bottom = top + height;
+
+        items.clear();
+        location.getItems().stream()
+                .filter(PosItem::getIsVisible)
+                .filter(pi -> {
+                    double piLeft = pi.getLeft();
+                    double piRight = pi.getRight();
+                    double piTop = pi.getTop();
+                    double piBottom = pi.getBottom();
+                    return Geometry.doOverlap(
+                            left, top, right, bottom,
+                            piLeft, piTop, piRight, piBottom);
+                })
+                .filter(pi -> pi.getPos().level <= level)
+                .collect(Collectors.toCollection(() -> items));
+
+        controller.getBoard().sortPosItems(items);
+    }
+
+
+    private void updateHoveredHeroBaseAnimation() {
+        Creature hoveredHero = gameController.getHoveredHero();
+        if (hoveredHero != null) {
+            hoveredHero.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
+        }
     }
 
     private void updateCreaturesControls() {
@@ -255,7 +364,11 @@ public class GameRunner {
 
     private void refreshGame() {
         if (!areImagesReloaded.get()) return;
-        gameController.refreshGame();
+        gameController.refreshGame(sortedMapItems);
+        if (controller.isInventory()) {
+            InventoryView inventoryView = gameController.getGameView().getInventoryView();
+            inventoryView.refresh(sortedMapItems, sortedHoldEquipment, sortedContainerEquipment);
+        }
     }
 
     private void loadSave(SaveMemento memento) {

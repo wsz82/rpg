@@ -8,7 +8,6 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.*;
-import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.*;
 import javafx.geometry.VPos;
@@ -20,7 +19,6 @@ import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.wsz.model.item.ItemType.*;
 
@@ -55,28 +53,6 @@ public abstract class CanvasView {
                 countableAmount = type.getAmount();
             }
         };
-    }
-
-    protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem> items, int level) {
-        double right = left + width;
-        double bottom = top + height;
-
-        items.clear();
-        location.getItems().stream()
-                .filter(PosItem::getIsVisible)
-                .filter(pi -> {
-                    double piLeft = pi.getLeft();
-                    double piRight = pi.getRight();
-                    double piTop = pi.getTop();
-                    double piBottom = pi.getBottom();
-                    return Geometry.doOverlap(
-                            left, top, right, bottom,
-                            piLeft, piTop, piRight, piBottom);
-                })
-                .filter(pi -> pi.getPos().level <= level)
-                .collect(Collectors.toCollection(() -> items));
-
-        board.sortPosItems(items);
     }
 
     protected void adjustCoverOpacity(Creature cr, PosItem pi) {
@@ -216,5 +192,13 @@ public abstract class CanvasView {
         gc.setTextBaseline(VPos.CENTER);
         gc.setTextAlign(TextAlignment.RIGHT);
         gc.fillText(text, mousePos.x * meter, mousePos.y * meter);
+    }
+
+    public double getWidth() {
+        return canvas.getWidth() / Sizes.getMeter();
+    }
+
+    public double getHeight() {
+        return canvas.getHeight() / Sizes.getMeter();
     }
 }

@@ -51,9 +51,9 @@ public class GameView extends CanvasView {
     private static final Coords TEMP = new Coords();
 
     private final Stage parent;
-    private final List<PosItem> items = new ArrayList<>(0);
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
+    private final InventoryView inventoryView;
     private final BarView barView;
     private final Coords curPos;
     private final FoggableDelegate foggableDelegate;
@@ -63,7 +63,6 @@ public class GameView extends CanvasView {
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
     private DialogView dialogView;
-    private InventoryView inventoryView;
     private boolean canStartDialog = true;
     private boolean canOpenInventory = true;
     private boolean isRefreshedOnce;
@@ -72,6 +71,7 @@ public class GameView extends CanvasView {
     public GameView(Stage parent, GameController gameController) {
         super(new Canvas(), gameController);
         this.parent = parent;
+        inventoryView = new InventoryView(canvas, gameController);
         barView = new BarView(canvas, gameController);
         mousePos = new Coords();
         curPos = controller.getCurPos();
@@ -81,7 +81,7 @@ public class GameView extends CanvasView {
         hookUpRemovableEvents();
     }
 
-    public void refresh() {
+    public void refresh(List<PosItem> sortedItems) {
         if (parent.isIconified()) {
             return;
         }
@@ -92,14 +92,14 @@ public class GameView extends CanvasView {
 
         if (tryStartDialog()) return;
         if (tryOpenInventory()) return;
+
         updatePos();
         clearBackground();
-        sortItems();
 
         Location location = controller.getCurrentLocation().getLocation();
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
-        drawItems(heroes);
+        drawItems(sortedItems, heroes);
 
         drawFog();
 
@@ -128,9 +128,8 @@ public class GameView extends CanvasView {
             if (canOpenInventory) {
                 canOpenInventory = false;
                 removeRemovableEvents();
-                inventoryView = new InventoryView(canvas, gameController);
+                inventoryView.hookUpRemovableEvents();
             }
-            inventoryView.refresh();
             return true;
         }
         if (!canOpenInventory) {
@@ -163,8 +162,8 @@ public class GameView extends CanvasView {
         return false;
     }
 
-    private void drawItems(List<Creature> heroes) {
-        for (PosItem pi : items) {
+    private void drawItems(List<PosItem> sortedItems, List<Creature> heroes) {
+        for (PosItem pi : sortedItems) {
             if (heroes != null) {
                 adjustCoverOpacity(heroes, pi);
             }
@@ -175,7 +174,7 @@ public class GameView extends CanvasView {
             double x = translatedPos.x * meter;
             double y = translatedPos.y * meter;
 
-            if (pi instanceof Creature) {
+            if (pi instanceof Creature) { //TODO generic
                 Creature cr = (Creature) pi;
                 drawCreatureBase(cr);
             } else if (pi instanceof Equipment) {
@@ -188,15 +187,6 @@ public class GameView extends CanvasView {
 
             gc.setGlobalAlpha(1);
         }
-    }
-
-    private void sortItems() {
-        Location location = controller.getCurrentLocation().getLocation();
-        int level = controller.getCurrentLayer().getLevel();
-        int meter = Sizes.getMeter();
-        double canvasWidth = canvas.getWidth() / meter;
-        double canvasHeight = canvas.getHeight() / meter;
-        sortItems(location, curPos.x, curPos.y, canvasWidth, canvasHeight, items, level);
     }
 
     private void drawSelection() {
@@ -732,5 +722,9 @@ public class GameView extends CanvasView {
 
     public BarView getBarView() {
         return barView;
+    }
+
+    public InventoryView getInventoryView() {
+        return inventoryView;
     }
 }

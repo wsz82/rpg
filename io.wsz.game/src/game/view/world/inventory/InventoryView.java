@@ -74,12 +74,10 @@ public class InventoryView {
 
         countableRelocationWindow = new CountableRelocationWindow(gameController, canvas, gc, mousePos);
 
-        hookUpEvents();
         defineRemovableEvents();
-        hookUpRemovableEvents();
     }
 
-    private void hookUpEvents() {
+    private void defineRemovableEvents() {
         closeEvent = e -> {
             KeyCode code = e.getCode();
             KeyCode inventoryClose = gameController.getSettings().getKey(KeyAction.INVENTORY);
@@ -90,10 +88,7 @@ public class InventoryView {
                 }
             }
         };
-        canvas.addEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
-    }
 
-    private void defineRemovableEvents() {
         onClick = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
@@ -148,19 +143,21 @@ public class InventoryView {
         };
     }
 
-    private void hookUpRemovableEvents() {
+    public void hookUpRemovableEvents() {
+        canvas.addEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
         canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
         canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
     }
 
     private void removeRemovableEvents() {
+        canvas.removeEventHandler(KeyEvent.KEY_RELEASED, closeEvent);
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
         canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
     }
 
-    public void refresh() {
+    public void refresh(List<PosItem> sortedMapItems, List<Equipment> sortedHoldItems, List<Equipment> sortedContainerItems) {
         double width = canvas.getWidth();
         if (width == 0) return;
         double barViewWidth = gameController.getGameView().getBarView().getWidth();
@@ -172,11 +169,11 @@ public class InventoryView {
 
         drawCreature(inventoryWidth, cr);
 
-        drawHold(inventoryWidth, cr);
+        drawHold(sortedHoldItems, inventoryWidth, cr);
 
-        drawDrop(inventoryWidth, cr);
+        drawDrop(sortedMapItems, inventoryWidth, cr);
 
-        drawContainer(inventoryWidth);
+        drawContainer(sortedContainerItems, inventoryWidth);
 
         drawCountableRelocationWindow(inventoryWidth);
 
@@ -451,7 +448,7 @@ public class InventoryView {
         return mousePos;
     }
 
-    private void drawHold(double inventoryWidth, Creature cr) {
+    private void drawHold(List<Equipment> items, double inventoryWidth, Creature cr) {
         Inventory inventory = cr.getInventory();
 
         int meter = Sizes.getMeter();
@@ -467,10 +464,11 @@ public class InventoryView {
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
         holdView.setInventory(inventory);
+        holdView.setSortedEquipment(items);
         holdView.refresh();
     }
 
-    private void drawDrop(double inventoryWidth, Creature cr) {
+    private void drawDrop(List<PosItem> sortedItems, double inventoryWidth, Creature cr) {
         List<Equipment> equipmentWithinRange;
         synchronized (gameController.getGameRunner()) {
             equipmentWithinRange = cr.getEquipmentWithinRange(controller);
@@ -518,15 +516,16 @@ public class InventoryView {
         Coords center = cr.getCenter();
         dropView.setCreaturePos(center.x, center.y);
         dropView.setDroppedEquipment(equipmentWithinRange);
+        dropView.setSortedItems(sortedItems);
         dropView.refresh();
     }
 
-    private void drawContainer(double inventoryWidth) {
+    private void drawContainer(List<Equipment> sortedContainerItems, double inventoryWidth) {
         Creature cr = controller.getCreatureToOpenInventory();
         Container con = controller.getContainerToOpen();
         if (con == null) return;
         CreatureSize size = cr.getSize();
-        boolean inventoryNotContainContainerToOpen = !holdView.getItems().contains(con);
+        boolean inventoryNotContainContainerToOpen = !holdView.getSortedEquipment().contains(con);
         if (inventoryNotContainContainerToOpen) {
             boolean containerOutOfRange = !con.withinRange(cr.getCenter(), cr.getRange(), size.getWidth(), size.getHeight());
             if (containerOutOfRange) return;
@@ -543,6 +542,7 @@ public class InventoryView {
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
         containerView.setContainer(con);
+        containerView.setSortedEquipment(sortedContainerItems);
         containerView.refresh();
     }
 
@@ -578,5 +578,17 @@ public class InventoryView {
     private void drawBackground(double inventoryWidth) {
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(0, 0, inventoryWidth * Sizes.getMeter(), canvas.getHeight());
+    }
+
+    public DropViewElement getDropView() {
+        return dropView;
+    }
+
+    public HoldViewElement getHoldView() {
+        return holdView;
+    }
+
+    public ContainerViewElement getContainerView() {
+        return containerView;
     }
 }
