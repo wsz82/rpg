@@ -40,9 +40,10 @@ public class DialogView {
     private final GameController gameController;
     private final GraphicsContext gc;
     private final double offset;
-    private final DialogMemento dialogMemento;
     private final Map<Question, VerticalPos> questionsPos = new HashMap<>(0);
 
+    private boolean isToRefresh;
+    private DialogMemento dialogMemento;
     private Question activeQuestion;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<MouseEvent> scrollBarStart;
@@ -54,7 +55,6 @@ public class DialogView {
     private int dialogWidth;
     private double caretPos;
     private int dialogHeight;
-    private boolean isToRefresh = true;
     private int scrollPos;
     private int scrollButtonHeight;
     private boolean scrollWithButton;
@@ -62,17 +62,21 @@ public class DialogView {
     private int endButtonWidth;
     private int endButtonHeight;
     private int endButtonY;
+    private boolean isGameViewNotRefreshedOnce;
 
-    public DialogView(Canvas canvas, GameController gameController, double offset, DialogMemento dialogMemento) {
+    public DialogView(Canvas canvas, GameController gameController, double offset) {
         this.canvas = canvas;
         this.gameController = gameController;
         this.offset = offset;
-        this.dialogMemento = dialogMemento;
         gc = canvas.getGraphicsContext2D();
-        hookUpEvents();
+        defineRemovableEvents();
     }
 
-    public void refresh() {
+    public void refresh(DialogMemento dialogMemento) {
+        this.dialogMemento = dialogMemento;
+        if (dialogMemento == null) {
+            endDialog();
+        }
         int width = (int) canvas.getWidth();
         int height = (int) canvas.getHeight();
         fontSize = (double) width / gameController.getSettings().getFontSize().getSize();
@@ -80,10 +84,6 @@ public class DialogView {
         dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
         dialogLeft = (width - dialogWidth) / 2;
         caretPos = 0;
-
-        if (dialogMemento == null) {
-            endDialog();
-        }
 
         List<DialogItem> dialogs = dialogMemento.getDialogs();
         if (Sizes.isReloadDialogImages()) {
@@ -159,7 +159,7 @@ public class DialogView {
         dialogMemento.setLastAnswer(greeting);
     }
 
-    private void hookUpEvents() {
+    private void defineRemovableEvents() {
         clickEvent = e -> {
             synchronized (gameController.getGameRunner()) {
                 MouseButton button = e.getButton();
@@ -174,8 +174,6 @@ public class DialogView {
                 }
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
-
         scrollBarStart = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
@@ -183,20 +181,22 @@ public class DialogView {
                 startScrollWithButton(e.getX(), e.getY());
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
-
         scrollBarStop = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
                 stopScrollWithButton();
             }
         };
-        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
-
         wheelScroll = e -> {
             e.consume();
             scrollWithWheel(e);
         };
+    }
+
+    public void hookUpRemovableEvents() {
+        canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
+        canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
         canvas.addEventHandler(ScrollEvent.SCROLL, wheelScroll);
     }
 
@@ -283,11 +283,15 @@ public class DialogView {
     }
 
     private void endDialog() {
+        removeRemovableEvents();
+        gameController.endDialog();
+    }
+
+    private void removeRemovableEvents() {
         canvas.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickEvent);
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, scrollBarStart);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, scrollBarStop);
         canvas.removeEventHandler(ScrollEvent.SCROLL, wheelScroll);
-        gameController.endDialog();
     }
 
     private int getViewHeight() {
@@ -606,6 +610,18 @@ public class DialogView {
 
     private int getScrollSpeed() {
         return (int) (gameController.getSettings().getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
+    }
+
+    public void setIsToRefresh(boolean isToRefresh) {
+        this.isToRefresh = isToRefresh;
+    }
+
+    public boolean isGameViewNotRefreshedOnce() {
+        return isGameViewNotRefreshedOnce;
+    }
+
+    public void setGameViewNotRefreshedOnce(boolean gameViewNotRefreshedOnce) {
+        this.isGameViewNotRefreshedOnce = gameViewNotRefreshedOnce;
     }
 
     private class VerticalPos {

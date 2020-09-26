@@ -48,6 +48,13 @@ public class BarView {
     }
 
     public void refresh() {
+        if (!gameController.getSettings().isShowBar()) {
+            return;
+        }
+        forceRefresh();
+    }
+
+    public void forceRefresh() {
         double canvasWidth = canvas.getWidth();
         if (canvasWidth == 0) {
             return;
@@ -287,7 +294,7 @@ public class BarView {
     }
 
     private void drawBackground(double leftX, double barWidth) {
-        gc.setFill(Color.DARKGRAY);
+        gc.setFill(Color.GREY);
         gc.fillRect(leftX, 0, barWidth, canvas.getHeight());
     }
 

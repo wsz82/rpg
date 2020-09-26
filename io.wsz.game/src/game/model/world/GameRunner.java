@@ -2,7 +2,9 @@ package game.model.world;
 
 import game.model.GameController;
 import game.model.save.SaveMemento;
+import game.view.world.board.BarView;
 import game.view.world.board.GameView;
+import game.view.world.dialog.DialogView;
 import game.view.world.inventory.ContainerViewElement;
 import game.view.world.inventory.DropViewElement;
 import game.view.world.inventory.HoldViewElement;
@@ -10,6 +12,7 @@ import game.view.world.inventory.InventoryView;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
+import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.location.CurrentLocation;
 import io.wsz.model.location.FogStatus;
@@ -32,6 +35,7 @@ import static io.wsz.model.sizes.Sizes.TURN_DURATION_MILLIS;
 
 public class GameRunner {
     private static final ArrayDeque<Runnable> LATER_RUN_BUFFER = new ArrayDeque<>(0);
+    private final ItemsSorter itemsSorterWhenDialogStarts;
 
     public static void runLater(Runnable laterRunner) {
         LATER_RUN_BUFFER.addLast(laterRunner);
@@ -51,6 +55,7 @@ public class GameRunner {
     public GameRunner(GameController gameController) {
         this.gameController = gameController;
         controller = gameController.getController();
+        itemsSorterWhenDialogStarts = this::sortMapItems;
     }
 
     public void startGame(SaveMemento memento) {
@@ -98,6 +103,9 @@ public class GameRunner {
 
                 Platform.runLater(() -> {
                     synchronized (this) {
+                        if (!gameController.isGame()) {
+                            return;
+                        }
                         controller.getLogger().logTimeBetweenViewStarts();
                         updateView();
                         controller.getLogger().logTimeOfViewLoopDuration();
@@ -144,10 +152,11 @@ public class GameRunner {
 
             sortHoldViewEquipment();
 
+            sortDropViewItems();
+
             sortContainerViewEquipment();
 
             if (gameController.getSettings().isPauseOnInventory()) {
-                sortDropViewItems();
                 return;
             }
         }
@@ -363,12 +372,34 @@ public class GameRunner {
     }
 
     private void refreshGame() {
-        if (!areImagesReloaded.get()) return;
-        gameController.refreshGame(sortedMapItems);
-        if (controller.isInventory()) {
-            InventoryView inventoryView = gameController.getGameView().getInventoryView();
-            inventoryView.refresh(sortedMapItems, sortedHoldEquipment, sortedContainerEquipment);
+        if (!areImagesReloaded.get()) {
+            return;
         }
+        gameController.refreshGame(sortedMapItems);
+        GameView gameView = gameController.getGameView();
+        if (controller.isInventory()) {
+            BarView barView = gameView.getBarView();
+            barView.forceRefresh();
+            refreshInventory(gameView);
+        } else if (gameController.isDialog()) {
+            refreshDialog(gameView);
+        }
+    }
+
+    private void refreshInventory(GameView gameView) {
+        InventoryView inventoryView = gameView.getInventoryView();
+        inventoryView.refresh(sortedMapItems, sortedHoldEquipment, sortedContainerEquipment);
+    }
+
+    private void refreshDialog(GameView gameView) {
+        DialogView dialogView = gameView.getDialogView();
+        if (dialogView.isGameViewNotRefreshedOnce()) {
+            dialogView.setGameViewNotRefreshedOnce(false);
+            gameView.sortItems(itemsSorterWhenDialogStarts);
+            gameView.forceRefresh(sortedMapItems);
+        }
+        DialogMemento dialogMemento = controller.getDialogMemento();
+        dialogView.refresh(dialogMemento);
     }
 
     private void loadSave(SaveMemento memento) {

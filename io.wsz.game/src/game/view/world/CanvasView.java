@@ -2,6 +2,7 @@ package game.view.world;
 
 import game.model.GameController;
 import game.model.textures.Cursor;
+import game.model.world.ItemsSorter;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
@@ -200,5 +201,9 @@ public abstract class CanvasView {
 
     public double getHeight() {
         return canvas.getHeight() / Sizes.getMeter();
+    }
+
+    public void sortItems(ItemsSorter itemsSorter) {
+        itemsSorter.sort();
     }
 }

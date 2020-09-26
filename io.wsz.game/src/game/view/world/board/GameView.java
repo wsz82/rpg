@@ -11,7 +11,6 @@ import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
-import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentLocation;
@@ -48,12 +47,13 @@ public class GameView extends CanvasView {
     private static final ItemType[] SECONDARY_TYPES =
             new ItemType[] {INDOOR, OUTDOOR, CONTAINER};
     private static final ItemType[] CREATURE_TYPE = new ItemType[] {CREATURE};
-    private static final Coords TEMP = new Coords();
 
     private final Stage parent;
+    private final Coords temp = new Coords();
     private final Coords selFirst = new Coords(-1, -1);
     private final Coords selSecond = new Coords(-1, -1);
     private final InventoryView inventoryView;
+    private final DialogView dialogView;
     private final BarView barView;
     private final Coords curPos;
     private final FoggableDelegate foggableDelegate;
@@ -62,16 +62,15 @@ public class GameView extends CanvasView {
     private long nextAvailableClickTime;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
-    private DialogView dialogView;
     private boolean canStartDialog = true;
     private boolean canOpenInventory = true;
-    private boolean isRefreshedOnce;
     private boolean isSelectionMode;
 
     public GameView(Stage parent, GameController gameController) {
         super(new Canvas(), gameController);
         this.parent = parent;
         inventoryView = new InventoryView(canvas, gameController);
+        dialogView = new DialogView(canvas, gameController, OFFSET);
         barView = new BarView(canvas, gameController);
         mousePos = new Coords();
         curPos = controller.getCurPos();
@@ -93,6 +92,11 @@ public class GameView extends CanvasView {
         if (tryStartDialog()) return;
         if (tryOpenInventory()) return;
 
+        forceRefresh(sortedItems);
+        barView.refresh();
+    }
+
+    public void forceRefresh(List<PosItem> sortedItems) {
         updatePos();
         clearBackground();
 
@@ -110,21 +114,17 @@ public class GameView extends CanvasView {
         if (isSelectionMode) {
             drawSelection();
         }
-        if (gameController.getSettings().isShowBar()) {
-            barView.refresh();
-        }
     }
 
-    void drawFog() {
+    private void drawFog() {
         int meter = Sizes.getMeter();
         double width = canvas.getWidth() / meter;
         double height = canvas.getHeight() / meter;
         foggableDelegate.drawFog(width, height);
     }
 
-    boolean tryOpenInventory() {
+    private boolean tryOpenInventory() {
         if (controller.isInventory()) {
-            barView.refresh();
             if (canOpenInventory) {
                 canOpenInventory = false;
                 removeRemovableEvents();
@@ -141,22 +141,17 @@ public class GameView extends CanvasView {
 
     private boolean tryStartDialog() {
         if (gameController.isDialog()) {
-            if (isRefreshedOnce) {
-                if (canStartDialog) {
-                    canStartDialog = false;
-                    removeRemovableEvents();
-                    DialogMemento dialogMemento = controller.getDialogMemento();
-                    dialogView = new DialogView(canvas, gameController, OFFSET, dialogMemento);
+            if (canStartDialog) {
+                canStartDialog = false;
+                removeRemovableEvents();
+                dialogView.hookUpRemovableEvents();
+                dialogView.setIsToRefresh(true);
+                dialogView.setGameViewNotRefreshedOnce(true);
                 }
-                dialogView.refresh();
                 return true;
-            } else {
-                isRefreshedOnce = true;
-            }
         }
         if (!canStartDialog) {
             canStartDialog = true;
-            isRefreshedOnce = false;
             hookUpRemovableEvents();
         }
         return false;
@@ -211,10 +206,10 @@ public class GameView extends CanvasView {
     }
 
     private Coords translateCoordsToScreenCoords(Coords pos) {
-        TEMP.x = pos.x;
-        TEMP.y = pos.y;
-        TEMP.subtract(curPos);
-        return TEMP;
+        temp.x = pos.x;
+        temp.y = pos.y;
+        temp.subtract(curPos);
+        return temp;
     }
 
     private Coords getMousePos(double mouseX, double mouseY, double left, double top) {
@@ -261,6 +256,7 @@ public class GameView extends CanvasView {
         int y = p.y;
 
         if (x < left || x > right || y < top || y > bottom) {
+            gameController.getCursor().setCursor(CursorType.MAIN);
             return;
         }
 
@@ -356,11 +352,11 @@ public class GameView extends CanvasView {
 
     private Coords getMapCoords(double x, double y, double left, double top) {
         Coords pos = getMousePos(x, y, left, top);
-        TEMP.x = pos.x;
-        TEMP.y = pos.y;
-        TEMP.level = controller.getCurrentLayer().getLevel();
-        TEMP.add(curPos);
-        return TEMP;
+        temp.x = pos.x;
+        temp.y = pos.y;
+        temp.level = controller.getCurrentLayer().getLevel();
+        temp.add(curPos);
+        return temp;
     }
 
     private void scrollDown(double locHeight) {
@@ -470,11 +466,11 @@ public class GameView extends CanvasView {
         double y = e.getY();
 
         Location location = controller.getCurrentLocation().getLocation();
-        TEMP.x = x / Sizes.getMeter();
-        TEMP.y = y / Sizes.getMeter();
-        TEMP.add(curPos);
-        double finalX = TEMP.x;
-        double finalY = TEMP.y;
+        temp.x = x / Sizes.getMeter();
+        temp.y = y / Sizes.getMeter();
+        temp.add(curPos);
+        double finalX = temp.x;
+        double finalY = temp.y;
 
         if (button.equals(MouseButton.PRIMARY)) {
             if (gameController.getSettings().isShowBar()) {
@@ -726,5 +722,9 @@ public class GameView extends CanvasView {
 
     public InventoryView getInventoryView() {
         return inventoryView;
+    }
+
+    public DialogView getDialogView() {
+        return dialogView;
     }
 }
