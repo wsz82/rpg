@@ -4,15 +4,11 @@ import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.BooleanExpression;
-import io.wsz.model.script.bool.countable.Countable;
-import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
+import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
-import io.wsz.model.script.bool.countable.item.CountableConcreteItem;
+import io.wsz.model.script.bool.countable.item.CountableItem;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
-
-import java.util.Optional;
 
 public class RequirementItemCountableView extends SpecificRequirement {
     private final ChoiceBox<Asset> itemCB = new ChoiceBox<>();
@@ -41,33 +37,39 @@ public class RequirementItemCountableView extends SpecificRequirement {
         //TODO generic populate i getExpression
         Asset item = getItem();
 
-        String id = null;
+        String itemId = null;
         if (item != null) {
-            id = item.getAssetId();
+            itemId = item.getAssetId();
         }
-        CountableConcreteItem countable = new CountableConcreteItem();
-        BooleanItemVsItem expression = new BooleanItemVsItem(id, countable);
-        countable.setExpression(expression);
+        CountableItem countable = new CountableItem();
+        countable.setCheckedId(itemId);
 
         CompareOperator compareOperator = getCompareOperator();
         if (compareOperator != null) {
             countable.setCompareOperator(compareOperator);
         }
         countable.setArgument(getArgument());
+        BooleanItemVsItem expression = new BooleanItemVsItem(null, countable);
         return expression;
     }
 
     @Override
-    public void populate(BooleanExpression<?> expression) {
-        if (!(expression instanceof BooleanCountableItem)) return;
-        BooleanCountableItem specificExpression = (BooleanCountableItem) expression;
-        Optional<Asset> optAsset = editorController.getObservableAssets().getEquipmentAssets().stream()
-                .filter(a -> a.getAssetId().equals(expression.getCheckedID()))
-                .findFirst();
-        setItem(optAsset.orElse(null));
-        Countable<Integer> countable = specificExpression.getCountable();
-        setCompareOperator(countable.getCompareOperator());
-        setArgument(countable.getArgument());
+    public void populate(BooleanObjectExpression<?> expression) {
+        if (!(expression instanceof BooleanItemVsItem)) return;
+        BooleanItemVsItem specificExpression = (BooleanItemVsItem) expression;
+        CountableItem countable = specificExpression.getCountable();
+        Asset asset = editorController.getObservableAssets().getEquipmentAssets().stream()
+                .filter(a -> a.getAssetId().equals(countable.getCheckedId()))
+                .findFirst().orElse(null);
+        setItem(asset);
+        CompareOperator compareOperator = countable.getCompareOperator();
+        if (compareOperator != null) {
+            setCompareOperator(compareOperator);
+        }
+        Integer argument = countable.getArgument();
+        if (argument != null) {
+            setArgument(argument);
+        }
     }
 
     public Asset getItem() {

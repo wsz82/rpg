@@ -3,7 +3,7 @@ package editor.view.dialog.requirement;
 import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.BooleanExpression;
+import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.countable.Countable;
 import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
@@ -28,7 +28,7 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public BooleanExpression<?> getExpression() {
+    public BooleanObjectExpression<?> getExpression() {
         Variable<Integer> variable = (Variable<Integer>) previousView.getVariable();
 
         String id = null;
@@ -49,11 +49,11 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public void populate(BooleanExpression<?> expression) {
+    public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanIntegerGlobalVariable)) return;
         BooleanIntegerGlobalVariable specificExpression = (BooleanIntegerGlobalVariable) expression;
         Variable<?> variable = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckedID()))
+                .filter(a -> a.getID().equals(expression.getCheckingId()))
                 .findFirst().orElse(null);
         previousView.setVariable(variable);
         Countable<Integer> countable = specificExpression.getCountable();

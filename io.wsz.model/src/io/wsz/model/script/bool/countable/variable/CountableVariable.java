@@ -13,9 +13,8 @@ public abstract class CountableVariable<N extends Number> extends Countable<N>{
     public CountableVariable() {
     }
 
-    public CountableVariable(CompareOperator compareOperator, N argument, BooleanVariableExpression<Variable<N>> expression) {
+    public CountableVariable(CompareOperator compareOperator, N argument) {
         super(compareOperator, argument);
-        this.expression = expression;
     }
 
     public void setExpression(BooleanVariableExpression<Variable<N>> expression) {

@@ -2,7 +2,7 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.BooleanType;
-import io.wsz.model.script.bool.BooleanExpression;
+import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.variable.Variable;
 import javafx.collections.FXCollections;
@@ -59,7 +59,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public BooleanExpression<?> getExpression() {
+    public BooleanObjectExpression<?> getExpression() {
         Variable<Boolean> variable = (Variable<Boolean>) previousView.getVariable();
 
         String id = null;
@@ -75,11 +75,11 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public void populate(BooleanExpression<?> expression) {
+    public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanTrueFalseGlobalVariable)) return;
         BooleanTrueFalseGlobalVariable specificExpression = (BooleanTrueFalseGlobalVariable) expression;
         Variable<?> variable = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckedID()))
+                .filter(a -> a.getID().equals(expression.getCheckingId()))
                 .findFirst().orElse(null);
         previousView.setVariable(variable);
         booleanCB.setValue(specificExpression.getBooleanType());

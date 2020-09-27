@@ -31,7 +31,7 @@ public abstract class Equalable<O> implements Externalizable {
     public boolean isEqual() {
         O amount;
         try {
-            amount = getAmount();
+            amount = getValue();
         } catch (NullPointerException e) {
             return false;
         }
@@ -43,7 +43,7 @@ public abstract class Equalable<O> implements Externalizable {
     public boolean isNotEqual() {
         O amount;
         try {
-            amount = getAmount();
+            amount = getValue();
         } catch (NullPointerException e) {
             return true;
         }
@@ -52,7 +52,7 @@ public abstract class Equalable<O> implements Externalizable {
 
     protected abstract boolean isNotEqual(O amount);
 
-    public abstract O getAmount();
+    public abstract O getValue();
 
     public EqualsOperator getEqualsOperator() {
         return equalsOperator;

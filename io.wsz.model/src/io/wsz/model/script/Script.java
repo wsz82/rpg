@@ -2,7 +2,7 @@ package io.wsz.model.script;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.script.command.*;
+import io.wsz.model.script.command.Executable;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -11,14 +11,12 @@ import java.io.ObjectOutput;
 import java.util.ArrayDeque;
 import java.util.Objects;
 
-import static io.wsz.model.script.ScriptKeyWords.*;
-
 public class Script implements Externalizable, Executable {
     private static final long serialVersionUID = 1L;
 
     public static Script parseScript(String s, Controller controller) {
         if (s == null || s.isEmpty()) return null;
-        Script script = new Script();
+        Script script = new Script(null);
         script.fillScript(s, controller);
         return script;
     }
@@ -36,59 +34,31 @@ public class Script implements Externalizable, Executable {
     }
 
     public void fillScript(String initialText, Controller controller) {
-        if (executables != null) {
-            executables.clear();
-        }
+        executables = new ArrayDeque<>(1);
         validator = new ScriptValidator(controller);
         if (initialText == null) return;
         this.initialText = initialText;
         String whiteSpace = "\\s+";
-        initialText = initialText.replaceAll(whiteSpace, "");
-        String[] commandsToParse = initialText.split(COMMAND_END);
+        String s = initialText.replaceAll(whiteSpace, "");
+        parsePreBlock(s, executables, validator, controller);
 
-        for (String commandToParse : commandsToParse) {
-            Executable executable = null;
-            if (commandToParse.startsWith(GLOBAL + DOT)) {
-                executable = GlobalVariableSet.parseCommand(commandToParse, validator);
-            } else if (commandToParse.startsWith(GIVE_TO_ADVERSARY)) {
-                executable = GiveToAdversary.parseCommand(commandToParse, validator);
-            } else if (commandToParse.startsWith(ADD_NEW)) {
-                executable = AddNew.parseCommand(commandToParse, validator);
-            } else if (commandToParse.startsWith(REMOVE)) {
-                executable = Remove.parseCommand(commandToParse, validator);
-            } else if (commandToParse.startsWith(RUN)) {
-                executable = getScriptToRun(controller, commandToParse, validator);
-            } else {
-                validator.setSyntaxInvalid(commandToParse);
-            }
-
-            if (validator.isInvalid()) {
-                validator.buildMessage();
-                System.out.println(validator.getMessage());
-                return;
-            }
-
-            if (executable != null) {
-                if (executables == null) {
-                    executables = new ArrayDeque<>(1);
-                }
-                executables.addFirst(executable);
-            }
+        if (validator.isInvalid()) {
+            validator.buildMessage();
+            System.out.println(validator.getMessage());
         }
-    }
-
-    private Executable getScriptToRun(Controller controller, String commandToParse, ScriptValidator validator) {
-        String scriptToRunId = commandToParse.replaceFirst(RUN, "");
-        Executable scriptToRun = controller.getScriptById(scriptToRunId);
-        if (scriptToRun == null) {
-            validator.setScriptIdInvalid(scriptToRunId);
-        }
-        return scriptToRun;
     }
 
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
         for (Executable executable : executables) {
             executable.execute(controller, firstAdversary, secondAdversary);
+        }
+    }
+
+    public String getValidatorMessage() {
+        if (validator != null) {
+            return validator.getMessage();
+        } else {
+            return null;
         }
     }
 
@@ -102,14 +72,6 @@ public class Script implements Externalizable, Executable {
 
     public String getInitialText() {
         return initialText;
-    }
-
-    public String getValidatorMessage() {
-        if (validator != null) {
-            return validator.getMessage();
-        } else {
-            return null;
-        }
     }
 
     @Override

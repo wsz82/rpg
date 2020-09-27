@@ -6,7 +6,6 @@ import io.wsz.model.script.ArgumentType;
 import io.wsz.model.script.Method;
 import io.wsz.model.script.bool.BooleanItemExpression;
 import io.wsz.model.script.bool.BooleanVariableExpression;
-import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
@@ -44,15 +43,15 @@ public class RequirementsListView {
 
     public void populate(Requirements input) {
         if (input == null) return;
-        List<BooleanCountableItem> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
+        List<BooleanItemVsItem> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
         if (booleanPCItemExpressions != null) {
-            for (BooleanCountableItem expression : booleanPCItemExpressions) {
+            for (BooleanItemVsItem expression : booleanPCItemExpressions) {
                 populateWithCreatureItemExpression(expression, PC_HAS);
             }
         }
-        List<BooleanCountableItem> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
+        List<BooleanItemVsItem> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
         if (booleanNPCItemExpressions != null) {
-            for (BooleanCountableItem expression : booleanNPCItemExpressions) {
+            for (BooleanItemVsItem expression : booleanNPCItemExpressions) {
                 populateWithCreatureItemExpression(expression, NPC_HAS);
             }
         }
@@ -103,7 +102,7 @@ public class RequirementsListView {
                                                                               BooleanVariableExpression expression) {
         GlobalVariableRequirementView globalVariableView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
         Variable<?> variable = editorController.getObservableGlobalVariables().stream()
-                .filter(v -> v.getID().equals(expression.getCheckedID()))
+                .filter(v -> v.getID().equals(expression.getCheckingId()))
                 .findFirst()
                 .orElse(null);
         globalVariableView.setVariable(variable);
@@ -119,7 +118,7 @@ public class RequirementsListView {
         creatureHasView.populate(expression);
     }
 
-    private void populateWithCreatureItemExpression(BooleanCountableItem expression, Method method) {
+    private void populateWithCreatureItemExpression(BooleanItemVsItem expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
 
         ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, ITEM);
@@ -259,7 +258,7 @@ public class RequirementsListView {
         SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement();
         BooleanItemVsItem expression = (BooleanItemVsItem) specificRequirement.getExpression();
 
-        List<BooleanCountableItem> booleanPChasExpressions = output.getBooleanPChasItemExpressions();
+        List<BooleanItemVsItem> booleanPChasExpressions = output.getBooleanPChasItemExpressions();
         if (booleanPChasExpressions == null) {
             booleanPChasExpressions = new ArrayList<>(1);
             output.setBooleanPChasItemExpressions(booleanPChasExpressions);
@@ -271,7 +270,7 @@ public class RequirementsListView {
         SpecificRequirement specificRequirement = afterMethodRequirementView.getSpecificRequirement(); //TODO class specific req
         BooleanItemVsItem expression = (BooleanItemVsItem) specificRequirement.getExpression();
 
-        List<BooleanCountableItem> booleanNPChasExpressions = output.getBooleanNPChasItemExpressions();
+        List<BooleanItemVsItem> booleanNPChasExpressions = output.getBooleanNPChasItemExpressions();
         if (booleanNPChasExpressions == null) {
             booleanNPChasExpressions = new ArrayList<>(1);
             output.setBooleanNPChasItemExpressions(booleanNPChasExpressions);

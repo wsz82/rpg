@@ -160,8 +160,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public PosItem getItemById(String lookedId) {
+    public PosItem getItemByItemId(String lookedId) {
         return getItemByItemId(this, lookedId);
+    }
+
+    protected int getInnerAmountById(String checkedId) {
+        return getContainableAmountById(checkedId);
     }
 
     public Double getIndividualNettoWeight() {

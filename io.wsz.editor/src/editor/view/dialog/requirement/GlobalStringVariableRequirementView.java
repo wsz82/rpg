@@ -2,7 +2,7 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.EqualsOperator;
-import io.wsz.model.script.bool.BooleanExpression;
+import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.equals.variable.EqualableStringVariable;
 import io.wsz.model.script.variable.Variable;
@@ -39,7 +39,7 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public BooleanExpression<?> getExpression() {
+    public BooleanObjectExpression<?> getExpression() {
         Variable<String> variable = (Variable<String>) previousView.getVariable();
 
         String id = null;
@@ -60,11 +60,11 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public void populate(BooleanExpression<?> expression) {
+    public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanStringVariableEquals)) return;
         BooleanStringVariableEquals specificExpression = (BooleanStringVariableEquals) expression;
         Optional<Variable<?>> optAsset = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckedID()))
+                .filter(a -> a.getID().equals(expression.getCheckingId()))
                 .findFirst();
         previousView.setVariable(optAsset.orElse(null));
         EqualableStringVariable countable = specificExpression.getEqualable();

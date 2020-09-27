@@ -1,7 +1,5 @@
 package io.wsz.model.script.bool.countable.variable;
 
-import io.wsz.model.script.variable.Variable;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -14,15 +12,14 @@ public class BooleanDecimalGlobalVariable extends BooleanNumberGlobalVariable<Do
     public BooleanDecimalGlobalVariable() {
     }
 
-    public BooleanDecimalGlobalVariable(String checkedID, CountableDecimalVariable countable) {
-        super(checkedID);
+    public BooleanDecimalGlobalVariable(String checkedId, CountableDecimalVariable countable) {
+        super(checkedId);
         this.countable = countable;
         this.countable.setExpression(this);
     }
 
     @Override
-    public boolean isTrue(Variable<Double> checkedVariable) {
-        this.checkedVariable = checkedVariable;
+    public boolean isTrue() {
         return countable.isFitAmount();
     }
 

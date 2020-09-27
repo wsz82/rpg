@@ -1,14 +1,11 @@
 package io.wsz.model.script.bool.countable;
 
-import io.wsz.model.item.Creature;
-import io.wsz.model.item.Equipment;
 import io.wsz.model.script.CompareOperator;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 
 public abstract class Countable<N extends Number> implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -123,17 +120,6 @@ public abstract class Countable<N extends Number> implements Externalizable {
 
     public void setArgument(N argument) {
         this.argument = argument;
-    }
-
-    protected int getCreatureAmount(Creature cr, String checkedID) {
-        List<Equipment> items = cr.getItems();
-        int count = (int) items.stream()
-                .filter(i -> i.getAssetId().equals(checkedID))
-                .count();
-        count += cr.getInventory().getEquippedItems().values().stream()
-                .filter(i -> i.getAssetId().equals(checkedID))
-                .count();
-        return count;
     }
 
     @Override

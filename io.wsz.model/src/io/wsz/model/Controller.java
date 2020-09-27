@@ -304,10 +304,18 @@ public class Controller {
         return null;
     }
 
+    public PosItem getItemOrAssetById(String id) {
+        PosItem item = getItemByItemId(id);
+        if (item == null) {
+            item = getItemByAssetId(id);
+        }
+        return item;
+    }
+
     public PosItem getItemByItemId(String itemId) {
         for (Location l : getLocations()) {
             for (PosItem i : l.getItems()) {
-                PosItem item = i.getItemById(itemId);
+                PosItem item = i.getItemByItemId(itemId);
                 if (item != null) {
                     return item;
                 }
@@ -319,6 +327,12 @@ public class Controller {
     public Location getLocationById(String id) {
         return model.getActivePlugin().getWorld().getLocations().stream()
                 .filter(a -> a.getId().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    public InventoryPlaceType getInventoryPlaceById(String id) {
+        return model.getActivePlugin().getWorld().getInventoryPlaces().stream()
+                .filter(i -> i.getId().equals(id))
                 .findFirst().orElse(null);
     }
 

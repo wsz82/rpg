@@ -1,7 +1,5 @@
 package io.wsz.model.script.bool.countable.variable;
 
-import io.wsz.model.script.variable.Variable;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -21,8 +19,7 @@ public class BooleanIntegerGlobalVariable extends BooleanNumberGlobalVariable<In
     }
 
     @Override
-    public boolean isTrue(Variable<Integer> checkedVariable) {
-        this.checkedVariable = checkedVariable;
+    public boolean isTrue() {
         return countable.isFitAmount();
     }
 

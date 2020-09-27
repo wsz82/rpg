@@ -367,6 +367,23 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         addNewItemToLocation(toLocation, toLevel, toX, toY, item);
     }
 
+    @Override
+    public final int getAmountById(String checkedId) {
+        if (itemId != null && itemId.equals(checkedId) || getAssetId().equals(checkedId)) {
+            return getAmount();
+        } else {
+            return getInnerAmountById(checkedId);
+        }
+    }
+
+    public int getAmount() {
+        return 1;
+    }
+
+    protected int getInnerAmountById(String checkedId) {
+        return 0;
+    }
+
     protected abstract A getNewItemFromPrototype();
 
     protected void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, A item) {
@@ -388,7 +405,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         }
     }
 
-    public PosItem getItemById(String lookedId) {
+    public PosItem getItemByItemId(String lookedId) {
         if (this.itemId != null && this.itemId.equals(lookedId)) {
             return this;
         } else {

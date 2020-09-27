@@ -11,9 +11,8 @@ public class EqualableStringVariable extends Equalable<String> {
     public EqualableStringVariable() {
     }
 
-    public EqualableStringVariable(EqualsOperator equalsOperator, String argument, BooleanStringVariableEquals expression) {
+    public EqualableStringVariable(EqualsOperator equalsOperator, String argument) {
         super(equalsOperator, argument);
-        this.expression = expression;
     }
 
     @Override
@@ -27,8 +26,8 @@ public class EqualableStringVariable extends Equalable<String> {
     }
 
     @Override
-    public String getAmount() {
-        return expression.getCheckedVariable().getValue();
+    public String getValue() {
+        return expression.getCheckingObject().getValue();
     }
 
     public void setExpression(BooleanStringVariableEquals expression) {

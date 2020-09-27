@@ -8,7 +8,7 @@ public abstract class BooleanNumberGlobalVariable<N extends Number> extends Bool
     public BooleanNumberGlobalVariable() {
     }
 
-    public BooleanNumberGlobalVariable(String checkedID) {
-        super(checkedID);
+    public BooleanNumberGlobalVariable(String checkingId) {
+        super(checkingId);
     }
 }

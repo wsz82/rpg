@@ -144,6 +144,7 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         return amount;
     }
 
+    @Override
     public int getAmount() {
         if (amount == null) {
             if (isThisPrototype()) {

@@ -134,9 +134,9 @@ public class ScriptsEditStage extends ChildStage {
     }
 
     private void addScript() {
-        Script script = new Script();
         String id = "_new";
-        script.setId(getUniqueID(id, getIds()));
+        String uniqueID = getUniqueID(id, getIds());
+        Script script = new Script(uniqueID);
         scriptListView.getItems().add(script);
     }
 

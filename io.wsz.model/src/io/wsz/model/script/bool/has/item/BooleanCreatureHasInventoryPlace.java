@@ -15,14 +15,18 @@ public class BooleanCreatureHasInventoryPlace extends BooleanItemExpression<Crea
     public BooleanCreatureHasInventoryPlace() {
     }
 
-    public BooleanCreatureHasInventoryPlace(HasableCreatureInventoryPlace hasable) {
+    public BooleanCreatureHasInventoryPlace(String checkingId, HasableCreatureInventoryPlace hasable) {
+        super(checkingId);
         this.hasable = hasable;
-        this.hasable.setExpression(this);
     }
 
     @Override
-    public boolean isTrue(Creature checkedItem) {
-        this.checkedItem = checkedItem;
+    public void setCheckingObject(Creature item) {
+        this.checkingObject = item;
+    }
+
+    @Override
+    public boolean isTrue() {
         return hasable.has();
     }
 

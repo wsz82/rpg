@@ -4,7 +4,7 @@ import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.script.bool.BooleanItemExpression;
-import io.wsz.model.script.bool.countable.item.BooleanCountableItem;
+import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
@@ -24,8 +24,8 @@ public class Requirements implements Externalizable {
     private static final Collection<Variable<String>> GLOBAL_STRING_VARIABLES = new ArrayList<>(0);
     private static final Collection<Variable<Boolean>> GLOBAL_BOOLEAN_VARIABLES = new ArrayList<>(0);
 
-    private List<BooleanCountableItem> booleanPChasItemExpressions;
-    private List<BooleanCountableItem> booleanNPChasItemExpressions;
+    private List<BooleanItemVsItem> booleanPChasItemExpressions;
+    private List<BooleanItemVsItem> booleanNPChasItemExpressions;
     private List<BooleanItemExpression> booleanPChasExpressions;
     private List<BooleanItemExpression> booleanNPChasExpressions;
     private List<BooleanNumberGlobalVariable> booleanNumberGlobalVariablesExpressions;
@@ -52,12 +52,13 @@ public class Requirements implements Externalizable {
                 .allMatch(b -> {
                     Variable<Boolean> variable = GLOBAL_BOOLEAN_VARIABLES.stream()
                             .filter(v -> {
-                                String variableID = b.getCheckedID();
+                                String variableID = b.getCheckingId();
                                 return v.getID().equals(variableID);
                             })
                             .findFirst()
                             .orElse(null);
-                    return variable == null || b.isTrue(variable);
+                    b.setCheckingObject(variable);
+                    return variable == null || b.isTrue();
                 });
     }
 
@@ -71,12 +72,13 @@ public class Requirements implements Externalizable {
                 .allMatch(b -> {
                     Variable<String> variable = GLOBAL_STRING_VARIABLES.stream()
                             .filter(v -> {
-                                String variableID = b.getCheckedID();
+                                String variableID = b.getCheckingId();
                                 return v.getID().equals(variableID);
                             })
                             .findFirst()
                             .orElse(null);
-                    return variable == null || b.isTrue(variable);
+                    b.setCheckingObject(variable);
+                    return variable == null || b.isTrue();
                 });
     }
 
@@ -86,23 +88,30 @@ public class Requirements implements Externalizable {
                 .allMatch(b -> {
                     Variable<?> variable = globalVariables.stream()
                             .filter(v -> {
-                                String variableID = b.getCheckedID();
+                                String variableID = b.getCheckingId();
                                 return v.getID().equals(variableID);
                             })
                             .findFirst()
                             .orElse(null);
-                    return variable == null || b.isTrue(variable);
+                    b.setCheckingObject(variable);
+                    return variable == null || b.isTrue();
                 });
     }
 
     private boolean doMatchItemHasRequirements(PosItem item, List<BooleanItemExpression> expressions) {
         return expressions == null || expressions.stream()
-                .allMatch(b -> b.isTrue(item));
+                .allMatch(b -> {
+                    b.setCheckingObject(item);
+                    return b.isTrue();
+                });
     }
 
-    private boolean doMatchItemHasCountableRequirements(PosItem item, List<BooleanCountableItem> expressions) {
+    private boolean doMatchItemHasCountableRequirements(PosItem item, List<BooleanItemVsItem> expressions) {
         return expressions == null || expressions.stream()
-                .allMatch(b -> b.isTrue(item));
+                .allMatch(b -> {
+                    b.setCheckingObject(item);
+                    return b.isTrue();
+                });
     }
 
     public boolean isEmpty() {
@@ -115,19 +124,19 @@ public class Requirements implements Externalizable {
                 && (booleanTrueFalseGlobalVariablesExpressions == null || booleanTrueFalseGlobalVariablesExpressions.isEmpty());
     }
 
-    public List<BooleanCountableItem> getBooleanPChasItemExpressions() {
+    public List<BooleanItemVsItem> getBooleanPChasItemExpressions() {
         return booleanPChasItemExpressions;
     }
 
-    public void setBooleanPChasItemExpressions(List<BooleanCountableItem> booleanPChasItemExpressions) {
+    public void setBooleanPChasItemExpressions(List<BooleanItemVsItem> booleanPChasItemExpressions) {
         this.booleanPChasItemExpressions = booleanPChasItemExpressions;
     }
 
-    public List<BooleanCountableItem> getBooleanNPChasItemExpressions() {
+    public List<BooleanItemVsItem> getBooleanNPChasItemExpressions() {
         return booleanNPChasItemExpressions;
     }
 
-    public void setBooleanNPChasItemExpressions(List<BooleanCountableItem> booleanNPChasItemExpressions) {
+    public void setBooleanNPChasItemExpressions(List<BooleanItemVsItem> booleanNPChasItemExpressions) {
         this.booleanNPChasItemExpressions = booleanNPChasItemExpressions;
     }
 
@@ -184,8 +193,8 @@ public class Requirements implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        booleanPChasItemExpressions = (List<BooleanCountableItem>) in.readObject();
-        booleanNPChasItemExpressions = (List<BooleanCountableItem>) in.readObject();
+        booleanPChasItemExpressions = (List<BooleanItemVsItem>) in.readObject();
+        booleanNPChasItemExpressions = (List<BooleanItemVsItem>) in.readObject();
         booleanPChasExpressions = (List<BooleanItemExpression>) in.readObject();
         booleanNPChasExpressions = (List<BooleanItemExpression>) in.readObject();
         booleanNumberGlobalVariablesExpressions = (List<BooleanNumberGlobalVariable>) in.readObject();

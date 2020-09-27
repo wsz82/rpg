@@ -13,14 +13,14 @@ public class HasableCreatureInventoryPlace extends Hasable {
     public HasableCreatureInventoryPlace() {
     }
 
-    public HasableCreatureInventoryPlace(BooleanItemExpression<Creature> expression) {
-        this.expression = expression;
+    public HasableCreatureInventoryPlace(String checkedId, Not not) {
+        super(checkedId, not);
     }
 
     @Override
     public boolean has() {
-        boolean has = expression.getCheckedItem().getInventoryPlaces().keySet().stream()
-                .anyMatch(i -> i.getId().equals(expression.getCheckedID()));
+        boolean has = expression.getCheckingObject().getInventoryPlaces().keySet().stream()
+                .anyMatch(i -> i.getId().equals(expression.getCheckingId()));
         if (not == Not.NOT) {
             return !has;
         } else {

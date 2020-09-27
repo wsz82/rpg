@@ -22,8 +22,7 @@ public class BooleanStringVariableEquals extends BooleanVariableExpression<Varia
     }
 
     @Override
-    public boolean isTrue(Variable<String> checkedVariable) {
-        this.checkedVariable = checkedVariable;
+    public boolean isTrue() {
         return equalable.isFitAmount();
     }
 

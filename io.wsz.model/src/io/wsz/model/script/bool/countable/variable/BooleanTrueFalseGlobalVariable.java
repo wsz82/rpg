@@ -20,11 +20,16 @@ public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<Va
         super(checkedID);
     }
 
+    public BooleanTrueFalseGlobalVariable(String checkedID, BooleanType booleanType) {
+        super(checkedID);
+        this.booleanType = booleanType;
+    }
+
     @Override
-    public boolean isTrue(Variable<Boolean> variable) {
+    public boolean isTrue() {
         return switch (booleanType) {
-            case TRUE -> variable.getValue();
-            case FALSE -> !variable.getValue();
+            case TRUE -> checkingObject.getValue();
+            case FALSE -> !checkingObject.getValue();
         };
     }
 

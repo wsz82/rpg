@@ -1,7 +1,16 @@
 package io.wsz.model.script.bool.countable.variable;
 
+import io.wsz.model.script.CompareOperator;
+
 public class CountableDecimalVariable extends CountableVariable<Double>{
     private static final long serialVersionUID = 1L;
+
+    public CountableDecimalVariable() {
+    }
+
+    public CountableDecimalVariable(CompareOperator compareOperator, Double argument) {
+        super(compareOperator, argument);
+    }
 
     @Override
     protected boolean isLesserOrEqual(Double amount) {
@@ -35,6 +44,6 @@ public class CountableDecimalVariable extends CountableVariable<Double>{
 
     @Override
     public Double getAmount() {
-        return expression.getCheckedVariable().getValue();
+        return expression.getCheckingObject().getValue();
     }
 }

@@ -2,40 +2,37 @@ package io.wsz.model.script;
 
 import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.command.Executable;
 import io.wsz.model.script.variable.Variable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScriptValidator {
     private final Controller controller;
 
     private boolean isInvalid;
     private String message;
-    private boolean isSyntaxInvalid;
-    private String code;
-    private boolean isScriptIdInvalid;
-    private String scriptId;
-    private boolean isGlobalVariableIdInvalid;
-    private String globalVariableId;
-    private boolean isAssetIdInvalid;
-    private String assetId;
-    private boolean isLocationIdInvalid;
-    private String locationId;
-    private boolean isIntegerInvalid;
-    private String shouldBeInteger;
-    private boolean isDecimalInvalid;
-    private String shouldBeDecimal;
-    private boolean isBooleanInvalid;
-    private String shouldBeBoolean;
-    private boolean isUnrecognized;
-    private String shouldBeCode;
-    private boolean isItemIdInvalid;
-    private String itemId;
-    private boolean isItemOrAssetIdInvalid;
-    private String itemOrAssetId;
-    private boolean isNewItemIdInvalid;
-    private String newItemId;
+    private final List<String> syntaxInvalid = new ArrayList<>(0);
+    private final List<String> scriptId = new ArrayList<>(0);
+    private final List<String> globalVariableId = new ArrayList<>(0);
+    private final List<String> assetId = new ArrayList<>(0);
+    private final List<String> locationId = new ArrayList<>(0);
+    private final List<String> shouldBeInteger = new ArrayList<>(0);
+    private final List<String> shouldBeDecimal = new ArrayList<>(0);
+    private final List<String> shouldBeBoolean = new ArrayList<>(0);
+    private final List<String> shouldBeCode = new ArrayList<>(0);
+    private final List<String> itemId = new ArrayList<>(0);
+    private final List<String> itemOrAssetId = new ArrayList<>(0);
+    private final List<String> newItemId = new ArrayList<>(0);
+    private final List<String> globalBooleanVariableId = new ArrayList<>(0);
+    private final List<String> equalsOperator = new ArrayList<>(0);
+    private final List<String> creatureId = new ArrayList<>(0);
+    private final List<String> inventoryPlaces = new ArrayList<>(0);
 
     public ScriptValidator(Controller controller) {
         this.controller = controller;
@@ -64,12 +61,27 @@ public class ScriptValidator {
         }
     }
 
+    public void validateGlobalVariableHasBooleanValue(String id) {
+        Variable<?> global = controller.getGlobalVariableById(id);
+        if (global == null) {
+            setGlobalVariableInvalid(id);
+        } else {
+            Object variableValue = global.getValue();
+            if (!(variableValue instanceof Boolean)) {
+                setGlobalBooleanVariableInvalid(id);
+            }
+        }
+    }
+
+    private void setGlobalBooleanVariableInvalid(String id) {
+        globalBooleanVariableId.add(id);
+    }
+
     private void validateBoolean(String value) {
         boolean isNotTrueOrFalse = !value.equals("true") && !value.equals("false");
         if (isNotTrueOrFalse) {
             isInvalid = true;
-            isBooleanInvalid = true;
-            shouldBeBoolean = value;
+            shouldBeBoolean.add(value);
         }
     }
 
@@ -88,12 +100,16 @@ public class ScriptValidator {
     }
 
     public void validateItemOrAsset(String id) {
-        PosItem item = controller.getItemByItemId(id);
+        PosItem item = controller.getItemOrAssetById(id);
         if (item == null) {
-            item = controller.getItemByAssetId(id);
-            if (item == null) {
-                setItemOrAssetIdInvalid(id);
-            }
+            setItemOrAssetIdInvalid(id);
+        }
+    }
+
+    public void validateCreature(String id) {
+        PosItem item = controller.getItemOrAssetById(id);
+        if (!(item instanceof Creature)) {
+            setCreatureIdInvalid(id);
         }
     }
 
@@ -115,8 +131,7 @@ public class ScriptValidator {
             Integer.parseInt(integer);
         } catch (NumberFormatException e) {
             isInvalid = true;
-            isIntegerInvalid = true;
-            shouldBeInteger = integer;
+            shouldBeInteger.add(integer);
         }
     }
 
@@ -125,8 +140,7 @@ public class ScriptValidator {
             Double.parseDouble(decimal);
         } catch (NumberFormatException e) {
             isInvalid = true;
-            isDecimalInvalid = true;
-            shouldBeDecimal = decimal;
+            shouldBeDecimal.add(decimal);
         }
     }
 
@@ -134,8 +148,27 @@ public class ScriptValidator {
         boolean isNotRecognized = !s.isEmpty();
         if (isNotRecognized) {
             isInvalid = true;
-            isUnrecognized = true;
-            shouldBeCode = s;
+            shouldBeCode.add(s);
+        }
+    }
+
+    public void validateShouldNotBeEmpty(String firstComponent) {
+        if (firstComponent.isEmpty()) {
+            isInvalid = true;
+            syntaxInvalid.add("is empty");
+        }
+    }
+
+    public void validateEqualsOperator(EqualsOperator equalsOperator, String operator) {
+        if (equalsOperator == null) {
+            setEqualsOperatorInvalid(operator);
+        }
+    }
+
+    public void validateInventoryPlaceId(String id) {
+        InventoryPlaceType placeType = controller.getInventoryPlaceById(id);
+        if (placeType == null) {
+            setInventoryPlaceInvalid(id);
         }
     }
 
@@ -143,44 +176,79 @@ public class ScriptValidator {
         StringBuilder builder = new StringBuilder();
         if (isInvalid) {
             builder.append("INVALID");
-            if (isSyntaxInvalid) {
-                builder.append("\n SYNTAX: ").append(code);
+            if (!syntaxInvalid.isEmpty()) {
+                builder.append("\n SYNTAX");
+                iterateToBuildMessage(builder, syntaxInvalid);
             }
-            if (isScriptIdInvalid) {
-                builder.append("\n SCRIPT ID: ").append(scriptId);
+            if (!scriptId.isEmpty()) {
+                builder.append("\n SCRIPT ID");
+                iterateToBuildMessage(builder, scriptId);
             }
-            if (isGlobalVariableIdInvalid) {
-                builder.append("\n GLOBAL VARIABLE ID: ").append(globalVariableId);
+            if (!globalVariableId.isEmpty()) {
+                builder.append("\n GLOBAL VARIABLE ID");
+                iterateToBuildMessage(builder, globalVariableId);
             }
-            if (isAssetIdInvalid) {
-                builder.append("\n ASSET ID: ").append(assetId);
+
+            if (!globalBooleanVariableId.isEmpty()) {
+                builder.append("\n GLOBAL BOOlEAN VARIABLE ID");
+                iterateToBuildMessage(builder, globalBooleanVariableId);
             }
-            if (isItemIdInvalid) {
-                builder.append("\n ITEM ID: ").append(itemId);
+            if (!assetId.isEmpty()) {
+                builder.append("\n ASSET ID");
+                iterateToBuildMessage(builder, assetId);
             }
-            if (isItemOrAssetIdInvalid) {
-                builder.append("\n ITEM OR ASSET ID: ").append(itemOrAssetId);
+            if (!itemId.isEmpty()) {
+                builder.append("\n ITEM ID");
+                iterateToBuildMessage(builder, itemId);
             }
-            if (isNewItemIdInvalid) {
-                builder.append("\n NEW ITEM ID ALREADY EXISTS: ").append(newItemId);
+            if (!itemOrAssetId.isEmpty()) {
+                builder.append("\n ITEM OR ASSET ID");
+                iterateToBuildMessage(builder, itemOrAssetId);
             }
-            if (isLocationIdInvalid) {
-                builder.append("\n LOCATION ID: ").append(locationId);
+            if (!creatureId.isEmpty()) {
+                builder.append("\n CREATURE ID");
+                iterateToBuildMessage(builder, creatureId);
             }
-            if (isIntegerInvalid) {
-                builder.append("\n INTEGER: ").append(shouldBeInteger);
+            if (!newItemId.isEmpty()) {
+                builder.append("\n NEW ITEM ID ALREADY EXISTS");
+                iterateToBuildMessage(builder, newItemId);
             }
-            if (isDecimalInvalid) {
-                builder.append("\n DECIMAL: ").append(shouldBeDecimal);
+            if (!locationId.isEmpty()) {
+                builder.append("\n LOCATION ID");
+                iterateToBuildMessage(builder, locationId);
             }
-            if (isBooleanInvalid) {
-                builder.append("\n BOOLEAN: ").append(shouldBeBoolean);
+            if (!inventoryPlaces.isEmpty()) {
+                builder.append("\n INVENTORY PLACE ID");
+                iterateToBuildMessage(builder, inventoryPlaces);
             }
-            if (isUnrecognized) {
-                builder.append("\n UNRECOGNIZED: ").append(shouldBeCode);
+            if (!shouldBeInteger.isEmpty()) {
+                builder.append("\n INTEGER");
+                iterateToBuildMessage(builder, shouldBeInteger);
+            }
+            if (!shouldBeDecimal.isEmpty()) {
+                builder.append("\n DECIMAL");
+                iterateToBuildMessage(builder, shouldBeDecimal);
+            }
+            if (!shouldBeBoolean.isEmpty()) {
+                builder.append("\n BOOLEAN");
+                iterateToBuildMessage(builder, shouldBeBoolean);
+            }
+            if (!equalsOperator.isEmpty()) {
+                builder.append("\n BOOLEAN");
+                iterateToBuildMessage(builder, equalsOperator);
+            }
+            if (!shouldBeCode.isEmpty()) {
+                builder.append("\n UNRECOGNIZED");
+                iterateToBuildMessage(builder, shouldBeCode);
             }
         }
         message = builder.toString();
+    }
+
+    public void iterateToBuildMessage(StringBuilder builder, List<String> invalids) {
+        for (String message : invalids) {
+            builder.append(" | ").append(message);
+        }
     }
 
     public boolean isInvalid() {
@@ -201,49 +269,56 @@ public class ScriptValidator {
 
     public void setSyntaxInvalid(String code) {
         isInvalid = true;
-        this.code = code;
-        isSyntaxInvalid = true;
+        this.syntaxInvalid.add(code);
     }
 
     public void setScriptIdInvalid(String id) {
         isInvalid = true;
-        this.scriptId = id;
-        isScriptIdInvalid = true;
+        this.scriptId.add(id);
     }
 
     public void setGlobalVariableInvalid(String id) {
         isInvalid = true;
-        this.globalVariableId = id;
-        isGlobalVariableIdInvalid = true;
+        this.globalVariableId.add(id);
     }
 
     public void setAssetIdInvalid(String id) {
         isInvalid = true;
-        this.assetId = id;
-        isAssetIdInvalid = true;
+        this.assetId.add(id);
     }
 
     private void setItemIdInvalid(String id) {
         isInvalid = true;
-        this.itemId = id;
-        isItemIdInvalid = true;
+        this.itemId.add(id);
     }
 
     private void setItemOrAssetIdInvalid(String id) {
         isInvalid = true;
-        this.itemOrAssetId = id;
-        isItemOrAssetIdInvalid = true;
+        this.itemOrAssetId.add(id);
+    }
+
+    private void setCreatureIdInvalid(String id) {
+        isInvalid = true;
+        this.creatureId.add(id);
     }
 
     private void setNewItemIdInvalid(String id) {
         isInvalid = true;
-        this.newItemId = id;
-        isNewItemIdInvalid = true;
+        this.newItemId.add(id);
     }
 
     public void setLocationIdInvalid(String id) {
         isInvalid = true;
-        this.locationId = id;
-        isLocationIdInvalid = true;
+        this.locationId.add(id);
+    }
+
+    private void setEqualsOperatorInvalid(String operator) {
+        isInvalid = true;
+        this.equalsOperator.add(operator);
+    }
+
+    private void setInventoryPlaceInvalid(String id) {
+        isInvalid = true;
+        this.inventoryPlaces.add(id);
     }
 }

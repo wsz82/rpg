@@ -3,7 +3,7 @@ package editor.view.dialog.requirement;
 import editor.model.EditorController;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.script.Not;
-import io.wsz.model.script.bool.BooleanExpression;
+import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.bool.has.item.HasableCreatureInventoryPlace;
 import javafx.collections.FXCollections;
@@ -11,7 +11,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 
 import java.util.List;
-import java.util.Optional;
 
 public class RequirementItemHasView extends SpecificRequirement{
     private final ChoiceBox<Not> notCB = new ChoiceBox<>();
@@ -45,11 +44,10 @@ public class RequirementItemHasView extends SpecificRequirement{
     @Override
     public BooleanCreatureHasInventoryPlace getExpression() {
         HasableCreatureInventoryPlace hasable = new HasableCreatureInventoryPlace();
-        BooleanCreatureHasInventoryPlace expression = new BooleanCreatureHasInventoryPlace(hasable);
-        hasable.setExpression(expression);
+        BooleanCreatureHasInventoryPlace expression = new BooleanCreatureHasInventoryPlace(null, hasable);
         InventoryPlaceType placeType = getInventoryPlaceType();
         if (placeType != null) {
-            expression.setCheckedID(placeType.getId());
+            hasable.setCheckedId(placeType.getId());
         }
         Not not = getNot();
         hasable.setNot(not);
@@ -57,14 +55,15 @@ public class RequirementItemHasView extends SpecificRequirement{
     }
 
     @Override
-    public void populate(BooleanExpression expression) {
+    public void populate(BooleanObjectExpression expression) {
         if (!(expression instanceof BooleanCreatureHasInventoryPlace)) return;
         BooleanCreatureHasInventoryPlace specificExpression = (BooleanCreatureHasInventoryPlace) expression;
-        setNot(specificExpression.getHasable().getNot());
-        Optional<InventoryPlaceType> optPlaceType = editorController.getObservableInventoryPlacesTypes().stream()
-                .filter(a -> a.getId().equals(expression.getCheckedID()))
-                .findFirst();
-        setInventoryPlaceType(optPlaceType.orElse(null));
+        HasableCreatureInventoryPlace hasable = specificExpression.getHasable();
+        setNot(hasable.getNot());
+        InventoryPlaceType placeType = editorController.getObservableInventoryPlacesTypes().stream()
+                .filter(a -> a.getId().equals(hasable.getCheckedId()))
+                .findFirst().orElse(null);
+        setInventoryPlaceType(placeType);
     }
 
     public Not getNot() {

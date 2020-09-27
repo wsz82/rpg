@@ -18,7 +18,7 @@ public class AddNew implements Executable, Externalizable {
 
     public static Executable parseCommand(String s, ScriptValidator validator) {
         AddNew command = new AddNew();
-        s = s.replaceFirst(ADD_NEW + REGEX_OPEN_BRACKET, "");
+        s = s.replaceFirst(ADD_NEW + REGEX_BRACKET_OPEN, "");
         int nextIndex = s.indexOf(COMMA);
 
         if (nextIndex != -1) {
@@ -54,7 +54,7 @@ public class AddNew implements Executable, Externalizable {
 
                         nextIndex = s.indexOf(COMMA);
                         if (nextIndex == -1) {
-                            nextIndex = s.indexOf(CLOSE_BRACKET);
+                            nextIndex = s.indexOf(BRACKET_CLOSE);
                         }
 
                         if (nextIndex != -1) {
@@ -71,7 +71,7 @@ public class AddNew implements Executable, Externalizable {
                                     String newItemId = s.substring(0, nextIndex);
                                     command.newItemId = newItemId;
                                     validator.validateNewItemId(newItemId);
-                                    s = s.replaceFirst(newItemId + QUOTE + REGEX_CLOSE_BRACKET, "");
+                                    s = s.replaceFirst(newItemId + QUOTE + REGEX_BRACKET_CLOSE, "");
                                     validator.validateIsEmpty(s);
                                 } else {
                                     parseWithoutNewItemId(s, validator, command);
@@ -91,7 +91,7 @@ public class AddNew implements Executable, Externalizable {
 
     public static void parseWithoutNewItemId(String s, ScriptValidator validator, AddNew command) {
         command.newItemId = null;
-        s = s.replaceFirst(REGEX_CLOSE_BRACKET, "");
+        s = s.replaceFirst(REGEX_BRACKET_CLOSE, "");
         validator.validateIsEmpty(s);
     }
 

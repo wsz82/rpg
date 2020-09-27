@@ -3,13 +3,13 @@ package io.wsz.model.item;
 import java.util.List;
 
 public interface Containable {
-    ItemGetter byItemIdGetter = PosItem::getItemById;
-    ItemGetter byAssetIdGetter = PosItem::getItemById;
+    ItemGetter byItemIdGetter = PosItem::getItemByItemId;
+    ItemGetter byAssetIdGetter = PosItem::getItemByItemId;
 
     List<Equipment> getItems();
 
     default PosItem getItemByAssetId(PosItem thisItem, String lookedId) {
-        String thisId = thisItem.getItemId();
+        String thisId = thisItem.getAssetId();
         return getItemById(byAssetIdGetter, thisItem, lookedId, thisId);
     }
 
@@ -33,6 +33,18 @@ public interface Containable {
             }
         }
         return null;
+    }
+
+    default int getContainableAmountById(String lookedId) {
+        List<Equipment> items = getItems();
+        boolean isNotEmpty = !items.isEmpty();
+        int amount = 0;
+        if (isNotEmpty) {
+            for (PosItem i : items) {
+                amount += i.getAmountById(lookedId);
+            }
+        }
+        return amount;
     }
 
     @FunctionalInterface

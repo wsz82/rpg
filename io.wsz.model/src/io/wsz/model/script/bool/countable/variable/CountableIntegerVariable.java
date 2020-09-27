@@ -1,7 +1,16 @@
 package io.wsz.model.script.bool.countable.variable;
 
+import io.wsz.model.script.CompareOperator;
+
 public class CountableIntegerVariable extends CountableVariable<Integer>{
     private static final long serialVersionUID = 1L;
+
+    public CountableIntegerVariable() {
+    }
+
+    public CountableIntegerVariable(CompareOperator compareOperator, Integer argument) {
+        super(compareOperator, argument);
+    }
 
     @Override
     protected boolean isLesserOrEqual(Integer amount) {
@@ -35,6 +44,6 @@ public class CountableIntegerVariable extends CountableVariable<Integer>{
 
     @Override
     public Integer getAmount() {
-        return expression.getCheckedVariable().getValue();
+        return expression.getCheckingObject().getValue();
     }
 }

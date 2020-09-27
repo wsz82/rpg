@@ -458,8 +458,13 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public PosItem getItemById(String lookedId) {
+    public PosItem getItemByItemId(String lookedId) {
         return getItemByItemId(this, lookedId);
+    }
+
+    @Override
+    protected int getInnerAmountById(String checkedId) {
+        return getContainableAmountById(checkedId);
     }
 
     public Task getTask() {

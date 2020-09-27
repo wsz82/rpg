@@ -65,6 +65,8 @@ public abstract class Asset<A extends Asset> implements Externalizable {
 
     public abstract void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, String newItemId);
 
+    public abstract int getAmountById(String checkedId);
+
     public String getAssetId() {
         if (assetId == null) {
             return "";
