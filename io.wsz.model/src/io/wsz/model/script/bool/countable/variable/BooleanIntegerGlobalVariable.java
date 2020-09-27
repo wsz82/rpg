@@ -23,6 +23,7 @@ public class BooleanIntegerGlobalVariable extends BooleanNumberGlobalVariable<In
         return countable.isFitAmount();
     }
 
+    @Override
     public CountableIntegerVariable getCountable() {
         return countable;
     }

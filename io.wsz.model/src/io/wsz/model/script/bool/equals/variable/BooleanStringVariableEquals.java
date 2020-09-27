@@ -1,5 +1,6 @@
 package io.wsz.model.script.bool.equals.variable;
 
+import io.wsz.model.Controller;
 import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.variable.Variable;
 
@@ -24,6 +25,19 @@ public class BooleanStringVariableEquals extends BooleanVariableExpression<Varia
     @Override
     public boolean isTrue() {
         return equalable.isFitAmount();
+    }
+
+    @Override
+    public void setChecker(Controller controller) {
+        super.setChecker(controller);
+        String checkedId = equalable.getCheckedId();
+        if (checkedId != null) {
+            Variable<?> variable = controller.getGlobalVariableById(checkedId);
+            Object value = variable.getValue();
+            if (value instanceof String) {
+                equalable.setArgument((String) value);
+            }
+        }
     }
 
     public EqualableStringVariable getEqualable() {

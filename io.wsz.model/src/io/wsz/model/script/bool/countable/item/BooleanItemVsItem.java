@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+//TODO change name
 public class BooleanItemVsItem extends BooleanItemExpression<Asset> {
     private static final long serialVersionUID = 1L;
 
@@ -20,6 +21,7 @@ public class BooleanItemVsItem extends BooleanItemExpression<Asset> {
         this.countable.setExpression(this);
     }
 
+    @Override
     public boolean isTrue() {
         return itemHasAmount();
     }

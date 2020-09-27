@@ -8,8 +8,8 @@ public class CountableDecimalVariable extends CountableVariable<Double>{
     public CountableDecimalVariable() {
     }
 
-    public CountableDecimalVariable(CompareOperator compareOperator, Double argument) {
-        super(compareOperator, argument);
+    public CountableDecimalVariable(String checkedId, CompareOperator compareOperator, Double argument) {
+        super(checkedId, compareOperator, argument);
     }
 
     @Override

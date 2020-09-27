@@ -7,9 +7,7 @@ import io.wsz.model.script.Method;
 import io.wsz.model.script.bool.BooleanItemExpression;
 import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
-import io.wsz.model.script.bool.countable.variable.BooleanNumberGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
-import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.Button;
@@ -68,22 +66,9 @@ public class RequirementsListView {
             }
         }
 
-        List<BooleanNumberGlobalVariable> booleanNumberGlobalVariablesExpressions = input.getBooleanNumberGlobalVariablesExpressions();
-        if (booleanNumberGlobalVariablesExpressions != null) {
-            for (BooleanNumberGlobalVariable expression : booleanNumberGlobalVariablesExpressions) {
-                populateWithGlobalVariableExpression(expression, GLOBAL);
-            }
-        }
-        List<BooleanStringVariableEquals> booleanStringGlobalVariablesExpressions = input.getBooleanStringGlobalVariablesExpressions();
-        if (booleanStringGlobalVariablesExpressions != null) {
-            for (BooleanStringVariableEquals expression : booleanStringGlobalVariablesExpressions) {
-                populateWithGlobalVariableExpression(expression, GLOBAL);
-            }
-        }
-
-        List<BooleanTrueFalseGlobalVariable> booleanTrueFalseGlobalVariablesExpressions = input.getBooleanTrueFalseGlobalVariablesExpressions();
-        if (booleanTrueFalseGlobalVariablesExpressions != null) {
-            for (BooleanTrueFalseGlobalVariable expression : booleanTrueFalseGlobalVariablesExpressions) {
+        List<BooleanVariableExpression> globalVariablesExpressions = input.getGlobalVariablesExpressions();
+        if (globalVariablesExpressions != null) {
+            for (BooleanVariableExpression expression : globalVariablesExpressions) {
                 populateWithGlobalVariableExpression(expression, GLOBAL);
             }
         }
@@ -160,49 +145,13 @@ public class RequirementsListView {
 
     private void addGlobalVariableExpression(Requirements output, RequirementView requirementView) {
         GlobalVariableRequirementView secondaryView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
-        Object value = secondaryView.getVariable().getValue();
-        if (value instanceof Boolean) {
-            addGlobalBooleanExpression(output, secondaryView);
-        } else if (value instanceof Integer || value instanceof Double) {
-            addGlobalNumberExpression(output, secondaryView);
-        } else if (value instanceof String) {
-            addGlobalStringExpression(output, secondaryView);
+        List<BooleanVariableExpression> expressions = output.getGlobalVariablesExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setGlobalVariablesExpressions(expressions);
         }
-    }
-
-    private void addGlobalBooleanExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
         SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
         BooleanTrueFalseGlobalVariable expression = (BooleanTrueFalseGlobalVariable) specificRequirement.getExpression();
-
-        List<BooleanTrueFalseGlobalVariable> expressions = output.getBooleanTrueFalseGlobalVariablesExpressions();
-        if (expressions == null) {
-            expressions = new ArrayList<>(1);
-            output.setBooleanTrueFalseGlobalVariablesExpressions(expressions);
-        }
-        expressions.add(expression);
-    }
-
-    private void addGlobalNumberExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
-        SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
-        BooleanNumberGlobalVariable expression = (BooleanNumberGlobalVariable) specificRequirement.getExpression();
-
-        List<BooleanNumberGlobalVariable> expressions = output.getBooleanNumberGlobalVariablesExpressions();
-        if (expressions == null) {
-            expressions = new ArrayList<>(1);
-            output.setBooleanNumberGlobalVariablesExpressions(expressions);
-        }
-        expressions.add(expression);
-    }
-
-    private void addGlobalStringExpression(Requirements output, GlobalVariableRequirementView secondaryView) {
-        SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
-        BooleanStringVariableEquals expression = (BooleanStringVariableEquals) specificRequirement.getExpression();
-
-        List<BooleanStringVariableEquals> expressions = output.getBooleanStringGlobalVariablesExpressions();
-        if (expressions == null) {
-            expressions = new ArrayList<>(1);
-            output.setBooleanStringGlobalVariablesExpressions(expressions);
-        }
         expressions.add(expression);
     }
 

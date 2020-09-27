@@ -13,8 +13,8 @@ public abstract class CountableVariable<N extends Number> extends Countable<N>{
     public CountableVariable() {
     }
 
-    public CountableVariable(CompareOperator compareOperator, N argument) {
-        super(compareOperator, argument);
+    public CountableVariable(String checkedId, CompareOperator compareOperator, N argument) {
+        super(checkedId, compareOperator, argument);
     }
 
     public void setExpression(BooleanVariableExpression<Variable<N>> expression) {

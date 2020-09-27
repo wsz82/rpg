@@ -23,6 +23,7 @@ public class BooleanDecimalGlobalVariable extends BooleanNumberGlobalVariable<Do
         return countable.isFitAmount();
     }
 
+    @Override
     public CountableDecimalVariable getCountable() {
         return countable;
     }

@@ -168,10 +168,12 @@ public class If implements Executable, Externalizable {
                     if (variable != null) {
                         Object value = variable.getValue();
                         if (value instanceof Integer) {
-                            CountableIntegerVariable countable = new CountableIntegerVariable(compareOperator, (int) value);
+                            //todo comapirng to global
+                            CountableIntegerVariable countable = new CountableIntegerVariable(null, compareOperator, (int) value);
                             return new BooleanIntegerGlobalVariable(globalId, countable);
                         } else if (value instanceof Double) {
-                            CountableDecimalVariable countable = new CountableDecimalVariable(compareOperator, (double) value);
+                            //todo comapirng to global
+                            CountableDecimalVariable countable = new CountableDecimalVariable(null, compareOperator, (double) value);
                             return new BooleanDecimalGlobalVariable(globalId, countable);
                         } else if (value instanceof String) {
                             String compareString = compareOperator.toString();
@@ -189,7 +191,8 @@ public class If implements Executable, Externalizable {
                                     }
                                 }
                             }
-                            EqualableStringVariable equalable = new EqualableStringVariable(equalsOperator, amount);
+                            //todo comapirng to global
+                            EqualableStringVariable equalable = new EqualableStringVariable(null, equalsOperator, amount);
                             return new BooleanStringVariableEquals(globalId, equalable);
                         }
                     }

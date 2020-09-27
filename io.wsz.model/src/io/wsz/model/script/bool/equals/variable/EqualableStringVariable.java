@@ -11,8 +11,8 @@ public class EqualableStringVariable extends Equalable<String> {
     public EqualableStringVariable() {
     }
 
-    public EqualableStringVariable(EqualsOperator equalsOperator, String argument) {
-        super(equalsOperator, argument);
+    public EqualableStringVariable(String checkedId, EqualsOperator equalsOperator, String argument) {
+        super(checkedId, equalsOperator, argument);
     }
 
     @Override

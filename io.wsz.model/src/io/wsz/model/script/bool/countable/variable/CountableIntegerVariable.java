@@ -8,8 +8,8 @@ public class CountableIntegerVariable extends CountableVariable<Integer>{
     public CountableIntegerVariable() {
     }
 
-    public CountableIntegerVariable(CompareOperator compareOperator, Integer argument) {
-        super(compareOperator, argument);
+    public CountableIntegerVariable(String checkedId, CompareOperator compareOperator, Integer argument) {
+        super(checkedId, compareOperator, argument);
     }
 
     @Override

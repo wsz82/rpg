@@ -1,13 +1,13 @@
 package io.wsz.model.script.bool.countable;
 
 import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.bool.Comparable;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public abstract class Countable<N extends Number> implements Externalizable {
+public abstract class Countable<N extends Number> extends Comparable {
     private static final long serialVersionUID = 1L;
 
     protected CompareOperator compareOperator;
@@ -16,7 +16,8 @@ public abstract class Countable<N extends Number> implements Externalizable {
     public Countable() {
     }
 
-    public Countable(CompareOperator compareOperator, N argument) {
+    public Countable(String checkedId, CompareOperator compareOperator, N argument) {
+        super(checkedId);
         this.compareOperator = compareOperator;
         this.argument = argument;
     }
@@ -106,6 +107,14 @@ public abstract class Countable<N extends Number> implements Externalizable {
 
     public abstract N getAmount();
 
+    public String getCheckedId() {
+        return checkedId;
+    }
+
+    public void setCheckedId(String checkedId) {
+        this.checkedId = checkedId;
+    }
+
     public CompareOperator getCompareOperator() {
         return compareOperator;
     }
@@ -124,12 +133,14 @@ public abstract class Countable<N extends Number> implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
         out.writeObject(compareOperator);
         out.writeObject(argument);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
         compareOperator = (CompareOperator) in.readObject();
         argument = (N) in.readObject();
     }
