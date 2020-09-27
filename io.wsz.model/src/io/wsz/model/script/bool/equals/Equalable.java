@@ -30,28 +30,28 @@ public abstract class Equalable<O> extends Comparable {
     }
 
     public boolean isEqual() {
-        O amount;
+        O value;
         try {
-            amount = getValue();
+            value = getValue();
         } catch (NullPointerException e) {
             return false;
         }
-        return isEqual(amount);
+        return isEqual(value);
     }
 
-    protected abstract boolean isEqual(O amount);
+    protected abstract boolean isEqual(O value);
 
     public boolean isNotEqual() {
-        O amount;
+        O value;
         try {
-            amount = getValue();
+            value = getValue();
         } catch (NullPointerException e) {
             return true;
         }
-        return isNotEqual(amount);
+        return isNotEqual(value);
     }
 
-    protected abstract boolean isNotEqual(O amount);
+    protected abstract boolean isNotEqual(O value);
 
     public abstract O getValue();
 

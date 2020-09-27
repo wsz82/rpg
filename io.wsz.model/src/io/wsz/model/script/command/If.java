@@ -2,13 +2,21 @@ package io.wsz.model.script.command;
 
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.script.*;
+import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.EqualsOperator;
+import io.wsz.model.script.Not;
+import io.wsz.model.script.ScriptValidator;
 import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.item.CountableItem;
-import io.wsz.model.script.bool.countable.variable.*;
+import io.wsz.model.script.bool.countable.variable.BooleanDecimalGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.CountableDecimalVariable;
+import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
+import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.EqualableStringVariable;
+import io.wsz.model.script.bool.equals.variable.EqualableTrueFalse;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.bool.has.item.HasableCreatureInventoryPlace;
 import io.wsz.model.script.variable.Variable;
@@ -141,13 +149,14 @@ public class If implements Executable, Externalizable {
                 condition = condition.replaceFirst(globalId, "");
                 condition = condition.replace(BRACKET_CLOSE, "");
                 validator.validateIsEmpty(condition);
-                BooleanType booleanType;
+                EqualsOperator equalsOperator;
                 if (negate) {
-                    booleanType = BooleanType.FALSE;
+                    equalsOperator = EqualsOperator.EQUAL;
                 } else {
-                    booleanType = BooleanType.TRUE;
+                    equalsOperator = EqualsOperator.NOT_EQUAL;
                 }
-                return new BooleanTrueFalseGlobalVariable(globalId, booleanType);
+                EqualableTrueFalse equalable = new EqualableTrueFalse(null, equalsOperator, true);
+                return new BooleanTrueFalseGlobalVariable(globalId, equalable);
             }
         } else {
             String operatorString = compareOperator.toString();

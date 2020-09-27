@@ -7,7 +7,7 @@ import io.wsz.model.script.Method;
 import io.wsz.model.script.bool.BooleanItemExpression;
 import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
-import io.wsz.model.script.bool.countable.variable.BooleanTrueFalseGlobalVariable;
+import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.Button;

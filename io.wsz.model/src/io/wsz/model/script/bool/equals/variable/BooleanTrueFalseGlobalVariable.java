@@ -8,15 +8,15 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class BooleanStringVariableEquals extends BooleanVariableExpression<Variable<String>> {
+public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<Variable<Boolean>> {
     private static final long serialVersionUID = 1L;
 
-    private EqualableStringVariable equalable;
+    private EqualableTrueFalse equalable;
 
-    public BooleanStringVariableEquals() {
+    public BooleanTrueFalseGlobalVariable() {
     }
 
-    public BooleanStringVariableEquals(String checkingId, EqualableStringVariable equalable) {
+    public BooleanTrueFalseGlobalVariable(String checkingId, EqualableTrueFalse equalable) {
         super(checkingId);
         this.equalable = equalable;
         this.equalable.setExpression(this);
@@ -34,28 +34,28 @@ public class BooleanStringVariableEquals extends BooleanVariableExpression<Varia
         if (checkedId != null) {
             Variable<?> variable = controller.getGlobalVariableById(checkedId);
             Object value = variable.getValue();
-            if (value instanceof String) {
-                equalable.setArgument((String) value);
+            try {
+                equalable.setArgument((Boolean) value);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public EqualableStringVariable getEqualable() {
+    public EqualableTrueFalse getEqualable() {
         return equalable;
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-
         out.writeObject(equalable);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-
-        equalable = (EqualableStringVariable) in.readObject();
+        equalable = (EqualableTrueFalse) in.readObject();
         equalable.setExpression(this);
     }
 }

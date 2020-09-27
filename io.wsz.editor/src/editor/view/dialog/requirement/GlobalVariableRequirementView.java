@@ -37,26 +37,23 @@ public class GlobalVariableRequirementView extends AfterMethodRequirementView {
         } else if (value instanceof String) {
             setUpStringGlobalVariableRequirement();
         }
+        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     private void setUpBooleanGlobalVariableRequirement() {
         this.specificRequirement = new GlobalBooleanVariableRequirementView(editorController, this);
-        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     private void setUpIntegerGlobalVariableRequirement() {
         this.specificRequirement = new GlobalIntegerVariableRequirementView(editorController, this);
-        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     private void setUpDecimalGlobalVariableRequirement() {
         this.specificRequirement = new GlobalDecimalVariableRequirementView(editorController, this);
-        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     private void setUpStringGlobalVariableRequirement() {
         this.specificRequirement = new GlobalStringVariableRequirementView(editorController, this);
-        elements.getChildren().addAll(specificRequirement.getElements());
     }
 
     @Override

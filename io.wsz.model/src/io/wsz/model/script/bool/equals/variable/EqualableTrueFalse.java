@@ -3,34 +3,34 @@ package io.wsz.model.script.bool.equals.variable;
 import io.wsz.model.script.EqualsOperator;
 import io.wsz.model.script.bool.equals.Equalable;
 
-public class EqualableStringVariable extends Equalable<String> {
+public class EqualableTrueFalse extends Equalable<Boolean> {
     private static final long serialVersionUID = 1L;
 
-    private transient BooleanStringVariableEquals expression;
+    private transient BooleanTrueFalseGlobalVariable expression;
 
-    public EqualableStringVariable() {
+    public EqualableTrueFalse() {
     }
 
-    public EqualableStringVariable(String checkedId, EqualsOperator equalsOperator, String argument) {
+    public EqualableTrueFalse(String checkedId, EqualsOperator equalsOperator, Boolean argument) {
         super(checkedId, equalsOperator, argument);
     }
 
     @Override
-    protected boolean isEqual(String value) {
+    protected boolean isEqual(Boolean value) {
         return value.equals(argument);
     }
 
     @Override
-    protected boolean isNotEqual(String value) {
+    protected boolean isNotEqual(Boolean value) {
         return !value.equals(argument);
     }
 
     @Override
-    public String getValue() {
+    public Boolean getValue() {
         return expression.getCheckingObject().getValue();
     }
 
-    public void setExpression(BooleanStringVariableEquals expression) {
+    public void setExpression(BooleanTrueFalseGlobalVariable expression) {
         this.expression = expression;
     }
 }

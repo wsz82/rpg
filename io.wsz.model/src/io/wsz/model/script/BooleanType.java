@@ -1,20 +1,17 @@
 package io.wsz.model.script;
 
 public enum BooleanType {
-    TRUE ("is true"),
-    FALSE ("is false");
+    TRUE ("true"),
+    FALSE ("false");
 
-    private String display;
+    private final String display;
 
     BooleanType(String display) {
         this.display = display;
     }
 
-    public String getDisplay() {
+    @Override
+    public String toString() {
         return display;
-    }
-
-    public void setDisplay(String display) {
-        this.display = display;
     }
 }
