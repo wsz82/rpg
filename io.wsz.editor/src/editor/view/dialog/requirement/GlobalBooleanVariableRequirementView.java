@@ -29,7 +29,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         fillElements();
         setUpOperatorCB();
         setUpBooleanCB();
-        setUpVariableCB(variableCB, editorController.getObservableGlobalBooleans());
+        setUpVariableCB(variableCB, editorController.getObservableGlobalBooleans(), previousView.getVariable());
     }
 
     private void setUpOperatorCB() {

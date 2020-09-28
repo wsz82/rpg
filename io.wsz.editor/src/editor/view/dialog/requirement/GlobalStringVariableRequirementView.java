@@ -27,7 +27,7 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
         dual.hookUpEvents();
         fillElements();
         setUpOperatorCB();
-        setUpVariableCB(variableCB, editorController.getObservableGlobalStrings());
+        setUpVariableCB(variableCB, editorController.getObservableGlobalStrings(), previousView.getVariable());
     }
 
     private void setUpOperatorCB() {

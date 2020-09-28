@@ -23,7 +23,7 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
         dual.hookUpEvents();
         fillElements();
         setUpOperatorCB(operatorCB);
-        setUpVariableCB(variableCB, editorController.getObservableGlobalIntegers());
+        setUpVariableCB(variableCB, editorController.getObservableGlobalIntegers(), previousView.getVariable());
     }
 
     @Override

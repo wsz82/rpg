@@ -23,7 +23,7 @@ public class GlobalDecimalVariableRequirementView extends SpecificRequirement {
         dual.hookUpEvents();
         fillElements();
         setUpOperatorCB(operatorCB);
-        setUpVariableCB(variableCB, editorController.getObservableGlobalDecimals());
+        setUpVariableCB(variableCB, editorController.getObservableGlobalDecimals(), previousView.getVariable());
     }
 
     @Override
