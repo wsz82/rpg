@@ -7,7 +7,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.HBox;
-import javafx.util.StringConverter;
 
 import java.util.List;
 
@@ -38,27 +37,6 @@ public class RequirementView {
             elements.getChildren().clear();
             resolveMethodSelection(newMethod);
         });
-        methodCB.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Method method) {
-                if (method == null) {
-                    return "";
-                } else {
-                    return method.getDisplay();
-                }
-            }
-
-            @Override
-            public Method fromString(String display) {
-                Method[] methodsArr = Method.values();
-                for (Method method : methodsArr) {
-                    if (method.getDisplay().equals(display)) {
-                        return method;
-                    }
-                }
-                return null;
-            }
-        });
     }
 
     private void resolveMethodSelection(Method newMethod) {
@@ -87,7 +65,6 @@ public class RequirementView {
     private void removeRequirement() {
         owner.removeRequirement(this);
     }
-
 
     public HBox getRow() {
         return row;

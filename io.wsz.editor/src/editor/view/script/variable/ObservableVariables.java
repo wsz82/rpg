@@ -1,4 +1,4 @@
-package editor.view.script;
+package editor.view.script.variable;
 
 import io.wsz.model.script.variable.*;
 import javafx.collections.FXCollections;
@@ -91,6 +91,13 @@ public class ObservableVariables {
         ObservableList<Variable<?>> merged = FXCollections.observableArrayList();
         merged.addAll(strings);
         merged.addAll(booleans);
+        merged.addAll(integers);
+        merged.addAll(decimals);
+        return merged;
+    }
+
+    public ObservableList<VariableNumber<?>> getMergedNumberVariables() {
+        ObservableList<VariableNumber<?>> merged = FXCollections.observableArrayList();
         merged.addAll(integers);
         merged.addAll(decimals);
         return merged;

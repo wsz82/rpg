@@ -75,9 +75,7 @@ public class RequirementsListView {
 
     private void populateWithGlobalVariableExpression(BooleanVariableExpression expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
-
         GlobalVariableRequirementView secondaryView = getNewGlobalVariableRequirementView(requirementView, expression);
-
         SpecificRequirement globalVariableView = secondaryView.getSpecificRequirement();
         if (globalVariableView != null) {
             globalVariableView.populate(expression);
@@ -96,18 +94,14 @@ public class RequirementsListView {
 
     private void populateWithCreatureHasInventoryPlaceExpression(BooleanItemExpression expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
-
         AfterMethodRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, INVENTORY_PLACE);
-
         SpecificRequirement creatureHasView = typeView.getSpecificRequirement();
         creatureHasView.populate(expression);
     }
 
     private void populateWithCreatureItemExpression(BooleanItemVsItem expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
-
         ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, ITEM);
-
         SpecificRequirement creatureItemView = typeView.getSpecificRequirement();
         creatureItemView.populate(expression);
     }

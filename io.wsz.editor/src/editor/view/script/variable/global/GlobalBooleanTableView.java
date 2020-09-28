@@ -1,13 +1,12 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.VariableBoolean;
-import javafx.stage.Stage;
 
 public class GlobalBooleanTableView extends GlobalsTableView<VariableBoolean> {
 
-    public GlobalBooleanTableView(Stage parent, EditorController editorController) {
-        super(parent, editorController);
+    public GlobalBooleanTableView(EditorController editorController) {
+        super(editorController);
     }
 
     @Override

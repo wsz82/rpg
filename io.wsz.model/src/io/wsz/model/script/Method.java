@@ -5,17 +5,14 @@ public enum Method {
     NPC_HAS ("NPC has"),
     GLOBAL ("Global");
 
-    private String display;
+    private final String display;
 
     Method(String display) {
         this.display = display;
     }
 
-    public String getDisplay() {
+    @Override
+    public String toString() {
         return display;
-    }
-
-    public void setDisplay(String display) {
-        this.display = display;
     }
 }

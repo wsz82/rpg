@@ -1,13 +1,12 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.VariableInteger;
-import javafx.stage.Stage;
 
 public class GlobalIntegerTableView extends GlobalsTableView<VariableInteger> {
 
-    public GlobalIntegerTableView(Stage parent, EditorController editorController) {
-        super(parent, editorController);
+    public GlobalIntegerTableView(EditorController editorController) {
+        super(editorController);
     }
 
     @Override
