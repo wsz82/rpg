@@ -1,43 +1,27 @@
 package editor.view;
 
-import javafx.beans.value.ChangeListener;
-import javafx.scene.control.TextField;
-
-public class IntegerField extends TextField {
+public class IntegerField extends NumberField<Integer> {
 
     public IntegerField(boolean canBeEmpty) {
-        filterTextFieldForInteger(null, canBeEmpty);
+        super(canBeEmpty);
     }
 
     public IntegerField(Integer min, boolean canBeEmpty) {
-        filterTextFieldForInteger(min, canBeEmpty);
+        super(min, canBeEmpty);
     }
 
-    private void filterTextFieldForInteger(Integer min, boolean canBeEmpty) {
-        ChangeListener<String> positiveNumberListener = (observable, oldValue, newValue) -> {
-            int newNumber = 0;
-
-            try {
-                newNumber = Integer.parseInt(newValue);
-            } catch (NumberFormatException|NullPointerException e) {
-                if (canBeEmpty && (newValue == null || newValue.isEmpty())) {
-                    setText("");
-                    return;
-                }
-                if (oldValue.isEmpty()) {
-                    oldValue = "0";
-                }
-                setText("" + oldValue);
-            }
-            resetIfBelowMin(min, oldValue, newNumber);
-        };
-        textProperty().addListener(positiveNumberListener);
+    @Override
+    protected Integer getDefaultValue() {
+        return 0;
     }
 
-    private void resetIfBelowMin(Integer min, String oldValue, int newNumber) {
-        if (min == null) {
-            return;
-        }
-        if (newNumber < min) setText("" + oldValue);
+    @Override
+    protected boolean isBelowMin(Integer min, Integer newNumber) {
+        return newNumber < min;
+    }
+
+    @Override
+    protected Integer getNumber(String text) {
+        return Integer.parseInt(text);
     }
 }

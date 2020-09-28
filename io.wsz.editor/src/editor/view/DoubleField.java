@@ -1,43 +1,27 @@
 package editor.view;
 
-import javafx.beans.value.ChangeListener;
-import javafx.scene.control.TextField;
-
-public class DoubleField extends TextField {
+public class DoubleField extends NumberField<Double> {
 
     public DoubleField(boolean canBeEmpty) {
-        filterTextFieldForDouble(null, canBeEmpty);
+        super(canBeEmpty);
     }
 
     public DoubleField(Double min, boolean canBeEmpty) {
-        filterTextFieldForDouble(min, canBeEmpty);
+        super(min, canBeEmpty);
     }
 
-    private void filterTextFieldForDouble(Double min, boolean canBeEmpty) {
-        ChangeListener<String> positiveNumberListener = (observable, oldValue, newValue) -> {
-            double newNumber = 0.0;
-
-            try {
-                newNumber = Double.parseDouble(newValue);
-            } catch (NumberFormatException|NullPointerException e ) {
-                if (canBeEmpty && (newValue == null || newValue.isEmpty())) {
-                    setText("");
-                    return;
-                }
-                if (oldValue.isEmpty()) {
-                    oldValue = "0.0";
-                }
-                setText("" + oldValue);
-            }
-            resetIfBelowMin(min, oldValue, newNumber);
-        };
-        textProperty().addListener(positiveNumberListener);
+    @Override
+    protected Double getDefaultValue() {
+        return 0.0;
     }
 
-    private void resetIfBelowMin(Double min, String oldValue, double newNumber) {
-        if (min == null) {
-            return;
-        }
-        if (newNumber < min) setText("" + oldValue);
+    @Override
+    protected boolean isBelowMin(Double min, Double newNumber) {
+        return newNumber < min;
+    }
+
+    @Override
+    protected Double getNumber(String text) {
+        return Double.parseDouble(text);
     }
 }

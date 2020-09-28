@@ -70,13 +70,15 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanStringVariableEquals)) return;
         BooleanStringVariableEquals specificExpression = (BooleanStringVariableEquals) expression;
+        String checkingId = expression.getCheckingId();
         editorController.getObservableGlobalStrings().stream()
-                .filter(a -> a.getId().equals(expression.getCheckingId()))
+                .filter(a -> a.getId().equals(checkingId))
                 .findFirst().ifPresent(previousView::setVariable);
-        EqualableStringVariable countable = specificExpression.getEqualable();
-        setEqualsOperator(countable.getEqualsOperator());
-        setArgument(countable.getArgument());
-        String checkedId = countable.getCheckedId();
+        EqualableStringVariable equalable = specificExpression.getEqualable();
+        if (equalable == null) return;
+        setEqualsOperator(equalable.getEqualsOperator());
+        setArgument(equalable.getArgument());
+        String checkedId = equalable.getCheckedId();
         editorController.getObservableGlobalStrings().stream()
                 .filter(a -> a.getId().equals(checkedId))
                 .findFirst().ifPresent(variableCB::setValue);

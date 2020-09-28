@@ -83,26 +83,19 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanTrueFalseGlobalVariable)) return;
         BooleanTrueFalseGlobalVariable specificExpression = (BooleanTrueFalseGlobalVariable) expression;
+        String checkingId = expression.getCheckingId();
         editorController.getObservableGlobalBooleans().stream()
-                .filter(a -> a.getId().equals(expression.getCheckingId()))
+                .filter(a -> a.getId().equals(checkingId))
                 .findFirst().ifPresent(previousView::setVariable);
-
         EqualableTrueFalse equalable = specificExpression.getEqualable();
+        if (equalable == null) return;
         operatorCB.setValue(equalable.getEqualsOperator());
-
-        BooleanType booleanType = null;
+        BooleanType booleanType = BooleanType.FALSE;
         Boolean argument = equalable.getArgument();
-        if (argument != null) {
-            if (argument) {
-                booleanType = BooleanType.TRUE;
-            } else {
-                booleanType = BooleanType.FALSE;
-            }
+        if (argument) {
+            booleanType = BooleanType.TRUE;
         }
-        if (booleanType != null) {
-            booleanCB.setValue(booleanType);
-        }
-
+        booleanCB.setValue(booleanType);
         String checkedId = equalable.getCheckedId();
         editorController.getObservableGlobalBooleans().stream()
                 .filter(a -> a.getId().equals(checkedId))

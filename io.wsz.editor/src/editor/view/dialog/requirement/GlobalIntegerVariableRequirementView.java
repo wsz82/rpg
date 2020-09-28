@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.script.CompareOperator;
 import io.wsz.model.script.bool.BooleanObjectExpression;
-import io.wsz.model.script.bool.countable.Countable;
 import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
 import io.wsz.model.script.variable.Variable;
@@ -13,54 +12,65 @@ import javafx.scene.control.ChoiceBox;
 
 public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
-    private final IntegerField argumentInput = new IntegerField(false);
+    private final IntegerField argumentInput = new IntegerField(true);
+    private final ChoiceBox<VariableInteger> variableCB = new ChoiceBox<>();
     private final GlobalVariableRequirementView previousView;
 
     public GlobalIntegerVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
         super(editorController);
         this.previousView = previousView;
-        setUpOperatorCB(operatorCB);
+        DualTextFieldChoiceBox<IntegerField> dual = new DualTextFieldChoiceBox<>(argumentInput, variableCB);
+        dual.hookUpEvents();
         fillElements();
+        setUpOperatorCB(operatorCB);
+        setUpVariableCB(variableCB, editorController.getObservableGlobalIntegers());
     }
 
     @Override
     protected void fillElements() {
-        elements.getChildren().addAll(operatorCB, argumentInput);
+        elements.getChildren().addAll(operatorCB, argumentInput, variableCB);
     }
 
     @Override
     public BooleanObjectExpression<?> getExpression() {
-        Variable<Integer> variable = (Variable<Integer>) previousView.getVariable();
+        Variable<?> variable = previousView.getVariable();
 
-        String id = null;
+        String checkingId = null;
         if (variable != null) {
-            id = variable.getId();
+            checkingId = variable.getId();
         }
-
-        CountableIntegerVariable countable = new CountableIntegerVariable();
-        BooleanIntegerGlobalVariable expression = new BooleanIntegerGlobalVariable(id, countable);
-        countable.setExpression(expression);
 
         CompareOperator compareOperator = getCompareOperator();
-        if (compareOperator != null) {
-            countable.setCompareOperator(compareOperator);
+        Integer argument = null;
+        if (argumentInput.isVisible()) {
+            argument = argumentInput.getValue();
         }
-        countable.setArgument(getArgument());
-        return expression;
+        String checkedId = null;
+        VariableInteger value = variableCB.getValue();
+        if (variableCB.isVisible() && value != null) {
+            checkedId = value.getId();
+        }
+
+        CountableIntegerVariable countable = new CountableIntegerVariable(checkedId, compareOperator, argument);
+        return new BooleanIntegerGlobalVariable(checkingId, countable);
     }
 
     @Override
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanIntegerGlobalVariable)) return;
         BooleanIntegerGlobalVariable specificExpression = (BooleanIntegerGlobalVariable) expression;
-        VariableInteger checking = editorController.getObservableGlobalIntegers().stream()
-                .filter(a -> a.getId().equals(expression.getCheckingId()))
-                .findFirst().orElse(null);
-        previousView.setVariable(checking);
-        Countable<Integer> countable = specificExpression.getCountable();
+        String checkingId = expression.getCheckingId();
+        editorController.getObservableGlobalIntegers().stream()
+                .filter(a -> a.getId().equals(checkingId))
+                .findFirst().ifPresent(previousView::setVariable);
+        CountableIntegerVariable countable = specificExpression.getCountable();
         if (countable == null) return;
         setCompareOperator(countable.getCompareOperator());
         setArgument(countable.getArgument());
+        String checkedId = countable.getCheckedId();
+        editorController.getObservableGlobalIntegers().stream()
+                .filter(a -> a.getId().equals(checkedId))
+                .findFirst().ifPresent(variableCB::setValue);
     }
 
     public CompareOperator getCompareOperator() {
@@ -71,16 +81,11 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
         operatorCB.setValue(operator);
     }
 
-    public int getArgument() {
-        String argument = argumentInput.getText();
-        if (argument.isEmpty()) {
-            return 0;
-        } else {
-            return Integer.parseInt(argument);
-        }
+    public Integer getArgument() {
+        return argumentInput.getValue();
     }
 
-    public void setArgument(int argument) {
+    public void setArgument(Integer argument) {
         argumentInput.setText(String.valueOf(argument));
     }
 }
