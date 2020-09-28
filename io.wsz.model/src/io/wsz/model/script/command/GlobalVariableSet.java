@@ -9,7 +9,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 
 import static io.wsz.model.script.ScriptKeyWords.*;
 
@@ -23,12 +22,12 @@ public class GlobalVariableSet implements Executable, Externalizable {
         int setIndex = s.indexOf(SET);
 
         if (setIndex != -1) {
-            String globalVarID = s.substring(0, setIndex);
-            command.globalVarID = globalVarID;
-            s = s.replaceFirst(globalVarID + SET, "");
+            String globalVarId = s.substring(0, setIndex);
+            command.globalVarId = globalVarId;
+            s = s.replaceFirst(globalVarId + SET, "");
             String value = s;
             command.value = value;
-            validator.validateGlobalVariable(globalVarID, value);
+            validator.validateGlobalVariable(globalVarId, value);
             s = s.replaceFirst(value, "");
             validator.validateIsEmpty(s);
             return command;
@@ -37,27 +36,25 @@ public class GlobalVariableSet implements Executable, Externalizable {
         return null;
     }
 
-    private String globalVarID;
+    private String globalVarId;
     private String value;
 
     @Override
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
-        List<Variable<?>> globalVariables = controller.getModel().getActivePlugin().getWorld().getGlobalVariables();
-        if (globalVariables == null || globalVariables.isEmpty()) return;
-        Variable<?> globalVar = controller.getGlobalVariableById(globalVarID);
+        Variable<?> globalVar = controller.getGlobalVariableById(globalVarId);
         if (globalVar == null) return;
         globalVar.setValue(value);
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeObject(globalVarID);
+        out.writeObject(globalVarId);
         out.writeObject(value);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        globalVarID = (String) in.readObject();
+        globalVarId = (String) in.readObject();
         value = (String) in.readObject();
     }
 }

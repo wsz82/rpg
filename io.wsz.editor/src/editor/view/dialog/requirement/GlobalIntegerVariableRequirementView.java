@@ -8,6 +8,7 @@ import io.wsz.model.script.bool.countable.Countable;
 import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableInteger;
 import javafx.scene.control.ChoiceBox;
 
 public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
@@ -33,7 +34,7 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
 
         String id = null;
         if (variable != null) {
-            id = variable.getID();
+            id = variable.getId();
         }
 
         CountableIntegerVariable countable = new CountableIntegerVariable();
@@ -52,10 +53,10 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanIntegerGlobalVariable)) return;
         BooleanIntegerGlobalVariable specificExpression = (BooleanIntegerGlobalVariable) expression;
-        Variable<?> variable = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckingId()))
+        VariableInteger checking = editorController.getObservableGlobalIntegers().stream()
+                .filter(a -> a.getId().equals(expression.getCheckingId()))
                 .findFirst().orElse(null);
-        previousView.setVariable(variable);
+        previousView.setVariable(checking);
         Countable<Integer> countable = specificExpression.getCountable();
         if (countable == null) return;
         setCompareOperator(countable.getCompareOperator());

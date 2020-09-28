@@ -2,7 +2,7 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.Variable;
-import javafx.collections.FXCollections;
+import io.wsz.model.script.variable.VariableType;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.HBox;
@@ -17,9 +17,8 @@ public class GlobalVariableRequirementView extends AfterMethodRequirementView {
     }
 
     private void setUpVariableCB() {
-        ObservableList<Variable<?>> observableGlobalVariables = editorController.getObservableGlobalVariables();
-        ObservableList<Variable<?>> observableGlobalVariablesWithNull = FXCollections.observableArrayList(observableGlobalVariables);
-        variableCB.setItems(observableGlobalVariablesWithNull);
+        ObservableList<Variable<?>> globals = editorController.getObservableGlobals().getMergedVariables();
+        variableCB.setItems(globals);
         variableCB.valueProperty().addListener((observable, oldVar, newVar) -> {
             elements.getChildren().clear();
             setUpSpecificRequirement(newVar);
@@ -27,33 +26,14 @@ public class GlobalVariableRequirementView extends AfterMethodRequirementView {
     }
 
     private void setUpSpecificRequirement(Variable<?> newVar) {
-        Object value = newVar.getValue();
-        if (value instanceof Boolean) {
-            setUpBooleanGlobalVariableRequirement();
-        } else if (value instanceof Integer) {
-            setUpIntegerGlobalVariableRequirement();
-        } else if (value instanceof Double) {
-            setUpDecimalGlobalVariableRequirement();
-        } else if (value instanceof String) {
-            setUpStringGlobalVariableRequirement();
-        }
+        VariableType type = newVar.getType();
+        this.specificRequirement = switch (type) {
+            case STRING -> new GlobalStringVariableRequirementView(editorController, this);
+            case BOOLEAN -> new GlobalBooleanVariableRequirementView(editorController, this);
+            case INTEGER -> new GlobalIntegerVariableRequirementView(editorController, this);
+            case DECIMAL -> new GlobalDecimalVariableRequirementView(editorController, this);
+        };
         elements.getChildren().addAll(specificRequirement.getElements());
-    }
-
-    private void setUpBooleanGlobalVariableRequirement() {
-        this.specificRequirement = new GlobalBooleanVariableRequirementView(editorController, this);
-    }
-
-    private void setUpIntegerGlobalVariableRequirement() {
-        this.specificRequirement = new GlobalIntegerVariableRequirementView(editorController, this);
-    }
-
-    private void setUpDecimalGlobalVariableRequirement() {
-        this.specificRequirement = new GlobalDecimalVariableRequirementView(editorController, this);
-    }
-
-    private void setUpStringGlobalVariableRequirement() {
-        this.specificRequirement = new GlobalStringVariableRequirementView(editorController, this);
     }
 
     @Override

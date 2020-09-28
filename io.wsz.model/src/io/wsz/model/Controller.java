@@ -281,9 +281,8 @@ public class Controller {
     }
 
     public Variable<?> getGlobalVariableById(String id) {
-        return model.getActivePlugin().getWorld().getGlobalVariables().stream()
-                .filter(g -> g.getID().equals(id))
-                .findFirst().orElse(null);
+        World world = model.getActivePlugin().getWorld();
+        return world.getVariables().getVariableById(id);
     }
 
     public Asset getAssetById(String id) {

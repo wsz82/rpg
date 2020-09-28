@@ -7,12 +7,12 @@ import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.EqualableTrueFalse;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableBoolean;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
@@ -29,7 +29,14 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         fillElements();
         setUpOperatorCB();
         setUpBooleanCB();
-        setUpVariableCB();
+        setUpVariableCB(variableCB);
+    }
+
+    protected void setUpVariableCB(ChoiceBox<Variable<Boolean>> choiceBox) {
+        ObservableList<VariableBoolean> booleans = editorController.getObservableGlobalBooleans();
+        ObservableList<Variable<Boolean>> booleansWithNull = FXCollections.observableArrayList(booleans);
+        booleansWithNull.add(null);
+        choiceBox.setItems(booleansWithNull);
     }
 
     private void setUpOperatorCB() {
@@ -37,16 +44,6 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         List<EqualsOperator> types = List.of(operators);
         ObservableList<EqualsOperator> observableTypes = FXCollections.observableArrayList(types);
         operatorCB.setItems(observableTypes);
-    }
-
-    private void setUpVariableCB() {
-        List<Variable<Boolean>> observableGlobalVariables = editorController.getObservableGlobalVariables().stream()
-                .filter(v -> v.getValue() instanceof Boolean)
-                .map(v -> (Variable<Boolean>) v)
-                .collect(Collectors.toList());
-        ObservableList<Variable<Boolean>> variables = FXCollections.observableArrayList(observableGlobalVariables);
-        variables.add(null);
-        variableCB.setItems(variables);
     }
 
     private void setUpBooleanCB() {
@@ -68,7 +65,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
 
         String checkingId = null;
         if (variable != null) {
-            checkingId = variable.getID();
+            checkingId = variable.getId();
         }
 
         EqualsOperator operator = operatorCB.getValue();
@@ -83,7 +80,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         String checkedId = null;
         Variable<Boolean> value = variableCB.getValue();
         if (variableCB.isVisible() && value != null) {
-            checkedId = value.getID();
+            checkedId = value.getId();
         }
         EqualableTrueFalse equalable = new EqualableTrueFalse(checkedId, operator, argument);
         BooleanTrueFalseGlobalVariable expression = new BooleanTrueFalseGlobalVariable(checkingId, equalable);
@@ -94,8 +91,8 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanTrueFalseGlobalVariable)) return;
         BooleanTrueFalseGlobalVariable specificExpression = (BooleanTrueFalseGlobalVariable) expression;
-        Variable<?> checking = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckingId()))
+        VariableBoolean checking = editorController.getObservableGlobalBooleans().stream()
+                .filter(a -> a.getId().equals(expression.getCheckingId()))
                 .findFirst().orElse(null);
         previousView.setVariable(checking);
         EqualableTrueFalse equalable = specificExpression.getEqualable();
@@ -115,10 +112,8 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         }
 
         String checkedId = equalable.getCheckedId();
-        Variable<Boolean> checked = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(checkedId))
-                .filter(v -> v.getValue() instanceof Boolean)
-                .map(v -> (Variable<Boolean>) v)
+        Variable<Boolean> checked = editorController.getObservableGlobalBooleans().stream()
+                .filter(a -> a.getId().equals(checkedId))
                 .findFirst().orElse(null);
         if (checked != null) {
             variableCB.setValue(checked);

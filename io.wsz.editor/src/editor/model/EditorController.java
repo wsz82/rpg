@@ -5,6 +5,7 @@ import editor.model.settings.SettingsMemento;
 import editor.view.asset.ObservableAssets;
 import editor.view.asset.items.ItemsStage;
 import editor.view.plugin.PluginSettingsStage;
+import editor.view.script.ObservableVariables;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;
@@ -22,7 +23,7 @@ import io.wsz.model.plugin.PluginCaretaker;
 import io.wsz.model.plugin.PluginFileCaretaker;
 import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.script.Script;
-import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.*;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.world.World;
 import javafx.collections.FXCollections;
@@ -41,7 +42,7 @@ public class EditorController {
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
     private final ObservableList<Dialog> observableDialogs = FXCollections.observableArrayList();
-    private final ObservableList<Variable<?>> observableGlobalVariables = FXCollections.observableArrayList();
+    private final ObservableVariables observableGlobals = new ObservableVariables();
     private final ObservableList<Script> observableScripts = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords(-1, -1);
 
@@ -100,8 +101,18 @@ public class EditorController {
     }
 
     private void initGlobalVariables(World newWorld) {
-        List<Variable<?>> variables = new ArrayList<>(0);
-        newWorld.setGlobalVariables(variables);
+        Variables variables = new Variables();
+
+        List<VariableString> strings = new ArrayList<>(0);
+        variables.setStrings(strings);
+        List<VariableBoolean> booleans = new ArrayList<>(0);
+        variables.setBooleans(booleans);
+        List<VariableInteger> integers = new ArrayList<>(0);
+        variables.setIntegers(integers);
+        List<VariableDecimal> decimals = new ArrayList<>(0);
+        variables.setDecimals(decimals);
+
+        newWorld.setVariables(variables);
     }
 
     private void initLocations(World newWorld) {
@@ -126,7 +137,7 @@ public class EditorController {
         observableLocations.clear();
         observableInventoryPlaceTypes.clear();
         observableDialogs.clear();
-        observableGlobalVariables.clear();
+        observableGlobals.clear();
         observableScripts.clear();
     }
 
@@ -190,8 +201,18 @@ public class EditorController {
     }
 
     private void loadObservableGlobalVariablesToPlugin(World world) {
-        List<Variable<?>> variables = new ArrayList<>(observableGlobalVariables);
-        world.setGlobalVariables(variables);
+        Variables variables = new Variables();
+
+        List<VariableString> strings = new ArrayList<>(observableGlobals.getStrings());
+        variables.setStrings(strings);
+        List<VariableBoolean> booleans = new ArrayList<>(observableGlobals.getBooleans());
+        variables.setBooleans(booleans);
+        List<VariableInteger> integers = new ArrayList<>(observableGlobals.getIntegers());
+        variables.setIntegers(integers);
+        List<VariableDecimal> decimals = new ArrayList<>(observableGlobals.getDecimals());
+        variables.setDecimals(decimals);
+
+        world.setVariables(variables);
     }
 
     private void loadObservableDialogsToPlugin(World world) {
@@ -259,9 +280,7 @@ public class EditorController {
     }
 
     private void restoreObservableGlobalVariables(World world) {
-        observableGlobalVariables.clear();
-        List<Variable<?>> globalVariables = world.getGlobalVariables();
-        observableGlobalVariables.addAll(globalVariables);
+        observableGlobals.fillLists(world.getVariables());
     }
 
     private void restoreObservableDialogs(World world) {
@@ -382,8 +401,24 @@ public class EditorController {
         return observableDialogs;
     }
 
-    public ObservableList<Variable<?>> getObservableGlobalVariables() {
-        return observableGlobalVariables;
+    public ObservableVariables getObservableGlobals() {
+        return observableGlobals;
+    }
+
+    public ObservableList<VariableString> getObservableGlobalStrings() {
+        return observableGlobals.getStrings();
+    }
+
+    public ObservableList<VariableBoolean> getObservableGlobalBooleans() {
+        return observableGlobals.getBooleans();
+    }
+
+    public ObservableList<VariableInteger> getObservableGlobalIntegers() {
+        return observableGlobals.getIntegers();
+    }
+
+    public ObservableList<VariableDecimal> getObservableGlobalDecimals() {
+        return observableGlobals.getDecimals();
     }
 
     public ObservableList<Script> getObservableScripts() {

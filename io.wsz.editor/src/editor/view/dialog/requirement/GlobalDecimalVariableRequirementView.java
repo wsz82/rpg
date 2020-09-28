@@ -8,9 +8,8 @@ import io.wsz.model.script.bool.countable.Countable;
 import io.wsz.model.script.bool.countable.variable.BooleanDecimalGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableDecimalVariable;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableDecimal;
 import javafx.scene.control.ChoiceBox;
-
-import java.util.Optional;
 
 public class GlobalDecimalVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
@@ -35,7 +34,7 @@ public class GlobalDecimalVariableRequirementView extends SpecificRequirement {
 
         String id = null;
         if (variable != null) {
-            id = variable.getID();
+            id = variable.getId();
         }
 
         CountableDecimalVariable countable = new CountableDecimalVariable();
@@ -54,10 +53,10 @@ public class GlobalDecimalVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanDecimalGlobalVariable)) return;
         BooleanDecimalGlobalVariable specificExpression = (BooleanDecimalGlobalVariable) expression;
-        Optional<Variable<?>> optAsset = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckingId()))
-                .findFirst();
-        previousView.setVariable(optAsset.orElse(null));
+        VariableDecimal checking = editorController.getObservableGlobalDecimals().stream()
+                .filter(a -> a.getId().equals(expression.getCheckingId()))
+                .findFirst().orElse(null);
+        previousView.setVariable(checking);
         Countable<Double> countable = specificExpression.getCountable();
         setCompareOperator(countable.getCompareOperator());
         setArgument(countable.getArgument());

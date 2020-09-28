@@ -6,17 +6,18 @@ import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.equals.variable.EqualableStringVariable;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableString;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 import java.util.List;
-import java.util.Optional;
 
 public class GlobalStringVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final TextField argumentInput = new TextField();
+    private final ChoiceBox<Variable<String>> variableCB = new ChoiceBox<>();
     private final GlobalVariableRequirementView previousView;
 
     public GlobalStringVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
@@ -44,7 +45,7 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
 
         String id = null;
         if (variable != null) {
-            id = variable.getID();
+            id = variable.getId();
         }
 
         EqualableStringVariable equalable = new EqualableStringVariable();
@@ -63,10 +64,10 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanStringVariableEquals)) return;
         BooleanStringVariableEquals specificExpression = (BooleanStringVariableEquals) expression;
-        Optional<Variable<?>> optAsset = editorController.getObservableGlobalVariables().stream()
-                .filter(a -> a.getID().equals(expression.getCheckingId()))
-                .findFirst();
-        previousView.setVariable(optAsset.orElse(null));
+        VariableString checking = editorController.getObservableGlobalStrings().stream()
+                .filter(a -> a.getId().equals(expression.getCheckingId()))
+                .findFirst().orElse(null);
+        previousView.setVariable(checking);
         EqualableStringVariable countable = specificExpression.getEqualable();
         setCompareOperator(countable.getEqualsOperator());
         setArgument(countable.getArgument());

@@ -7,7 +7,6 @@ import io.wsz.model.script.Method;
 import io.wsz.model.script.bool.BooleanItemExpression;
 import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
-import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.has.item.BooleanCreatureHasInventoryPlace;
 import io.wsz.model.script.variable.Variable;
 import javafx.scene.control.Button;
@@ -80,16 +79,17 @@ public class RequirementsListView {
         GlobalVariableRequirementView secondaryView = getNewGlobalVariableRequirementView(requirementView, expression);
 
         SpecificRequirement globalVariableView = secondaryView.getSpecificRequirement();
-        globalVariableView.populate(expression);
+        if (globalVariableView != null) {
+            globalVariableView.populate(expression);
+        }
     }
 
     private GlobalVariableRequirementView getNewGlobalVariableRequirementView(RequirementView requirementView,
                                                                               BooleanVariableExpression expression) {
         GlobalVariableRequirementView globalVariableView = (GlobalVariableRequirementView) requirementView.getAfterMethodRequirementView();
-        Variable<?> variable = editorController.getObservableGlobalVariables().stream()
-                .filter(v -> v.getID().equals(expression.getCheckingId()))
-                .findFirst()
-                .orElse(null);
+        Variable<?> variable = editorController.getObservableGlobals().getMergedVariables().stream()
+                .filter(v -> v.getId().equals(expression.getCheckingId()))
+                .findFirst().orElse(null);
         globalVariableView.setVariable(variable);
         return globalVariableView;
     }
@@ -151,7 +151,7 @@ public class RequirementsListView {
             output.setGlobalVariablesExpressions(expressions);
         }
         SpecificRequirement specificRequirement = secondaryView.getSpecificRequirement();
-        BooleanTrueFalseGlobalVariable expression = (BooleanTrueFalseGlobalVariable) specificRequirement.getExpression();
+        BooleanVariableExpression expression = (BooleanVariableExpression) specificRequirement.getExpression();
         expressions.add(expression);
     }
 

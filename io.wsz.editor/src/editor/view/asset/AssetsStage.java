@@ -40,14 +40,12 @@ public class AssetsStage extends ChildStage {
         this.contentTableView = contentTableView;
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
-        initWindow();
     }
 
-    private void initWindow() {
+    public void initWindow() {
         Scene scene = new Scene(root);
         setTitle(ASSETS);
         setScene(scene);
-
         createTabs();
     }
 

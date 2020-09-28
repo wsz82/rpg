@@ -13,7 +13,7 @@ import editor.view.location.LocationParametersStage;
 import editor.view.location.LocationsStage;
 import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
-import editor.view.script.GlobalVariablesEditStage;
+import editor.view.script.GlobalsStage;
 import editor.view.script.ScriptsEditStage;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
@@ -60,6 +60,7 @@ class MainView {
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(mainStage, ctv, editorCanvas, editorController);
         assetsWindow = new AssetsStage(mainStage, pointer, ctv, editorCanvas, editorController);
+        assetsWindow.initWindow();
         locationsWindow = new LocationsStage(mainStage, editorController, editorCanvas);
         pss = new PluginSettingsStage(mainStage, editorController);
     }
@@ -214,9 +215,9 @@ class MainView {
     private MenuItem getGlobalVariablesMenuItem() {
         final MenuItem globalVariables = new MenuItem("Global variables");
         globalVariables.setOnAction(event -> {
-            GlobalVariablesEditStage variablesEditStage = new GlobalVariablesEditStage(mainStage, editorController);
-            variablesEditStage.initStage();
-            variablesEditStage.show();
+            GlobalsStage globals = new GlobalsStage(mainStage, editorController);
+            globals.initWindow();
+            globals.show();
         });
         return globalVariables;
     }
