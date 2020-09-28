@@ -1,6 +1,6 @@
 package io.wsz.model.script.variable;
 
-public class VariableInteger extends Variable<Integer>{
+public class VariableInteger extends VariableNumber<Integer>{
     private static final long serialVersionUID = 1L;
 
     public VariableInteger() {

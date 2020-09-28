@@ -1,4 +1,4 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.Variable;
@@ -6,17 +6,13 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.stage.Stage;
 
 import java.util.List;
 
 public abstract class GlobalsTableView<A extends Variable<?>> extends TableView<A> {
     protected final EditorController editorController;
-    protected final Stage parent;
 
-    public GlobalsTableView(Stage parent, EditorController editorController) {
-        super();
-        this.parent = parent;
+    public GlobalsTableView(EditorController editorController) {
         this.editorController = editorController;
     }
 

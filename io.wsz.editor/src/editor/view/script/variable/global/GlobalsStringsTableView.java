@@ -1,13 +1,12 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.VariableString;
-import javafx.stage.Stage;
 
 public class GlobalsStringsTableView extends GlobalsTableView<VariableString> {
 
-    public GlobalsStringsTableView(Stage parent, EditorController editorController) {
-        super(parent, editorController);
+    public GlobalsStringsTableView(EditorController editorController) {
+        super(editorController);
     }
 
     @Override

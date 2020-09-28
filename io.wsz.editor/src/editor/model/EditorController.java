@@ -5,7 +5,7 @@ import editor.model.settings.SettingsMemento;
 import editor.view.asset.ObservableAssets;
 import editor.view.asset.items.ItemsStage;
 import editor.view.plugin.PluginSettingsStage;
-import editor.view.script.ObservableVariables;
+import editor.view.script.variable.ObservableVariables;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.asset.Asset;

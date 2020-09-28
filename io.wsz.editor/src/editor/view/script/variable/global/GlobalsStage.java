@@ -1,4 +1,4 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import editor.view.stage.ChildStage;
@@ -32,22 +32,22 @@ public class GlobalsStage extends ChildStage {
     private void createTabs() {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        GlobalsTableView<VariableString> stringsTableView = new GlobalsStringsTableView(this, editorController);
+        GlobalsTableView<VariableString> stringsTableView = new GlobalsStringsTableView(editorController);
         ObservableList<VariableString> globalStrings = editorController.getObservableGlobalStrings();
         stringsTableView.initGlobalsTable(globalStrings);
         setUpTab(stringsTableView, VariableType.STRING.toString());
 
-        GlobalsTableView<VariableBoolean> booleanTableView = new GlobalBooleanTableView(this, editorController);
+        GlobalsTableView<VariableBoolean> booleanTableView = new GlobalBooleanTableView(editorController);
         ObservableList<VariableBoolean> globalBooleans = editorController.getObservableGlobalBooleans();
         booleanTableView.initGlobalsTable(globalBooleans);
         setUpTab(booleanTableView, VariableType.BOOLEAN.toString());
 
-        GlobalsTableView<VariableInteger> integerTableView = new GlobalIntegerTableView(this, editorController);
+        GlobalsTableView<VariableInteger> integerTableView = new GlobalIntegerTableView(editorController);
         ObservableList<VariableInteger> globalIntegers = editorController.getObservableGlobalIntegers();
         integerTableView.initGlobalsTable(globalIntegers);
         setUpTab(integerTableView, VariableType.INTEGER.toString());
 
-        GlobalsTableView<VariableDecimal> decimalTableView = new GlobalDecimalTableView(this, editorController);
+        GlobalsTableView<VariableDecimal> decimalTableView = new GlobalDecimalTableView(editorController);
         ObservableList<VariableDecimal> globalDecimals = editorController.getObservableGlobalDecimals();
         decimalTableView.initGlobalsTable(globalDecimals);
         setUpTab(decimalTableView, VariableType.DECIMAL.toString());

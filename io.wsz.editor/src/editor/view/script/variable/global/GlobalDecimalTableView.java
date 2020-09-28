@@ -1,13 +1,12 @@
-package editor.view.script;
+package editor.view.script.variable.global;
 
 import editor.model.EditorController;
 import io.wsz.model.script.variable.VariableDecimal;
-import javafx.stage.Stage;
 
 public class GlobalDecimalTableView extends GlobalsTableView<VariableDecimal> {
 
-    public GlobalDecimalTableView(Stage parent, EditorController editorController) {
-        super(parent, editorController);
+    public GlobalDecimalTableView(EditorController editorController) {
+        super(editorController);
     }
 
     @Override

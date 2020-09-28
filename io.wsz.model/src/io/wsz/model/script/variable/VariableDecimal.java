@@ -1,6 +1,6 @@
 package io.wsz.model.script.variable;
 
-public class VariableDecimal extends Variable<Double>{
+public class VariableDecimal extends VariableNumber<Double>{
     private static final long serialVersionUID = 1L;
 
     public VariableDecimal() {
