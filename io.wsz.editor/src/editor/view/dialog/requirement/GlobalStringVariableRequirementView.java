@@ -17,14 +17,17 @@ import java.util.List;
 public class GlobalStringVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final TextField argumentInput = new TextField();
-    private final ChoiceBox<Variable<String>> variableCB = new ChoiceBox<>();
+    private final ChoiceBox<VariableString> variableCB = new ChoiceBox<>();
     private final GlobalVariableRequirementView previousView;
 
     public GlobalStringVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
         super(editorController);
         this.previousView = previousView;
-        setUpOperatorCB();
+        DualTextFieldChoiceBox<TextField> dual = new DualTextFieldChoiceBox<>(argumentInput, variableCB);
+        dual.hookUpEvents();
         fillElements();
+        setUpOperatorCB();
+        setUpVariableCB(variableCB, editorController.getObservableGlobalStrings());
     }
 
     private void setUpOperatorCB() {
@@ -36,48 +39,54 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
 
     @Override
     protected void fillElements() {
-        elements.getChildren().addAll(operatorCB, argumentInput);
+        elements.getChildren().addAll(operatorCB, argumentInput, variableCB);
     }
 
     @Override
     public BooleanObjectExpression<?> getExpression() {
-        Variable<String> variable = (Variable<String>) previousView.getVariable();
+        Variable<?> variable = previousView.getVariable();
 
-        String id = null;
+        String checkingId = null;
         if (variable != null) {
-            id = variable.getId();
+            checkingId = variable.getId();
         }
 
-        EqualableStringVariable equalable = new EqualableStringVariable();
-        BooleanStringVariableEquals expression = new BooleanStringVariableEquals(id, equalable);
-        equalable.setExpression(expression);
-
-        EqualsOperator equalsOperator = getCompareOperator();
-        if (equalsOperator != null) {
-            equalable.setEqualsOperator(equalsOperator);
+        String argument = null;
+        if (argumentInput.isVisible()) {
+            argument = argumentInput.getText();
         }
-        equalable.setArgument(getArgument());
-        return expression;
+        String checkedId = null;
+        VariableString value = variableCB.getValue();
+        if (variableCB.isVisible() && value != null) {
+            checkedId = value.getId();
+        }
+
+        EqualsOperator operator = getEqualsOperator();
+        EqualableStringVariable equalable = new EqualableStringVariable(checkedId, operator, argument);
+        return new BooleanStringVariableEquals(checkingId, equalable);
     }
 
     @Override
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanStringVariableEquals)) return;
         BooleanStringVariableEquals specificExpression = (BooleanStringVariableEquals) expression;
-        VariableString checking = editorController.getObservableGlobalStrings().stream()
+        editorController.getObservableGlobalStrings().stream()
                 .filter(a -> a.getId().equals(expression.getCheckingId()))
-                .findFirst().orElse(null);
-        previousView.setVariable(checking);
+                .findFirst().ifPresent(previousView::setVariable);
         EqualableStringVariable countable = specificExpression.getEqualable();
-        setCompareOperator(countable.getEqualsOperator());
+        setEqualsOperator(countable.getEqualsOperator());
         setArgument(countable.getArgument());
+        String checkedId = countable.getCheckedId();
+        editorController.getObservableGlobalStrings().stream()
+                .filter(a -> a.getId().equals(checkedId))
+                .findFirst().ifPresent(variableCB::setValue);
     }
 
-    public EqualsOperator getCompareOperator() {
+    public EqualsOperator getEqualsOperator() {
         return operatorCB.getValue();
     }
 
-    public void setCompareOperator(EqualsOperator operator) {
+    public void setEqualsOperator(EqualsOperator operator) {
         operatorCB.setValue(operator);
     }
 

@@ -24,7 +24,7 @@ public class DualChoiceBox {
         });
     }
 
-    public void checkDualInvisibility() {
+    private void checkDualInvisibility() {
         boolean bothAreInvisible = !first.isVisible() && !second.isVisible();
         if (bothAreInvisible) {
             first.setVisible(true);

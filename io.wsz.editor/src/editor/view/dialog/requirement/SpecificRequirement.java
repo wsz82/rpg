@@ -3,6 +3,7 @@ package editor.view.dialog.requirement;
 import editor.model.EditorController;
 import io.wsz.model.script.CompareOperator;
 import io.wsz.model.script.bool.BooleanObjectExpression;
+import io.wsz.model.script.variable.Variable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -25,6 +26,12 @@ public abstract class SpecificRequirement {
         List<CompareOperator> operators = List.of(operatorsArr);
         ObservableList<CompareOperator> observableOperators = FXCollections.observableArrayList(operators);
         operatorCB.setItems(observableOperators);
+    }
+
+    protected <V extends Variable<?>> void setUpVariableCB(ChoiceBox<V> choiceBox, ObservableList<V> variables) {
+        ObservableList<V> variablesWithNull = FXCollections.observableArrayList(variables);
+        variablesWithNull.add(null);
+        choiceBox.setItems(variablesWithNull);
     }
 
     public abstract BooleanObjectExpression<?> getExpression();

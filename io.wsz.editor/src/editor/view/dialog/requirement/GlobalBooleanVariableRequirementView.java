@@ -17,7 +17,7 @@ import java.util.List;
 public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final ChoiceBox<BooleanType> booleanCB = new ChoiceBox<>();
-    private final ChoiceBox<Variable<Boolean>> variableCB = new ChoiceBox<>();
+    private final ChoiceBox<VariableBoolean> variableCB = new ChoiceBox<>();
     private final GlobalVariableRequirementView previousView;
 
     public GlobalBooleanVariableRequirementView(EditorController editorController,
@@ -29,14 +29,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         fillElements();
         setUpOperatorCB();
         setUpBooleanCB();
-        setUpVariableCB(variableCB);
-    }
-
-    protected void setUpVariableCB(ChoiceBox<Variable<Boolean>> choiceBox) {
-        ObservableList<VariableBoolean> booleans = editorController.getObservableGlobalBooleans();
-        ObservableList<Variable<Boolean>> booleansWithNull = FXCollections.observableArrayList(booleans);
-        booleansWithNull.add(null);
-        choiceBox.setItems(booleansWithNull);
+        setUpVariableCB(variableCB, editorController.getObservableGlobalBooleans());
     }
 
     private void setUpOperatorCB() {
@@ -61,7 +54,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
 
     @Override
     public BooleanObjectExpression<?> getExpression() {
-        Variable<Boolean> variable = (Variable<Boolean>) previousView.getVariable();
+        Variable<?> variable = previousView.getVariable();
 
         String checkingId = null;
         if (variable != null) {
@@ -78,23 +71,22 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
             };
         }
         String checkedId = null;
-        Variable<Boolean> value = variableCB.getValue();
+        VariableBoolean value = variableCB.getValue();
         if (variableCB.isVisible() && value != null) {
             checkedId = value.getId();
         }
         EqualableTrueFalse equalable = new EqualableTrueFalse(checkedId, operator, argument);
-        BooleanTrueFalseGlobalVariable expression = new BooleanTrueFalseGlobalVariable(checkingId, equalable);
-        return expression;
+        return new BooleanTrueFalseGlobalVariable(checkingId, equalable);
     }
 
     @Override
     public void populate(BooleanObjectExpression<?> expression) {
         if (!(expression instanceof BooleanTrueFalseGlobalVariable)) return;
         BooleanTrueFalseGlobalVariable specificExpression = (BooleanTrueFalseGlobalVariable) expression;
-        VariableBoolean checking = editorController.getObservableGlobalBooleans().stream()
+        editorController.getObservableGlobalBooleans().stream()
                 .filter(a -> a.getId().equals(expression.getCheckingId()))
-                .findFirst().orElse(null);
-        previousView.setVariable(checking);
+                .findFirst().ifPresent(previousView::setVariable);
+
         EqualableTrueFalse equalable = specificExpression.getEqualable();
         operatorCB.setValue(equalable.getEqualsOperator());
 
@@ -112,11 +104,8 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
         }
 
         String checkedId = equalable.getCheckedId();
-        Variable<Boolean> checked = editorController.getObservableGlobalBooleans().stream()
+        editorController.getObservableGlobalBooleans().stream()
                 .filter(a -> a.getId().equals(checkedId))
-                .findFirst().orElse(null);
-        if (checked != null) {
-            variableCB.setValue(checked);
-        }
+                .findFirst().ifPresent(variableCB::setValue);
     }
 }

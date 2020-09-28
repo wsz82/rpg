@@ -13,9 +13,8 @@ public class DualTextFieldChoiceBox<T extends TextField> {
     }
 
     public void hookUpEvents() {
-        textField.setOnAction(e -> {
-            String text = textField.getText();
-            choiceBox.setVisible(text == null || text.isEmpty());
+        textField.textProperty().addListener((observable, oldInput, newInput) -> {
+            choiceBox.setVisible(newInput == null || newInput.isEmpty());
             checkDualInvisibility();
         });
         choiceBox.setOnAction(e -> {
@@ -25,7 +24,7 @@ public class DualTextFieldChoiceBox<T extends TextField> {
         });
     }
 
-    public void checkDualInvisibility() {
+    private void checkDualInvisibility() {
         boolean bothAreInvisible = !textField.isVisible() && !choiceBox.isVisible();
         if (bothAreInvisible) {
             textField.setVisible(true);
