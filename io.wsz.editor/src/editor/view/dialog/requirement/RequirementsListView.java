@@ -12,8 +12,7 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.wsz.model.script.ArgumentType.ASSET;
-import static io.wsz.model.script.ArgumentType.INVENTORY_PLACE;
+import static io.wsz.model.script.ArgumentType.*;
 import static io.wsz.model.script.Method.*;
 
 public class RequirementsListView {
@@ -36,35 +35,41 @@ public class RequirementsListView {
 
     public void populate(Requirements input) {
         if (input == null) return;
-        List<BooleanExpression> booleanPCItemExpressions = input.getBooleanPChasItemExpressions();
-        populateWithExpressions(booleanPCItemExpressions, PC_HAS, ASSET);
+        List<BooleanExpression> PCAssetExpressions = input.getPChasAssetExpressions();
+        populateWithExpressions(PCAssetExpressions, PC_HAS, ASSET);
 
-        List<BooleanExpression> booleanNPCItemExpressions = input.getBooleanNPChasItemExpressions();
-        populateWithExpressions(booleanNPCItemExpressions, NPC_HAS, ASSET);
+        List<BooleanExpression> NPCAssetExpressions = input.getNPChasAssetExpressions();
+        populateWithExpressions(NPCAssetExpressions, NPC_HAS, ASSET);
 
-        List<BooleanExpression> booleanPChasExpressions = input.getBooleanPChasExpressions();
-        populateWithExpressions(booleanPChasExpressions, PC_HAS, INVENTORY_PLACE);
+        List<BooleanExpression> PCItemExpressions = input.getPChasItemExpressions();
+        populateWithExpressions(PCItemExpressions, PC_HAS, ITEM);
 
-        List<BooleanExpression> booleanNPChasExpressions = input.getBooleanNPChasExpressions();
-        populateWithExpressions(booleanNPChasExpressions, NPC_HAS, INVENTORY_PLACE);
+        List<BooleanExpression> NPCItemExpressions = input.getNPChasItemExpressions();
+        populateWithExpressions(NPCItemExpressions, NPC_HAS, ITEM);
+
+        List<BooleanExpression> PChasExpressions = input.getPChasExpressions();
+        populateWithExpressions(PChasExpressions, PC_HAS, INVENTORY_PLACE);
+
+        List<BooleanExpression> NPChasExpressions = input.getNPChasExpressions();
+        populateWithExpressions(NPChasExpressions, NPC_HAS, INVENTORY_PLACE);
 
         List<BooleanExpression> globalVariablesExpressions = input.getGlobalVariablesExpressions();
         populateWithExpressions(globalVariablesExpressions, GLOBAL, null);
     }
 
-    protected <A extends BooleanExpression> void populateWithExpressions(List<A> expressions, Method method, ArgumentType argumentType) {
+    protected <A extends BooleanExpression<?>> void populateWithExpressions(List<A> expressions, Method method, ArgumentType argumentType) {
         if (expressions != null) {
-            for (BooleanExpression expression : expressions) {
+            for (A expression : expressions) {
                 populateWithExpression(expression, method, argumentType, expression.getCheckingId());
             }
         }
     }
 
-    private void populateWithExpression(BooleanExpression expression, Method method, ArgumentType argumentType, String checkingId) {
+    private <A extends BooleanExpression<?>>  void populateWithExpression(A expression, Method method, ArgumentType argumentType, String checkingId) {
         RequirementView requirementView = createRequirementView(method);
         AfterMethodRequirementView typeView = requirementView.getSecondaryView();
         typeView.injectVariables(editorController, argumentType, checkingId);
-        SpecificRequirement specificRequirement = typeView.getSpecificRequirement();
+        SpecificRequirement<A> specificRequirement = typeView.getSpecificRequirement();
         specificRequirement.populate(expression);
     }
 

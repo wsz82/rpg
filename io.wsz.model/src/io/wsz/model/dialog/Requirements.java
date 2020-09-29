@@ -14,17 +14,21 @@ import java.util.List;
 public class Requirements implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private List<BooleanExpression> booleanPChasItemExpressions;
-    private List<BooleanExpression> booleanNPChasItemExpressions;
-    private List<BooleanExpression> booleanPChasExpressions;
-    private List<BooleanExpression> booleanNPChasExpressions;
+    private List<BooleanExpression> PChasAssetExpressions;
+    private List<BooleanExpression> NPChasAssetExpressions;
+    private List<BooleanExpression> PChasItemExpressions;
+    private List<BooleanExpression> NPChasItemExpressions;
+    private List<BooleanExpression> PChasExpressions;
+    private List<BooleanExpression> NPChasExpressions;
     private List<BooleanExpression> globalVariablesExpressions;
 
     public boolean doMatch(Controller controller, Creature pc, PosItem npc) {
-        return doMatchExpressions(booleanPChasItemExpressions, pc, controller)
-                && doMatchExpressions(booleanNPChasItemExpressions, npc, controller)
-                && doMatchExpressions(booleanPChasExpressions, pc, controller)
-                && doMatchExpressions(booleanNPChasExpressions, npc, controller)
+        return doMatchExpressions(PChasAssetExpressions, pc, controller)
+                && doMatchExpressions(NPChasAssetExpressions, npc, controller)
+                && doMatchExpressions(PChasItemExpressions, pc, controller)
+                && doMatchExpressions(NPChasItemExpressions, npc, controller)
+                && doMatchExpressions(PChasExpressions, pc, controller)
+                && doMatchExpressions(NPChasExpressions, npc, controller)
                 && doMatchExpressions(globalVariablesExpressions, null, controller);
     }
 
@@ -37,43 +41,45 @@ public class Requirements implements Externalizable {
     }
 
     public boolean isEmpty() {
-        return (booleanPChasItemExpressions == null || booleanPChasItemExpressions.isEmpty())
-                && (booleanNPChasItemExpressions == null || booleanNPChasItemExpressions.isEmpty())
-                && (booleanPChasExpressions == null || booleanPChasExpressions.isEmpty())
-                && (booleanNPChasExpressions == null || booleanNPChasExpressions.isEmpty())
-                && (globalVariablesExpressions == null || globalVariablesExpressions.isEmpty());
+        return (PChasAssetExpressions == null || PChasAssetExpressions.isEmpty())
+                && (NPChasAssetExpressions == null || NPChasAssetExpressions.isEmpty())
+                && (PChasExpressions == null || PChasExpressions.isEmpty())
+                && (NPChasExpressions == null || NPChasExpressions.isEmpty())
+                && (globalVariablesExpressions == null || globalVariablesExpressions.isEmpty())
+                && (PChasItemExpressions == null || PChasItemExpressions.isEmpty())
+                && (NPChasItemExpressions == null || NPChasItemExpressions.isEmpty());
     }
 
-    public List<BooleanExpression> getBooleanPChasItemExpressions() {
-        return booleanPChasItemExpressions;
+    public List<BooleanExpression> getPChasAssetExpressions() {
+        return PChasAssetExpressions;
     }
 
-    public void setBooleanPChasItemExpressions(List<BooleanExpression> booleanPChasItemExpressions) {
-        this.booleanPChasItemExpressions = booleanPChasItemExpressions;
+    public void setPChasAssetExpressions(List<BooleanExpression> PChasAssetExpressions) {
+        this.PChasAssetExpressions = PChasAssetExpressions;
     }
 
-    public List<BooleanExpression> getBooleanNPChasItemExpressions() {
-        return booleanNPChasItemExpressions;
+    public List<BooleanExpression> getNPChasAssetExpressions() {
+        return NPChasAssetExpressions;
     }
 
-    public void setBooleanNPChasItemExpressions(List<BooleanExpression> booleanNPChasItemExpressions) {
-        this.booleanNPChasItemExpressions = booleanNPChasItemExpressions;
+    public void setNPChasAssetExpressions(List<BooleanExpression> NPChasAssetExpressions) {
+        this.NPChasAssetExpressions = NPChasAssetExpressions;
     }
 
-    public List<BooleanExpression> getBooleanPChasExpressions() {
-        return booleanPChasExpressions;
+    public List<BooleanExpression> getPChasExpressions() {
+        return PChasExpressions;
     }
 
-    public void setBooleanPChasExpressions(List<BooleanExpression> booleanPChasExpressions) {
-        this.booleanPChasExpressions = booleanPChasExpressions;
+    public void setPChasExpressions(List<BooleanExpression> PChasExpressions) {
+        this.PChasExpressions = PChasExpressions;
     }
 
-    public List<BooleanExpression> getBooleanNPChasExpressions() {
-        return booleanNPChasExpressions;
+    public List<BooleanExpression> getNPChasExpressions() {
+        return NPChasExpressions;
     }
 
-    public void setBooleanNPChasExpressions(List<BooleanExpression> booleanNPChasExpressions) {
-        this.booleanNPChasExpressions = booleanNPChasExpressions;
+    public void setNPChasExpressions(List<BooleanExpression> NPChasExpressions) {
+        this.NPChasExpressions = NPChasExpressions;
     }
 
     public List<BooleanExpression> getGlobalVariablesExpressions() {
@@ -84,21 +90,41 @@ public class Requirements implements Externalizable {
         this.globalVariablesExpressions = globalVariablesExpressions;
     }
 
+    public List<BooleanExpression> getPChasItemExpressions() {
+        return PChasItemExpressions;
+    }
+
+    public void setPChasItemExpressions(List<BooleanExpression> PChasItemExpressions) {
+        this.PChasItemExpressions = PChasItemExpressions;
+    }
+
+    public List<BooleanExpression> getNPChasItemExpressions() {
+        return NPChasItemExpressions;
+    }
+
+    public void setNPChasItemExpressions(List<BooleanExpression> NPChasItemExpressions) {
+        this.NPChasItemExpressions = NPChasItemExpressions;
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeObject(booleanPChasItemExpressions);
-        out.writeObject(booleanNPChasItemExpressions);
-        out.writeObject(booleanPChasExpressions);
-        out.writeObject(booleanNPChasExpressions);
+        out.writeObject(PChasAssetExpressions);
+        out.writeObject(NPChasAssetExpressions);
+        out.writeObject(PChasItemExpressions);
+        out.writeObject(NPChasItemExpressions);
+        out.writeObject(PChasExpressions);
+        out.writeObject(NPChasExpressions);
         out.writeObject(globalVariablesExpressions);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        booleanPChasItemExpressions = (List<BooleanExpression>) in.readObject();
-        booleanNPChasItemExpressions = (List<BooleanExpression>) in.readObject();
-        booleanPChasExpressions = (List<BooleanExpression>) in.readObject();
-        booleanNPChasExpressions = (List<BooleanExpression>) in.readObject();
+        PChasAssetExpressions = (List<BooleanExpression>) in.readObject();
+        NPChasAssetExpressions = (List<BooleanExpression>) in.readObject();
+        PChasItemExpressions = (List<BooleanExpression>) in.readObject();
+        NPChasItemExpressions = (List<BooleanExpression>) in.readObject();
+        PChasExpressions = (List<BooleanExpression>) in.readObject();
+        NPChasExpressions = (List<BooleanExpression>) in.readObject();
         globalVariablesExpressions = (List<BooleanExpression>) in.readObject();
     }
 }

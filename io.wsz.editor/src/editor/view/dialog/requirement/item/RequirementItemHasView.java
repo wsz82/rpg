@@ -67,20 +67,20 @@ public class RequirementItemHasView extends SpecificRequirement<BooleanCreatureH
     }
 
     private void addExpressionToPChas(Requirements output, BooleanCreatureHasInventoryPlace expression) {
-        List<BooleanExpression> expressions = output.getBooleanPChasExpressions();
+        List<BooleanExpression> expressions = output.getPChasExpressions();
         if (expressions == null) {
             expressions = new ArrayList<>(1);
-            output.setBooleanPChasExpressions(expressions);
+            output.setPChasExpressions(expressions);
         }
         if (expression == null) return;
         expressions.add(expression);
     }
 
     private void addExpressionToNPChas(Requirements output, BooleanCreatureHasInventoryPlace expression) {
-        List<BooleanExpression> expressions = output.getBooleanNPChasExpressions();
+        List<BooleanExpression> expressions = output.getNPChasExpressions();
         if (expressions == null) {
             expressions = new ArrayList<>(1);
-            output.setBooleanNPChasExpressions(expressions);
+            output.setNPChasExpressions(expressions);
         }
         if (expression == null) return;
         expressions.add(expression);

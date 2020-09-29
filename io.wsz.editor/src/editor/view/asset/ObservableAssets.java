@@ -37,8 +37,8 @@ public class ObservableAssets {
         return assets;
     }
 
-    public ObservableList<Asset> getEquipmentAssets() {
-        ObservableList<Asset> equipments = FXCollections.observableArrayList();
+    public ObservableList<Asset<?>> getEquipmentAssets() {
+        ObservableList<Asset<?>> equipments = FXCollections.observableArrayList();
         equipments.addAll(weapons);
         equipments.addAll(containers);
         equipments.addAll(miscs);

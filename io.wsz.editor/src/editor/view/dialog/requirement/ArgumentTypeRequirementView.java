@@ -2,6 +2,7 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import editor.view.dialog.requirement.item.RequirementAssetCountableView;
+import editor.view.dialog.requirement.item.RequirementItemCountableView;
 import editor.view.dialog.requirement.item.RequirementItemHasView;
 import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.ArgumentType;
@@ -37,9 +38,8 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
         specificRequirement = switch (newType) {
             case ASSET -> new RequirementAssetCountableView(editorController);
             case INVENTORY_PLACE -> new RequirementItemHasView(editorController);
-            case ITEM -> null; //TODO
+            case ITEM -> new RequirementItemCountableView(editorController);
         };
-        if (specificRequirement == null) return;
         elements.getChildren().addAll(specificRequirement.getElements());
     }
 
@@ -56,13 +56,5 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
     @Override
     public void addExpressionTo(Requirements output, Method method) {
         specificRequirement.addExpressionTo(output, method);
-    }
-
-    public ArgumentType getArgumentType() {
-        return argumentTypeCB.getValue();
-    }
-
-    public void setArgumentType(ArgumentType argumentType) {
-        argumentTypeCB.setValue(argumentType);
     }
 }
