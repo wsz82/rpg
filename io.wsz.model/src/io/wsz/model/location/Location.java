@@ -25,7 +25,7 @@ public class Location implements Externalizable {
     private double width;
     private double height;
     private ObservableList<Layer> layers;
-    private ObservableList<PosItem> items;
+    private List<PosItem> items;
     private List<PosItem> itemsToRemove;
     private List<PosItem> itemsToAdd;
     private List<List<FogStatusWithImage>> discoveredFog;
@@ -110,8 +110,12 @@ public class Location implements Externalizable {
         return layers;
     }
 
-    public ObservableList<PosItem> getItems() {
+    public List<PosItem> getItems() {
         return items;
+    }
+
+    public void setItems(List<PosItem> items) {
+        this.items = items;
     }
 
     public List<PosItem> getItemsToRemove() {
@@ -155,7 +159,7 @@ public class Location implements Externalizable {
 
         out.writeObject(new ArrayList<>(layers));
 
-        out.writeObject(new ArrayList<>(items));
+        out.writeObject(items);
 
         out.writeObject(itemsToRemove);
 
@@ -177,8 +181,7 @@ public class Location implements Externalizable {
         List<Layer> serLayers = (List<Layer>) in.readObject();
         layers = FXCollections.observableArrayList(serLayers);
 
-        List<PosItem> serItems = (List<PosItem>) in.readObject();
-        items = FXCollections.observableArrayList(serItems);
+        items = (List<PosItem>) in.readObject();
 
         itemsToRemove = (List<PosItem>) in.readObject();
 

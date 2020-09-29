@@ -13,6 +13,6 @@ class CurrentLocationBox extends HBox {
 
         getChildren().addAll(layerText, currentLocationName);
         setSpacing(5);
-        currentLocationName.textProperty().bind(controller.getCurrentLocation().getNameProperty());
+        currentLocationName.textProperty().bind(controller.getCurrentLocation().getIdProperty());
     }
 }

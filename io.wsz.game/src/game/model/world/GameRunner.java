@@ -14,7 +14,7 @@ import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
@@ -361,7 +361,7 @@ public class GameRunner {
         Location locationToUpdate = controller.getLocationToUpdate();
         if (locationToUpdate != null) {
             controller.setLocationToUpdate(null);
-            CurrentLocation cl = controller.getCurrentLocation();
+            CurrentObservableLocation cl = controller.getCurrentLocation();
             Location l = cl.getLocation();
             if (!l.getId().equals(locationToUpdate.getId())) {
                 cl.setLocation(locationToUpdate);
@@ -421,8 +421,8 @@ public class GameRunner {
     private class Loader extends Task<String> {
         @Override
         protected String call() throws Exception {
-            CurrentLocation currentLocation = controller.getCurrentLocation();
-            List<PosItem> items = currentLocation.getItems();
+            CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+            List<PosItem> items = currentObservableLocation.getItems();
             Set<PosItem> assets = getAssets(items);
 
             CreatureBase[] bases = CreatureBase.getBases();
@@ -438,7 +438,7 @@ public class GameRunner {
             i++;
             updateProgress(i, total);
 
-            Location location = currentLocation.getLocation();
+            Location location = currentObservableLocation.getLocation();
             location.initDiscoveredFog(fog, fog.getHalfFogSize());
 
             for (CreatureBase base : bases) {

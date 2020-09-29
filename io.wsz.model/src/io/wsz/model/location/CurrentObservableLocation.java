@@ -6,25 +6,39 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class CurrentLocation {
+import java.util.ArrayList;
+
+public class CurrentObservableLocation {
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
+    private final ObservableList<PosItem> items = FXCollections.observableArrayList();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final DoubleProperty heightProperty = new SimpleDoubleProperty();
-    private final StringProperty nameProperty = new SimpleStringProperty();
+    private final StringProperty idProperty = new SimpleStringProperty();
 
-    public CurrentLocation(){}
+    public CurrentObservableLocation(){}
 
     public void setLocation(Location location) {
+        saveCurrent();
         if (location != null) {
             this.widthProperty.set(location.getWidth());
             this.heightProperty.set(location.getHeight());
-            this.nameProperty.set(location.getId());
+            this.idProperty.set(location.getId());
+            this.items.clear();
+            this.items.addAll(location.getItems());
             this.locationProperty.set(location);
         } else {
             this.widthProperty.set(0);
             this.heightProperty.set(0);
-            this.nameProperty.set(null);
+            this.idProperty.set(null);
+            this.items.clear();
             this.locationProperty.set(null);
+        }
+    }
+
+    public void saveCurrent() {
+        Location current = this.locationProperty.get();
+        if (current != null) {
+            current.setItems(new ArrayList<>(items));
         }
     }
 
@@ -63,25 +77,20 @@ public class CurrentLocation {
     }
 
     public String getName() {
-        return nameProperty.get();
+        return idProperty.get();
     }
 
-    public StringProperty getNameProperty() {
-        return nameProperty;
+    public StringProperty getIdProperty() {
+        return idProperty;
     }
 
     public void setName(String name) {
         this.locationProperty.get().setId(name);
-        this.nameProperty.set(name);
+        this.idProperty.set(name);
     }
 
     public ObservableList<PosItem> getItems() {
-        Location location = locationProperty.get();
-        if (location != null) {
-            return location.getItems();
-        } else {
-            return FXCollections.emptyObservableList();
-        }
+        return items;
     }
 
     public ObservableList<Layer> getLayers() {

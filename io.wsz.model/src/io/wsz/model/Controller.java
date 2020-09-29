@@ -9,7 +9,7 @@ import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.CurrentLayer;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.logger.Logger;
 import io.wsz.model.plugin.Plugin;
@@ -335,7 +335,7 @@ public class Controller {
                 .findFirst().orElse(null);
     }
 
-    public CurrentLocation getCurrentLocation() {
+    public CurrentObservableLocation getCurrentLocation() {
         return model.getCurrentLocation();
     }
 

@@ -5,7 +5,7 @@ import editor.view.content.ContentTableView;
 import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -267,10 +267,10 @@ public class EditorCanvas extends Canvas {
             }
             refresh();
         };
-        CurrentLocation currentLocation = controller.getCurrentLocation();
-        currentLocation.getItems().addListener(locationListener);
-        currentLocation.locationProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<PosItem> items = currentLocation.getItems();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        currentObservableLocation.getItems().addListener(locationListener);
+        currentObservableLocation.locationProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<PosItem> items = currentObservableLocation.getItems();
             hookupItemsEvents(items);
             items.addListener(locationListener);
         });
@@ -447,11 +447,6 @@ public class EditorCanvas extends Canvas {
         updatePos(keyCode, pos);
     }
 
-    private void movePointer(KeyCode keyCode) {
-        Coords mark = pointer.getMark();
-        updatePos(keyCode, mark);
-    }
-
     private void updatePos(KeyCode keyCode, Coords pos) {
         double dif = 1.0 / Sizes.getMeter();
         switch (keyCode) {
@@ -482,7 +477,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void removeItem(PosItem pi) {
-        controller.getModel().getCurrentLocation().getLocation().getItems().remove(pi);
+        controller.getModel().getCurrentLocation().getItems().remove(pi);
         refresh();
     }
 

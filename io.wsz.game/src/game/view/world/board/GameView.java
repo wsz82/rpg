@@ -13,7 +13,7 @@ import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -247,9 +247,9 @@ public class GameView extends CanvasView {
             right -= barView.getWidth();
         }
         double bottom = b.getMaxY();
-        CurrentLocation currentLocation = controller.getCurrentLocation();
-        double locWidth = currentLocation.getWidth();
-        double locHeight = currentLocation.getHeight();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        double locWidth = currentObservableLocation.getWidth();
+        double locHeight = currentObservableLocation.getHeight();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
@@ -271,7 +271,7 @@ public class GameView extends CanvasView {
             }
         }
 
-        Location location = currentLocation.getLocation();
+        Location location = currentObservableLocation.getLocation();
 
         if (settings.isCenterOnPC()) {
             centerOnPC(meter, canvasMeterWidth, canvasMeterHeight, settings, location);

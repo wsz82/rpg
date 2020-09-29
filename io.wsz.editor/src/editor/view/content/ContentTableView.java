@@ -6,12 +6,11 @@ import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -32,26 +31,15 @@ public class ContentTableView extends TableView<PosItem> {
     private Pointer pointer;
 
     public ContentTableView(EditorCanvas editorCanvas, EditorController editorController) {
-        super();
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
         controller = editorController.getController();
-        initTable();
     }
 
-    private void initTable() {
-        CurrentLocation currentLocation = controller.getCurrentLocation();
-        ObservableList<PosItem> items = currentLocation.getLocation().getItems();
+    public void initTable() {
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        ObservableList<PosItem> items = currentObservableLocation.getItems();
         setItems(items);
-        currentLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
-            ObservableList<PosItem> newItems;
-            if (newLocation != null) {
-                newItems = newLocation.getItems();
-            } else {
-                newItems = FXCollections.emptyObservableList();
-            }
-            setItems(newItems);
-        });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
@@ -100,7 +88,7 @@ public class ContentTableView extends TableView<PosItem> {
             int level = t.getNewValue();
             PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
 
-            List<Integer> levels = currentLocation.getLayers().stream()
+            List<Integer> levels = currentObservableLocation.getLayers().stream()
                     .map(l -> l.getLevel())
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {

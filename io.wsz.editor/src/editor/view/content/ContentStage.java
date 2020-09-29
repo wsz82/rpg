@@ -19,16 +19,14 @@ public class ContentStage extends ChildStage {
     public ContentStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
         super(parent);
         table = new ContentTableView(editorCanvas, editorController);
-        initWindow();
     }
 
-    private void initWindow() {
+    public void initWindow() {
+        table.initTable();
         Scene scene = new Scene(root);
         setTitle(TITLE);
         setScene(scene);
-
         setUpContextMenu();
-
         root.getChildren().add(table);
     }
 

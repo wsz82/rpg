@@ -56,6 +56,7 @@ class MainView {
         editorCanvas = new EditorCanvas(mainStage, editorController, center, pointer);
         center.getChildren().add(editorCanvas);
         contentsWindow = new ContentStage(mainStage, editorCanvas, editorController);
+        contentsWindow.initWindow();
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(mainStage, ctv, editorCanvas, editorController);

@@ -7,7 +7,7 @@ import editor.view.stage.EditorCanvas;
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -37,10 +37,10 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void initTable() {
-        CurrentLocation currentLocation = controller.getCurrentLocation();
-        ObservableList<Layer> layers = currentLocation.getLayers();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        ObservableList<Layer> layers = currentObservableLocation.getLayers();
         setItems(layers);
-        currentLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
+        currentObservableLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
             ObservableList<Layer> observableLayers;
             if (newLocation != null) {
                 observableLayers = newLocation.getLayers();

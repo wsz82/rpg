@@ -16,7 +16,7 @@ import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.CurrentLayer;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentLocation;
+import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginCaretaker;
@@ -66,12 +66,12 @@ public class EditorController {
 
         Model model = controller.getModel();
 
-        CurrentLocation currentLocation = model.getCurrentLocation();
+        CurrentObservableLocation currentObservableLocation = model.getCurrentLocation();
         CurrentLayer currentLayer = model.getCurrentLayer();
 
         World newWorld = new World();
 
-        initWorldsList(currentLocation, currentLayer, newWorld);
+        initWorldsList(currentObservableLocation, currentLayer, newWorld);
 
         Plugin newPlugin = new Plugin();
 
@@ -84,8 +84,8 @@ public class EditorController {
         controller.setModel(model);
     }
 
-    private void initWorldsList(CurrentLocation currentLocation, CurrentLayer currentLayer, World newWorld) {
-        initNewLocation(currentLocation, currentLayer);
+    private void initWorldsList(CurrentObservableLocation currentObservableLocation, CurrentLayer currentLayer, World newWorld) {
+        initNewLocation(currentObservableLocation, currentLayer);
         initLocations(newWorld);
         initAssets(newWorld);
         initEquipmentTypes(newWorld);
@@ -151,12 +151,12 @@ public class EditorController {
         newWorld.setAssets(assets);
     }
 
-    private void initNewLocation(CurrentLocation currentLocation, CurrentLayer currentLayer) {
+    private void initNewLocation(CurrentObservableLocation currentObservableLocation, CurrentLayer currentLayer) {
         Location location = new Location("new", 20, 20);
         Layer layer = new Layer("new");
         location.getLayers().add(layer);
 
-        currentLocation.setLocation(location);
+        currentObservableLocation.setLocation(location);
         currentLayer.setLayer(layer);
         observableLocations.add(location);
     }
@@ -169,6 +169,8 @@ public class EditorController {
 
     private void savePlugin(String pluginName, Coords startPos, Model model) {
         Plugin activePlugin = model.getActivePlugin();
+
+        model.getCurrentLocation().saveCurrent();
 
         activePlugin.setStartPos(startPos);
         World world = activePlugin.getWorld();
@@ -326,9 +328,9 @@ public class EditorController {
     private void restoreFirstLocationAndLayer(Model model, List<Location> locations) {
         if (locations.isEmpty()) return;
         Location firstLocation = locations.get(0);
-        CurrentLocation currentLocation = model.getCurrentLocation();
-        currentLocation.setLocation(null);
-        currentLocation.setLocation(firstLocation);
+        CurrentObservableLocation currentObservableLocation = model.getCurrentLocation();
+        currentObservableLocation.setLocation(null);
+        currentObservableLocation.setLocation(firstLocation);
         Layer firstLayer = firstLocation.getLayers().get(0);
         model.getCurrentLayer().setLayer(firstLayer);
     }
