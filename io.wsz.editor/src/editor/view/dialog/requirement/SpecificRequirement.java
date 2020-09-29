@@ -28,9 +28,15 @@ public abstract class SpecificRequirement {
         operatorCB.setItems(observableOperators);
     }
 
+    protected <V extends Variable<?>> void setUpVariableCB(ChoiceBox<V> choiceBox, ObservableList<V> variables) {
+        setUpVariableCB(choiceBox, variables, null);
+    }
+
     protected <V extends Variable<?>> void setUpVariableCB(ChoiceBox<V> choiceBox, ObservableList<V> variables, Variable<?> toRemove) {
         ObservableList<V> variablesWithNull = FXCollections.observableArrayList(variables);
-        variablesWithNull.remove(toRemove);
+        if (toRemove != null) {
+            variablesWithNull.remove(toRemove);
+        }
         variablesWithNull.add(null);
         choiceBox.setItems(variablesWithNull);
     }

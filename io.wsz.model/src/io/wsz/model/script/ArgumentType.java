@@ -1,6 +1,18 @@
 package io.wsz.model.script;
 
 public enum ArgumentType {
-    ITEM,
-    INVENTORY_PLACE
+    ASSET ("asset"),
+    INVENTORY_PLACE ("inventory place"),
+    ITEM ("item");
+
+    private final String display;
+
+    ArgumentType(String display) {
+        this.display = display;
+    }
+
+    @Override
+    public String toString() {
+        return display;
+    }
 }

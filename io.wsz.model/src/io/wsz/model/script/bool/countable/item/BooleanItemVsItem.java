@@ -1,7 +1,9 @@
 package io.wsz.model.script.bool.countable.item;
 
+import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.script.bool.BooleanItemExpression;
+import io.wsz.model.script.variable.Variable;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -24,6 +26,21 @@ public class BooleanItemVsItem extends BooleanItemExpression<Asset> {
     @Override
     public boolean isTrue() {
         return itemHasAmount();
+    }
+
+    @Override
+    public void setUpVariables(Controller controller) {
+        super.setUpVariables(controller);
+        String checkedVariableId = countable.getCheckedVariableId();
+        if (checkedVariableId != null) {
+            Variable<?> variable = controller.getGlobalVariableById(checkedVariableId);
+            Object value = variable.getValue();
+            try {
+                countable.setArgument((Integer) value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected boolean itemHasAmount() {

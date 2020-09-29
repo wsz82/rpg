@@ -16,8 +16,8 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.wsz.model.script.ArgumentType.ASSET;
 import static io.wsz.model.script.ArgumentType.INVENTORY_PLACE;
-import static io.wsz.model.script.ArgumentType.ITEM;
 import static io.wsz.model.script.Method.*;
 
 public class RequirementsListView {
@@ -101,7 +101,7 @@ public class RequirementsListView {
 
     private void populateWithCreatureItemExpression(BooleanItemVsItem expression, Method method) {
         RequirementView requirementView = getNewRequirementView(method);
-        ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, ITEM);
+        ArgumentTypeRequirementView typeView = getNewArgumentTypeRequirementView(requirementView, ASSET);
         SpecificRequirement creatureItemView = typeView.getSpecificRequirement();
         creatureItemView.populate(expression);
     }
@@ -161,14 +161,14 @@ public class RequirementsListView {
 
     private void switchBetweenArgumentTypesPChas(ArgumentType argumentType, Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
         switch (argumentType) {
-            case ITEM -> addPChasItemExpression(output, afterMethodRequirementView);
+            case ASSET -> addPChasItemExpression(output, afterMethodRequirementView);
             case INVENTORY_PLACE -> addPChasInventoryPlaceExpression(output, afterMethodRequirementView);
         }
     }
 
     private void switchBetweenArgumentTypesNPChas(ArgumentType argumentType, Requirements output, AfterMethodRequirementView afterMethodRequirementView) {
         switch (argumentType) {
-            case ITEM -> addNPChasItemExpression(output, afterMethodRequirementView);
+            case ASSET -> addNPChasItemExpression(output, afterMethodRequirementView);
             case INVENTORY_PLACE -> addNPChasInventoryPlaceExpression(output, afterMethodRequirementView);
         }
     }

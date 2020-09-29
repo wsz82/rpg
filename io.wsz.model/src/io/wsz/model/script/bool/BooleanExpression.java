@@ -9,5 +9,5 @@ public abstract class BooleanExpression implements Externalizable {
 
     public abstract boolean isTrue();
 
-    public abstract void setChecker(Controller controller);
+    public abstract void setUpVariables(Controller controller);
 }

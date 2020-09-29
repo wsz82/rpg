@@ -17,8 +17,8 @@ public abstract class BooleanNumberGlobalVariable<N extends Number> extends Bool
     public abstract CountableVariable<N> getCountable();
 
     @Override
-    public void setChecker(Controller controller) {
-        super.setChecker(controller);
+    public void setUpVariables(Controller controller) {
+        super.setUpVariables(controller);
         CountableVariable<N> countable = getCountable();
         String checkedId = countable.getCheckedId();
         if (checkedId != null) {

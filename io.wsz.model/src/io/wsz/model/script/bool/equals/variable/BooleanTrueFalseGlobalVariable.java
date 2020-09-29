@@ -28,8 +28,8 @@ public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<Va
     }
 
     @Override
-    public void setChecker(Controller controller) {
-        super.setChecker(controller);
+    public void setUpVariables(Controller controller) {
+        super.setUpVariables(controller);
         String checkedId = equalable.getCheckedId();
         if (checkedId != null) {
             Variable<?> variable = controller.getGlobalVariableById(checkedId);

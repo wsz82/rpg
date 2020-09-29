@@ -31,13 +31,13 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
 
     private void setUpSpecificRequirement(ArgumentType newType) {
         switch (newType) {
-            case ITEM -> setUpItemCountableRequirement();
+            case ASSET -> setUpItemCountableRequirement();
             case INVENTORY_PLACE -> setUpItemHasRequirement();
         }
     }
 
     private void setUpItemCountableRequirement() {
-        this.specificRequirement = new RequirementItemCountableView(editorController);
+        this.specificRequirement = new RequirementAssetCountableView(editorController);
         elements.getChildren().addAll(specificRequirement.getElements());
     }
 

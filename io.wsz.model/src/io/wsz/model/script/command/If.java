@@ -125,7 +125,8 @@ public class If implements Executable, Externalizable {
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
                                 }
-                                CountableItem countable = new CountableItem(itemId, compareOperator, argument);
+                                //todo comapirng to global
+                                CountableItem countable = new CountableItem(itemId, compareOperator, argument, null);
                                 return new BooleanItemVsItem(creatureId, countable);
                             }
                         }
@@ -241,7 +242,7 @@ public class If implements Executable, Externalizable {
 
     @Override
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
-        expression.setChecker(controller);
+        expression.setUpVariables(controller);
         if (expression.isTrue()) { //TODO OR and AND
             for (Executable executable : executables) {
                 executable.execute(controller, firstAdversary, secondAdversary);

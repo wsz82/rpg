@@ -33,7 +33,7 @@ public class Requirements implements Externalizable {
     private boolean doMatchBooleanGlobalExpressions(List<BooleanVariableExpression> expressions, Controller controller) {
         return expressions == null || expressions.stream()
                 .allMatch(b -> {
-                    b.setChecker(controller);
+                    b.setUpVariables(controller);
                     return b.isTrue();
                 });
     }

@@ -22,7 +22,7 @@ public abstract class BooleanItemExpression<A extends Asset> extends BooleanObje
     }
 
     @Override
-    public void setChecker(Controller controller) {
+    public void setUpVariables(Controller controller) {
         try {
             checkingObject = (A) controller.getItemOrAssetById(checkingId);
         } catch (Exception e) {
