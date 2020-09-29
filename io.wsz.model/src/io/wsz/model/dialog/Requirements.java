@@ -3,9 +3,7 @@ package io.wsz.model.dialog;
 import io.wsz.model.Controller;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.script.bool.BooleanItemExpression;
-import io.wsz.model.script.bool.BooleanVariableExpression;
-import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
+import io.wsz.model.script.bool.BooleanExpression;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -16,40 +14,24 @@ import java.util.List;
 public class Requirements implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    private List<BooleanItemVsItem> booleanPChasItemExpressions;
-    private List<BooleanItemVsItem> booleanNPChasItemExpressions;
-    private List<BooleanItemExpression> booleanPChasExpressions;
-    private List<BooleanItemExpression> booleanNPChasExpressions;
-    private List<BooleanVariableExpression> globalVariablesExpressions;
+    private List<BooleanExpression> booleanPChasItemExpressions;
+    private List<BooleanExpression> booleanNPChasItemExpressions;
+    private List<BooleanExpression> booleanPChasExpressions;
+    private List<BooleanExpression> booleanNPChasExpressions;
+    private List<BooleanExpression> globalVariablesExpressions;
 
     public boolean doMatch(Controller controller, Creature pc, PosItem npc) {
-        return doMatchItemHasCountableRequirements(pc, booleanPChasItemExpressions)
-                && doMatchItemHasCountableRequirements(npc, booleanNPChasItemExpressions)
-                && doMatchItemHasRequirements(pc, booleanPChasExpressions)
-                && doMatchItemHasRequirements(npc, booleanNPChasExpressions)
-                && doMatchBooleanGlobalExpressions(globalVariablesExpressions, controller);
+        return doMatchExpressions(booleanPChasItemExpressions, pc, controller)
+                && doMatchExpressions(booleanNPChasItemExpressions, npc, controller)
+                && doMatchExpressions(booleanPChasExpressions, pc, controller)
+                && doMatchExpressions(booleanNPChasExpressions, npc, controller)
+                && doMatchExpressions(globalVariablesExpressions, null, controller);
     }
 
-    private boolean doMatchBooleanGlobalExpressions(List<BooleanVariableExpression> expressions, Controller controller) {
+    private boolean doMatchExpressions(List<BooleanExpression> expressions, PosItem override, Controller controller) {
         return expressions == null || expressions.stream()
                 .allMatch(b -> {
-                    b.setUpVariables(controller);
-                    return b.isTrue();
-                });
-    }
-
-    private boolean doMatchItemHasRequirements(PosItem item, List<BooleanItemExpression> expressions) {
-        return expressions == null || expressions.stream()
-                .allMatch(b -> {
-                    b.setCheckingObject(item);
-                    return b.isTrue();
-                });
-    }
-
-    private boolean doMatchItemHasCountableRequirements(PosItem item, List<BooleanItemVsItem> expressions) {
-        return expressions == null || expressions.stream()
-                .allMatch(b -> {
-                    b.setCheckingObject(item);
+                    b.setUpVariables(controller, override);
                     return b.isTrue();
                 });
     }
@@ -62,43 +44,43 @@ public class Requirements implements Externalizable {
                 && (globalVariablesExpressions == null || globalVariablesExpressions.isEmpty());
     }
 
-    public List<BooleanItemVsItem> getBooleanPChasItemExpressions() {
+    public List<BooleanExpression> getBooleanPChasItemExpressions() {
         return booleanPChasItemExpressions;
     }
 
-    public void setBooleanPChasItemExpressions(List<BooleanItemVsItem> booleanPChasItemExpressions) {
+    public void setBooleanPChasItemExpressions(List<BooleanExpression> booleanPChasItemExpressions) {
         this.booleanPChasItemExpressions = booleanPChasItemExpressions;
     }
 
-    public List<BooleanItemVsItem> getBooleanNPChasItemExpressions() {
+    public List<BooleanExpression> getBooleanNPChasItemExpressions() {
         return booleanNPChasItemExpressions;
     }
 
-    public void setBooleanNPChasItemExpressions(List<BooleanItemVsItem> booleanNPChasItemExpressions) {
+    public void setBooleanNPChasItemExpressions(List<BooleanExpression> booleanNPChasItemExpressions) {
         this.booleanNPChasItemExpressions = booleanNPChasItemExpressions;
     }
 
-    public List<BooleanItemExpression> getBooleanPChasExpressions() {
+    public List<BooleanExpression> getBooleanPChasExpressions() {
         return booleanPChasExpressions;
     }
 
-    public void setBooleanPChasExpressions(List<BooleanItemExpression> booleanPChasExpressions) {
+    public void setBooleanPChasExpressions(List<BooleanExpression> booleanPChasExpressions) {
         this.booleanPChasExpressions = booleanPChasExpressions;
     }
 
-    public List<BooleanItemExpression> getBooleanNPChasExpressions() {
+    public List<BooleanExpression> getBooleanNPChasExpressions() {
         return booleanNPChasExpressions;
     }
 
-    public void setBooleanNPChasExpressions(List<BooleanItemExpression> booleanNPChasExpressions) {
+    public void setBooleanNPChasExpressions(List<BooleanExpression> booleanNPChasExpressions) {
         this.booleanNPChasExpressions = booleanNPChasExpressions;
     }
 
-    public List<BooleanVariableExpression> getGlobalVariablesExpressions() {
+    public List<BooleanExpression> getGlobalVariablesExpressions() {
         return globalVariablesExpressions;
     }
 
-    public void setGlobalVariablesExpressions(List<BooleanVariableExpression> globalVariablesExpressions) {
+    public void setGlobalVariablesExpressions(List<BooleanExpression> globalVariablesExpressions) {
         this.globalVariablesExpressions = globalVariablesExpressions;
     }
 
@@ -113,10 +95,10 @@ public class Requirements implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        booleanPChasItemExpressions = (List<BooleanItemVsItem>) in.readObject();
-        booleanNPChasItemExpressions = (List<BooleanItemVsItem>) in.readObject();
-        booleanPChasExpressions = (List<BooleanItemExpression>) in.readObject();
-        booleanNPChasExpressions = (List<BooleanItemExpression>) in.readObject();
-        globalVariablesExpressions = (List<BooleanVariableExpression>) in.readObject();
+        booleanPChasItemExpressions = (List<BooleanExpression>) in.readObject();
+        booleanNPChasItemExpressions = (List<BooleanExpression>) in.readObject();
+        booleanPChasExpressions = (List<BooleanExpression>) in.readObject();
+        booleanNPChasExpressions = (List<BooleanExpression>) in.readObject();
+        globalVariablesExpressions = (List<BooleanExpression>) in.readObject();
     }
 }

@@ -30,21 +30,23 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
     }
 
     private void setUpSpecificRequirement(ArgumentType newType) {
-        switch (newType) {
-            case ASSET -> setUpItemCountableRequirement();
-            case INVENTORY_PLACE -> setUpItemHasRequirement();
-            //TODO case ITEM ->;
-        }
-    }
-
-    private void setUpItemCountableRequirement() {
-        this.specificRequirement = new RequirementAssetCountableView(editorController);
+        specificRequirement = switch (newType) {
+            case ASSET -> new RequirementAssetCountableView(editorController);
+            case INVENTORY_PLACE -> new RequirementItemHasView(editorController);
+            case ITEM -> null; //TODO
+        };
+        if (specificRequirement == null) return;
         elements.getChildren().addAll(specificRequirement.getElements());
     }
 
-    private void setUpItemHasRequirement() {
-        this.specificRequirement = new RequirementItemHasView(editorController);
-        elements.getChildren().addAll(specificRequirement.getElements());
+    @Override
+    public HBox getElements() {
+        return elementsWithArgumentTypeCB;
+    }
+
+    @Override
+    public void injectVariables(EditorController editorController, ArgumentType argumentType, String checkingId) {
+        argumentTypeCB.setValue(argumentType);
     }
 
     public ArgumentType getArgumentType() {
@@ -53,10 +55,5 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
 
     public void setArgumentType(ArgumentType argumentType) {
         argumentTypeCB.setValue(argumentType);
-    }
-
-    @Override
-    public HBox getElements() {
-        return elementsWithArgumentTypeCB;
     }
 }

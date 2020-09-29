@@ -29,8 +29,8 @@ public class BooleanItemVsItem extends BooleanItemExpression<Asset> {
     }
 
     @Override
-    public void setUpVariables(Controller controller) {
-        super.setUpVariables(controller);
+    public void setUpVariables(Controller controller, Asset checkingOverride) {
+        super.setUpVariables(controller, checkingOverride);
         String checkedVariableId = countable.getCheckedVariableId();
         if (checkedVariableId != null) {
             Variable<?> variable = controller.getGlobalVariableById(checkedVariableId);

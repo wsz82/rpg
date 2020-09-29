@@ -1,6 +1,7 @@
 package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
+import io.wsz.model.script.ArgumentType;
 import javafx.scene.layout.HBox;
 
 public abstract class AfterMethodRequirementView {
@@ -17,4 +18,6 @@ public abstract class AfterMethodRequirementView {
     }
 
     public abstract HBox getElements();
+
+    public abstract void injectVariables(EditorController editorController, ArgumentType argumentType, String checkingId);
 }

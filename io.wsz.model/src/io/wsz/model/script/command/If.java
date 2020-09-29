@@ -242,7 +242,7 @@ public class If implements Executable, Externalizable {
 
     @Override
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
-        expression.setUpVariables(controller);
+        expression.setUpVariables(controller, null);
         if (expression.isTrue()) { //TODO OR and AND
             for (Executable executable : executables) {
                 executable.execute(controller, firstAdversary, secondAdversary);

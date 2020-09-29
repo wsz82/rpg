@@ -1,6 +1,7 @@
 package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
+import io.wsz.model.script.ArgumentType;
 import io.wsz.model.script.variable.Variable;
 import io.wsz.model.script.variable.VariableType;
 import javafx.collections.ObservableList;
@@ -41,11 +42,19 @@ public class GlobalVariableRequirementView extends AfterMethodRequirementView {
         return elementsWithVariableCB;
     }
 
+    @Override
+    public void injectVariables(EditorController editorController, ArgumentType argumentType, String checkingId) {
+        Variable<?> variable = editorController.getObservableGlobals().getMergedVariables().stream()
+                .filter(v -> v.getId().equals(checkingId))
+                .findFirst().orElse(null);
+        setVariable(variable);
+    }
+
     public Variable<?> getVariable() {
         return variableCB.getValue();
     }
 
-    public void setVariable(Variable<?> asset) {
-        variableCB.setValue(asset);
+    public void setVariable(Variable<?> variable) {
+        variableCB.setValue(variable);
     }
 }

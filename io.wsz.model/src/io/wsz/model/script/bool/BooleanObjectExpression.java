@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public abstract class BooleanObjectExpression<O> extends BooleanExpression implements Externalizable {
+public abstract class BooleanObjectExpression<O> extends BooleanExpression<O> implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     protected String checkingId;

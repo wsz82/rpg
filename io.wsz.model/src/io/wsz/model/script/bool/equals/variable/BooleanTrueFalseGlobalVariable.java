@@ -3,12 +3,13 @@ package io.wsz.model.script.bool.equals.variable;
 import io.wsz.model.Controller;
 import io.wsz.model.script.bool.BooleanVariableExpression;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableBoolean;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<Variable<Boolean>> {
+public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<VariableBoolean> {
     private static final long serialVersionUID = 1L;
 
     private EqualableTrueFalse equalable;
@@ -28,8 +29,8 @@ public class BooleanTrueFalseGlobalVariable extends BooleanVariableExpression<Va
     }
 
     @Override
-    public void setUpVariables(Controller controller) {
-        super.setUpVariables(controller);
+    public void setUpVariables(Controller controller, VariableBoolean checkingOverride) {
+        super.setUpVariables(controller, checkingOverride);
         String checkedId = equalable.getCheckedId();
         if (checkedId != null) {
             Variable<?> variable = controller.getGlobalVariableById(checkedId);

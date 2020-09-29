@@ -22,7 +22,7 @@ public abstract class BooleanVariableExpression<V extends Variable<?>> extends B
     }
 
     @Override
-    public void setUpVariables(Controller controller) {
+    public void setUpVariables(Controller controller, V checkingOverride) {
         try {
             checkingObject = (V) controller.getGlobalVariableById(checkingId);
         } catch (Exception e) {

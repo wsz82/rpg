@@ -40,19 +40,10 @@ public class RequirementView {
     }
 
     private void resolveMethodSelection(Method newMethod) {
-        switch (newMethod) {
-            case PC_HAS, NPC_HAS -> setUpArgumentTypeRequirement();
-            case GLOBAL -> setUpGlobalVariableRequirement();
-        }
-    }
-
-    private void setUpGlobalVariableRequirement() {
-        this.afterMethodRequirementView = new GlobalVariableRequirementView(editorController);
-        elements.getChildren().addAll(afterMethodRequirementView.getElements());
-    }
-
-    private void setUpArgumentTypeRequirement() {
-        this.afterMethodRequirementView = new ArgumentTypeRequirementView(editorController);
+        this.afterMethodRequirementView = switch (newMethod) {
+            case PC_HAS, NPC_HAS -> new ArgumentTypeRequirementView(editorController);
+            case GLOBAL -> new GlobalVariableRequirementView(editorController);
+        };
         elements.getChildren().addAll(afterMethodRequirementView.getElements());
     }
 
