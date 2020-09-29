@@ -3,7 +3,6 @@ package editor.view.dialog.requirement;
 import editor.model.EditorController;
 import io.wsz.model.script.BooleanType;
 import io.wsz.model.script.EqualsOperator;
-import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
 import io.wsz.model.script.bool.equals.variable.EqualableTrueFalse;
 import io.wsz.model.script.variable.Variable;
@@ -14,7 +13,7 @@ import javafx.scene.control.ChoiceBox;
 
 import java.util.List;
 
-public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
+public class GlobalBooleanVariableRequirementView extends SpecificRequirement<BooleanTrueFalseGlobalVariable> {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final ChoiceBox<BooleanType> booleanCB = new ChoiceBox<>();
     private final ChoiceBox<VariableBoolean> variableCB = new ChoiceBox<>();
@@ -53,7 +52,7 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public BooleanObjectExpression<?> getExpression() {
+    public BooleanTrueFalseGlobalVariable getExpression() {
         Variable<?> variable = previousView.getVariable();
 
         String checkingId = null;
@@ -80,14 +79,12 @@ public class GlobalBooleanVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public void populate(BooleanObjectExpression<?> expression) {
-        if (!(expression instanceof BooleanTrueFalseGlobalVariable)) return;
-        BooleanTrueFalseGlobalVariable specificExpression = (BooleanTrueFalseGlobalVariable) expression;
+    public void populate(BooleanTrueFalseGlobalVariable expression) {
         String checkingId = expression.getCheckingId();
         editorController.getObservableGlobalBooleans().stream()
                 .filter(a -> a.getId().equals(checkingId))
                 .findFirst().ifPresent(previousView::setVariable);
-        EqualableTrueFalse equalable = specificExpression.getEqualable();
+        EqualableTrueFalse equalable = expression.getEqualable();
         if (equalable == null) return;
         operatorCB.setValue(equalable.getEqualsOperator());
         BooleanType booleanType = BooleanType.FALSE;

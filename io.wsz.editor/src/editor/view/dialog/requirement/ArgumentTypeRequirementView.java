@@ -33,6 +33,7 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
         switch (newType) {
             case ASSET -> setUpItemCountableRequirement();
             case INVENTORY_PLACE -> setUpItemHasRequirement();
+            //TODO case ITEM ->;
         }
     }
 

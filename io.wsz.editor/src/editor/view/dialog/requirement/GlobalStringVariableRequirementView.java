@@ -2,7 +2,6 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.EqualsOperator;
-import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.equals.variable.EqualableStringVariable;
 import io.wsz.model.script.variable.Variable;
@@ -14,7 +13,7 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
-public class GlobalStringVariableRequirementView extends SpecificRequirement {
+public class GlobalStringVariableRequirementView extends SpecificRequirement<BooleanStringVariableEquals> {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final TextField argumentInput = new TextField();
     private final ChoiceBox<VariableString> variableCB = new ChoiceBox<>();
@@ -43,7 +42,7 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
     }
 
     @Override
-    public BooleanObjectExpression<?> getExpression() {
+    public BooleanStringVariableEquals getExpression() {
         Variable<?> variable = previousView.getVariable();
 
         String checkingId = null;
@@ -61,42 +60,24 @@ public class GlobalStringVariableRequirementView extends SpecificRequirement {
             checkedId = value.getId();
         }
 
-        EqualsOperator operator = getEqualsOperator();
+        EqualsOperator operator = operatorCB.getValue();
         EqualableStringVariable equalable = new EqualableStringVariable(checkedId, operator, argument);
         return new BooleanStringVariableEquals(checkingId, equalable);
     }
 
     @Override
-    public void populate(BooleanObjectExpression<?> expression) {
-        if (!(expression instanceof BooleanStringVariableEquals)) return;
-        BooleanStringVariableEquals specificExpression = (BooleanStringVariableEquals) expression;
+    public void populate(BooleanStringVariableEquals expression) {
         String checkingId = expression.getCheckingId();
         editorController.getObservableGlobalStrings().stream()
                 .filter(a -> a.getId().equals(checkingId))
                 .findFirst().ifPresent(previousView::setVariable);
-        EqualableStringVariable equalable = specificExpression.getEqualable();
+        EqualableStringVariable equalable = expression.getEqualable();
         if (equalable == null) return;
-        setEqualsOperator(equalable.getEqualsOperator());
-        setArgument(equalable.getArgument());
+        operatorCB.setValue(equalable.getEqualsOperator());
+        argumentInput.setText(equalable.getArgument());
         String checkedId = equalable.getCheckedId();
         editorController.getObservableGlobalStrings().stream()
                 .filter(a -> a.getId().equals(checkedId))
                 .findFirst().ifPresent(variableCB::setValue);
-    }
-
-    public EqualsOperator getEqualsOperator() {
-        return operatorCB.getValue();
-    }
-
-    public void setEqualsOperator(EqualsOperator operator) {
-        operatorCB.setValue(operator);
-    }
-
-    public String getArgument() {
-        return argumentInput.getText();
-    }
-
-    public void setArgument(String argument) {
-        argumentInput.setText(argument);
     }
 }

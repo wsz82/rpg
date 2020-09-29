@@ -4,14 +4,13 @@ import editor.model.EditorController;
 import editor.view.IntegerField;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.BooleanObjectExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.item.CountableItem;
 import io.wsz.model.script.variable.VariableInteger;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
 
-public class RequirementAssetCountableView extends SpecificRequirement {
+public class RequirementAssetCountableView extends SpecificRequirement<BooleanItemVsItem> {
     private final ChoiceBox<Asset> assetCB = new ChoiceBox<>();
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
     private final IntegerField argumentInput = new IntegerField(0, true);
@@ -39,7 +38,6 @@ public class RequirementAssetCountableView extends SpecificRequirement {
 
     @Override
     public BooleanItemVsItem getExpression() {
-        //TODO generic populate i getExpression
         Asset asset = assetCB.getValue();
 
         String assetId = null;
@@ -62,10 +60,8 @@ public class RequirementAssetCountableView extends SpecificRequirement {
     }
 
     @Override
-    public void populate(BooleanObjectExpression<?> expression) {
-        if (!(expression instanceof BooleanItemVsItem)) return;
-        BooleanItemVsItem specificExpression = (BooleanItemVsItem) expression;
-        CountableItem countable = specificExpression.getCountable();
+    public void populate(BooleanItemVsItem expression) {
+        CountableItem countable = expression.getCountable();
         if (countable == null) return;
         String checkedId = countable.getCheckedId();
         editorController.getObservableAssets().getEquipmentAssets().stream()

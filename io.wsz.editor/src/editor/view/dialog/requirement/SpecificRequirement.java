@@ -2,7 +2,7 @@ package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.BooleanObjectExpression;
+import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.variable.Variable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +11,7 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public abstract class SpecificRequirement {
+public abstract class SpecificRequirement<B extends BooleanExpression> {
     protected final HBox elements = new HBox(5);
     protected final EditorController editorController;
 
@@ -41,9 +41,9 @@ public abstract class SpecificRequirement {
         choiceBox.setItems(variablesWithNull);
     }
 
-    public abstract BooleanObjectExpression<?> getExpression();
+    public abstract B getExpression();
 
-    public abstract void populate(BooleanObjectExpression<?> expression);
+    public abstract void populate(B expression);
 
     public HBox getElements() {
         return elements;
