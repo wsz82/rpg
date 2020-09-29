@@ -1,14 +1,22 @@
-package editor.view.dialog.requirement;
+package editor.view.dialog.requirement.item;
 
 import editor.model.EditorController;
 import editor.view.IntegerField;
+import editor.view.dialog.requirement.DualTextFieldChoiceBox;
+import editor.view.dialog.requirement.SpecificRequirement;
 import io.wsz.model.asset.Asset;
+import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.Method;
+import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import io.wsz.model.script.bool.countable.item.CountableItem;
 import io.wsz.model.script.variable.VariableInteger;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RequirementAssetCountableView extends SpecificRequirement<BooleanItemVsItem> {
     private final ChoiceBox<Asset> assetCB = new ChoiceBox<>();
@@ -57,6 +65,35 @@ public class RequirementAssetCountableView extends SpecificRequirement<BooleanIt
         CompareOperator compareOperator = operatorCB.getValue();
         CountableItem countable = new CountableItem(assetId, compareOperator, argument, checkedVariableId);
         return new BooleanItemVsItem(null, countable);
+    }
+
+    @Override
+    public void addExpressionTo(Requirements output, Method method) {
+        BooleanItemVsItem expression = getExpression();
+        switch (method) {
+            case PC_HAS -> addExpressionToPChas(output, expression);
+            case NPC_HAS -> addExpressionToNPChas(output, expression);
+        }
+    }
+
+    private void addExpressionToPChas(Requirements output, BooleanItemVsItem expression) {
+        List<BooleanExpression> expressions = output.getBooleanPChasItemExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setBooleanPChasItemExpressions(expressions);
+        }
+        if (expression == null) return;
+        expressions.add(expression);
+    }
+
+    private void addExpressionToNPChas(Requirements output, BooleanItemVsItem expression) {
+        List<BooleanExpression> expressions = output.getBooleanNPChasItemExpressions();
+        if (expressions == null) {
+            expressions = new ArrayList<>(1);
+            output.setBooleanNPChasItemExpressions(expressions);
+        }
+        if (expression == null) return;
+        expressions.add(expression);
     }
 
     @Override

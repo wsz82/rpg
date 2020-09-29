@@ -1,6 +1,8 @@
 package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
+import editor.view.dialog.requirement.global.GlobalVariableRequirementView;
+import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.Method;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,7 +21,7 @@ public class RequirementView {
     private final HBox row = new HBox(5, elementsWithMethodCB, removeButton);
     private final RequirementsListView owner;
 
-    private AfterMethodRequirementView afterMethodRequirementView;
+    private AfterMethodRequirementView secondaryView;
 
     public RequirementView(RequirementsListView owner, EditorController editorController) {
         this.editorController = editorController;
@@ -40,11 +42,11 @@ public class RequirementView {
     }
 
     private void resolveMethodSelection(Method newMethod) {
-        this.afterMethodRequirementView = switch (newMethod) {
+        this.secondaryView = switch (newMethod) {
             case PC_HAS, NPC_HAS -> new ArgumentTypeRequirementView(editorController);
             case GLOBAL -> new GlobalVariableRequirementView(editorController);
         };
-        elements.getChildren().addAll(afterMethodRequirementView.getElements());
+        elements.getChildren().addAll(secondaryView.getElements());
     }
 
     private void hookUpRemoveEvent() {
@@ -55,6 +57,12 @@ public class RequirementView {
 
     private void removeRequirement() {
         owner.removeRequirement(this);
+    }
+
+    public void addExpressionTo(Requirements output) {
+        Method method = getMethod();
+        if (method == null) return;
+        secondaryView.addExpressionTo(output, method);
     }
 
     public HBox getRow() {
@@ -69,7 +77,7 @@ public class RequirementView {
         methodCB.setValue(method);
     }
 
-    public AfterMethodRequirementView getAfterMethodRequirementView() {
-        return afterMethodRequirementView;
+    public AfterMethodRequirementView getSecondaryView() {
+        return secondaryView;
     }
 }

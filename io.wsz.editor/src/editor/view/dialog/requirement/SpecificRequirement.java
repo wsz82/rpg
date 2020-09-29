@@ -1,7 +1,9 @@
 package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
+import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.CompareOperator;
+import io.wsz.model.script.Method;
 import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.variable.Variable;
 import javafx.collections.FXCollections;
@@ -42,6 +44,8 @@ public abstract class SpecificRequirement<B extends BooleanExpression> {
     }
 
     public abstract B getExpression();
+
+    public abstract void addExpressionTo(Requirements output, Method method);
 
     public abstract void populate(B expression);
 

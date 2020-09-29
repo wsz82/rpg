@@ -220,7 +220,7 @@ public class QuestionsCenterView {
     private void saveQuestionItem(QuestionItem qi) {
         Question question = qi.question;
         question.setText(questionText.getText());
-        question.setRequirements(questionRequirementsListView.getOutput());
+        question.setRequirements(questionRequirementsListView.createOutput());
         question.setBeginScript(scriptArea.getScript());
         questionsTableView.refresh();
     }

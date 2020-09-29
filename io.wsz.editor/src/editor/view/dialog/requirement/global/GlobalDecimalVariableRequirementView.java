@@ -1,28 +1,29 @@
-package editor.view.dialog.requirement;
+package editor.view.dialog.requirement.global;
 
 import editor.model.EditorController;
-import editor.view.IntegerField;
+import editor.view.DoubleField;
+import editor.view.dialog.requirement.DualTextFieldChoiceBox;
 import io.wsz.model.script.CompareOperator;
-import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
-import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;
+import io.wsz.model.script.bool.countable.variable.BooleanDecimalGlobalVariable;
+import io.wsz.model.script.bool.countable.variable.CountableDecimalVariable;
 import io.wsz.model.script.variable.Variable;
-import io.wsz.model.script.variable.VariableInteger;
+import io.wsz.model.script.variable.VariableDecimal;
 import javafx.scene.control.ChoiceBox;
 
-public class GlobalIntegerVariableRequirementView extends SpecificRequirement<BooleanIntegerGlobalVariable> {
+public class GlobalDecimalVariableRequirementView extends GlobalVariableSpecificRequirementView<BooleanDecimalGlobalVariable> {
     private final ChoiceBox<CompareOperator> operatorCB = new ChoiceBox<>();
-    private final IntegerField argumentInput = new IntegerField(true);
-    private final ChoiceBox<VariableInteger> variableCB = new ChoiceBox<>();
+    private final DoubleField argumentInput = new DoubleField(true);
+    private final ChoiceBox<VariableDecimal> variableCB = new ChoiceBox<>();
     private final GlobalVariableRequirementView previousView;
 
-    public GlobalIntegerVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
+    public GlobalDecimalVariableRequirementView(EditorController editorController, GlobalVariableRequirementView previousView) {
         super(editorController);
         this.previousView = previousView;
-        DualTextFieldChoiceBox<IntegerField> dual = new DualTextFieldChoiceBox<>(argumentInput, variableCB);
+        DualTextFieldChoiceBox<DoubleField> dual = new DualTextFieldChoiceBox<>(argumentInput, variableCB);
         dual.hookUpEvents();
         fillElements();
         setUpOperatorCB(operatorCB);
-        setUpVariableCB(variableCB, editorController.getObservableGlobalIntegers(), previousView.getVariable());
+        setUpVariableCB(variableCB, editorController.getObservableGlobalDecimals(), previousView.getVariable());
     }
 
     @Override
@@ -31,7 +32,7 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement<Bo
     }
 
     @Override
-    public BooleanIntegerGlobalVariable getExpression() {
+    public BooleanDecimalGlobalVariable getExpression() {
         Variable<?> variable = previousView.getVariable();
 
         String checkingId = null;
@@ -40,32 +41,33 @@ public class GlobalIntegerVariableRequirementView extends SpecificRequirement<Bo
         }
 
         CompareOperator compareOperator = operatorCB.getValue();
-        Integer argument = null;
+
+        Double argument = null;
         if (argumentInput.isVisible()) {
             argument = argumentInput.getValue();
         }
         String checkedId = null;
-        VariableInteger value = variableCB.getValue();
+        VariableDecimal value = variableCB.getValue();
         if (variableCB.isVisible() && value != null) {
             checkedId = value.getId();
         }
 
-        CountableIntegerVariable countable = new CountableIntegerVariable(checkedId, compareOperator, argument);
-        return new BooleanIntegerGlobalVariable(checkingId, countable);
+        CountableDecimalVariable countable = new CountableDecimalVariable(checkedId, compareOperator, argument);
+        return new BooleanDecimalGlobalVariable(checkingId, countable);
     }
 
     @Override
-    public void populate(BooleanIntegerGlobalVariable expression) {
+    public void populate(BooleanDecimalGlobalVariable expression) {
         String checkingId = expression.getCheckingId();
-        editorController.getObservableGlobalIntegers().stream()
+        editorController.getObservableGlobalDecimals().stream()
                 .filter(a -> a.getId().equals(checkingId))
                 .findFirst().ifPresent(previousView::setVariable);
-        CountableIntegerVariable countable = expression.getCountable();
+        CountableDecimalVariable countable = expression.getCountable();
         if (countable == null) return;
         operatorCB.setValue(countable.getCompareOperator());
         argumentInput.setText(String.valueOf(countable.getArgument()));
         String checkedId = countable.getCheckedId();
-        editorController.getObservableGlobalIntegers().stream()
+        editorController.getObservableGlobalDecimals().stream()
                 .filter(a -> a.getId().equals(checkedId))
                 .findFirst().ifPresent(variableCB::setValue);
     }

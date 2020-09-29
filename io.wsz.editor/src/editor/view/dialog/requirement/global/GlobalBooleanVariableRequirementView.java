@@ -1,6 +1,7 @@
-package editor.view.dialog.requirement;
+package editor.view.dialog.requirement.global;
 
 import editor.model.EditorController;
+import editor.view.dialog.requirement.DualChoiceBox;
 import io.wsz.model.script.BooleanType;
 import io.wsz.model.script.EqualsOperator;
 import io.wsz.model.script.bool.equals.variable.BooleanTrueFalseGlobalVariable;
@@ -13,7 +14,7 @@ import javafx.scene.control.ChoiceBox;
 
 import java.util.List;
 
-public class GlobalBooleanVariableRequirementView extends SpecificRequirement<BooleanTrueFalseGlobalVariable> {
+public class GlobalBooleanVariableRequirementView extends GlobalVariableSpecificRequirementView<BooleanTrueFalseGlobalVariable> {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final ChoiceBox<BooleanType> booleanCB = new ChoiceBox<>();
     private final ChoiceBox<VariableBoolean> variableCB = new ChoiceBox<>();

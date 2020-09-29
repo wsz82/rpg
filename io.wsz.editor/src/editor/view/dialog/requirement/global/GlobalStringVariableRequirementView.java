@@ -1,6 +1,7 @@
-package editor.view.dialog.requirement;
+package editor.view.dialog.requirement.global;
 
 import editor.model.EditorController;
+import editor.view.dialog.requirement.DualTextFieldChoiceBox;
 import io.wsz.model.script.EqualsOperator;
 import io.wsz.model.script.bool.equals.variable.BooleanStringVariableEquals;
 import io.wsz.model.script.bool.equals.variable.EqualableStringVariable;
@@ -13,7 +14,7 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
-public class GlobalStringVariableRequirementView extends SpecificRequirement<BooleanStringVariableEquals> {
+public class GlobalStringVariableRequirementView extends GlobalVariableSpecificRequirementView<BooleanStringVariableEquals> {
     private final ChoiceBox<EqualsOperator> operatorCB = new ChoiceBox<>();
     private final TextField argumentInput = new TextField();
     private final ChoiceBox<VariableString> variableCB = new ChoiceBox<>();

@@ -197,7 +197,7 @@ public class AnswersCenterView {
     private void saveAnswerItem(AnswerItem item) {
         Answer answer = item.answer;
         answer.setText(answerTextArea.getText());
-        answer.setRequirements(answerRequirementsListView.getOutput());
+        answer.setRequirements(answerRequirementsListView.createOutput());
         answer.setBeginScript(scriptArea.getScript());
         answersTableView.refresh();
     }

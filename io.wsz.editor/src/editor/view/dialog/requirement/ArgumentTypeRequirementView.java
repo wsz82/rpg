@@ -1,7 +1,11 @@
 package editor.view.dialog.requirement;
 
 import editor.model.EditorController;
+import editor.view.dialog.requirement.item.RequirementAssetCountableView;
+import editor.view.dialog.requirement.item.RequirementItemHasView;
+import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.ArgumentType;
+import io.wsz.model.script.Method;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
@@ -47,6 +51,11 @@ public class ArgumentTypeRequirementView extends AfterMethodRequirementView {
     @Override
     public void injectVariables(EditorController editorController, ArgumentType argumentType, String checkingId) {
         argumentTypeCB.setValue(argumentType);
+    }
+
+    @Override
+    public void addExpressionTo(Requirements output, Method method) {
+        specificRequirement.addExpressionTo(output, method);
     }
 
     public ArgumentType getArgumentType() {
