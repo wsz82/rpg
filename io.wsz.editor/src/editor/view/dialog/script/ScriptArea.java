@@ -1,15 +1,17 @@
 package editor.view.dialog.script;
 
 import editor.model.EditorController;
+import editor.view.script.ScriptEditArea;
 import io.wsz.model.script.Script;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 
 public class ScriptArea {
     private final EditorController editorController;
     private final VBox scriptVBox = new VBox(5);
-    private final TextArea textArea = new TextArea();
+
+    private ScriptEditArea scriptEditArea;
 
     public ScriptArea(EditorController editorController) {
         this.editorController = editorController;
@@ -17,11 +19,14 @@ public class ScriptArea {
 
     public void init() {
         final Label scriptAreaLabel = new Label("Script to run on begin");
-        scriptVBox.getChildren().addAll(scriptAreaLabel, textArea);
+        scriptAreaLabel.setAlignment(Pos.CENTER);
+        scriptEditArea = new ScriptEditArea(editorController);
+        scriptEditArea.initEditArea();
+        scriptVBox.getChildren().addAll(scriptAreaLabel, scriptEditArea.getEditArea());
     }
 
     public void clearArea() {
-        textArea.setText(null);
+        scriptEditArea.clearArea();
     }
 
     public void restoreScript(Script script) {
@@ -29,12 +34,11 @@ public class ScriptArea {
             clearArea();
             return;
         }
-        textArea.setText(script.getInitialText());
+        scriptEditArea.fillArea(script);
     }
 
     public Script getScript() {
-        String text = textArea.getText();
-        return Script.parseScript(text, editorController.getController());
+        return scriptEditArea.createScript();
     }
 
     public VBox getScriptArea() {
