@@ -2,7 +2,6 @@ package game.view.world.board;
 
 import game.model.GameController;
 import game.model.world.GameRunner;
-import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.PortraitAnimation;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;
@@ -29,8 +28,7 @@ public class BarView {
     private static final double PORTRAIT_PART = 9.0/10;
 
     private final Canvas canvas;
-    private final GameController gameController;
-    private final Controller controller;
+    private final GameController controller;
     private final GraphicsContext gc;
     private final LinkedList<Portrait> portraits = new LinkedList<>();
     private final List<Creature> creatures = new ArrayList<>(6);
@@ -39,16 +37,15 @@ public class BarView {
     private int hoveredPortrait;
     private double lastPortraitSize;
 
-    public BarView(Canvas canvas, GameController gameController) {
+    public BarView(Canvas canvas, GameController controller) {
         this.canvas = canvas;
-        this.gameController = gameController;
-        this.controller = gameController.getController();
+        this.controller = controller;
         this.gc = canvas.getGraphicsContext2D();
         hookUpEvents();
     }
 
     public void refresh() {
-        if (!gameController.getSettings().isShowBar()) {
+        if (!controller.getSettings().isShowBar()) {
             return;
         }
         forceRefresh();
@@ -91,7 +88,7 @@ public class BarView {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
                 e.consume();
-                if (hoveredPortrait != -1 && gameController.getDragged() == null) {
+                if (hoveredPortrait != -1 && controller.getDragged() == null) {
                     int hoveredPortraitIndex = hoveredPortrait;
                     GameRunner.runLater(() -> resolveHeroControlAndLocation(e.isShiftDown(), hoveredPortraitIndex));
                 }
@@ -178,8 +175,8 @@ public class BarView {
 
     private void updateHoveredPortrait(double leftX, double padding, double portraitSize) {
         if (hoveredPortrait == -1) {
-            if (gameController.getHoveredHero() != null) {
-                gameController.setHoveredHero(null);
+            if (controller.getHoveredHero() != null) {
+                controller.setHoveredHero(null);
             }
             return;
         }
@@ -190,9 +187,9 @@ public class BarView {
         }
 
         Creature hero = cl.creature;
-        Creature hoveredHero = gameController.getHoveredHero();
+        Creature hoveredHero = controller.getHoveredHero();
         if (hoveredHero != hero) {
-            gameController.setHoveredHero(hero);
+            controller.setHoveredHero(hero);
         }
 
         gc.setStroke(Color.LIGHTGREY);

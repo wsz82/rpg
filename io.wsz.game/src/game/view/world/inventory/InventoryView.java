@@ -2,7 +2,6 @@ package game.view.world.inventory;
 
 import game.model.GameController;
 import game.model.setting.KeyAction;
-import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Container;
@@ -33,8 +32,7 @@ public class InventoryView {
     private static final double HOLD_HEIGHT = 0.3;
 
     private final Canvas canvas;
-    private final GameController gameController;
-    private final Controller controller;
+    private final GameController controller;
     private final GraphicsContext gc;
     private final Coords mousePos = new Coords();
     private final Coords imgRelativeCoords = new Coords();
@@ -57,22 +55,21 @@ public class InventoryView {
     private InventoryViewElement lastCheckedView;
     private InventoryViewElement dragScrolledView;
 
-    public InventoryView(Canvas canvas, GameController gameController) {
+    public InventoryView(Canvas canvas, GameController controller) {
         this.canvas = canvas;
-        this.gameController = gameController;
-        controller = gameController.getController();
+        this.controller = controller;
         gc = canvas.getGraphicsContext2D();
 
-        holdView = new HoldViewElement(canvas, gameController, mousePos);
+        holdView = new HoldViewElement(canvas, controller, mousePos);
         inventoryElements.add(holdView);
-        dropView = new DropViewElement(canvas, gameController, mousePos);
+        dropView = new DropViewElement(canvas, controller, mousePos);
         inventoryElements.add(dropView);
-        containerView = new ContainerViewElement(canvas, gameController, mousePos);
+        containerView = new ContainerViewElement(canvas, controller, mousePos);
         inventoryElements.add(containerView);
-        creatureView = new CreatureViewElement(canvas, gameController, mousePos);
+        creatureView = new CreatureViewElement(canvas, controller, mousePos);
         inventoryElements.add(creatureView);
 
-        countableRelocationWindow = new CountableRelocationWindow(gameController, canvas, gc, mousePos);
+        countableRelocationWindow = new CountableRelocationWindow(controller, canvas, gc, mousePos);
 
         defineRemovableEvents();
     }
@@ -80,10 +77,10 @@ public class InventoryView {
     private void defineRemovableEvents() {
         closeEvent = e -> {
             KeyCode code = e.getCode();
-            KeyCode inventoryClose = gameController.getSettings().getKey(KeyAction.INVENTORY);
+            KeyCode inventoryClose = controller.getSettings().getKey(KeyAction.INVENTORY);
             if (code.equals(inventoryClose) || code.equals(KeyCode.ESCAPE)) {
                 e.consume();
-                synchronized (gameController.getGameRunner()) {
+                synchronized (controller.getGameRunner()) {
                     closeInventory();
                 }
             }
@@ -95,7 +92,7 @@ public class InventoryView {
                 e.consume();
                 mousePos.x = e.getX() / Sizes.getMeter();
                 mousePos.y = e.getY() / Sizes.getMeter();
-                synchronized (gameController.getGameRunner()) {
+                synchronized (controller.getGameRunner()) {
                     startDragEquipment(mousePos.x, mousePos.y);
                     startDragScrollBar(mousePos.x, mousePos.y);
                 }
@@ -103,7 +100,7 @@ public class InventoryView {
                 e.consume();
                 mousePos.x = e.getX() / Sizes.getMeter();
                 mousePos.y = e.getY() / Sizes.getMeter();
-                synchronized (gameController.getGameRunner()) {
+                synchronized (controller.getGameRunner()) {
                     openContainer();
                 }
             }
@@ -112,13 +109,13 @@ public class InventoryView {
         dragStop = e -> {
             MouseButton button = e.getButton();
             if (button.equals(MouseButton.PRIMARY)) {
-                if (gameController.getDragged() != null) {
+                if (controller.getDragged() != null) {
                     e.consume();
                     mousePos.x = e.getX() / Sizes.getMeter();
                     mousePos.y = e.getY() / Sizes.getMeter();
                     double x = mousePos.x;
                     double y = mousePos.y;
-                    synchronized (gameController.getGameRunner()) {
+                    synchronized (controller.getGameRunner()) {
                         stopDragEquipment(x, y);
                     }
                 }
@@ -160,7 +157,7 @@ public class InventoryView {
     public void refresh(List<PosItem> sortedMapItems, List<Equipment> sortedHoldItems, List<Equipment> sortedContainerItems) {
         double width = canvas.getWidth();
         if (width == 0) return;
-        double barViewWidth = gameController.getGameView().getBarView().getWidth();
+        double barViewWidth = controller.getGameView().getBarView().getWidth();
         double inventoryWidth = (width - barViewWidth) / Sizes.getMeter();
 
         Creature cr = controller.getCreatureToOpenInventory();
@@ -217,17 +214,17 @@ public class InventoryView {
         boolean canEquipmentBeRemoved = viewElement.tryRemove(selected, creature);
         if (canEquipmentBeRemoved) {
             Equipment dragged = selected.cloneEquipment(true);
-            gameController.setDragged(dragged);
+            controller.setDragged(dragged);
             draggedInitWidth = dragged.getImageWidth();
             draggedInitHeight = dragged.getImageHeight();
         }
     }
 
     private void stopDragEquipment(double mouseX, double mouseY) {
-        Equipment dragged = gameController.getDragged();
+        Equipment dragged = controller.getDragged();
         if (dragged == null) return;
         dragged.getAnimationPos().setNextFrameUpdate(0);
-        Creature hoveredHero = gameController.getHoveredHero();
+        Creature hoveredHero = controller.getHoveredHero();
         Creature cr = controller.getCreatureToOpenInventory();
 
         boolean mayBeCountable = dragged instanceof EquipmentMayCountable;
@@ -242,11 +239,11 @@ public class InventoryView {
         }
 
         if (isMany) {
-            gameController.setDragged(null);
+            controller.setDragged(null);
             moveCountableEquipment(mouseX, mouseY, hoveredHero, cr, countable, amount);
         } else {
             resolveDraggedDestination(mouseX, mouseY, hoveredHero, cr, dragged);
-            gameController.setDragged(null);
+            controller.setDragged(null);
         }
     }
 
@@ -379,11 +376,11 @@ public class InventoryView {
     }
 
     private void closeInventory() {
-        Equipment dragged = gameController.getDragged();
+        Equipment dragged = controller.getDragged();
         if (dragged != null) {
             Creature cr = controller.getCreatureToOpenInventory();
             holdView.tryAdd(dragged, cr, 0, 0, true);
-            gameController.setDragged(null);
+            controller.setDragged(null);
         }
         canvas.removeEventHandler(MouseEvent.MOUSE_PRESSED, onClick);
         canvas.removeEventHandler(MouseEvent.MOUSE_RELEASED, dragStop);
@@ -411,7 +408,7 @@ public class InventoryView {
 
         Coords mousePos = getMousePos(x, y, left, top);
         int meter = Sizes.getMeter();
-        Equipment dragged = gameController.getDragged();
+        Equipment dragged = controller.getDragged();
         if (dragged != null) {
             playDraggedAnimation(mousePos);
 
@@ -424,7 +421,7 @@ public class InventoryView {
 
     private void playDraggedAnimation(Coords mousePos) {
         InventoryViewElement ev = getView(mousePos.x, mousePos.y);
-        Equipment dragged = gameController.getDragged();
+        Equipment dragged = controller.getDragged();
         EquipmentAnimationPos animationPos = dragged.getAnimationPos();
         if (ev instanceof DropViewElement) {
             if (!(lastCheckedView instanceof DropViewElement)) {
@@ -459,7 +456,7 @@ public class InventoryView {
         double y = HOLD_Y_POS * canvasHeight / meter;
 
         holdView.setInventoryWidth(inventoryWidth);
-        holdView.setDragged(gameController.getDragged());
+        holdView.setDragged(controller.getDragged());
         holdView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / meter);
         holdView.setViewPos(x, y);
         holdView.setSize(holdWidth, holdHeight);
@@ -470,7 +467,7 @@ public class InventoryView {
 
     private void drawDrop(List<PosItem> sortedItems, double inventoryWidth, Creature cr) {
         List<Equipment> equipmentWithinRange;
-        synchronized (gameController.getGameRunner()) {
+        synchronized (controller.getGameRunner()) {
             equipmentWithinRange = cr.getEquipmentWithinRange(controller);
         }
 
@@ -537,7 +534,7 @@ public class InventoryView {
         double y = 0.2 * canvas.getHeight() / meter;
 
         containerView.setInventoryWidth(inventoryWidth);
-        containerView.setDragged(gameController.getDragged());
+        containerView.setDragged(controller.getDragged());
         containerView.setScrollWidth(canvas.getWidth() * SCROLL_BUTTON_PART / meter);
         containerView.setViewPos(x, y);
         containerView.setSize(width, height);
@@ -569,7 +566,7 @@ public class InventoryView {
         double y = CREATURE_Y_POS * canvas.getHeight() / meter;
 
         creatureView.setDrawnCreature(cr);
-        creatureView.setDragged(gameController.getDragged());
+        creatureView.setDragged(controller.getDragged());
         creatureView.setViewPos(x, y);
         creatureView.setSize(creatureViewWidth, creatureViewHeight);
         creatureView.refresh();

@@ -69,7 +69,7 @@ public class KeysControlTableView {
         table.setItems(keys);
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        Properties locale = gameController.getController().getLocale();
+        Properties locale = gameController.getLocale();
         TableColumn<Key, String> actionCol = new TableColumn<>(locale.getProperty(LocaleKeys.ACTION));
         actionCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override

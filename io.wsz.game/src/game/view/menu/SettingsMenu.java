@@ -3,7 +3,6 @@ package game.view.menu;
 import game.model.GameController;
 import game.model.setting.Key;
 import game.model.setting.Settings;
-import io.wsz.model.Controller;
 import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.sizes.FontSize;
 import io.wsz.model.sizes.Paths;
@@ -25,9 +24,8 @@ import java.io.File;
 import java.util.Properties;
 
 class SettingsMenu extends StackPane {
-    private final GameController gameController;
+    private final GameController controller;
     private final Settings settings;
-    private final Controller controller;
     private final GameStage gameStage;
     private final SettingsParent parent;
     private final Button graphics;
@@ -46,12 +44,11 @@ class SettingsMenu extends StackPane {
     private Label languageLabel;
     private Button backToSettings;
 
-    public SettingsMenu(GameStage gameStage, GameController gameController, SettingsParent parent) {
+    public SettingsMenu(GameStage gameStage, GameController controller, SettingsParent parent) {
         this.parent = parent;
         this.gameStage = gameStage;
-        this.gameController = gameController;
-        this.settings = gameController.getSettings();
-        this.controller = gameController.getController();
+        this.controller = controller;
+        this.settings = controller.getSettings();
         final VBox buttons = new VBox(10);
         buttons.setAlignment(Pos.CENTER);
 
@@ -82,7 +79,7 @@ class SettingsMenu extends StackPane {
 
         Properties locale = controller.getLocale();
 
-        KeysControlTableView keysControls = new KeysControlTableView(gameController);
+        KeysControlTableView keysControls = new KeysControlTableView(controller);
         keysControls.initTable();
         TableView<Key> keys = keysControls.getTable();
         keys.setMaxWidth(root.getWidth()/3);
@@ -171,7 +168,7 @@ class SettingsMenu extends StackPane {
                 language = Paths.ENGLISH;
             }
             settings.setLanguage(language);
-            gameController.setLocale(language);
+            controller.setLocale(language);
             updateNodesDisplayText();
         });
     }

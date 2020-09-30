@@ -37,7 +37,7 @@ public class DialogView {
     private static final double END_BUTTON_HEIGHT_PART = 0.15;
 
     private final Canvas canvas;
-    private final GameController gameController;
+    private final GameController controller;
     private final GraphicsContext gc;
     private final double offset;
     private final Map<Question, VerticalPos> questionsPos = new HashMap<>(0);
@@ -64,9 +64,9 @@ public class DialogView {
     private int endButtonY;
     private boolean isGameViewNotRefreshedOnce;
 
-    public DialogView(Canvas canvas, GameController gameController, double offset) {
+    public DialogView(Canvas canvas, GameController controller, double offset) {
         this.canvas = canvas;
-        this.gameController = gameController;
+        this.controller = controller;
         this.offset = offset;
         gc = canvas.getGraphicsContext2D();
         defineRemovableEvents();
@@ -79,7 +79,7 @@ public class DialogView {
         }
         int width = (int) canvas.getWidth();
         int height = (int) canvas.getHeight();
-        fontSize = (double) width / gameController.getSettings().getFontSize().getSize();
+        fontSize = (double) width / controller.getSettings().getFontSize().getSize();
         dialogTop = height - getViewHeight();
         dialogWidth = (int) (TEXT_FIELD_WIDTH * width);
         dialogLeft = (width - dialogWidth) / 2;
@@ -91,7 +91,7 @@ public class DialogView {
             return;
         }
 
-        gameController.getCursor().setCursor(CursorType.MAIN);
+        controller.getCursor().setCursor(CursorType.MAIN);
 
         updatePos();
 
@@ -145,7 +145,7 @@ public class DialogView {
         PosItem npc = dialogMemento.getNpc();
         Dialog dialog = npc.getDialog();
         Creature pc = dialogMemento.getPc();
-        Answer greeting = dialog.getGreeting(gameController.getController(), pc, npc);
+        Answer greeting = dialog.getGreeting(controller, pc, npc);
         if (greeting == null) {
             dialogMemento.setFinished(true);
             isToRefresh = true;
@@ -154,14 +154,14 @@ public class DialogView {
         addDialogItem(npc, greeting.getText());
         Script answerScript = greeting.getBeginScript();
         if (answerScript != null) {
-            answerScript.execute(gameController.getController(), npc, pc);
+            answerScript.execute(controller, npc, pc);
         }
         dialogMemento.setLastAnswer(greeting);
     }
 
     private void defineRemovableEvents() {
         clickEvent = e -> {
-            synchronized (gameController.getGameRunner()) {
+            synchronized (controller.getGameRunner()) {
                 MouseButton button = e.getButton();
                 if (button.equals(MouseButton.PRIMARY)) {
                     e.consume();
@@ -260,7 +260,7 @@ public class DialogView {
         Creature pc = dialogMemento.getPc();
         addDialogItem(pc, activeQuestion.getText());
         Script questionScript = activeQuestion.getBeginScript();
-        Controller controller = gameController.getController();
+        Controller controller = this.controller;
         if (questionScript != null) {
             questionScript.execute(controller, pc, dialogMemento.getNpc());
         }
@@ -284,7 +284,7 @@ public class DialogView {
 
     private void endDialog() {
         removeRemovableEvents();
-        gameController.endDialog();
+        controller.endDialog();
     }
 
     private void removeRemovableEvents() {
@@ -444,7 +444,6 @@ public class DialogView {
         PosItem answering = dialogMemento.getNpc();
         Dialog dialog = answering.getDialog();
         Creature asking = dialogMemento.getPc();
-        Controller controller = gameController.getController();
         List<Question> questions = dialog.getQuestionsListByID(questionsID, controller, asking, answering);
         if (questions == null || questions.isEmpty()) {
             dialogMemento.setFinished(true);
@@ -578,7 +577,7 @@ public class DialogView {
             return;
         }
         if (!isWheelScroll) {
-            gameController.getCursor().setCursor(CursorType.DOWN);
+            controller.getCursor().setCursor(CursorType.DOWN);
         }
         dialogMemento.setCurPos(Math.min(newY, maxPos));
         isToRefresh = true;
@@ -594,7 +593,7 @@ public class DialogView {
             return;
         }
         if (!isWheelScroll) {
-            gameController.getCursor().setCursor(CursorType.UP);
+            controller.getCursor().setCursor(CursorType.UP);
         }
         int newY = curPos - getScrollSpeed();
         dialogMemento.setCurPos(Math.max(newY, 0));
@@ -609,7 +608,7 @@ public class DialogView {
     }
 
     private int getScrollSpeed() {
-        return (int) (gameController.getSettings().getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
+        return (int) (controller.getSettings().getDialogScrollSpeed() * canvas.getWidth() / Sizes.getMeter() * 3);
     }
 
     public void setIsToRefresh(boolean isToRefresh) {

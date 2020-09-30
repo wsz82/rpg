@@ -140,7 +140,7 @@ public class GameView extends CanvasView {
     }
 
     private boolean tryStartDialog() {
-        if (gameController.isDialog()) {
+        if (controller.isDialog()) {
             if (canStartDialog) {
                 canStartDialog = false;
                 removeRemovableEvents();
@@ -225,7 +225,7 @@ public class GameView extends CanvasView {
         double canvasWidth = canvas.getWidth();
         double canvasMeterWidth = canvasWidth / meter;
         double canvasMeterHeight = canvas.getHeight() / meter;
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         if (posToCenter.x != -1) {
             double widthCorrection = 0;
             if (settings.isShowBar()) {
@@ -256,7 +256,7 @@ public class GameView extends CanvasView {
         int y = p.y;
 
         if (x < left || x > right || y < top || y > bottom) {
-            gameController.getCursor().setCursor(CursorType.MAIN);
+            controller.getCursor().setCursor(CursorType.MAIN);
             return;
         }
 
@@ -289,7 +289,7 @@ public class GameView extends CanvasView {
             return;
         }
 
-        Cursor cursor = gameController.getCursor();
+        Cursor cursor = controller.getCursor();
         if (x < left+OFFSET && x >= left
                 && y > top+OFFSET && y < bottom-OFFSET) {
             cursor.setCursor(CursorType.LEFT);
@@ -360,17 +360,17 @@ public class GameView extends CanvasView {
     }
 
     private void scrollDown(double locHeight) {
-        double newY = curPos.y + gameController.getSettings().getGameScrollSpeed();
+        double newY = curPos.y + controller.getSettings().getGameScrollSpeed();
         curPos.y = Math.min(newY, locHeight - canvas.getHeight()/Sizes.getMeter());
     }
 
     private void scrollUp() {
-        double newY = curPos.y - gameController.getSettings().getGameScrollSpeed();
+        double newY = curPos.y - controller.getSettings().getGameScrollSpeed();
         curPos.y = Math.max(newY, 0);
     }
 
     private void scrollRight(double locWidth) {
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         int meter = Sizes.getMeter();
         double canvasWidth = canvas.getWidth();
         if (settings.isShowBar()) {
@@ -382,7 +382,7 @@ public class GameView extends CanvasView {
     }
 
     private void scrollLeft() {
-        double newX = curPos.x - gameController.getSettings().getGameScrollSpeed();
+        double newX = curPos.x - controller.getSettings().getGameScrollSpeed();
         curPos.x = Math.max(newX, 0);
     }
 
@@ -473,7 +473,7 @@ public class GameView extends CanvasView {
         double finalY = temp.y;
 
         if (button.equals(MouseButton.PRIMARY)) {
-            if (gameController.getSettings().isShowBar()) {
+            if (controller.getSettings().isShowBar()) {
                 double barLeft = barView.getLeft();
                 if (x > barLeft) {
                     return;
@@ -505,14 +505,14 @@ public class GameView extends CanvasView {
         if (barKeys.contains(key)) {
             return;
         }
-        KeyCode pause = gameController.getSettings().getKey(KeyAction.PAUSE);
-        KeyCode inventory = gameController.getSettings().getKey(KeyAction.INVENTORY);
-        KeyCode hideOrShowPortraits = gameController.getSettings().getKey(KeyAction.HIDE_PORTRAITS);
-        KeyCode layerUp = gameController.getSettings().getKey(KeyAction.LAYER_UP);
-        KeyCode layerDown = gameController.getSettings().getKey(KeyAction.LAYER_DOWN);
+        KeyCode pause = controller.getSettings().getKey(KeyAction.PAUSE);
+        KeyCode inventory = controller.getSettings().getKey(KeyAction.INVENTORY);
+        KeyCode hideOrShowPortraits = controller.getSettings().getKey(KeyAction.HIDE_PORTRAITS);
+        KeyCode layerUp = controller.getSettings().getKey(KeyAction.LAYER_UP);
+        KeyCode layerDown = controller.getSettings().getKey(KeyAction.LAYER_DOWN);
         if (key == ESCAPE) {
-            ImageCursor main = gameController.getCursor().getMain();
-            gameController.setCursor(main);
+            ImageCursor main = controller.getCursor().getMain();
+            controller.setCursor(main);
         } else if (key == hideOrShowPortraits) {
             e.consume();
             switchPortraits();
@@ -532,7 +532,7 @@ public class GameView extends CanvasView {
     }
 
     private void switchPortraits() {
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         boolean isShowBar = settings.isShowBar();
         settings.setShowBar(!isShowBar);
         if (isShowBar) {
@@ -632,8 +632,8 @@ public class GameView extends CanvasView {
     }
 
     private void handlePause() {
-        boolean isGame = gameController.isGame();
-        gameController.setGame(!isGame);
+        boolean isGame = controller.isGame();
+        controller.setGame(!isGame);
     }
 
     private void openInventory() {
@@ -666,7 +666,7 @@ public class GameView extends CanvasView {
         }
         int locWidth = (int) (controller.getCurrentLocation().getWidth() * Sizes.getMeter());
         int locHeight = (int) (controller.getCurrentLocation().getHeight() * Sizes.getMeter());
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         int resWidth = settings.getHorizontalResolution();
         int resHeight = settings.getVerticalResolution();
         int sceneWidth = (int) canvas.getScene().getWidth();

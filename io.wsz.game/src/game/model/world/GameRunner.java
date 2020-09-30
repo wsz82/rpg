@@ -9,7 +9,6 @@ import game.view.world.inventory.ContainerViewElement;
 import game.view.world.inventory.DropViewElement;
 import game.view.world.inventory.HoldViewElement;
 import game.view.world.inventory.InventoryView;
-import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
@@ -45,21 +44,19 @@ public class GameRunner {
     private final List<Equipment> sortedHoldEquipment = new ArrayList<>(0);
     private final List<Equipment> sortedContainerEquipment = new ArrayList<>(0);
     private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
-    private final GameController gameController;
-    private final Controller controller;
+    private final GameController controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
     private final AtomicBoolean areImagesReloaded = new AtomicBoolean(false);
 
     private Thread gameThread;
 
-    public GameRunner(GameController gameController) {
-        this.gameController = gameController;
-        controller = gameController.getController();
+    public GameRunner(GameController controller) {
+        this.controller = controller;
         itemsSorterWhenDialogStarts = this::sortMapItems;
     }
 
     public void startGame(SaveMemento memento) {
-        gameController.setGame(false);
+        controller.setGame(false);
 
         if (memento == null) {
             loadNewGame();
@@ -71,17 +68,17 @@ public class GameRunner {
     }
 
     public void resumeGame() {
-        gameController.setGame(true);
+        controller.setGame(true);
     }
 
     private void reloadImages() {
         Sizes.setReloadImages(false);
-        gameController.setGame(false);
+        controller.setGame(false);
         Task<String> loader = new Loader();
-        gameController.showLoaderView(loader);
+        controller.showLoaderView(loader);
         new Thread(loader).start();
         loader.setOnSucceeded(e -> {
-            gameController.setGame(true);
+            controller.setGame(true);
             if (gameThread == null) {
                 runGameThread();
             }
@@ -94,7 +91,7 @@ public class GameRunner {
                 long modelStart = System.currentTimeMillis();
                 controller.getLogger().logTimeBetweenModelStarts(modelStart);
 
-                if (!gameController.isGame()) {
+                if (!controller.isGame()) {
                     continue;
                 }
                 synchronized (this) {
@@ -103,7 +100,7 @@ public class GameRunner {
 
                 Platform.runLater(() -> {
                     synchronized (this) {
-                        if (!gameController.isGame()) {
+                        if (!controller.isGame()) {
                             return;
                         }
                         controller.getLogger().logTimeBetweenViewStarts();
@@ -130,10 +127,10 @@ public class GameRunner {
     }
 
     private void updateModel() {
-        if (!gameController.isGame()) {
+        if (!controller.isGame()) {
             return;
         }
-        if (gameController.isDialog()) {
+        if (controller.isDialog()) {
             return;
         }
 
@@ -156,7 +153,7 @@ public class GameRunner {
 
             sortContainerViewEquipment();
 
-            if (gameController.getSettings().isPauseOnInventory()) {
+            if (controller.getSettings().isPauseOnInventory()) {
                 return;
             }
         }
@@ -197,7 +194,7 @@ public class GameRunner {
     private void sortContainerViewEquipment() {
         Container containerToOpen = controller.getContainerToOpen();
         if (containerToOpen == null) return;
-        ContainerViewElement containerView = gameController.getGameView().getInventoryView().getContainerView();
+        ContainerViewElement containerView = controller.getGameView().getInventoryView().getContainerView();
         Coords curPos = containerView.getCurPos();
         double viewWidth = containerView.getViewWidth();
         double viewHeight = containerView.getViewHeight();
@@ -208,7 +205,7 @@ public class GameRunner {
     }
 
     private void sortHoldViewEquipment() {
-        HoldViewElement holdView = gameController.getGameView().getInventoryView().getHoldView();
+        HoldViewElement holdView = controller.getGameView().getInventoryView().getHoldView();
         Coords curPos = holdView.getCurPos();
         double viewWidth = holdView.getViewWidth();
         double viewHeight = holdView.getViewHeight();
@@ -230,7 +227,7 @@ public class GameRunner {
     private void sortMapItems() {
         Location location = controller.getCurrentLocation().getLocation();
         int level = controller.getCurrentLayer().getLevel();
-        GameView gameView = gameController.getGameView();
+        GameView gameView = controller.getGameView();
         double screenWidth = gameView.getWidth();
         double screenHeight = gameView.getHeight();
         Coords curPos = controller.getCurPos();
@@ -260,7 +257,7 @@ public class GameRunner {
     private void sortDropViewItems() {
         Creature cr = controller.getCreatureToOpenInventory();
         Location loc = cr.getPos().getLocation();
-        DropViewElement dropView = gameController.getGameView().getInventoryView().getDropView();
+        DropViewElement dropView = controller.getGameView().getInventoryView().getDropView();
         Coords curPos = dropView.getCurPos();
         double viewWidth = dropView.getViewWidth();
         double viewHeight = dropView.getViewHeight();
@@ -291,7 +288,7 @@ public class GameRunner {
 
 
     private void updateHoveredHeroBaseAnimation() {
-        Creature hoveredHero = gameController.getHoveredHero();
+        Creature hoveredHero = controller.getHoveredHero();
         if (hoveredHero != null) {
             hoveredHero.getBaseAnimationPos().setBaseAnimationType(CreatureBaseAnimationType.ACTION);
         }
@@ -330,7 +327,7 @@ public class GameRunner {
             return;
         }
 
-        gameController.setDialog(true);
+        controller.setDialog(true);
     }
 
     private void addItems(Location location) {
@@ -375,13 +372,13 @@ public class GameRunner {
         if (!areImagesReloaded.get()) {
             return;
         }
-        gameController.refreshGame(sortedMapItems);
-        GameView gameView = gameController.getGameView();
+        controller.refreshGame(sortedMapItems);
+        GameView gameView = controller.getGameView();
         if (controller.isInventory()) {
             BarView barView = gameView.getBarView();
             barView.forceRefresh();
             refreshInventory(gameView);
-        } else if (gameController.isDialog()) {
+        } else if (controller.isDialog()) {
             refreshDialog(gameView);
         }
     }
@@ -404,18 +401,18 @@ public class GameRunner {
 
     private void loadSave(SaveMemento memento) {
         LATER_RUN_BUFFER.clear();
-        gameController.restoreSaveMemento(memento);
-        gameController.initLoadedGameSettings(memento);
+        controller.restoreSaveMemento(memento);
+        controller.initLoadedGameSettings(memento);
         controller.initLoadGameHeroes(memento.getHeroes());
     }
 
     private void loadNewGame() {
         LATER_RUN_BUFFER.clear();
-        gameController.restoreActivePlugin();
-        gameController.initNewGameSettings();
+        controller.restoreActivePlugin();
+        controller.initNewGameSettings();
         controller.initNewGameHeroes();
         controller.setDialogMemento(null);
-        gameController.setDialog(false);
+        controller.setDialog(false);
     }
 
     private class Loader extends Task<String> {
@@ -431,7 +428,7 @@ public class GameRunner {
             updateProgress(0, total);
 
             File programDir = controller.getProgramDir();
-            gameController.getCursor().initCursorsImages(programDir);
+            controller.getCursor().initCursorsImages(programDir);
 
             Fog fog = controller.getFog();
             fog.initAllFogs(programDir);

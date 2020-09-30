@@ -37,8 +37,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameController {
-    private final Controller controller;
+public class GameController extends Controller {
     private final Cursor cursor = new Cursor();
     private final ObservableList<String> saves = FXCollections.observableArrayList();
     private final AtomicBoolean isGame = new AtomicBoolean();
@@ -51,13 +50,11 @@ public class GameController {
     private Creature hoveredHero;
     private Equipment dragged;
 
-    public GameController(Controller controller) {
-        this.controller = controller;
-        restoreSettings();
+    public GameController() {
     }
 
     public boolean startGame(SaveMemento memento) {
-        if (controller.getModel().getActivePluginMetadata() == null) {
+        if (model.getActivePluginMetadata() == null) {
             return false;
         }
         if (gameRunner == null) {
@@ -73,16 +70,14 @@ public class GameController {
     }
 
     public void restoreLastPluginMetadata() {
-        File programDir = controller.getProgramDir();
         LastPluginCaretaker lpc = new LastPluginCaretaker(programDir);
         String lastPluginName = lpc.loadMemento();
-        PluginMetadata loadedMetadata = controller.loadPluginMetadata(lastPluginName);
+        PluginMetadata loadedMetadata = loadPluginMetadata(lastPluginName);
         if (loadedMetadata == null) return;
-        controller.getModel().setActivePluginMetadata(loadedMetadata);
+        model.setActivePluginMetadata(loadedMetadata);
     }
 
     public void storeLastPluginName(PluginMetadata metadata) {
-        File programDir = controller.getProgramDir();
         LastPluginCaretaker pc = new LastPluginCaretaker(programDir);
         String pluginName = metadata.getPluginName();
         pc.saveMemento(pluginName);
@@ -92,10 +87,10 @@ public class GameController {
     public SaveMemento loadSaveMemento(String name, File programDir) {
         SaveCaretaker sc = new SaveCaretaker(programDir);
         SaveMemento memento = sc.loadMemento(name);
-        controller.getHeroes().addAll(memento.getHeroes());
+        getHeroes().addAll(memento.getHeroes());
         DialogMemento dialogMemento = memento.getDialogMemento();
         if (dialogMemento != null) {
-            controller.setDialogMemento(dialogMemento);
+            setDialogMemento(dialogMemento);
             setDialog(true);
             restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getNpc());
         }
@@ -103,19 +98,19 @@ public class GameController {
     }
 
     private void restoreAskingAndAnswering(Creature asking, PosItem answering) {
-        List<Location> locations = controller.getLocations();
+        List<Location> locations = getLocations();
         boolean askingSet = false;
         boolean answeringSet = false;
         for (Location l : locations) {
             for (PosItem pi : l.getItems()) {
                 if (!askingSet && asking.equals(pi)) {
                     Creature cr = (Creature) pi;
-                    controller.setDialogNpc(cr);
+                    setDialogNpc(cr);
                     askingSet = true;
                     continue;
                 }
                 if (!answeringSet && answering.equals(pi)) {
-                    controller.setAnswering(pi);
+                    setAnswering(pi);
                     answeringSet = true;
                 }
             }
@@ -139,10 +134,10 @@ public class GameController {
             name = createUniqueName(name);
             getSavesList().add(name);
         }
-        savedPos.setLocation(controller.getCurrentLocation().getLocation());
-        savedPos.level = controller.getCurrentLayer().getLevel();
-        SaveMemento memento = new SaveMemento(name, savedPos, controller.getHeroes(), controller.getDialogMemento());
-        memento.setWorld(controller.getActivePlugin().getWorld());
+        savedPos.setLocation(getCurrentLocation().getLocation());
+        savedPos.level = getCurrentLayer().getLevel();
+        SaveMemento memento = new SaveMemento(name, savedPos, getHeroes(), getDialogMemento());
+        memento.setWorld(getActivePlugin().getWorld());
         SaveCaretaker sc = new SaveCaretaker(programDir);
         sc.makeSave(memento);
     }
@@ -165,13 +160,12 @@ public class GameController {
         getSavesList().addAll(savesNames);
     }
 
-    private void restoreSettings() {
-        File programDir = controller.getProgramDir();
+    public void restoreSettings() {
         SettingMemento memento = loadSettingsMemento(programDir);
         this.settings = memento.getSettings();
-        settings.setMeter(settings.getHorizontalResolution(), controller);
-        settings.setVerticalMeter(settings.getVerticalResolution(), controller);
-        Sizes.setResizeWithResolution(memento.isResizeWithResolution(), controller);
+        settings.setMeter(settings.getHorizontalResolution(), this);
+        settings.setVerticalMeter(settings.getVerticalResolution(), this);
+        Sizes.setResizeWithResolution(memento.isResizeWithResolution(), this);
         setLocale(settings.getLanguage());
     }
 
@@ -186,11 +180,10 @@ public class GameController {
         fillProperties(defaultProperties, Paths.ENGLISH);
         Properties localeProperties = new Properties(defaultProperties);
         fillProperties(localeProperties, locale);
-        controller.setLocale(localeProperties);
+        setLocale(localeProperties);
     }
 
     private void fillProperties(Properties properties, String locale) {
-        File programDir = controller.getProgramDir();
         String localePath = programDir + Paths.LOCALE_DIR + File.separator + locale + Paths.DOT_PROPERTIES;
         Reader in = null;
         try {
@@ -214,7 +207,6 @@ public class GameController {
     }
 
     public void restoreSaveMemento(SaveMemento m) {
-        Model model = controller.getModel();
         Plugin activePlugin = model.getActivePlugin();
         if (activePlugin == null) {
             activePlugin = getLoadedPluginFromMetadata(model);
@@ -230,7 +222,7 @@ public class GameController {
     }
 
     private void setCurPos(Coords lastPos) {
-        Coords curPos = controller.getCurPos();
+        Coords curPos = getCurPos();
         curPos.x = lastPos.x;
         curPos.y = lastPos.y;
         curPos.level = lastPos.level;
@@ -241,11 +233,10 @@ public class GameController {
 
         List<Asset> assets = world.getAssets();
         List<Location> locations = world.getLocations();
-        controller.restoreItemsReferences(assets, locations, world);
+        restoreItemsReferences(assets, locations, world);
     }
 
     public void restoreActivePlugin() {
-        Model model = controller.getModel();
         Plugin plugin = getLoadedPluginFromMetadata(model);
         if (plugin == null) return;
         model.setActivePlugin(plugin);
@@ -259,14 +250,14 @@ public class GameController {
         PluginMetadata metadata = model.getActivePluginMetadata();
         if (metadata == null) return null;
         String pluginName = metadata.getPluginName();
-        PluginCaretaker caretaker = new PluginCaretaker(controller.getProgramDir());
+        PluginCaretaker caretaker = new PluginCaretaker(programDir);
         return caretaker.deserialize(pluginName);
     }
 
     private void restoreStartLocationAndLayer(Coords startPos) {
-        controller.restoreLocationOfCoords(startPos);
+        restoreLocationOfCoords(startPos);
         Location first = startPos.getLocation();
-        controller.getCurrentLocation().setLocation(first);
+        getCurrentLocation().setLocation(first);
 
         int serLevel = startPos.level;
         Optional<Layer> optLayer = first.getLayers().stream()
@@ -276,21 +267,21 @@ public class GameController {
         if (startLayer == null) {
             throw new NullPointerException("Start layer \"" + serLevel + "\" does not exist in start location");
         }
-        controller.getCurrentLayer().setLayer(startLayer);
+        getCurrentLayer().setLayer(startLayer);
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
-        Coords curPos = controller.getCurPos();
+        Coords curPos = getCurPos();
         Coords loadedPos = memento.getLastPos();
         curPos.x = loadedPos.x;
         curPos.y = loadedPos.y;
     }
 
     public void initNewGameSettings() {
-        Plugin p = controller.getActivePlugin();
+        Plugin p = getActivePlugin();
         double startX = p.getStartPos().x;
         double startY = p.getStartPos().y;
-        Coords curPos = controller.getPosToCenter();
+        Coords curPos = getPosToCenter();
         curPos.x = startX;
         curPos.y = startY;
     }
@@ -344,7 +335,7 @@ public class GameController {
 
     public void endDialog() {
         setDialog(false);
-        controller.setDialogMemento(null);
+        setDialogMemento(null);
     }
 
     public Creature getHoveredHero() {
@@ -353,10 +344,6 @@ public class GameController {
 
     public void setHoveredHero(Creature hoveredHero) {
         this.hoveredHero = hoveredHero;
-    }
-
-    public Controller getController() {
-        return controller;
     }
 
     public Settings getSettings() {

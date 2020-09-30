@@ -6,7 +6,6 @@ import game.model.setting.SettingMemento;
 import game.model.setting.Settings;
 import game.model.textures.Cursor;
 import game.view.world.board.GameView;
-import io.wsz.model.Controller;
 import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -33,8 +32,7 @@ import java.util.Properties;
 public class GameStage extends Stage {
     private static final KeyCodeCombination CLOSE_GAME = new KeyCodeCombination(KeyCode.F4, KeyCombination.ALT_DOWN);
 
-    private final GameController gameController;
-    private final Controller controller;
+    private final GameController controller;
     private final BorderPane root;
     private final GameView gameView;
 
@@ -47,14 +45,13 @@ public class GameStage extends Stage {
     private ListView<String> loadsView;
     private Button cancel;
 
-    public GameStage(GameController gameController) {
+    public GameStage(GameController controller) {
         super(StageStyle.DECORATED);
-        this.gameController = gameController;
-        this.controller = gameController.getController();
+        this.controller = controller;
         this.root = new BorderPane();
-        this.gameView = new GameView(this, gameController);
-        gameController.setGameStage(this);
-        gameController.setGameView(gameView);
+        this.gameView = new GameView(this, controller);
+        controller.setGameStage(this);
+        controller.setGameView(gameView);
     }
 
     public void init() {
@@ -82,7 +79,7 @@ public class GameStage extends Stage {
     }
 
     private void setCustomCursor(Scene scene) {
-        Cursor cursor = gameController.getCursor();
+        Cursor cursor = controller.getCursor();
         cursor.initCursorsImages(controller.getProgramDir());
         ImageCursor imageCursor = cursor.getMain();
         scene.setCursor(imageCursor);
@@ -103,11 +100,11 @@ public class GameStage extends Stage {
                 }
                 root.setCenter(parentToReturn);
                 if (parentToReturn == gameMenu) {
-                    gameController.setGame(false);
+                    controller.setGame(false);
                     Sizes.setTimeOfMenuOpen(System.currentTimeMillis());
                     setGameMenuForCenter();
                 } else if (parentToReturn == gameView.getCanvas()) {
-                    gameController.resumeGame();
+                    controller.resumeGame();
                 }
             }
         };
@@ -180,13 +177,13 @@ public class GameStage extends Stage {
         } else {
             parent = SettingsParent.GAME_MENU;
         }
-        final SettingsMenu settingsMenu = new SettingsMenu(this, gameController, parent);
+        final SettingsMenu settingsMenu = new SettingsMenu(this, controller, parent);
         root.setCenter(settingsMenu);
         settingsMenu.open(root);
     }
 
     private void startNewGame() {
-        gameController.restoreLastPluginMetadata();
+        controller.restoreLastPluginMetadata();
         startGame(null);
     }
 
@@ -196,7 +193,7 @@ public class GameStage extends Stage {
         final VBox menu = new VBox(10);
         menu.setAlignment(Pos.CENTER);
         final Button resume = new Button(locale.getProperty(LocaleKeys.RESUME));
-        resume.setOnAction(event -> gameController.resumeGame());
+        resume.setOnAction(event -> controller.resumeGame());
         final Button saveMenu = new Button(locale.getProperty(LocaleKeys.SAVE_GAME));
         saveMenu.setOnAction(event -> openSaveListToSave());
         final Button loadMenu = new Button(locale.getProperty(LocaleKeys.LOAD_GAME));
@@ -231,7 +228,7 @@ public class GameStage extends Stage {
     }
 
     private void initSavesList(File programDir) {
-        gameController.initSavesList(programDir);
+        controller.initSavesList(programDir);
     }
 
     private void initLoadsView() {
@@ -297,7 +294,7 @@ public class GameStage extends Stage {
     }
 
     private void startGame(SaveMemento memento) {
-        boolean gameStarted = gameController.startGame(memento);
+        boolean gameStarted = controller.startGame(memento);
         if (!gameStarted) {
             alertNoGame();
         }
@@ -347,35 +344,35 @@ public class GameStage extends Stage {
     }
 
     private void initSavesListView() {
-        savesView = new ListView<>(gameController.getSavesList());
+        savesView = new ListView<>(controller.getSavesList());
         savesView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     private void initLoadsListView() {
-        loadsView = new ListView<>(gameController.getSavesList());
+        loadsView = new ListView<>(controller.getSavesList());
         loadsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     private void loadSave() {
         String name = loadsView.getSelectionModel().getSelectedItem();
-        SaveMemento memento = gameController.loadSaveMemento(name, controller.getProgramDir());
+        SaveMemento memento = controller.loadSaveMemento(name, controller.getProgramDir());
         startGame(memento);
     }
 
     private void deleteSave() {
         String name = savesView.getSelectionModel().getSelectedItem();
-        gameController.deleteGameSave(name, controller.getProgramDir());
+        controller.deleteGameSave(name, controller.getProgramDir());
     }
 
     private void saveGame(boolean overwrite, String name) {
         Coords curPos = controller.getCurPos();
         File programDir = controller.getProgramDir();
-        gameController.saveGame(overwrite, name, curPos, programDir);
-        gameController.resumeGame();
+        controller.saveGame(overwrite, name, curPos, programDir);
+        controller.resumeGame();
     }
 
     private void restoreSettings() {
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         boolean isFullScreen = settings.isFullScreen();
         setFullScreen(isFullScreen);
         if (!isFullScreen) {
@@ -388,7 +385,7 @@ public class GameStage extends Stage {
 
     private void storeSettings() {
         SettingMemento memento = new SettingMemento();
-        Settings settings = gameController.getSettings();
+        Settings settings = controller.getSettings();
         boolean isFullScreen = isFullScreen();
         settings.setFullScreen(isFullScreen);
         if (!isFullScreen) {
@@ -397,7 +394,7 @@ public class GameStage extends Stage {
             settings.setWindowWidth(getWidth());
             settings.setWindowHeight(getHeight());
         }
-        gameController.saveSettings(controller.getProgramDir(), memento);
+        controller.saveSettings(controller.getProgramDir(), memento);
     }
 
     @Override

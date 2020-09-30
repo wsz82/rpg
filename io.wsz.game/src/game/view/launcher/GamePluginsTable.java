@@ -1,7 +1,6 @@
 package game.view.launcher;
 
 import game.model.GameController;
-import io.wsz.model.Controller;
 import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.plugin.PluginMetadata;
 import javafx.beans.binding.ObjectBinding;
@@ -26,13 +25,11 @@ import java.util.Properties;
 public class GamePluginsTable extends Stage {
     private final ChoiceBox<PluginMetadata> activePluginCB = new ChoiceBox<>();
     private final ObservableList<PluginMetadata> metadatas = FXCollections.observableArrayList();
-    private final GameController gameController;
-    private final Controller controller;
+    private final GameController controller;
 
-    public GamePluginsTable(GameController gameController) {
+    public GamePluginsTable(GameController controller) {
         super(StageStyle.UTILITY);
-        this.gameController = gameController;
-        controller = gameController.getController();
+        this.controller = controller;
         List<PluginMetadata> pluginMetadatas = controller.getPluginMetadatas();
         metadatas.addAll(pluginMetadatas);
         initWindow();
@@ -87,7 +84,7 @@ public class GamePluginsTable extends Stage {
             return;
         }
         controller.getModel().setActivePluginMetadata(pluginMetadataToActivate);
-        gameController.storeLastPluginName(pluginMetadataToActivate);
+        controller.storeLastPluginName(pluginMetadataToActivate);
         close();
     }
 

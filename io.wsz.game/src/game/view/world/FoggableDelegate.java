@@ -27,8 +27,8 @@ public class FoggableDelegate implements Foggable{
 
     private Coords viewPos;
 
-    public FoggableDelegate(GameController gameController, Canvas canvas, Coords curPos) {
-        this.controller = gameController.getController();
+    public FoggableDelegate(GameController controller, Canvas canvas, Coords curPos) {
+        this.controller = controller;
         this.gc = canvas.getGraphicsContext2D();
         this.curPos = curPos;
         this.viewPos = new Coords(0, 0);

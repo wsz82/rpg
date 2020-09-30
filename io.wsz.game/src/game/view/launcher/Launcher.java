@@ -33,7 +33,7 @@ class Launcher {
         final StackPane root = new StackPane();
         root.setPadding(new Insets(10));
 
-        Properties locale = gameController.getController().getLocale();
+        Properties locale = gameController.getLocale();
         final VBox menu = new VBox(10);
         final Button play = new Button(locale.getProperty(LocaleKeys.START_GAME));
         play.setOnAction(event -> play(gameController));

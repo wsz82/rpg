@@ -81,7 +81,7 @@ public abstract class InventoryViewElement extends CanvasView {
     }
 
     protected double getScrollSpeed() {
-        return gameController.getSettings().getDialogScrollSpeed();
+        return controller.getSettings().getDialogScrollSpeed();
     }
 
     public void setSize(double width, double height) {

@@ -1,7 +1,6 @@
 package game.view.launcher;
 
 import game.model.GameController;
-import io.wsz.model.Controller;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -11,11 +10,11 @@ import java.net.URISyntaxException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
-        Controller controller = new Controller();
+        GameController gameController = new GameController();
         File programDir = getProgramDir();
-        controller.setProgramDir(programDir);
-        controller.initNewModel();
-        GameController gameController = new GameController(controller);
+        gameController.setProgramDir(programDir);
+        gameController.initNewModel();
+        gameController.restoreSettings();
         Launcher launcher = new Launcher(stage);
         launcher.launch(gameController);
     }

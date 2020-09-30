@@ -3,7 +3,6 @@ package game.view.world;
 import game.model.GameController;
 import game.model.textures.Cursor;
 import game.model.world.ItemsSorter;
-import io.wsz.model.Controller;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
@@ -31,8 +30,7 @@ public abstract class CanvasView {
 
     protected final Canvas canvas;
     protected final GraphicsContext gc;
-    protected final GameController gameController;
-    protected final Controller controller;
+    protected final GameController controller;
     protected final Board board;
     protected final List<Creature> visibleControllables = new ArrayList<>(0);
     protected final CursorSetter cursorSetter;
@@ -41,14 +39,13 @@ public abstract class CanvasView {
     protected boolean isCursorOnCountable;
     protected int countableAmount;
 
-    public CanvasView(Canvas canvas, GameController gameController) {
+    public CanvasView(Canvas canvas, GameController controller) {
         this.canvas = canvas;
-        this.gameController = gameController;
-        controller = gameController.getController();
+        this.controller = controller;
         board = controller.getBoard();
         gc = canvas.getGraphicsContext2D();
         cursorSetter = type -> {
-            gameController.getCursor().setCursor(type);
+            controller.getCursor().setCursor(type);
             if (type.isShowAmount()) {
                 isCursorOnCountable = true;
                 countableAmount = type.getAmount();
@@ -147,7 +144,7 @@ public abstract class CanvasView {
         if (pos.x < minX || pos.y < minY || pos.x > maxX || pos.y > maxY) {
             return;
         }
-        Cursor cursor = gameController.getCursor();
+        Cursor cursor = controller.getCursor();
         PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
 
         if (selected == null) {
