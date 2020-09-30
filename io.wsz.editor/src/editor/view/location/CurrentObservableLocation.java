@@ -1,7 +1,8 @@
-package io.wsz.model.location;
+package editor.view.location;
 
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
+import io.wsz.model.location.Location;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

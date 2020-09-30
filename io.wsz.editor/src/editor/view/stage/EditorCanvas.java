@@ -2,16 +2,15 @@ package editor.view.stage;
 
 import editor.model.EditorController;
 import editor.view.content.ContentTableView;
+import editor.view.location.CurrentObservableLocation;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -194,9 +193,11 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.RIGHT
                     || e.getCode() == KeyCode.LEFT) {
                 PosItem active = controller.getActiveItem();
-                moveContent(e.getCode(), active);
-                contentTableView.refresh();
-                refresh();
+                if (active != null) {
+                    moveContent(e.getCode(), active);
+                    contentTableView.refresh();
+                    refresh();
+                }
             }
         };
         addEventHandler(KeyEvent.KEY_PRESSED, arrowsEvent);
@@ -221,7 +222,7 @@ public class EditorCanvas extends Canvas {
             int meter = Sizes.getMeter();
             double xPos = e.getX() / meter;
             double yPos = e.getY() / meter;
-            selectedItem = getPosItem(xPos, yPos);
+            selectedItem = getItemAtPos(xPos, yPos);
         }
         if (selectedItem != null && !selectedItem.isBlocked()) {
             controller.setActiveItem(selectedItem);
@@ -258,19 +259,10 @@ public class EditorCanvas extends Canvas {
             if (!c.next()) {
                 return;
             }
-            if (c.wasAdded() || c.wasRemoved()) {
-                List<PosItem> addedContent = (List<PosItem>) c.getAddedSubList();
-                hookupItemsEvents(addedContent);
-            }
             refresh();
         };
         CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
         currentObservableLocation.getItems().addListener(locationListener);
-        currentObservableLocation.locationProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<PosItem> items = currentObservableLocation.getItems();
-            hookupItemsEvents(items);
-            items.addListener(locationListener);
-        });
     }
 
     private void hookUpItemDragEvents() {
@@ -280,7 +272,7 @@ public class EditorCanvas extends Canvas {
                 e.consume();
                 double xPos = e.getX() / meter;
                 double yPos = e.getY() / meter;
-                PosItem selectedItem = getPosItem(xPos, yPos);
+                PosItem selectedItem = getItemAtPos(xPos, yPos);
                 if (selectedItem == null || selectedItem.isBlocked()) {
                     return;
                 }
@@ -329,21 +321,18 @@ public class EditorCanvas extends Canvas {
         });
     }
 
-    private PosItem getPosItem(double xPos, double yPos) {
-        PosItem pi;
+    private PosItem getItemAtPos(double xPos, double yPos) {
         int level = controller.getCurrentObservableLayer().getLevel();
-        Coords pos = new Coords(
-                xPos, yPos,
-                level,
-                controller.getCurrentObservableLocation().getLocation());
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
+        Location location = currentObservableLocation.getLocation();
+        Coords pos = new Coords(xPos, yPos, level, location);
         Coords translated = pos.clonePos();
         translated.add(curPos);
         double x = translated.x;
         double y = translated.y;
         ItemType[] types = ItemType.values();
-        Location location = controller.getCurrentObservableLocation().getLocation();
-        pi = controller.getBoard().lookForItem(location.getItems(), x, y, level, types, true);
-        return pi;
+        List<PosItem> items = currentObservableLocation.getItems();
+        return controller.getBoard().lookForItem(items, x, y, level, types, true);
     }
 
     private void hookUpScreenDragEvents() {
@@ -386,14 +375,6 @@ public class EditorCanvas extends Canvas {
         };
         addEventHandler(MouseDragEvent.DRAG_DETECTED, startScreenDrag);
         addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressScreenDrag);
-    }
-
-    private void hookupItemsEvents(List<PosItem> addedItems) {
-        for (PosItem pi : addedItems) {
-            pi.isVisibleProperty().addListener((observable, oldValue, newValue) -> {
-                refresh();
-            });
-        }
     }
 
     private void openContextMenu(PosItem pi, MouseEvent e) {
@@ -474,7 +455,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void removeItem(PosItem pi) {
-        controller.getModel().getCurrentLocation().getItems().remove(pi);
+        controller.getCurrentObservableLocation().getItems().remove(pi);
         refresh();
     }
 

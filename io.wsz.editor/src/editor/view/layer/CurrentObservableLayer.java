@@ -1,5 +1,6 @@
-package io.wsz.model.layer;
+package editor.view.layer;
 
+import io.wsz.model.layer.Layer;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 

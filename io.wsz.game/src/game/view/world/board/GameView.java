@@ -31,10 +31,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.wsz.model.item.CreatureControl.CONTROL;
 import static io.wsz.model.item.CreatureControl.CONTROLLABLE;
@@ -57,7 +55,6 @@ public class GameView extends CanvasView {
     private final Coords curPos;
     private final FoggableDelegate foggableDelegate;
 
-    private List<Layer> layers;
     private long nextAvailableClickTime;
     private EventHandler<MouseEvent> clickEvent;
     private EventHandler<KeyEvent> keyboardEvent;
@@ -429,11 +426,6 @@ public class GameView extends CanvasView {
             }
         });
 
-        //TODO fix
-//        controller.getModel().getCurrentLocation().locationProperty().addListener(observable -> {
-//            layers = getSortedLayers();
-//        });
-
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
             controller.reloadInventoryPictures();
         });
@@ -540,7 +532,9 @@ public class GameView extends CanvasView {
 
     private void changeToLayerDown() {
         Layer layer = controller.getCurrentLayer();
+        if (layer == null) return;
         Layer prev = layer;
+        List<Layer> layers = getSortedLayers();
         for (int i = 1; i < layers.size(); i++) {
             Layer current = layers.get(i);
             if (current == layer) {
@@ -552,7 +546,9 @@ public class GameView extends CanvasView {
 
     private void changeToLayerUp() {
         Layer layer = controller.getCurrentLayer();
+        if (layer == null) return;
         Layer next = layer;
+        List<Layer> layers = getSortedLayers();
         for (int i = 0; i < layers.size() - 1; i++) {
             Layer current = layers.get(i);
             if (current == layer) {
@@ -703,11 +699,9 @@ public class GameView extends CanvasView {
     }
 
     private List<Layer> getSortedLayers() {
-        List<Layer> layers = new ArrayList<>(controller.getCurrentLocation().getLayers());
-        return layers.stream()
-                .distinct()
-                .sorted(Comparator.comparingInt(Layer::getLevel))
-                .collect(Collectors.toList());
+        List<Layer> layers = controller.getCurrentLocation().getLayers();
+        layers.sort(Comparator.comparingInt(Layer::getLevel));
+        return layers;
     }
 
     public Canvas getCanvas() {

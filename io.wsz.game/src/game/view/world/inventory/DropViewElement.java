@@ -5,7 +5,7 @@ import game.view.world.FoggableDelegate;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.location.CurrentObservableLocation;
+import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -51,16 +51,16 @@ public class DropViewElement extends EquipmentViewElement {
         if (isMouseNotWithinView()) return;
         Coords localCoords = getLocalCoords();
         Creature creatureToOpenInventory = controller.getCreatureToOpenInventory();
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
-        double width = currentObservableLocation.getWidth();
-        double height = currentObservableLocation.getHeight();
+        Location currentLocation = controller.getCurrentLocation();
+        double width = currentLocation.getWidth();
+        double height = currentLocation.getHeight();
         setAppropriateCursor(creatureToOpenInventory, localCoords, 0, 0, width, height, getSortedEquipment());
     }
 
     private void updateCurPos() {
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
-        double maxCurPosX = currentObservableLocation.getWidth() - viewWidth;
-        double maxCurPosY = currentObservableLocation.getHeight() - viewHeight;
+        Location currentLocation = controller.getCurrentLocation();
+        double maxCurPosX = currentLocation.getWidth() - viewWidth;
+        double maxCurPosY = currentLocation.getHeight() - viewHeight;
         if (curPos.x < 0) {
             curPos.x = 0;
         } else if (curPos.x > maxCurPosX){

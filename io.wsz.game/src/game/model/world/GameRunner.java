@@ -13,7 +13,6 @@ import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
-import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
@@ -162,7 +161,7 @@ public class GameRunner {
         controller.getHeroes().stream()
                 .map(h -> h.getPos().getLocation())
                 .collect(Collectors.toCollection(() -> heroesLocations));
-        Location currentLocation = controller.getCurrentLocation().getLocation();
+        Location currentLocation = controller.getCurrentLocation();
         heroesLocations.add(currentLocation);
 
         for (Location l : heroesLocations) {
@@ -225,7 +224,7 @@ public class GameRunner {
     }
 
     private void sortMapItems() {
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         int level = controller.getCurrentLayer().getLevel();
         GameView gameView = controller.getGameView();
         double screenWidth = gameView.getWidth();
@@ -358,11 +357,9 @@ public class GameRunner {
         Location locationToUpdate = controller.getLocationToUpdate();
         if (locationToUpdate != null) {
             controller.setLocationToUpdate(null);
-            CurrentObservableLocation cl = controller.getCurrentLocation();
-            Location l = cl.getLocation();
-            if (!l.getId().equals(locationToUpdate.getId())) {
-                cl.setLocation(locationToUpdate);
-
+            Location currentLocation = controller.getCurrentLocation();
+            if (!currentLocation.getId().equals(locationToUpdate.getId())) {
+                controller.setCurrentLocation(locationToUpdate);
                 Sizes.setReloadImages(true);
             }
         }
@@ -418,8 +415,8 @@ public class GameRunner {
     private class Loader extends Task<String> {
         @Override
         protected String call() throws Exception {
-            CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
-            List<PosItem> items = currentObservableLocation.getItems();
+            Location currentLocation = controller.getCurrentLocation();
+            List<PosItem> items = currentLocation.getItems();
             Set<PosItem> assets = getAssets(items);
 
             CreatureBase[] bases = CreatureBase.getBases();
@@ -435,8 +432,7 @@ public class GameRunner {
             i++;
             updateProgress(i, total);
 
-            Location location = currentObservableLocation.getLocation();
-            location.initDiscoveredFog(fog, fog.getHalfFogSize());
+            currentLocation.initDiscoveredFog(fog, fog.getHalfFogSize());
 
             for (CreatureBase base : bases) {
                 base.initAnimation(programDir);

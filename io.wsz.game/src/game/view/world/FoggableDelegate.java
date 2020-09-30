@@ -40,11 +40,11 @@ public class FoggableDelegate implements Foggable{
     }
 
     public void drawFog(double width, double height) {
-        Location loc = controller.getCurrentLocation().getLocation();
+        Location currentLocation = controller.getCurrentLocation();
         Fog fog = controller.getFog();
         double fogSize = fog.getFogSize();
         double half = fog.getHalfFogSize();
-        List<List<FogStatusWithImage>> discoveredFog = loc.getDiscoveredFog();
+        List<List<FogStatusWithImage>> discoveredFog = currentLocation.getDiscoveredFog();
         if (discoveredFog == null) return;
         List<FogStatusWithImage> firstRow = discoveredFog.get(0);
         int widthPieces = firstRow.size();

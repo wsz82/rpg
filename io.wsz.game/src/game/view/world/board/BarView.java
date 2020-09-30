@@ -117,7 +117,7 @@ public class BarView {
             return;
         }
         if (!multiple) {
-            Location location = controller.getCurrentLocation().getLocation();
+            Location location = controller.getCurrentLocation();
             controller.getBoard().looseCreaturesControl(location);
         }
         resolveCreatureControlAndLocation(portraits.get(i));
@@ -125,7 +125,7 @@ public class BarView {
 
     private void resolveHeroControlAndLocation(boolean multiple, int hoveredPortrait) {
         if (!multiple){
-            Location location = controller.getCurrentLocation().getLocation();
+            Location location = controller.getCurrentLocation();
             controller.getBoard().looseCreaturesControl(location);
         }
         if (portraits.isEmpty()) return;
@@ -150,7 +150,7 @@ public class BarView {
         } else {
             controller.getCreaturesToLooseControl().add(cr);
         }
-        Location current = controller.getCurrentLocation().getLocation();
+        Location current = controller.getCurrentLocation();
         Location heroLocation = cr.getPos().getLocation();
         if (current != heroLocation) {
             controller.setLocationToUpdate(heroLocation);

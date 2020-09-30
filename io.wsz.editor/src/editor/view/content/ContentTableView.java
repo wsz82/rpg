@@ -2,11 +2,11 @@ package editor.view.content;
 
 import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
+import editor.view.location.CurrentObservableLocation;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
@@ -32,6 +33,13 @@ public class ContentTableView extends TableView<PosItem> {
     public ContentTableView(EditorCanvas editorCanvas, EditorController controller) {
         this.editorCanvas = editorCanvas;
         this.controller = controller;
+        hookUpOnClickCanvasRefreshEvent();
+    }
+
+    private void hookUpOnClickCanvasRefreshEvent() {
+        addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+            editorCanvas.refresh();
+        });
     }
 
     public void initTable() {

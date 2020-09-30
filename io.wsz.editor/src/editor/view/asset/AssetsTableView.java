@@ -39,11 +39,8 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         this.parent = parent;
         this.editorCanvas = editorCanvas;
         this.controller = controller;
-        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        initAssetsTable();
         setItems(assets);
-        setUpContextMenu();
-        setEditable(true);
+        initAssetsTable();
         hookupEvents();
     }
 
@@ -94,6 +91,9 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private void initAssetsTable() {
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        setEditable(true);
+
         TableColumn<A, String> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
@@ -137,6 +137,8 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
 
         ObservableList<TableColumn<A, ?>> columns = getColumns();
         columns.addAll(idCol, nameCol, pathCol);
+
+        setUpContextMenu();
     }
 
     private boolean assetIdIsNotUnique(String newValue) {
