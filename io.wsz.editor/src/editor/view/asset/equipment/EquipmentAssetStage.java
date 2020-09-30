@@ -66,14 +66,14 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
 
     private void setUpOccupiedPlaceCB() {
         occupiedPlaceCB.setPrefWidth(100);
-        ObservableList<InventoryPlaceType> origin = editorController.getObservableInventoryPlacesTypes();
+        ObservableList<InventoryPlaceType> origin = controller.getObservableInventoryPlacesTypes();
         ObservableList<InventoryPlaceType> types = FXCollections.observableArrayList(origin);
         types.add(null);
         occupiedPlaceCB.setItems(types);
     }
 
     private void setUpTypeCB() {
-        ObservableList<EquipmentType> equipmentTypes = editorController.getObservableEquipmentTypes();
+        ObservableList<EquipmentType> equipmentTypes = controller.getObservableEquipmentTypes();
         ObservableList<EquipmentType> equipmentTypesWithNull = FXCollections.observableArrayList(equipmentTypes);
         equipmentTypesWithNull.add(null);
         typeCB.setItems(equipmentTypesWithNull);
@@ -86,7 +86,7 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
 
             @Override
             public EquipmentType fromString(String name) {
-                Optional<EquipmentType> optType = editorController.getObservableEquipmentTypes().stream()
+                Optional<EquipmentType> optType = controller.getObservableEquipmentTypes().stream()
                         .filter(t -> t.getId().equals(name))
                         .findFirst();
                 return optType.orElse(null);

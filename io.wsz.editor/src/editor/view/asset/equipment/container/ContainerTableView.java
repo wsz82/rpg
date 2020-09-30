@@ -43,14 +43,14 @@ public class ContainerTableView extends EquipmentTableView<Container> {
         if (c == null) {
             return;
         }
-        ContainerAssetStage as = new ContainerAssetStage(parent, c, false, editorCanvas, editorController);
+        ContainerAssetStage as = new ContainerAssetStage(parent, c, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        ContainerAssetStage as = new ContainerAssetStage(parent, editorCanvas, editorController);
+        ContainerAssetStage as = new ContainerAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -69,7 +69,7 @@ public class ContainerTableView extends EquipmentTableView<Container> {
 
     @Override
     protected void removeAssetFromList(List assetsToRemove) {
-        editorController.getObservableAssets().getContainers().removeAll(assetsToRemove);
+        controller.getObservableAssets().getContainers().removeAll(assetsToRemove);
     }
 
     @Override

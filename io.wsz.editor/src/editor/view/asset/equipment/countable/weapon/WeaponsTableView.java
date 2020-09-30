@@ -65,14 +65,14 @@ public class WeaponsTableView extends EquipmentTableView<Weapon> {
         if (w == null) {
             return;
         }
-        WeaponAssetStage as = new WeaponAssetStage(parent, w, false, editorCanvas, editorController);
+        WeaponAssetStage as = new WeaponAssetStage(parent, w, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        WeaponAssetStage as = new WeaponAssetStage(parent, editorCanvas, editorController);
+        WeaponAssetStage as = new WeaponAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -90,7 +90,7 @@ public class WeaponsTableView extends EquipmentTableView<Weapon> {
 
     @Override
     protected void removeAssetFromList(List<Weapon> assetsToRemove) {
-        editorController.getObservableAssets().getWeapons().removeAll(assetsToRemove);
+        controller.getObservableAssets().getWeapons().removeAll(assetsToRemove);
     }
 
     @Override

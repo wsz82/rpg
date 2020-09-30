@@ -25,14 +25,14 @@ public class CoverTableView extends AssetsTableView<Cover> {
         if (c == null) {
             return;
         }
-        CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas, editorController);
+        CoverAssetStage as = new CoverAssetStage(parent, c, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        CoverAssetStage as = new CoverAssetStage(parent, editorCanvas, editorController);
+        CoverAssetStage as = new CoverAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -51,7 +51,7 @@ public class CoverTableView extends AssetsTableView<Cover> {
 
     @Override
     protected void removeAssetFromList(List<Cover> assetsToRemove) {
-        editorController.getObservableAssets().getCovers().removeAll(assetsToRemove);
+        controller.getObservableAssets().getCovers().removeAll(assetsToRemove);
     }
 
     @Override

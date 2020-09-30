@@ -67,7 +67,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected void fillInputs() {
-        exitEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
+        exitEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, controller);
         exitEdit.initCoords(container);
 
         super.fillInputs();
@@ -82,7 +82,7 @@ public class TeleportAssetStage extends AssetStage<Teleport> {
 
     @Override
     protected void addAssetToList(Teleport asset) {
-        editorController.getObservableAssets().getTeleports().add(asset);
+        controller.getObservableAssets().getTeleports().add(asset);
     }
 
     @Override

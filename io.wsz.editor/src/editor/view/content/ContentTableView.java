@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
-import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentObservableLocation;
@@ -26,15 +25,13 @@ import java.util.stream.Collectors;
 public class ContentTableView extends TableView<PosItem> {
     private final ContentEditDelegate contentEditDelegate = new ContentEditDelegate();
     private final EditorCanvas editorCanvas;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
 
     private Pointer pointer;
 
-    public ContentTableView(EditorCanvas editorCanvas, EditorController editorController) {
+    public ContentTableView(EditorCanvas editorCanvas, EditorController controller) {
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
     }
 
     public void initTable() {
@@ -196,7 +193,7 @@ public class ContentTableView extends TableView<PosItem> {
     }
 
     public void openEditWindow(Stage parent, PosItem pi) {
-        contentEditDelegate.openEditWindow(parent, pi, editorCanvas, editorController);
+        contentEditDelegate.openEditWindow(parent, pi, editorCanvas, controller);
     }
 
     public void setPointer(Pointer pointer) {

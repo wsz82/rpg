@@ -38,7 +38,7 @@ public class CoverAssetStage extends AssetStage<Cover> {
 
     @Override
     protected void addAssetToList(Cover asset) {
-        editorController.getObservableAssets().getCovers().add(asset);
+        controller.getObservableAssets().getCovers().add(asset);
     }
 
     @Override

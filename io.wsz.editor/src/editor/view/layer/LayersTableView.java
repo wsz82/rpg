@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.SafeIntegerStringConverter;
 import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentObservableLocation;
@@ -23,15 +22,13 @@ import java.util.stream.Collectors;
 class LayersTableView extends TableView<Layer> {
     private final ContentTableView contentTableView;
     private final EditorCanvas editorCanvas;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
 
-    public LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController editorController) {
+    public LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController controller) {
         super();
         this.contentTableView = contentTableView;
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
     }
 
     public void initTable() {

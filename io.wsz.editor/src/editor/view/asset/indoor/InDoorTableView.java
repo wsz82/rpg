@@ -25,14 +25,14 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         if (id == null) {
             return;
         }
-        InDoorAssetStage as = new InDoorAssetStage(parent, id, false, editorCanvas, editorController);
+        InDoorAssetStage as = new InDoorAssetStage(parent, id, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        InDoorAssetStage as = new InDoorAssetStage(parent, editorCanvas, editorController);
+        InDoorAssetStage as = new InDoorAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -50,7 +50,7 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
 
     @Override
     protected void removeAssetFromList(List<InDoor> assetsToRemove) {
-        editorController.getObservableAssets().getInDoors().removeAll(assetsToRemove);
+        controller.getObservableAssets().getInDoors().removeAll(assetsToRemove);
     }
 
     @Override

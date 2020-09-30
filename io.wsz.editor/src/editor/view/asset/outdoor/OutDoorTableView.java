@@ -42,14 +42,14 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
         if (id == null) {
             return;
         }
-        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas, editorController);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, id, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        OutDoorAssetStage as = new OutDoorAssetStage(parent, editorCanvas, editorController);
+        OutDoorAssetStage as = new OutDoorAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -67,7 +67,7 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
 
     @Override
     protected void removeAssetFromList(List<OutDoor> assetsToRemove) {
-        editorController.getObservableAssets().getOutDoors().removeAll(assetsToRemove);
+        controller.getObservableAssets().getOutDoors().removeAll(assetsToRemove);
     }
 
     @Override

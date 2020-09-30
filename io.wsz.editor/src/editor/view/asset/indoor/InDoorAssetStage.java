@@ -49,7 +49,7 @@ public class InDoorAssetStage extends AssetStage<InDoor> {
 
     @Override
     protected void addAssetToList(InDoor asset) {
-        editorController.getObservableAssets().getInDoors().add(asset);
+        controller.getObservableAssets().getInDoors().add(asset);
     }
 
     @Override

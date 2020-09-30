@@ -35,8 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class EditorController {
-    private final Controller controller;
+public class EditorController extends Controller {
     private final ObservableAssets observableAssets = new ObservableAssets();
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
@@ -49,9 +48,7 @@ public class EditorController {
     private PosItem activeItem;
     private ItemsStage activeItemsStage;
 
-    public EditorController(Controller controller){
-        this.controller = controller;
-    }
+    public EditorController(){}
 
     public SettingsMemento restoreSettings(File programDir) {
         return new SettingsCaretaker(programDir).loadMemento();
@@ -63,8 +60,6 @@ public class EditorController {
 
     public void initNewPlugin() {
         clearObservableLists();
-
-        Model model = controller.getModel();
 
         CurrentObservableLocation currentObservableLocation = model.getCurrentLocation();
         CurrentObservableLayer currentObservableLayer = model.getCurrentLayer();
@@ -80,8 +75,6 @@ public class EditorController {
 
         model.setActivePluginMetadata(newPluginMetadata);
         newPlugin.setWorld(newWorld);
-
-        controller.setModel(model);
     }
 
     private void initWorldsList(CurrentObservableLocation currentObservableLocation, CurrentObservableLayer currentObservableLayer, World newWorld) {
@@ -162,8 +155,6 @@ public class EditorController {
     }
 
     public void savePluginAs(String pluginName, Coords startPos) {
-        Model model = controller.getModel();
-
         savePlugin(pluginName, startPos, model);
     }
 
@@ -176,7 +167,6 @@ public class EditorController {
         activePlugin.setStartPos(startPos);
         World world = activePlugin.getWorld();
         loadObservableListsToPlugin(world);
-        File programDir = controller.getProgramDir();
         PluginFileCaretaker fileCaretaker = new PluginFileCaretaker(programDir);
         PluginMetadata metadata = model.getActivePluginMetadata();
 
@@ -184,7 +174,6 @@ public class EditorController {
     }
 
     public void saveActivePlugin(String pluginName, Coords startPos) {
-        Model model = controller.getModel();
         savePlugin(pluginName, startPos, model);
     }
 
@@ -246,9 +235,7 @@ public class EditorController {
     public void loadAndRestorePlugin(PluginMetadata metadata, PluginSettingsStage pss) {
         if (metadata == null) return;
 
-        Model model = controller.getModel();
         model.setActivePluginMetadata(metadata);
-        File programDir = controller.getProgramDir();
         String pluginName = metadata.getPluginName();
         PluginCaretaker pluginCaretaker = new PluginCaretaker(programDir);
         Plugin loadedPlugin = pluginCaretaker.deserialize(pluginName);
@@ -260,7 +247,7 @@ public class EditorController {
 
         List<Location> locations = world.getLocations();
         List<Asset> assets = world.getAssets();
-        controller.restoreItemsReferences(assets, locations, world);
+        restoreItemsReferences(assets, locations, world);
 
         restoreFirstLocationAndLayer(model, locations);
         restorePluginSettingsStage(pss, metadata, loadedPlugin);
@@ -314,7 +301,7 @@ public class EditorController {
         boolean isStartingLocation = metadata.isStartingLocation();
         pss.setStartingLocation(isStartingLocation);
         Coords startPos = activePlugin.getStartPos();
-        controller.restoreLocationOfCoords(startPos);
+        restoreLocationOfCoords(startPos);
         pss.setStartLocation(startPos.getLocation());
         pss.setStartX(startPos.x);
         pss.setStartY(startPos.y);
@@ -370,10 +357,6 @@ public class EditorController {
 
     public void setItemsStageToAddItems(ItemsStage itemsStage) {
         this.activeItemsStage = itemsStage;
-    }
-
-    public Controller getController() {
-        return controller;
     }
 
     public PosItem getActiveItem() {

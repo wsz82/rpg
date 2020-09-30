@@ -2,7 +2,6 @@ package editor.view.location;
 
 import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -18,19 +17,17 @@ import java.util.stream.Collectors;
 
 public class LocationsTableView extends TableView<Location> {
     private final EditorCanvas editorCanvas;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
 
-    public LocationsTableView(EditorCanvas editorCanvas, EditorController editorController) {
+    public LocationsTableView(EditorCanvas editorCanvas, EditorController controller) {
         super();
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
         initTable();
     }
 
     private void initTable() {
-        setItems(editorController.getObservableLocations());
+        setItems(controller.getObservableLocations());
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);

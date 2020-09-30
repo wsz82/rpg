@@ -119,7 +119,7 @@ public class WeaponAssetStage extends EquipmentMayCountableAssetStage<Weapon> {
 
     @Override
     protected void addAssetToList(Weapon asset) {
-        editorController.getObservableAssets().getWeapons().add(asset);
+        controller.getObservableAssets().getWeapons().add(asset);
     }
 
     @Override

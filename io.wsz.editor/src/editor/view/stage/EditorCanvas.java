@@ -2,7 +2,6 @@ package editor.view.stage;
 
 import editor.model.EditorController;
 import editor.view.content.ContentTableView;
-import io.wsz.model.Controller;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.CurrentObservableLocation;
@@ -31,8 +30,7 @@ public class EditorCanvas extends Canvas {
     private final Stage stage;
     private final Pointer pointer;
     private final Pane parent;
-    private final Controller controller;
-    private final EditorController editorController;
+    private final EditorController controller;
     private final Coords curPos;
     private final Coords draggedItemMousePos = new Coords();
 
@@ -40,10 +38,9 @@ public class EditorCanvas extends Canvas {
     private ContentTableView contentTableView;
     private PosItem draggedItem;
 
-    public EditorCanvas(Stage stage, EditorController editorController, Pane parent, Pointer pointer){
+    public EditorCanvas(Stage stage, EditorController controller, Pane parent, Pointer pointer){
         this.stage = stage;
-        this.editorController = editorController;
-        this.controller = editorController.getController();
+        this.controller = controller;
         this.curPos = controller.getCurPos();
         this.pointer = pointer;
         this.parent = parent;
@@ -89,7 +86,7 @@ public class EditorCanvas extends Canvas {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 } else {
-                    if (pi == editorController.getActiveItem()) {
+                    if (pi == controller.getActiveItem()) {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 }
@@ -140,7 +137,7 @@ public class EditorCanvas extends Canvas {
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
             if (!activeContentMarked
-                    && pi.equals(editorController.getActiveItem())) {
+                    && pi.equals(controller.getActiveItem())) {
                 activeContentMarked = true;
                 drawActiveContentRectangle(gc, pi);
             }
@@ -196,7 +193,7 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.UP
                     || e.getCode() == KeyCode.RIGHT
                     || e.getCode() == KeyCode.LEFT) {
-                PosItem active = editorController.getActiveItem();
+                PosItem active = controller.getActiveItem();
                 moveContent(e.getCode(), active);
                 contentTableView.refresh();
                 refresh();
@@ -227,12 +224,12 @@ public class EditorCanvas extends Canvas {
             selectedItem = getPosItem(xPos, yPos);
         }
         if (selectedItem != null && !selectedItem.isBlocked()) {
-            editorController.setActiveItem(selectedItem);
+            controller.setActiveItem(selectedItem);
             if (isSecondaryButton) {
                 openContextMenu(selectedItem, e);
             }
         } else {
-            editorController.setActiveItem(null);
+            controller.setActiveItem(null);
         }
     }
 
@@ -318,7 +315,7 @@ public class EditorCanvas extends Canvas {
                         controller.getCurrentLocation().getLocation());
                 if (draggedItem == null) {
                     dragPos.add(controller.getCurPos());
-                    editorController.setDragPos(dragPos);
+                    controller.setDragPos(dragPos);
                 } else {
                     dragPos.x -= draggedItemMousePos.x;
                     dragPos.y -= draggedItemMousePos.y;

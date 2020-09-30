@@ -5,7 +5,6 @@ import editor.view.asset.items.ItemsStage;
 import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
-import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
@@ -29,19 +28,17 @@ import java.util.stream.Collectors;
 
 public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<A> {
     protected final EditorCanvas editorCanvas;
-    protected final EditorController editorController;
-    protected final Controller controller;
+    protected final EditorController controller;
     protected final Stage parent;
 
     private Pointer pointer;
     private ContentTableView contentTableView;
 
-    public AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController editorController) {
+    public AssetsTableView(Stage parent, ObservableList<A> assets, EditorCanvas editorCanvas, EditorController controller) {
         super();
         this.parent = parent;
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         initAssetsTable();
         setItems(assets);
@@ -73,14 +70,14 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         setOnDragDone(e -> {
             e.consume();
             if (e.getTransferMode() == TransferMode.COPY) {
-                Coords dragPos = editorController.getDragPos();
+                Coords dragPos = controller.getDragPos();
                 ItemsStage itemsStage;
                 if (dragPos.x != -1) {
                     addItemsToStage(dragPos);
                     dragPos.x = -1;
-                } else if ((itemsStage = editorController.getItemsStageToAddItems()) != null) {
+                } else if ((itemsStage = controller.getItemsStageToAddItems()) != null) {
                     addItemsToContainable(itemsStage);
-                    editorController.setItemsStageToAddItems(null);
+                    controller.setItemsStageToAddItems(null);
                 }
             }
         });
@@ -143,7 +140,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private boolean assetIdIsNotUnique(String newValue) {
-        return editorController.getObservableAssets().getMergedAssets().stream()
+        return controller.getObservableAssets().getMergedAssets().stream()
                 .anyMatch(p -> p.getAssetId().equals(newValue));
     }
 
@@ -236,7 +233,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         List<String> assetsNames = assetsToRemove.stream()
                 .map(Asset::getAssetId)
                 .collect(Collectors.toList());
-       editorController.getObservableLocations().forEach(location -> {
+       controller.getObservableLocations().forEach(location -> {
            List<PosItem> items = location.getItems();
            List<PosItem> contentToRemove = items.stream()
                     .filter(p -> {

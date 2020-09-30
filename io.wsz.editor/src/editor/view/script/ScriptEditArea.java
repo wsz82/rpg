@@ -57,11 +57,11 @@ public class ScriptEditArea {
     }
 
     public Script createScript() {
-        return Script.parseScript(textArea.getText(), editorController.getController());
+        return Script.parseScript(textArea.getText(), editorController);
     }
 
     public void saveScript(Script script) {
-        script.fillScript(textArea.getText(), editorController.getController());
+        script.fillScript(textArea.getText(), editorController);
         invalidInfo.setText(script.getValidatorMessage());
     }
 

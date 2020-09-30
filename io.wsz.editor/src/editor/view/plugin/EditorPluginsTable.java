@@ -1,7 +1,6 @@
 package editor.view.plugin;
 
 import editor.model.EditorController;
-import io.wsz.model.Controller;
 import io.wsz.model.plugin.PluginMetadata;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -22,15 +21,13 @@ public class EditorPluginsTable extends Stage {
     private final ObservableList<PluginMetadata> metadatas = FXCollections.observableArrayList();
     private final TableView<PluginMetadata> table = new TableView<>();
     private final PluginSettingsStage pss;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
     private Label activePluginName;
 
-    public EditorPluginsTable(PluginSettingsStage pss, EditorController editorController) {
+    public EditorPluginsTable(PluginSettingsStage pss, EditorController controller) {
         super(StageStyle.UTILITY);
         this.pss = pss;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
         List<PluginMetadata> pluginMetadata = controller.getPluginMetadatas();
         metadatas.addAll(pluginMetadata);
     }
@@ -84,7 +81,7 @@ public class EditorPluginsTable extends Stage {
             alertNoPluginChosen();
             return;
         }
-        editorController.loadAndRestorePlugin(metadata, pss);
+        controller.loadAndRestorePlugin(metadata, pss);
         close();
     }
 

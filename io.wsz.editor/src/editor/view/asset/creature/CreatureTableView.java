@@ -53,14 +53,14 @@ public class CreatureTableView extends AssetsTableView<Creature> {
         if (cr == null) {
             return;
         }
-        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false, editorCanvas, editorController);
+        CreatureAssetStage as = new CreatureAssetStage(parent, cr, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        CreatureAssetStage as = new CreatureAssetStage(parent, editorCanvas, editorController);
+        CreatureAssetStage as = new CreatureAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -78,7 +78,7 @@ public class CreatureTableView extends AssetsTableView<Creature> {
 
     @Override
     protected void removeAssetFromList(List<Creature> assetsToRemove) {
-        editorController.getObservableAssets().getCreatures().removeAll(assetsToRemove);
+        controller.getObservableAssets().getCreatures().removeAll(assetsToRemove);
     }
 
     @Override

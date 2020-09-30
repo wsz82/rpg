@@ -112,7 +112,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     protected void fillInputs() {
         openable = new OpenableOutDoor(this, item, item.getOpenableItem(), isContent);
         openable.initOpenable(container);
-        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, editorController);
+        coordsEdit = new CoordsEdit(item.getIndividualExit(), isContent, editorCanvas, controller);
         coordsEdit.initCoords(container);
 
         super.fillInputs();
@@ -144,7 +144,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     @Override
     protected void addAssetToList(OutDoor asset) {
-        editorController.getObservableAssets().getOutDoors().add(asset);
+        controller.getObservableAssets().getOutDoors().add(asset);
     }
 
     @Override

@@ -5,7 +5,6 @@ import editor.view.DoubleField;
 import editor.view.asset.coords.*;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.PosItem;
@@ -31,8 +30,7 @@ import java.util.Optional;
 
 public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     protected final EditorCanvas editorCanvas;
-    protected final EditorController editorController;
-    protected final Controller controller;
+    protected final EditorController controller;
     protected final VBox container = new VBox(5);
     protected final Button interactionButton = new Button("Interaction point");
     protected final Button coverButton = new Button("Cover");
@@ -53,20 +51,18 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     private final Button create = new Button("Create");
     private final Button cancel = new Button("Cancel");
 
-    public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
+    public AssetStage(Stage parent, A item, boolean isContent, EditorCanvas editorCanvas, EditorController controller) {
         super(parent);
         this.item = item;
         this.isContent = isContent;
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
     }
 
-    public AssetStage(Stage parent, EditorCanvas editorCanvas, EditorController editorController) {
+    public AssetStage(Stage parent, EditorCanvas editorCanvas, EditorController controller) {
         super(parent);
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        this.controller = editorController.getController();
+        this.controller = controller;
         this.item = getNewAsset();
     }
 
@@ -142,7 +138,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     }
 
     private void setUpScriptCB() {
-        ObservableList<Script> scripts = editorController.getObservableScripts();
+        ObservableList<Script> scripts = controller.getObservableScripts();
         ObservableList<Script> scriptsWithNull = FXCollections.observableArrayList(scripts);
         scriptsWithNull.add(null);
         scriptCB.setItems(scriptsWithNull);
@@ -153,7 +149,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     }
 
     private void setUpDialogCB() {
-        ObservableList<Dialog> dialogs = editorController.getObservableDialogs();
+        ObservableList<Dialog> dialogs = controller.getObservableDialogs();
         ObservableList<Dialog> dialogsWithNull = FXCollections.observableArrayList(dialogs);
         dialogsWithNull.add(null);
         dialogsCB.setItems(dialogsWithNull);
@@ -169,7 +165,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
 
             @Override
             public Dialog fromString(String name) {
-                Optional<Dialog> optDialog = editorController.getObservableDialogs().stream()
+                Optional<Dialog> optDialog = controller.getObservableDialogs().stream()
                         .filter(t -> t.getID().equals(name))
                         .findFirst();
                 return optDialog.orElse(null);
@@ -215,7 +211,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         if (inputFileIsEmpty) {
             return;
         }
-        List<Asset> assets = editorController.getObservableAssets().getMergedAssets();
+        List<Asset> assets = controller.getObservableAssets().getMergedAssets();
         boolean doesAssetIdAlreadyExist = assets.stream()
                 .anyMatch(a -> a.getAssetId().equals(assetId));
         if (doesAssetIdAlreadyExist) {

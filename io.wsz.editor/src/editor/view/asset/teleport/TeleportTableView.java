@@ -70,14 +70,14 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
         if (t == null) {
             return;
         }
-        TeleportAssetStage as = new TeleportAssetStage(parent, t, false, editorCanvas, editorController);
+        TeleportAssetStage as = new TeleportAssetStage(parent, t, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        TeleportAssetStage as = new TeleportAssetStage(parent, editorCanvas, editorController);
+        TeleportAssetStage as = new TeleportAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -95,7 +95,7 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
 
     @Override
     protected void removeAssetFromList(List<Teleport> assetsToRemove) {
-        editorController.getObservableAssets().getTeleports().removeAll(assetsToRemove);
+        controller.getObservableAssets().getTeleports().removeAll(assetsToRemove);
     }
 
     @Override

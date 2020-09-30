@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.content.ContentTableView;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.layer.Layer;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -18,14 +17,12 @@ public class LayersStage extends ChildStage {
     private static final String LAYERS = "Layers";
     private final StackPane root = new StackPane();
     private final LayersTableView table;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
 
-    public LayersStage(Stage parent, ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController editorController) {
+    public LayersStage(Stage parent, ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController controller) {
         super(parent);
-        this.editorController = editorController;
-        controller = editorController.getController();
-        table = new LayersTableView(contentTableView, editorCanvas, editorController);
+        this.controller = controller;
+        table = new LayersTableView(contentTableView, editorCanvas, controller);
         table.initTable();
     }
 

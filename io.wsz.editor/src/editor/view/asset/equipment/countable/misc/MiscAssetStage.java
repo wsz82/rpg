@@ -39,7 +39,7 @@ public class MiscAssetStage extends EquipmentMayCountableAssetStage<Misc> {
 
     @Override
     protected void addAssetToList(Misc asset) {
-        editorController.getObservableAssets().getMiscs().add(asset);
+        controller.getObservableAssets().getMiscs().add(asset);
     }
 
     @Override

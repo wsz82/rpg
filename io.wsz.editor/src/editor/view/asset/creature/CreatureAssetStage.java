@@ -148,7 +148,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
             ResolutionImage inventoryBasicForEditor = animation.getInventoryBasicForEditor(programDir);
             Image basicInventory = inventoryBasicForEditor.getFxImage();
             InventoryPlaceEditStage editStage =
-                    new InventoryPlaceEditStage(editorController, parent, item, basicInventory, inventoryPlaces);
+                    new InventoryPlaceEditStage(controller, parent, item, basicInventory, inventoryPlaces);
             editStage.initWindow(isContent, "Inventory places editor");
             editStage.show();
         });
@@ -156,7 +156,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     private void hookUpItemsEditEvents() {
         itemsButton.setOnAction(e -> {
-            InventoryItemsStage itemsStage = new InventoryItemsStage(parent, item, editorCanvas, editorController);
+            InventoryItemsStage itemsStage = new InventoryItemsStage(parent, item, editorCanvas, controller);
             itemsStage.initWindow();
             itemsStage.show();
         });
@@ -265,7 +265,7 @@ public class CreatureAssetStage extends AssetStage<Creature> {
 
     @Override
     protected void addAssetToList(Creature asset) {
-        editorController.getObservableAssets().getCreatures().add(asset);
+        controller.getObservableAssets().getCreatures().add(asset);
     }
 
     @Override

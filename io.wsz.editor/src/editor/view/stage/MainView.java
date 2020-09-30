@@ -15,7 +15,6 @@ import editor.view.plugin.EditorPluginsTable;
 import editor.view.plugin.PluginSettingsStage;
 import editor.view.script.ScriptsEditStage;
 import editor.view.script.variable.global.GlobalsStage;
-import io.wsz.model.Controller;
 import io.wsz.model.Model;
 import io.wsz.model.plugin.PluginMetadata;
 import io.wsz.model.sizes.Paths;
@@ -35,8 +34,7 @@ class MainView {
     private static final double INIT_WIDTH = 800;
     private static final double INIT_HEIGHT = 600;
 
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
     private final EditorCanvas editorCanvas;
     private final Stage mainStage;
     private final Pane center;
@@ -47,25 +45,24 @@ class MainView {
     private final PluginSettingsStage pss;
     private final Pointer pointer;
 
-    public MainView(Stage mainStage, EditorController editorController) {
+    public MainView(Stage mainStage, EditorController controller) {
         this.mainStage = mainStage;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
         this.center = new Pane();
         pointer = new Pointer(controller);
-        editorCanvas = new EditorCanvas(mainStage, editorController, center, pointer);
+        editorCanvas = new EditorCanvas(mainStage, controller, center, pointer);
         center.getChildren().add(editorCanvas);
-        contentsWindow = new ContentStage(mainStage, editorCanvas, editorController);
+        contentsWindow = new ContentStage(mainStage, editorCanvas, controller);
         contentsWindow.initWindow();
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
-        layersWindow = new LayersStage(mainStage, ctv, editorCanvas, editorController);
+        layersWindow = new LayersStage(mainStage, ctv, editorCanvas, controller);
         layersWindow.initWindow();
-        assetsWindow = new AssetsStage(mainStage, pointer, ctv, editorCanvas, editorController);
+        assetsWindow = new AssetsStage(mainStage, pointer, ctv, editorCanvas, controller);
         assetsWindow.initWindow();
-        locationsWindow = new LocationsStage(mainStage, editorController, editorCanvas);
+        locationsWindow = new LocationsStage(mainStage, controller, editorCanvas);
         locationsWindow.initWindow();
-        pss = new PluginSettingsStage(mainStage, editorController);
+        pss = new PluginSettingsStage(mainStage, controller);
         pss.initWindow();
     }
 
@@ -84,7 +81,7 @@ class MainView {
         final Scene scene = new Scene(borderPane, INIT_WIDTH, INIT_HEIGHT);
         mainStage.setScene(scene);
 
-        File programDir = editorController.getController().getProgramDir();
+        File programDir = controller.getProgramDir();
         restoreSettings(programDir);
 
         mainStage.show();
@@ -112,7 +109,7 @@ class MainView {
                         onCancel.resolve();
                     } else if (r == ButtonType.YES) {
                         saveFile();
-                        File programDir = editorController.getController().getProgramDir();
+                        File programDir = controller.getProgramDir();
                         storeSettings(programDir);
                         alert.close();
                     }
@@ -127,11 +124,11 @@ class MainView {
                 contentsWindow.getX(), contentsWindow.getY(), contentsWindow.getWidth(), contentsWindow.getHeight(),
                 locationsWindow.getX(), locationsWindow.getY(), locationsWindow.getWidth(), locationsWindow.getHeight()
         );
-        editorController.storeSettings(programDir, memento);
+        controller.storeSettings(programDir, memento);
     }
 
     private void restoreSettings(File programDir) {
-        SettingsMemento memento = editorController.restoreSettings(programDir);
+        SettingsMemento memento = controller.restoreSettings(programDir);
         mainStage.setX(memento.getStageX());
         mainStage.setY(memento.getStageY());
         mainStage.setWidth(memento.getStageWidth());
@@ -202,7 +199,7 @@ class MainView {
     private MenuItem getScriptsMenuItem() {
         final MenuItem scripts = new MenuItem("Scripts");
         scripts.setOnAction(event -> {
-            ScriptsEditStage scriptsEditStage = new ScriptsEditStage(mainStage, editorController);
+            ScriptsEditStage scriptsEditStage = new ScriptsEditStage(mainStage, controller);
             scriptsEditStage.initStage();
             scriptsEditStage.show();
         });
@@ -223,7 +220,7 @@ class MainView {
     private MenuItem getGlobalVariablesMenuItem() {
         final MenuItem globalVariables = new MenuItem("Global variables");
         globalVariables.setOnAction(event -> {
-            GlobalsStage globals = new GlobalsStage(mainStage, editorController);
+            GlobalsStage globals = new GlobalsStage(mainStage, controller);
             globals.initWindow();
             globals.show();
         });
@@ -233,7 +230,7 @@ class MainView {
     private MenuItem getDialogsMenuItem() {
         final MenuItem dialogs = new MenuItem("Dialogs");
         dialogs.setOnAction(event -> {
-            DialogsEditStage dialogsEditStage = new DialogsEditStage(mainStage, editorController);
+            DialogsEditStage dialogsEditStage = new DialogsEditStage(mainStage, controller);
             dialogsEditStage.initWindow();
             dialogsEditStage.show();
         });
@@ -243,7 +240,7 @@ class MainView {
     private MenuItem getInventoryPlacesMenuItem() {
         final MenuItem inventoryPlaces = new MenuItem("Inventory places");
         inventoryPlaces.setOnAction(event -> {
-            InventoryPlaceTypeStage inventoryPlaceTypeStage = new InventoryPlaceTypeStage(mainStage, editorController);
+            InventoryPlaceTypeStage inventoryPlaceTypeStage = new InventoryPlaceTypeStage(mainStage, controller);
             inventoryPlaceTypeStage.show();
         });
         return inventoryPlaces;
@@ -252,7 +249,7 @@ class MainView {
     private MenuItem getEquipmentTypesMenuItem() {
         final MenuItem equipmentTypes = new MenuItem("Equipment types");
         equipmentTypes.setOnAction(event -> {
-            EquipmentTypeStage equipmentTypeStage = new EquipmentTypeStage(mainStage, editorController);
+            EquipmentTypeStage equipmentTypeStage = new EquipmentTypeStage(mainStage, controller);
             equipmentTypeStage.show();
         });
         return equipmentTypes;
@@ -322,12 +319,12 @@ class MainView {
         ActionResolver cancelResolver = () -> isCanceled[0] = true;
         askForSave(cancelResolver);
         if (!isCanceled[0]) {
-            editorController.initNewPlugin();
+            controller.initNewPlugin();
         }
     }
 
     private void openPluginsTable() {
-        final EditorPluginsTable plugins = new EditorPluginsTable(pss, editorController);
+        final EditorPluginsTable plugins = new EditorPluginsTable(pss, controller);
         plugins.initWindow();
         plugins.setUpActivePluginText();
         plugins.initOwner(mainStage);
@@ -337,7 +334,7 @@ class MainView {
     private void saveAsFile() {
         final DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Save plugin");
-        String initPath = editorController.getController().getProgramDir() + Paths.PLUGINS_DIR;
+        String initPath = controller.getProgramDir() + Paths.PLUGINS_DIR;
         File initDir = new File(initPath);
         dirChooser.setInitialDirectory(initDir);
         final File saveFile = dirChooser.showDialog(mainStage);
@@ -346,11 +343,10 @@ class MainView {
         }
         String name = saveFile.getName();
         Coords startPos = getStartCoords(pss);
-        editorController.savePluginAs(name, startPos);
+        controller.savePluginAs(name, startPos);
     }
 
     private void saveFile() {
-        Controller controller = editorController.getController();
         Model model = controller.getModel();
         PluginMetadata metadata = model.getActivePluginMetadata();
         updatePluginMetadata(metadata, pss);
@@ -360,7 +356,7 @@ class MainView {
             saveAsFile();
         } else {
             Coords startPos = getStartCoords(pss);
-            editorController.saveActivePlugin(pluginName, startPos);
+            this.controller.saveActivePlugin(pluginName, startPos);
         }
     }
 

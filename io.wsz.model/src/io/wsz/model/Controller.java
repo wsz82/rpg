@@ -27,22 +27,22 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Controller {
-    private final Logger logger = new Logger();
-    private final Board board = new Board(this);
-    private final Fog fog = new Fog();
-    private final LinkedList<Creature> heroes = new LinkedList<>();
-    private final List<Creature> creaturesToControl = new ArrayList<>(0);
-    private final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
-    private final Coords posToCenter = new Coords(-1, -1);
-    private final AtomicBoolean isInventory = new AtomicBoolean();
+    protected final Logger logger = new Logger();
+    protected final Board board = new Board(this);
+    protected final Fog fog = new Fog();
+    protected final LinkedList<Creature> heroes = new LinkedList<>();
+    protected final List<Creature> creaturesToControl = new ArrayList<>(0);
+    protected final List<Creature> creaturesToLooseControl = new ArrayList<>(0);
+    protected final Coords posToCenter = new Coords(-1, -1);
+    protected final AtomicBoolean isInventory = new AtomicBoolean();
 
-    private Model model;
-    private File programDir;
-    private Location locationToUpdate;
-    private Creature creatureToOpenInventory;
-    private Container containerToOpen;
-    private DialogMemento<PosItem<?,?>> dialogMemento;
-    private Properties locale;
+    protected Model model;
+    protected File programDir;
+    protected Location locationToUpdate;
+    protected Creature creatureToOpenInventory;
+    protected Container containerToOpen;
+    protected DialogMemento<PosItem<?,?>> dialogMemento;
+    protected Properties locale;
 
     public Controller(){}
 

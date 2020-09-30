@@ -1,7 +1,6 @@
 package editor.view.stage;
 
 import editor.model.EditorController;
-import io.wsz.model.Controller;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -11,13 +10,12 @@ import java.net.URISyntaxException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
-        Controller controller = new Controller();
-        controller.initNewModel();
-        EditorController editorController = new EditorController(controller);
+        EditorController editorController = new EditorController();
+        editorController.initNewModel();
         editorController.initNewPlugin();
 
         File programDir = getProgramDir();
-        controller.setProgramDir(programDir);
+        editorController.setProgramDir(programDir);
 
         MainView view = new MainView(stage, editorController);
         view.show();

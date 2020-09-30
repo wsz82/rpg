@@ -25,14 +25,14 @@ public class MiscTableView extends EquipmentTableView<Misc> {
         if (m == null) {
             return;
         }
-        MiscAssetStage as = new MiscAssetStage(parent, m, false, editorCanvas, editorController);
+        MiscAssetStage as = new MiscAssetStage(parent, m, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        MiscAssetStage as = new MiscAssetStage(parent, editorCanvas, editorController);
+        MiscAssetStage as = new MiscAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -50,7 +50,7 @@ public class MiscTableView extends EquipmentTableView<Misc> {
 
     @Override
     protected void removeAssetFromList(List<Misc> assetsToRemove) {
-        editorController.getObservableAssets().getMiscs().removeAll(assetsToRemove);
+        controller.getObservableAssets().getMiscs().removeAll(assetsToRemove);
     }
 
     @Override

@@ -25,14 +25,14 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
         if (l == null) {
             return;
         }
-        LandscapeAssetStage as = new LandscapeAssetStage(parent, l, false, editorCanvas, editorController);
+        LandscapeAssetStage as = new LandscapeAssetStage(parent, l, false, editorCanvas, controller);
         as.show();
         refreshTableOnStageHidden(as);
     }
 
     @Override
     protected void addAsset() {
-        LandscapeAssetStage as = new LandscapeAssetStage(parent, editorCanvas, editorController);
+        LandscapeAssetStage as = new LandscapeAssetStage(parent, editorCanvas, controller);
         as.show();
     }
 
@@ -50,7 +50,7 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
 
     @Override
     protected void removeAssetFromList(List<Landscape> assetsToRemove) {
-        editorController.getObservableAssets().getLandscapes().removeAll(assetsToRemove);
+        controller.getObservableAssets().getLandscapes().removeAll(assetsToRemove);
     }
 
     @Override

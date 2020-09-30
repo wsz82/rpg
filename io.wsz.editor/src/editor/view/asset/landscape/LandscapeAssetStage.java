@@ -37,7 +37,7 @@ public class LandscapeAssetStage extends AssetStage<Landscape> {
 
     @Override
     protected void addAssetToList(Landscape asset) {
-        editorController.getObservableAssets().getLandscapes().add(asset);
+        controller.getObservableAssets().getLandscapes().add(asset);
     }
 
     @Override

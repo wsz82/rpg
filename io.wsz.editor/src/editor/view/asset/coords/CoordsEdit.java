@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -24,19 +23,17 @@ import java.util.Optional;
 public class CoordsEdit {
     private final Coords pos;
     private final EditorCanvas editorCanvas;
-    private final EditorController editorController;
-    private final Controller controller;
+    private final EditorController controller;
     private final ChoiceBox<Location> locationChoice = new ChoiceBox<>();
     private final DoubleField inputX;
     private final DoubleField inputY;
     private final IntegerField inputLayer;
     private final Button goToButton = new Button("Go to");
 
-    public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas, EditorController editorController) {
+    public CoordsEdit(Coords pos, boolean isContent, EditorCanvas editorCanvas, EditorController controller) {
         this.pos = pos;
         this.editorCanvas = editorCanvas;
-        this.editorController = editorController;
-        controller = editorController.getController();
+        this.controller = controller;
         inputX = new DoubleField(0.0, isContent);
         inputY = new DoubleField(0.0, isContent);
         inputLayer = new IntegerField(isContent);
@@ -99,7 +96,7 @@ public class CoordsEdit {
                 return getLocation(s);
             }
         });
-        ObservableList<Location> original = editorController.getObservableLocations();
+        ObservableList<Location> original = controller.getObservableLocations();
         ObservableList<Location> locationsWithNull = FXCollections.observableArrayList(original);
         locationsWithNull.add(null);
         locationChoice.setItems(locationsWithNull);

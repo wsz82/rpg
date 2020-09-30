@@ -56,7 +56,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     private void hookupContainerEvents() {
         itemsButton.setOnAction(e -> {
-            ContainerItemsStage itemsStage = new ContainerItemsStage(parent, item, editorCanvas, editorController);
+            ContainerItemsStage itemsStage = new ContainerItemsStage(parent, item, editorCanvas, controller);
             itemsStage.initWindow();
             itemsStage.show();
         });
@@ -116,7 +116,7 @@ public class ContainerAssetStage extends EquipmentAssetStage<Container> {
 
     @Override
     protected void addAssetToList(Container asset) {
-        editorController.getObservableAssets().getContainers().add(asset);
+        controller.getObservableAssets().getContainers().add(asset);
     }
 
     @Override
