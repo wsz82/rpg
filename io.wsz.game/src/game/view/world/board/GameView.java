@@ -13,7 +13,6 @@ import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.item.*;
 import io.wsz.model.layer.Layer;
-import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -100,7 +99,7 @@ public class GameView extends CanvasView {
         updatePos();
         clearBackground();
 
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         List<Creature> heroes = board.getControlledAndControllableCreatures(location);
 
         drawItems(sortedItems, heroes);
@@ -247,9 +246,9 @@ public class GameView extends CanvasView {
             right -= barView.getWidth();
         }
         double bottom = b.getMaxY();
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
-        double locWidth = currentObservableLocation.getWidth();
-        double locHeight = currentObservableLocation.getHeight();
+        Location currentLocation = controller.getCurrentLocation();
+        double locWidth = currentLocation.getWidth();
+        double locHeight = currentLocation.getHeight();
 
         Point p = MouseInfo.getPointerInfo().getLocation();
         int x = p.x;
@@ -271,18 +270,16 @@ public class GameView extends CanvasView {
             }
         }
 
-        Location location = currentObservableLocation.getLocation();
-
         if (settings.isCenterOnPC()) {
-            centerOnPC(meter, canvasMeterWidth, canvasMeterHeight, settings, location);
+            centerOnPC(meter, canvasMeterWidth, canvasMeterHeight, settings, currentLocation);
         }
 
-        List<Creature> controlledCreatures = board.getControlledCreatures(location);
+        List<Creature> controlledCreatures = board.getControlledCreatures(currentLocation);
         Creature selected = null;
         if (!controlledCreatures.isEmpty()) {
             selected = controlledCreatures.get(0); //TODO selected creatures stand order
         }
-        setAppropriateCursor(selected, pos, 0, 0, locWidth, locHeight, location.getItems());
+        setAppropriateCursor(selected, pos, 0, 0, locWidth, locHeight, currentLocation.getItems());
 
         if (x >= left+OFFSET && x <= right-OFFSET
                 && y >= top+OFFSET && y <= bottom-OFFSET) {
@@ -432,9 +429,10 @@ public class GameView extends CanvasView {
             }
         });
 
-        controller.getModel().getCurrentLocation().locationProperty().addListener(observable -> {
-            layers = getSortedLayers();
-        });
+        //TODO fix
+//        controller.getModel().getCurrentLocation().locationProperty().addListener(observable -> {
+//            layers = getSortedLayers();
+//        });
 
         canvas.widthProperty().addListener((observable, oldValue, newValue) -> {
             controller.reloadInventoryPictures();
@@ -445,7 +443,7 @@ public class GameView extends CanvasView {
     }
 
     private void resolveSelection(double left, double top, double right, double bottom, boolean multiple) {
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         List<Creature> creatures = board.getControllablesWithinRectangle(left, top, right, bottom, location);
         creatures.forEach(c -> controller.getCreaturesToControl().add(c));
         if (!creatures.isEmpty() && !multiple) {
@@ -465,7 +463,7 @@ public class GameView extends CanvasView {
         double x = e.getX();
         double y = e.getY();
 
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         temp.x = x / Sizes.getMeter();
         temp.y = y / Sizes.getMeter();
         temp.add(curPos);
@@ -541,7 +539,7 @@ public class GameView extends CanvasView {
     }
 
     private void changeToLayerDown() {
-        Layer layer = controller.getCurrentLayer().getLayer();
+        Layer layer = controller.getCurrentLayer();
         Layer prev = layer;
         for (int i = 1; i < layers.size(); i++) {
             Layer current = layers.get(i);
@@ -549,11 +547,11 @@ public class GameView extends CanvasView {
                 prev = layers.get(i - 1);
             }
         }
-        controller.getCurrentLayer().setLayer(prev);
+        controller.setCurrentLayer(prev);
     }
 
     private void changeToLayerUp() {
-        Layer layer = controller.getCurrentLayer().getLayer();
+        Layer layer = controller.getCurrentLayer();
         Layer next = layer;
         for (int i = 0; i < layers.size() - 1; i++) {
             Layer current = layers.get(i);
@@ -561,7 +559,7 @@ public class GameView extends CanvasView {
                 next = layers.get(i + 1);
             }
         }
-        controller.getCurrentLayer().setLayer(next);
+        controller.setCurrentLayer(next);
     }
 
     private void updateCurPosForShowBarUpdate() {
@@ -637,7 +635,7 @@ public class GameView extends CanvasView {
     }
 
     private void openInventory() {
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         List<Creature> controlled = board.getControlledCreatures(location);
         if (controlled.isEmpty()) {
             return;
@@ -648,13 +646,13 @@ public class GameView extends CanvasView {
     }
 
     private void commandControlledFirstAction(PosItem pi) {
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         board.getControlledCreatures(location)
                 .forEach(c -> c.onFirstAction(pi));
     }
 
     private void commandControlledGoTo(double x, double y) {
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentLocation();
         board.getControlledCreatures(location)
                 .forEach(c -> c.goTo(x, y));
     }

@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public class EditorController extends Controller {
+    private final CurrentObservableLocation currentObservableLocation = new CurrentObservableLocation();
+    private final CurrentObservableLayer currentObservableLayer = new CurrentObservableLayer();
     private final ObservableAssets observableAssets = new ObservableAssets();
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
@@ -60,9 +62,6 @@ public class EditorController extends Controller {
 
     public void initNewPlugin() {
         clearObservableLists();
-
-        CurrentObservableLocation currentObservableLocation = model.getCurrentLocation();
-        CurrentObservableLayer currentObservableLayer = model.getCurrentLayer();
 
         World newWorld = new World();
 
@@ -161,8 +160,8 @@ public class EditorController extends Controller {
     private void savePlugin(String pluginName, Coords startPos, Model model) {
         Plugin activePlugin = model.getActivePlugin();
 
-        model.getCurrentLocation().saveCurrent();
-        model.getCurrentLayer().saveCurrent();
+        currentObservableLocation.saveCurrent();
+        currentObservableLayer.saveCurrent();
 
         activePlugin.setStartPos(startPos);
         World world = activePlugin.getWorld();
@@ -249,7 +248,7 @@ public class EditorController extends Controller {
         List<Asset> assets = world.getAssets();
         restoreItemsReferences(assets, locations, world);
 
-        restoreFirstLocationAndLayer(model, locations);
+        restoreFirstLocationAndLayer(locations);
         restorePluginSettingsStage(pss, metadata, loadedPlugin);
     }
 
@@ -313,14 +312,13 @@ public class EditorController extends Controller {
         observableAssets.fillLists(assets);
     }
 
-    private void restoreFirstLocationAndLayer(Model model, List<Location> locations) {
+    private void restoreFirstLocationAndLayer(List<Location> locations) {
         if (locations.isEmpty()) return;
         Location firstLocation = locations.get(0);
-        CurrentObservableLocation currentObservableLocation = model.getCurrentLocation();
         currentObservableLocation.setLocation(null);
         currentObservableLocation.setLocation(firstLocation);
         Layer firstLayer = firstLocation.getLayers().get(0);
-        model.getCurrentLayer().setLayer(firstLayer);
+        currentObservableLayer.setLayer(firstLayer);
     }
 
     public void updateCreaturesInventoryPlacesNames(String oldName, String newName) {
@@ -365,6 +363,26 @@ public class EditorController extends Controller {
 
     public void setActiveItem(PosItem activeItem) {
         this.activeItem = activeItem;
+    }
+
+    public CurrentObservableLocation getCurrentObservableLocation() {
+        return currentObservableLocation;
+    }
+
+    @Override
+    public void setCurrentLocation(Location location) {
+        super.setCurrentLocation(location);
+        currentObservableLocation.setLocation(location);
+    }
+
+    public CurrentObservableLayer getCurrentObservableLayer() {
+        return currentObservableLayer;
+    }
+
+    @Override
+    public void setCurrentLayer(Layer layer) {
+        super.setCurrentLayer(layer);
+        currentObservableLayer.setLayer(layer);
     }
 
     public ObservableAssets getObservableAssets() {

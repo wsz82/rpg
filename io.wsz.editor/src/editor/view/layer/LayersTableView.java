@@ -32,7 +32,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     public void initTable() {
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
         ObservableList<Layer> layers = currentObservableLocation.getLayers();
         setItems(layers);
 
@@ -56,7 +56,7 @@ class LayersTableView extends TableView<Layer> {
 
             if (isLevelUnique(newLevel)) {
                 layer.setLevel(newLevel);
-                controller.getCurrentLayer().setLayer(layer);
+                controller.getCurrentObservableLayer().setLayer(layer);
                 contentTableView.refresh();
                 editorCanvas.refresh();
             } else {
@@ -104,13 +104,13 @@ class LayersTableView extends TableView<Layer> {
 
         getSelectionModel().selectedItemProperty().addListener((observable, oldSel, newSel) -> {
             if (newSel != null) {
-                controller.getCurrentLayer().setLayer(newSel);
+                controller.getCurrentObservableLayer().setLayer(newSel);
             }
         });
     }
 
     private void updateItemsLevel(int newLevel, Integer oldLevel) {
-        for (PosItem pi : controller.getCurrentLocation().getItems()) {
+        for (PosItem pi : controller.getCurrentObservableLocation().getItems()) {
             Coords pos = pi.getPos();
             if (pos.level == oldLevel) {
                 pos.level = newLevel;
@@ -119,7 +119,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void updateItemsVisibility(int level, boolean visible) {
-        for (PosItem pi : controller.getCurrentLocation().getItems()) {
+        for (PosItem pi : controller.getCurrentObservableLocation().getItems()) {
             if (pi.getPos().level == level) {
                 pi.setIsVisible(visible);
             }
@@ -138,7 +138,7 @@ class LayersTableView extends TableView<Layer> {
 
     void removeLayers() {
         List<Layer> layersToRemove = getSelectionModel().getSelectedItems();
-        List<Layer> layers = controller.getCurrentLocation().getLayers();
+        List<Layer> layers = controller.getCurrentObservableLocation().getLayers();
         boolean listSizesAreEqual = layers.size() == layersToRemove.size();
         if (listSizesAreEqual) {
             layersToRemove = layersToRemove.stream()
@@ -153,10 +153,10 @@ class LayersTableView extends TableView<Layer> {
         List<Integer> levelsToRemove = layersToRemove.stream()
                 .map(l -> l.getLevel())
                 .collect(Collectors.toList());
-        List<PosItem> itemsToRemove = controller.getCurrentLocation().getItems().stream()
+        List<PosItem> itemsToRemove = controller.getCurrentObservableLocation().getItems().stream()
                 .filter(pi -> levelsToRemove.contains(pi.getPos().level))
                 .collect(Collectors.toList());
-        controller.getCurrentLocation().getItems().removeAll(itemsToRemove);
+        controller.getCurrentObservableLocation().getItems().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {

@@ -43,7 +43,7 @@ public class Remove implements Executable, Externalizable {
 
     @Override
     public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
-        locationWithItem = controller.getCurrentLocation().getLocation();
+        locationWithItem = controller.getCurrentLocation();
         List<PosItem> items = locationWithItem.getItems();
 
         for (PosItem i : items) {

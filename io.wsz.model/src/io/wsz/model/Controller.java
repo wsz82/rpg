@@ -8,8 +8,7 @@ import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
-import io.wsz.model.layer.CurrentObservableLayer;
-import io.wsz.model.location.CurrentObservableLocation;
+import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.logger.Logger;
 import io.wsz.model.plugin.Plugin;
@@ -196,7 +195,7 @@ public class Controller {
 
     public void initNewGameHeroes() {
         this.heroes.clear();
-        Location start = model.getCurrentLocation().getLocation();
+        Location start = model.getCurrentLocation();
         List<Creature> controllables = board.getControllableCreatures(start);
         for (Creature cr : controllables) {
             this.heroes.addLast(cr);
@@ -335,14 +334,6 @@ public class Controller {
                 .findFirst().orElse(null);
     }
 
-    public CurrentObservableLocation getCurrentLocation() {
-        return model.getCurrentLocation();
-    }
-
-    public CurrentObservableLayer getCurrentLayer() {
-        return model.getCurrentLayer();
-    }
-
     public Plugin getActivePlugin() {
         return model.getActivePlugin();
     }
@@ -353,6 +344,22 @@ public class Controller {
 
     public Fog getFog() {
         return fog;
+    }
+
+    public Location getCurrentLocation() {
+        return model.getCurrentLocation();
+    }
+
+    public void setCurrentLocation(Location location) {
+        model.setCurrentLocation(location);
+    }
+
+    public Layer getCurrentLayer() {
+        return model.getCurrentLayer();
+    }
+
+    public void setCurrentLayer(Layer layer) {
+        model.setCurrentLayer(layer);
     }
 
     public Properties getLocale() {

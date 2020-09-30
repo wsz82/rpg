@@ -1,20 +1,15 @@
 package io.wsz.model;
 
-import io.wsz.model.layer.CurrentObservableLayer;
-import io.wsz.model.location.CurrentObservableLocation;
+import io.wsz.model.layer.Layer;
+import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
 import io.wsz.model.plugin.PluginMetadata;
 
 public class Model {
     private PluginMetadata activePluginMetadata;
     private Plugin activePlugin;
-    private final CurrentObservableLocation currentObservableLocation;
-    private final CurrentObservableLayer currentObservableLayer;
-
-    public Model() {
-        this.currentObservableLocation = new CurrentObservableLocation();
-        this.currentObservableLayer = new CurrentObservableLayer();
-    }
+    private Location currentLocation;
+    private Layer currentLayer;
 
     public Plugin getActivePlugin() {
         return activePlugin;
@@ -32,11 +27,19 @@ public class Model {
         this.activePluginMetadata = activePluginMetadata;
     }
 
-    public CurrentObservableLocation getCurrentLocation() {
-        return currentObservableLocation;
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 
-    public CurrentObservableLayer getCurrentLayer() {
-        return currentObservableLayer;
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public Layer getCurrentLayer() {
+        return currentLayer;
+    }
+
+    public void setCurrentLayer(Layer currentLayer) {
+        this.currentLayer = currentLayer;
     }
 }

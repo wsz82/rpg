@@ -40,9 +40,9 @@ public class Board {
     public void centerScreenOn(Coords posToCenter, double canvasMeterWidth, double canvasMeterHeight, double widthCorrection) {
         Location locationToGo = posToCenter.getLocation();
         if (locationToGo != null) {
-            Location actual = controller.getCurrentLocation().getLocation();
+            Location actual = controller.getCurrentLocation();
             if (actual != locationToGo) {
-                controller.getCurrentLocation().setLocation(locationToGo);
+                controller.setCurrentLocation(locationToGo);
             }
         }
         curPos.level = posToCenter.level;
@@ -53,7 +53,7 @@ public class Board {
         } catch (IndexOutOfBoundsException e) {
             layer = layers.get(0);
         }
-        controller.getCurrentLayer().setLayer(layer);
+        controller.setCurrentLayer(layer);
 
         double x = posToCenter.x - canvasMeterWidth/2;
         double y = posToCenter.y - canvasMeterHeight/2;

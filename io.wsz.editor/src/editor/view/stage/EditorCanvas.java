@@ -60,7 +60,7 @@ public class EditorCanvas extends Canvas {
         double canvasHeight = getHeight();
         double bottom = top + canvasHeight/ meter;
 
-        List<PosItem> items = controller.getCurrentLocation().getItems();
+        List<PosItem> items = controller.getCurrentObservableLocation().getItems();
         items = items.stream()
                 .filter(PosItem::getIsVisible)
                 .filter(pi -> {
@@ -81,7 +81,7 @@ public class EditorCanvas extends Canvas {
             double itemsOpacity = EditorToolBar.getItemsOpacity();
             if (itemsOpacity != 1) {
                 if (EditorToolBar.isLayerOpacity()) {
-                    int level = controller.getCurrentLayer().getLevel();
+                    int level = controller.getCurrentObservableLayer().getLevel();
                     if (pi.getPos().level == level) {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
@@ -151,7 +151,7 @@ public class EditorCanvas extends Canvas {
                 return;
             }
             Coords translated = mark.clonePos();
-            translated.setLocation(controller.getCurrentLocation().getLocation());
+            translated.setLocation(controller.getCurrentObservableLocation().getLocation());
             translated.subtract(curPos);
             Image marker = pointer.getMarkerImage();
             if (marker == null) {
@@ -242,13 +242,13 @@ public class EditorCanvas extends Canvas {
             curPos.y = 0;
             refresh();
         });
-        controller.getCurrentLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
+        controller.getCurrentObservableLocation().locationProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
-        controller.getCurrentLocation().getWidthProperty().addListener((observable, oldValue, newValue) -> {
+        controller.getCurrentObservableLocation().getWidthProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
-        controller.getCurrentLocation().getHeightProperty().addListener((observable, oldValue, newValue) -> {
+        controller.getCurrentObservableLocation().getHeightProperty().addListener((observable, oldValue, newValue) -> {
             refresh();
         });
     }
@@ -264,7 +264,7 @@ public class EditorCanvas extends Canvas {
             }
             refresh();
         };
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
         currentObservableLocation.getItems().addListener(locationListener);
         currentObservableLocation.locationProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<PosItem> items = currentObservableLocation.getItems();
@@ -311,8 +311,8 @@ public class EditorCanvas extends Canvas {
             if (db.hasImage()) {
                 Coords dragPos = new Coords(
                         e.getX() / meter, e.getY() / meter,
-                        controller.getCurrentLayer().getLevel(),
-                        controller.getCurrentLocation().getLocation());
+                        controller.getCurrentObservableLayer().getLevel(),
+                        controller.getCurrentObservableLocation().getLocation());
                 if (draggedItem == null) {
                     dragPos.add(controller.getCurPos());
                     controller.setDragPos(dragPos);
@@ -331,17 +331,17 @@ public class EditorCanvas extends Canvas {
 
     private PosItem getPosItem(double xPos, double yPos) {
         PosItem pi;
-        int level = controller.getCurrentLayer().getLevel();
+        int level = controller.getCurrentObservableLayer().getLevel();
         Coords pos = new Coords(
                 xPos, yPos,
                 level,
-                controller.getCurrentLocation().getLocation());
+                controller.getCurrentObservableLocation().getLocation());
         Coords translated = pos.clonePos();
         translated.add(curPos);
         double x = translated.x;
         double y = translated.y;
         ItemType[] types = ItemType.values();
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentObservableLocation().getLocation();
         pi = controller.getBoard().lookForItem(location.getItems(), x, y, level, types, true);
         return pi;
     }
@@ -367,8 +367,8 @@ public class EditorCanvas extends Canvas {
             double dY = dy[1] - dy[0];
             double newX = curPos.x * Sizes.getMeter() - dX;
             double newY = curPos.y * Sizes.getMeter() - dY;
-            double locWidth = controller.getCurrentLocation().getWidth() * Sizes.getMeter();
-            double locHeight = controller.getCurrentLocation().getHeight() * Sizes.getMeter();
+            double locWidth = controller.getCurrentObservableLocation().getWidth() * Sizes.getMeter();
+            double locHeight = controller.getCurrentObservableLocation().getHeight() * Sizes.getMeter();
 
             if (newX + getWidth() <= locWidth) {
                 curPos.x = Math.max(newX, 0) / Sizes.getMeter();
@@ -418,8 +418,8 @@ public class EditorCanvas extends Canvas {
     }
 
     private void setSize() {
-        double locWidth = controller.getCurrentLocation().getWidth() * Sizes.getMeter();
-        double locHeight = controller.getCurrentLocation().getHeight() * Sizes.getMeter();
+        double locWidth = controller.getCurrentObservableLocation().getWidth() * Sizes.getMeter();
+        double locHeight = controller.getCurrentObservableLocation().getHeight() * Sizes.getMeter();
         double maxWidth = parent.getWidth();
         double maxHeight = parent.getHeight();
         if (locWidth >= maxWidth) {
@@ -463,7 +463,7 @@ public class EditorCanvas extends Canvas {
             y = newPos.y - pi.getImage().getHeight()/Sizes.getMeter();
         }
         pos.y = y;
-        pos.setLocation(controller.getCurrentLocation().getLocation());
+        pos.setLocation(controller.getCurrentObservableLocation().getLocation());
         contentTableView.refresh();
         refresh();
     }

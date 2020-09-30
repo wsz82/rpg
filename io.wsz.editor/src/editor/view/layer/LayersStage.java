@@ -55,11 +55,11 @@ public class LayersStage extends ChildStage {
     private void addLayer() {
         Layer layer = new Layer("new layer");
         Layer uniqueLayer = getUniqueLayer(layer);
-        controller.getCurrentLocation().getLayers().add(uniqueLayer);
+        controller.getCurrentObservableLocation().getLayers().add(uniqueLayer);
     }
 
     private Layer getUniqueLayer(Layer layer) {
-        List<Layer> layers = controller.getCurrentLocation().getLayers();
+        List<Layer> layers = controller.getCurrentObservableLocation().getLayers();
         boolean levelExists = layers.stream()
                 .anyMatch(l -> l.getLevel() == layer.getLevel());
         boolean nameExists = layers.stream()

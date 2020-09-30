@@ -35,7 +35,7 @@ public class ContentTableView extends TableView<PosItem> {
     }
 
     public void initTable() {
-        CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
+        CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
         ObservableList<PosItem> items = currentObservableLocation.getItems();
         setItems(items);
 
@@ -159,7 +159,7 @@ public class ContentTableView extends TableView<PosItem> {
 
     void removeContents() {
         ObservableList<PosItem> itemsToRemove = getSelectionModel().getSelectedItems();
-        controller.getCurrentLocation().getItems().removeAll(itemsToRemove);
+        controller.getCurrentObservableLocation().getItems().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {
@@ -172,7 +172,7 @@ public class ContentTableView extends TableView<PosItem> {
     public void moveToPointer() {
         List<PosItem> itemsToMove = getSelectionModel().getSelectedItems();
         Coords newPos = pointer.getMark();
-        Location location = controller.getCurrentLocation().getLocation();
+        Location location = controller.getCurrentObservableLocation().getLocation();
         for (PosItem pi : itemsToMove) {
             Coords pos = pi.getPos();
             pos.x = newPos.x;

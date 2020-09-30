@@ -156,7 +156,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         addItemsToStage.setOnAction(event -> {
             Coords mark = pointer.getMark();
             Coords cloned = mark.clonePos();
-            cloned.setLocation(controller.getCurrentLocation().getLocation());
+            cloned.setLocation(controller.getCurrentObservableLocation().getLocation());
             addItemsToStage(mark);
         });
         contextMenu.getItems().addAll(addAsset, editAsset, removeAsset, addItemsToStage);
@@ -170,7 +170,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         for (A item : createdItems) {
             Image img = item.getImage().getFxImage();
             if (isImageTooBig(item, img)) continue;
-            controller.getCurrentLocation().getItems().add(item);
+            controller.getCurrentObservableLocation().getItems().add(item);
         }
     }
 

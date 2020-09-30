@@ -1,8 +1,8 @@
 package editor.view.location;
 
+import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.stage.ChildStage;
-import io.wsz.model.Controller;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,9 +17,9 @@ public class LocationParametersStage extends ChildStage {
     private final DoubleField inputHeight = new DoubleField(0.01, false);
     private final Button accept = new Button("Ok");
     private final Button cancel = new Button("Cancel");
-    private final Controller controller;
+    private final EditorController controller;
 
-    public LocationParametersStage(Stage parent, Controller controller) {
+    public LocationParametersStage(Stage parent, EditorController controller) {
         super(parent);
         this.controller = controller;
         initWindow();
@@ -34,13 +34,13 @@ public class LocationParametersStage extends ChildStage {
         HBox widthWithLabel = new HBox(10);
         Label widthLabel = new Label("Width");
         widthWithLabel.getChildren().addAll(widthLabel, inputWidth);
-        inputWidth.setText("" + controller.getCurrentLocation().getLocation().getWidth());
+        inputWidth.setText("" + controller.getCurrentObservableLocation().getLocation().getWidth());
         inputWidth.setPrefWidth(80);
 
         HBox heightWithLabel = new HBox(10);
         Label heightLabel = new Label("Height");
         heightWithLabel.getChildren().addAll(heightLabel, inputHeight);
-        inputHeight.setText("" + controller.getCurrentLocation().getLocation().getHeight());
+        inputHeight.setText("" + controller.getCurrentObservableLocation().getLocation().getHeight());
         inputHeight.setPrefWidth(80);
 
         VBox allParameters = new VBox(10);
@@ -69,7 +69,7 @@ public class LocationParametersStage extends ChildStage {
     }
 
     private void changeCurrentLocationParameters(double width, double height) {
-        controller.getCurrentLocation().setWidth(width);
-        controller.getCurrentLocation().setHeight(height);
+        controller.getCurrentObservableLocation().setWidth(width);
+        controller.getCurrentObservableLocation().setHeight(height);
     }
 }

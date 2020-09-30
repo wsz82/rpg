@@ -70,7 +70,7 @@ public class TeleportableDelagate implements Externalizable {
         cr.changePosition(from, exit);
         if (cr.getControl().equals(CONTROL)) {
             controller.setLocationToUpdate(target);
-            controller.getCurrentLayer().setLayer(targetLayer);
+            controller.setCurrentLayer(targetLayer);
             controller.setPosToCenter(exit);
         }
         boolean isNotTeleportingToTheSameLocation = !from.equals(exit.getLocation());

@@ -49,9 +49,9 @@ public class LocationsTableView extends TableView<Location> {
             } else {
                 location.setId(t.getOldValue());
             }
-            Location currentLocation = controller.getCurrentLocation().getLocation();
+            Location currentLocation = controller.getCurrentObservableLocation().getLocation();
             if (location.equals(currentLocation)) {
-                controller.getCurrentLocation().setName(newValue);
+                controller.getCurrentObservableLocation().setName(newValue);
             }
             refresh();
         });
@@ -70,9 +70,9 @@ public class LocationsTableView extends TableView<Location> {
             double newWidth = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setWidth(newWidth);
-            Location currentLocation = controller.getCurrentLocation().getLocation();
+            Location currentLocation = controller.getCurrentObservableLocation().getLocation();
             if (location.equals(currentLocation)) {
-                controller.getCurrentLocation().setWidth(newWidth);
+                controller.getCurrentObservableLocation().setWidth(newWidth);
             }
             refresh();
         });
@@ -90,9 +90,9 @@ public class LocationsTableView extends TableView<Location> {
             double newHeight = t.getNewValue();
             Location location = getItems().get(t.getTablePosition().getRow());
             location.setHeight(t.getNewValue());
-            Location currentLocation = controller.getCurrentLocation().getLocation();
+            Location currentLocation = controller.getCurrentObservableLocation().getLocation();
             if (location.equals(currentLocation)) {
-                controller.getCurrentLocation().setHeight(newHeight);
+                controller.getCurrentObservableLocation().setHeight(newHeight);
             }
             refresh();
         });
@@ -123,15 +123,15 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private void changeCurrentLocationIfWasRemoved(List<Location> locations) {
-        Location currentLocation = controller.getCurrentLocation().getLocation();
+        Location currentLocation = controller.getCurrentObservableLocation().getLocation();
         if (!locations.contains(currentLocation)) {
-            controller.getCurrentLocation().setLocation(locations.get(0));
+            controller.getCurrentObservableLocation().setLocation(locations.get(0));
         }
     }
 
     public void goTo() {
         Location location = getSelectionModel().getSelectedItem();
-        controller.getCurrentLocation().setLocation(location);
+        controller.getCurrentObservableLocation().setLocation(location);
         Coords curPos = controller.getBoard().getCurPos();
         curPos.x = 0;
         curPos.y = 0;

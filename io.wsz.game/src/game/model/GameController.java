@@ -134,7 +134,7 @@ public class GameController extends Controller {
             name = createUniqueName(name);
             getSavesList().add(name);
         }
-        savedPos.setLocation(getCurrentLocation().getLocation());
+        savedPos.setLocation(getCurrentLocation());
         savedPos.level = getCurrentLayer().getLevel();
         SaveMemento memento = new SaveMemento(name, savedPos, getHeroes(), getDialogMemento());
         memento.setWorld(getActivePlugin().getWorld());
@@ -257,7 +257,7 @@ public class GameController extends Controller {
     private void restoreStartLocationAndLayer(Coords startPos) {
         restoreLocationOfCoords(startPos);
         Location first = startPos.getLocation();
-        getCurrentLocation().setLocation(first);
+        model.setCurrentLocation(first);
 
         int serLevel = startPos.level;
         Optional<Layer> optLayer = first.getLayers().stream()
@@ -267,7 +267,7 @@ public class GameController extends Controller {
         if (startLayer == null) {
             throw new NullPointerException("Start layer \"" + serLevel + "\" does not exist in start location");
         }
-        getCurrentLayer().setLayer(startLayer);
+        model.setCurrentLayer(startLayer);
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {

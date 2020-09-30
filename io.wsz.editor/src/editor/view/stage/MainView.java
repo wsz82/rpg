@@ -168,9 +168,9 @@ class MainView {
         bottomHorizontalBar.setSpacing(10);
         final CoordinatesBox coordinatesBox = new CoordinatesBox(center, controller);
         coordinatesBox.initBox();
-        final CurrentLocationBox currentLocationBox = new CurrentLocationBox(controller.getCurrentLocation().getIdProperty());
+        final CurrentLocationBox currentLocationBox = new CurrentLocationBox(controller.getCurrentObservableLocation().getIdProperty());
         currentLocationBox.initBox();
-        final CurrentLayerBox currentLayerBox = new CurrentLayerBox(controller.getCurrentLayer().levelProperty());
+        final CurrentLayerBox currentLayerBox = new CurrentLayerBox(controller.getCurrentObservableLayer().levelProperty());
         currentLayerBox.initBox();
 
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);

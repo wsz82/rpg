@@ -1,6 +1,6 @@
 package editor.view.stage;
 
-import io.wsz.model.Controller;
+import editor.model.EditorController;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
@@ -19,11 +19,11 @@ public class Pointer {
     private Image markerImage;
     private EditorCanvas editorCanvas;
 
-    public Pointer(Controller controller) {
+    public Pointer(EditorController controller) {
         clickEvent = hookUpEvents(controller);
     }
 
-    public EventHandler<MouseEvent> hookUpEvents(Controller controller) {
+    public EventHandler<MouseEvent> hookUpEvents(EditorController controller) {
         final EventHandler<MouseEvent> clickEvent;
         clickEvent = e -> {
             e.consume();
@@ -34,10 +34,10 @@ public class Pointer {
         return clickEvent;
     }
 
-    private void setMark(Controller controller, MouseEvent e) {
+    private void setMark(EditorController controller, MouseEvent e) {
         mark.x = e.getX() / Sizes.getMeter();
         mark.y = e.getY() / Sizes.getMeter();
-        mark.level = controller.getCurrentLayer().getLevel();
+        mark.level = controller.getCurrentObservableLayer().getLevel();
         mark.add(controller.getCurPos());
         if (markerImage == null) {
             loadMarkerImage();
