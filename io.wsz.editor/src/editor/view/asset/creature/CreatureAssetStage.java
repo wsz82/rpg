@@ -1,14 +1,14 @@
 package editor.view.asset.creature;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
-import editor.view.IntegerField;
 import editor.view.asset.AssetStage;
 import editor.view.asset.coords.CoordsPointEditStage;
 import editor.view.asset.coords.PointSetter;
 import editor.view.asset.creature.inventory.InventoryItemsStage;
 import editor.view.asset.creature.inventory.place.InventoryPlaceEditStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.DoubleField;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.animation.creature.CreatureAnimation;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.CreatureControl;

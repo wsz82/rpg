@@ -1,10 +1,10 @@
 package editor.view.asset.equipment.container;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
-import editor.view.IntegerField;
 import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.DoubleField;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.OpenableItem;
 import javafx.scene.control.Button;

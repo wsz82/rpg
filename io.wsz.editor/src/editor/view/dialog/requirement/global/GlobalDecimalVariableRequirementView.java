@@ -1,8 +1,8 @@
 package editor.view.dialog.requirement.global;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
 import editor.view.dialog.requirement.DualTextFieldChoiceBox;
+import editor.view.utilities.DoubleField;
 import io.wsz.model.script.CompareOperator;
 import io.wsz.model.script.bool.countable.variable.BooleanDecimalGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableDecimalVariable;

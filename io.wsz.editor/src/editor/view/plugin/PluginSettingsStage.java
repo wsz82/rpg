@@ -1,9 +1,9 @@
 package editor.view.plugin;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
-import editor.view.IntegerField;
 import editor.view.stage.ChildStage;
+import editor.view.utilities.DoubleField;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.location.Location;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;

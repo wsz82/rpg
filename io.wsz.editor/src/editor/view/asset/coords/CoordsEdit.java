@@ -1,9 +1,9 @@
 package editor.view.asset.coords;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
-import editor.view.IntegerField;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.DoubleField;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;

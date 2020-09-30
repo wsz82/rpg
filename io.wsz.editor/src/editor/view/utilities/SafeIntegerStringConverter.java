@@ -1,4 +1,4 @@
-package editor.view;
+package editor.view.utilities;
 
 import javafx.util.converter.IntegerStringConverter;
 

@@ -13,8 +13,6 @@ import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.world.World;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +32,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     protected String itemId;
     protected boolean isVisible;
-    protected BooleanProperty isBlocked;
+    protected boolean isBlocked;
     protected Coords pos;
     protected A prototype;
     protected List<Coords> coverLine;
@@ -46,14 +44,13 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     protected Script script;
 
     public PosItem() {
-        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked");
         this.pos = new Coords();
     }
 
     public PosItem(ItemType type, Controller controller) {
         super(type);
         this.isVisible = true;
-        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", false);
+        this.isBlocked = false;
         this.pos = new Coords();
         this.controller = controller;
         this.coverLine = new ArrayList<>(0);
@@ -63,7 +60,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     public PosItem(A prototype) {
         this.prototype = prototype;
         this.isVisible = true;
-        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", false);
+        this.isBlocked = false;
         this.pos = new Coords();
     }
 
@@ -76,7 +73,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
             this.itemId = getUniqueId(other.itemId);
         }
         this.isVisible = other.isVisible;
-        this.isBlocked = new SimpleBooleanProperty(this, "isBlocked", other.isBlocked.get());
+        this.isBlocked = other.isBlocked;
         this.pos = other.pos.clonePos();
         this.coverLine = Geometry.cloneCoordsList(other.coverLine);
         this.collisionPolygons = Geometry.cloneCoordsPolygons(other.collisionPolygons);
@@ -468,15 +465,11 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     }
 
     public boolean isBlocked() {
-        return isBlocked.get();
-    }
-
-    public BooleanProperty isBlockedProperty() {
         return isBlocked;
     }
 
-    public void setIsBlocked(boolean isBlocked) {
-        this.isBlocked.set(isBlocked);
+    public void setBlocked(boolean isBlocked) {
+        this.isBlocked = isBlocked;
     }
 
     public Coords getPos() {
@@ -739,7 +732,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         out.writeBoolean(isVisible);
 
-        out.writeBoolean(isBlocked.get());
+        out.writeBoolean(isBlocked);
 
         out.writeObject(pos);
 
@@ -771,7 +764,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
         isVisible = in.readBoolean();
 
-        isBlocked.set(in.readBoolean());
+        isBlocked = in.readBoolean();
 
         Coords pos = (Coords) in.readObject();
         this.pos.x = pos.x;

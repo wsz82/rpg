@@ -1,4 +1,4 @@
-package editor.view;
+package editor.view.utilities;
 
 public class DoubleField extends NumberField<Double> {
 

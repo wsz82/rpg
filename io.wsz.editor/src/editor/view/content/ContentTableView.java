@@ -1,21 +1,21 @@
 package editor.view.content;
 
 import editor.model.EditorController;
-import editor.view.SafeIntegerStringConverter;
 import editor.view.location.CurrentObservableLocation;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
+import editor.view.utilities.BooleanGetter;
+import editor.view.utilities.BooleanSetter;
+import editor.view.utilities.CheckBoxCallback;
+import editor.view.utilities.SafeIntegerStringConverter;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -28,6 +28,10 @@ public class ContentTableView extends TableView<PosItem> {
     private final ContentEditDelegate contentEditDelegate = new ContentEditDelegate();
     private final EditorCanvas editorCanvas;
     private final EditorController controller;
+    private final BooleanSetter<PosItem> visibleSetter = PosItem::setVisible;
+    private final BooleanGetter<PosItem> visibleGetter = PosItem::isVisible;
+    private final BooleanSetter<PosItem> blockedSetter = PosItem::setBlocked;
+    private final BooleanGetter<PosItem> blockedGetter = PosItem::isBlocked;
 
     private Pointer pointer;
 
@@ -109,18 +113,11 @@ public class ContentTableView extends TableView<PosItem> {
         });
 
         TableColumn<PosItem, CheckBox> visibilityCol = new TableColumn<>("Visibility");
-        visibilityCol.setCellValueFactory(f -> {
-            PosItem pi = f.getValue();
-            CheckBox checkBox = new CheckBox();
-            checkBox.selectedProperty().setValue(pi.isVisible());
-            checkBox.selectedProperty().addListener((ov, oldVal, newVal) -> pi.setVisible(newVal));
-            return new SimpleObjectProperty<>(checkBox);
-        });
+        visibilityCol.setCellValueFactory(new CheckBoxCallback<>(visibleGetter, visibleSetter));
         visibilityCol.setEditable(true);
 
-        TableColumn<PosItem, Boolean> blockedCol = new TableColumn<>("Block");
-        blockedCol.setCellValueFactory(new PropertyValueFactory<>("isBlocked"));
-        blockedCol.setCellFactory(CheckBoxTableCell.forTableColumn(blockedCol));
+        TableColumn<PosItem, CheckBox> blockedCol = new TableColumn<>("Block");
+        blockedCol.setCellValueFactory(new CheckBoxCallback<>(blockedGetter, blockedSetter));
         blockedCol.setEditable(true);
 
         TableColumn<PosItem, Double> posCol = new TableColumn<>("Position");
@@ -213,4 +210,5 @@ public class ContentTableView extends TableView<PosItem> {
     public void setPointer(Pointer pointer) {
         this.pointer = pointer;
     }
+
 }

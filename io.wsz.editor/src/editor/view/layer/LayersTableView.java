@@ -1,19 +1,22 @@
 package editor.view.layer;
 
 import editor.model.EditorController;
-import editor.view.SafeIntegerStringConverter;
 import editor.view.content.ContentTableView;
 import editor.view.location.CurrentObservableLocation;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.BooleanGetter;
+import editor.view.utilities.BooleanSetter;
+import editor.view.utilities.CheckBoxCallback;
+import editor.view.utilities.SafeIntegerStringConverter;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import java.util.List;
@@ -23,12 +26,22 @@ class LayersTableView extends TableView<Layer> {
     private final ContentTableView contentTableView;
     private final EditorCanvas editorCanvas;
     private final EditorController controller;
+    private final BooleanGetter<Layer> visibleGetter;
+    private final BooleanSetter<Layer> visibleSetter;
 
     public LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController controller) {
         super();
         this.contentTableView = contentTableView;
         this.editorCanvas = editorCanvas;
         this.controller = controller;
+        visibleGetter = Layer::isVisible;
+        visibleSetter = (layer, value) -> {
+            int level = layer.getLevel();
+            layer.setVisible(value);
+            updateItemsVisibility(level, value);
+            contentTableView.refresh();
+            editorCanvas.refresh();
+        };
     }
 
     public void initTable() {
@@ -86,16 +99,18 @@ class LayersTableView extends TableView<Layer> {
         });
         nameCol.setPrefWidth(100);
 
-        TableColumn<Layer, Boolean> visibleCol = new TableColumn<>("Visibility");
+        TableColumn<Layer, CheckBox> visibleCol = new TableColumn<>("Visibility");
         visibleCol.setEditable(true);
-        visibleCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibleCol));
-        visibleCol.setCellValueFactory(p -> {
-            Layer newLayer = p.getValue();
-            int level = newLayer.getLevel();
-            boolean visible = newLayer.getVisible();
-            updateItemsVisibility(level, visible);
-            return newLayer.getVisibleProperty();
-        });
+        visibleCol.setCellValueFactory(new CheckBoxCallback<>(visibleGetter, visibleSetter));
+//        visibleCol.setCellValueFactory(p -> {
+//            Layer newLayer = p.getValue();
+//            int level = newLayer.getLevel();
+//            boolean visible = newLayer.isVisible();
+//            updateItemsVisibility(level, visible);
+//            contentTableView.refresh();
+//            editorCanvas.refresh();
+//            return newLayer.getVisibleProperty();
+//        });
 
         ObservableList<TableColumn<Layer, ?>> columns = this.getColumns();
         columns.add(0, levelCol);
@@ -162,7 +177,7 @@ class LayersTableView extends TableView<Layer> {
     public void changeVisibility() {
         List<Layer> layersToChange = getSelectionModel().getSelectedItems();
         for (Layer layer : layersToChange) {
-            layer.setVisible(!layer.getVisible());
+            layer.setVisible(!layer.isVisible());
         }
     }
 }

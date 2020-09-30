@@ -1,9 +1,9 @@
 package editor.view.dialog.requirement.item;
 
 import editor.model.EditorController;
-import editor.view.IntegerField;
 import editor.view.dialog.requirement.DualTextFieldChoiceBox;
 import editor.view.dialog.requirement.SpecificRequirement;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.CompareOperator;

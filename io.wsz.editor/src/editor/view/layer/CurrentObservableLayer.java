@@ -20,7 +20,14 @@ public class CurrentObservableLayer {
     }
 
     public void setLayer(Layer layer) {
-        this.layer = layer;
+        saveCurrent();
+        if (layer != null) {
+            this.level.set(layer.getLevel());
+            this.layer = layer;
+        } else {
+            this.level.set(0);
+            this.layer = null;
+        }
     }
 
     public int getLevel() {

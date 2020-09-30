@@ -1,10 +1,10 @@
 package editor.view.asset.items;
 
 import editor.model.EditorController;
-import editor.view.SafeIntegerStringConverter;
 import editor.view.content.ContentEditDelegate;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.SafeIntegerStringConverter;
 import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.EquipmentMayCountable;

@@ -1,8 +1,8 @@
 package editor.view.location;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
 import editor.view.stage.ChildStage;
+import editor.view.utilities.DoubleField;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -1,8 +1,8 @@
 package editor.view.dialog.requirement.global;
 
 import editor.model.EditorController;
-import editor.view.IntegerField;
 import editor.view.dialog.requirement.DualTextFieldChoiceBox;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.script.CompareOperator;
 import io.wsz.model.script.bool.countable.variable.BooleanIntegerGlobalVariable;
 import io.wsz.model.script.bool.countable.variable.CountableIntegerVariable;

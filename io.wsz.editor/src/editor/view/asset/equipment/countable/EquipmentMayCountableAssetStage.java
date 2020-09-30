@@ -1,9 +1,9 @@
 package editor.view.asset.equipment.countable;
 
 import editor.model.EditorController;
-import editor.view.IntegerField;
 import editor.view.asset.equipment.EquipmentAssetStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.IntegerField;
 import io.wsz.model.item.EquipmentMayCountable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

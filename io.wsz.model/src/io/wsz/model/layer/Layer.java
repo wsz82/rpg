@@ -1,8 +1,6 @@
 package io.wsz.model.layer;
 
 import io.wsz.model.sizes.Sizes;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -15,14 +13,14 @@ public class Layer implements Externalizable {
 
     private int level;
     private String id;
-    private final BooleanProperty visible = new SimpleBooleanProperty(this, "visible");
+    private boolean visible;
 
     public Layer() {}
 
     public Layer(String layerName) {
         this.level = 0;
         this.id = layerName;
-        this.visible.set(true);
+        this.visible = true;
     }
 
     public void setLevel(int level) {
@@ -42,14 +40,10 @@ public class Layer implements Externalizable {
     }
 
     public void setVisible(boolean value) {
-        visible.set(value);
+        visible = value;
     }
 
-    public boolean getVisible() {
-        return visible.get();
-    }
-
-    public BooleanProperty getVisibleProperty() {
+    public boolean isVisible() {
         return visible;
     }
 
@@ -80,7 +74,7 @@ public class Layer implements Externalizable {
 
         out.writeUTF(id);
 
-        out.writeBoolean(visible.get());
+        out.writeBoolean(visible);
     }
 
     @Override
@@ -91,6 +85,6 @@ public class Layer implements Externalizable {
 
         id = in.readUTF();
 
-        visible.set(in.readBoolean());
+        visible = in.readBoolean();
     }
 }

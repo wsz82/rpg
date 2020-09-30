@@ -1,7 +1,7 @@
 package editor.view.asset.coords;
 
-import editor.view.DoubleField;
 import editor.view.stage.ChildStage;
+import editor.view.utilities.DoubleField;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;

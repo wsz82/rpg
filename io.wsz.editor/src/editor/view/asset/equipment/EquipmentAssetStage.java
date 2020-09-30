@@ -1,9 +1,9 @@
 package editor.view.asset.equipment;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.DoubleField;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;

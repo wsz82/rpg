@@ -1,9 +1,9 @@
 package editor.view.asset.equipment.countable.weapon;
 
 import editor.model.EditorController;
-import editor.view.DoubleField;
 import editor.view.asset.equipment.countable.EquipmentMayCountableAssetStage;
 import editor.view.stage.EditorCanvas;
+import editor.view.utilities.DoubleField;
 import io.wsz.model.item.Weapon;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
