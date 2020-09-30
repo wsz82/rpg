@@ -20,12 +20,18 @@ public class Pointer {
     private EditorCanvas editorCanvas;
 
     public Pointer(Controller controller) {
+        clickEvent = hookUpEvents(controller);
+    }
+
+    public EventHandler<MouseEvent> hookUpEvents(Controller controller) {
+        final EventHandler<MouseEvent> clickEvent;
         clickEvent = e -> {
             e.consume();
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 setMark(controller, e);
             }
         };
+        return clickEvent;
     }
 
     private void setMark(Controller controller, MouseEvent e) {

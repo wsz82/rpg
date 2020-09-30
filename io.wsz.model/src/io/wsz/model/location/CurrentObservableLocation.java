@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class CurrentObservableLocation {
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
+    private final ObservableList<Layer> layers = FXCollections.observableArrayList();
     private final ObservableList<PosItem> items = FXCollections.observableArrayList();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final DoubleProperty heightProperty = new SimpleDoubleProperty();
@@ -25,11 +26,14 @@ public class CurrentObservableLocation {
             this.idProperty.set(location.getId());
             this.items.clear();
             this.items.addAll(location.getItems());
+            this.layers.clear();
+            this.layers.addAll(location.getLayers());
             this.locationProperty.set(location);
         } else {
             this.widthProperty.set(0);
             this.heightProperty.set(0);
             this.idProperty.set(null);
+            this.layers.clear();
             this.items.clear();
             this.locationProperty.set(null);
         }
@@ -39,6 +43,7 @@ public class CurrentObservableLocation {
         Location current = this.locationProperty.get();
         if (current != null) {
             current.setItems(new ArrayList<>(items));
+            current.setLayers(new ArrayList<>(layers));
         }
     }
 
@@ -94,6 +99,6 @@ public class CurrentObservableLocation {
     }
 
     public ObservableList<Layer> getLayers() {
-        return locationProperty.get().getLayers();
+        return layers;
     }
 }

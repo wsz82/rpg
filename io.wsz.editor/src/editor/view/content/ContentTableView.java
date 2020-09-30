@@ -6,6 +6,7 @@ import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.Controller;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -86,10 +87,10 @@ public class ContentTableView extends TableView<PosItem> {
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
             int level = t.getNewValue();
-            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            PosItem pi = getSelectionModel().getSelectedItem();
 
             List<Integer> levels = currentObservableLocation.getLayers().stream()
-                    .map(l -> l.getLevel())
+                    .map(Layer::getLevel)
                     .collect(Collectors.toList());
             if (!levels.contains(level)) {
                 alertLayerNotExisting(level);
@@ -124,7 +125,7 @@ public class ContentTableView extends TableView<PosItem> {
         });
         xCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         xCol.setOnEditCommit(t -> {
-            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            PosItem pi = getSelectionModel().getSelectedItem();
             pi.getPos().x = t.getNewValue();
             refresh();
             editorCanvas.refresh();
@@ -140,7 +141,7 @@ public class ContentTableView extends TableView<PosItem> {
         });
         yCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         yCol.setOnEditCommit(t -> {
-            PosItem pi = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            PosItem pi = getSelectionModel().getSelectedItem();
             pi.getPos().y = t.getNewValue();
             refresh();
             editorCanvas.refresh();

@@ -10,7 +10,6 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.location.CurrentObservableLocation;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -27,28 +26,18 @@ class LayersTableView extends TableView<Layer> {
     private final EditorController editorController;
     private final Controller controller;
 
-    LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController editorController) {
+    public LayersTableView(ContentTableView contentTableView, EditorCanvas editorCanvas, EditorController editorController) {
         super();
         this.contentTableView = contentTableView;
         this.editorCanvas = editorCanvas;
         this.editorController = editorController;
         controller = editorController.getController();
-        initTable();
     }
 
-    private void initTable() {
+    public void initTable() {
         CurrentObservableLocation currentObservableLocation = controller.getCurrentLocation();
         ObservableList<Layer> layers = currentObservableLocation.getLayers();
         setItems(layers);
-        currentObservableLocation.locationProperty().addListener((observable, oldLocation, newLocation) -> {
-            ObservableList<Layer> observableLayers;
-            if (newLocation != null) {
-                observableLayers = newLocation.getLayers();
-            } else {
-                observableLayers = FXCollections.emptyObservableList();
-            }
-            setItems(observableLayers);
-        });
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setEditable(true);
@@ -63,7 +52,7 @@ class LayersTableView extends TableView<Layer> {
         levelCol.setEditable(true);
         levelCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeIntegerStringConverter()));
         levelCol.setOnEditCommit(t -> {
-            Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            Layer layer = getSelectionModel().getSelectedItem();
             int newLevel = t.getNewValue();
             Integer oldLevel = t.getOldValue();
             updateItemsLevel(newLevel, oldLevel);
@@ -89,7 +78,7 @@ class LayersTableView extends TableView<Layer> {
         nameCol.setEditable(true);
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         nameCol.setOnEditCommit(t -> {
-            Layer layer = t.getTableView().getItems().get(t.getTablePosition().getRow());
+            Layer layer = getSelectionModel().getSelectedItem();
             String newValue = t.getNewValue();
             if (isNameUnique(newValue)) {
                 layer.setId(newValue);

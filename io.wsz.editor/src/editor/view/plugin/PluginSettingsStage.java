@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.DoubleField;
 import editor.view.IntegerField;
 import editor.view.stage.ChildStage;
-import io.wsz.model.Controller;
 import io.wsz.model.location.Location;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -31,16 +30,13 @@ public class PluginSettingsStage extends ChildStage {
     private final IntegerProperty startLevel = new SimpleIntegerProperty();
     private final StackPane root = new StackPane();
     private final EditorController editorController;
-    private final Controller controller;
 
     public PluginSettingsStage(Stage parent, EditorController editorController){
         super(parent);
         this.editorController = editorController;
-        controller = editorController.getController();
-        initWindow();
     }
 
-    private void initWindow() {
+    public void initWindow() {
         Scene scene = new Scene(root);
         setTitle(TITLE);
         setScene(scene);

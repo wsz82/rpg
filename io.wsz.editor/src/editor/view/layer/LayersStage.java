@@ -26,10 +26,10 @@ public class LayersStage extends ChildStage {
         this.editorController = editorController;
         controller = editorController.getController();
         table = new LayersTableView(contentTableView, editorCanvas, editorController);
-        initWindow();
+        table.initTable();
     }
 
-    private void initWindow() {
+    public void initWindow() {
         Scene scene = new Scene(root);
         setTitle(LAYERS);
         setScene(scene);

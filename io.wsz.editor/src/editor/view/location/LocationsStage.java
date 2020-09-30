@@ -24,10 +24,9 @@ public class LocationsStage extends ChildStage {
         super(parent);
         this.editorController = editorController;
         this.table = new LocationsTableView(editorCanvas, editorController);
-        initWindow();
     }
 
-    private void initWindow() {
+    public void initWindow() {
         Scene scene = new Scene(root);
         setTitle(TITLE);
         setScene(scene);

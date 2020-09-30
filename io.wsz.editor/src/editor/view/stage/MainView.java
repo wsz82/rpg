@@ -60,10 +60,13 @@ class MainView {
         final ContentTableView ctv = contentsWindow.getTable();
         editorCanvas.setContentTableView(ctv);
         layersWindow = new LayersStage(mainStage, ctv, editorCanvas, editorController);
+        layersWindow.initWindow();
         assetsWindow = new AssetsStage(mainStage, pointer, ctv, editorCanvas, editorController);
         assetsWindow.initWindow();
         locationsWindow = new LocationsStage(mainStage, editorController, editorCanvas);
+        locationsWindow.initWindow();
         pss = new PluginSettingsStage(mainStage, editorController);
+        pss.initWindow();
     }
 
     public void show() {
@@ -167,8 +170,12 @@ class MainView {
         final HBox bottomHorizontalBar = new HBox();
         bottomHorizontalBar.setSpacing(10);
         final CoordinatesBox coordinatesBox = new CoordinatesBox(center, controller);
-        final CurrentLocationBox currentLocationBox = new CurrentLocationBox(controller);
-        final CurrentLayerBox currentLayerBox = new CurrentLayerBox(controller);
+        coordinatesBox.initBox();
+        final CurrentLocationBox currentLocationBox = new CurrentLocationBox(controller.getCurrentLocation().getIdProperty());
+        currentLocationBox.initBox();
+        final CurrentLayerBox currentLayerBox = new CurrentLayerBox(controller.getCurrentLayer().levelProperty());
+        currentLayerBox.initBox();
+
         bottomHorizontalBar.getChildren().addAll(coordinatesBox, currentLocationBox, currentLayerBox);
         bottom.getChildren().addAll(bottomHorizontalBar);
     }

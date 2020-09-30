@@ -1,23 +1,25 @@
 package io.wsz.model.layer;
 
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 
-public class CurrentLayer {
-    private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>();
+public class CurrentObservableLayer {
     private final IntegerProperty level = new SimpleIntegerProperty();
+    private Layer layer;
 
-    public CurrentLayer() {}
+    public CurrentObservableLayer() {}
+
+    public void saveCurrent() {
+        if (layer == null) return;
+        layer.setLevel(level.get());
+    }
 
     public Layer getLayer() {
-        return layer.get();
+        return layer;
     }
 
     public void setLayer(Layer layer) {
-        level.set(layer.getLevel());
-        this.layer.set(layer);
+        this.layer = layer;
     }
 
     public int getLevel() {

@@ -5,8 +5,6 @@ import io.wsz.model.layer.Layer;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.Fog;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -24,7 +22,7 @@ public class Location implements Externalizable {
     private String id;
     private double width;
     private double height;
-    private ObservableList<Layer> layers;
+    private List<Layer> layers;
     private List<PosItem> items;
     private List<PosItem> itemsToRemove;
     private List<PosItem> itemsToAdd;
@@ -34,18 +32,19 @@ public class Location implements Externalizable {
 
     public Location(String id) {
         this.id = id;
-        this.layers = FXCollections.observableArrayList();
-        this.items = FXCollections.observableArrayList();
-        this.itemsToRemove = new ArrayList<>(0);
-        this.itemsToAdd = new ArrayList<>(0);
+        initLists();
     }
 
     public Location(String id, int width, int height) {
         this.id = id;
         this.width = width;
         this.height = height;
-        this.layers = FXCollections.observableArrayList();
-        this.items = FXCollections.observableArrayList();
+        initLists();
+    }
+
+    private void initLists() {
+        this.layers = new ArrayList<>(0);
+        this.items = new ArrayList<>(0);
         this.itemsToRemove = new ArrayList<>(0);
         this.itemsToAdd = new ArrayList<>(0);
     }
@@ -106,8 +105,12 @@ public class Location implements Externalizable {
         this.height = height;
     }
 
-    public ObservableList<Layer> getLayers() {
+    public List<Layer> getLayers() {
         return layers;
+    }
+
+    public void setLayers(List<Layer> layers) {
+        this.layers = layers;
     }
 
     public List<PosItem> getItems() {
@@ -157,7 +160,7 @@ public class Location implements Externalizable {
 
         out.writeDouble(height);
 
-        out.writeObject(new ArrayList<>(layers));
+        out.writeObject(layers);
 
         out.writeObject(items);
 
@@ -178,8 +181,7 @@ public class Location implements Externalizable {
 
         height = in.readDouble();
 
-        List<Layer> serLayers = (List<Layer>) in.readObject();
-        layers = FXCollections.observableArrayList(serLayers);
+        layers = (List<Layer>) in.readObject();
 
         items = (List<PosItem>) in.readObject();
 
