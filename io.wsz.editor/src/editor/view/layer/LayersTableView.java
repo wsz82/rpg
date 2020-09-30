@@ -121,7 +121,7 @@ class LayersTableView extends TableView<Layer> {
     private void updateItemsVisibility(int level, boolean visible) {
         for (PosItem pi : controller.getCurrentObservableLocation().getItems()) {
             if (pi.getPos().level == level) {
-                pi.setIsVisible(visible);
+                pi.setVisible(visible);
             }
         }
     }

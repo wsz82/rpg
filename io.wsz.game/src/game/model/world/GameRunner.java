@@ -269,7 +269,7 @@ public class GameRunner {
 
         items.clear();
         location.getItems().stream()
-                .filter(PosItem::getIsVisible)
+                .filter(PosItem::isVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
                     double piRight = pi.getRight();

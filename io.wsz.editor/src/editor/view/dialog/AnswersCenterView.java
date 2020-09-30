@@ -100,9 +100,9 @@ public class AnswersCenterView {
         });
         posCol.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         posCol.setOnEditCommit(t -> {
+            AnswerItem qi = answersTableView.getSelectionModel().getSelectedItem();
             int newPos = t.getNewValue();
-            ObservableList<AnswerItem> answerItems = answersTableView.getItems();
-            AnswerItem qi = answerItems.get(t.getTablePosition().getRow());
+            List<AnswerItem> answerItems = answersTableView.getItems();
             boolean newPosExists = answerItems.stream()
                     .anyMatch(q -> q.pos == newPos);
             if (!newPosExists) {

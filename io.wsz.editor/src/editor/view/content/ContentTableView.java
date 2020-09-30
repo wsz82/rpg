@@ -11,6 +11,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -107,9 +108,14 @@ public class ContentTableView extends TableView<PosItem> {
             refresh();
         });
 
-        TableColumn<PosItem, Boolean> visibilityCol = new TableColumn<>("Visibility");
-        visibilityCol.setCellValueFactory(new PropertyValueFactory<>("isVisible"));
-        visibilityCol.setCellFactory(CheckBoxTableCell.forTableColumn(visibilityCol));
+        TableColumn<PosItem, CheckBox> visibilityCol = new TableColumn<>("Visibility");
+        visibilityCol.setCellValueFactory(f -> {
+            PosItem pi = f.getValue();
+            CheckBox checkBox = new CheckBox();
+            checkBox.selectedProperty().setValue(pi.isVisible());
+            checkBox.selectedProperty().addListener((ov, oldVal, newVal) -> pi.setVisible(newVal));
+            return new SimpleObjectProperty<>(checkBox);
+        });
         visibilityCol.setEditable(true);
 
         TableColumn<PosItem, Boolean> blockedCol = new TableColumn<>("Block");
@@ -173,7 +179,7 @@ public class ContentTableView extends TableView<PosItem> {
     public void changeVisibility() {
         List<PosItem> itemsToChange = getSelectionModel().getSelectedItems();
         for (PosItem pi : itemsToChange) {
-            pi.setIsVisible(!pi.getIsVisible());
+            pi.setVisible(!pi.isVisible());
         }
     }
 

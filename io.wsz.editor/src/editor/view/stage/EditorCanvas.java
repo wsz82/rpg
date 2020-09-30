@@ -61,7 +61,7 @@ public class EditorCanvas extends Canvas {
 
         List<PosItem> items = controller.getCurrentObservableLocation().getItems();
         items = items.stream()
-                .filter(PosItem::getIsVisible)
+                .filter(PosItem::isVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
                     double piRight = pi.getRight();
@@ -450,7 +450,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void setInvisible(PosItem pi) {
-        pi.setIsVisible(false);
+        pi.setVisible(false);
         refresh();
     }
 
