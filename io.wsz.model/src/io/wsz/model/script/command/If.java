@@ -241,7 +241,7 @@ public class If implements Executable, Externalizable {
     private BooleanExpression expression;
 
     @Override
-    public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
+    public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         expression.setUpVariables(controller, null);
         if (expression.isTrue()) { //TODO OR and AND
             for (Executable executable : executables) {

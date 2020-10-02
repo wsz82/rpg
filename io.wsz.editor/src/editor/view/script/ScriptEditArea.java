@@ -32,7 +32,6 @@ public class ScriptEditArea {
         invalidInfo.setTextFill(Color.RED);
         bottomInfo.getChildren().add(invalidInfo);
         editArea.getChildren().addAll(topBar, textArea, bottomInfo);
-        editArea.setVisible(false);
 
         hookUpValidateEvent();
     }
@@ -40,18 +39,17 @@ public class ScriptEditArea {
     protected void hookUpValidateEvent() {
         validate.setOnAction(e -> {
             Script script = createScript();
+            if (script == null) return;
             invalidInfo.setText(script.getValidatorMessage());
         });
     }
 
     public void fillArea(Script script) {
-        editArea.setVisible(true);
         textArea.setText(script.getInitialText());
         invalidInfo.setText(script.getValidatorMessage());
     }
 
     public void clearArea() {
-        editArea.setVisible(false);
         textArea.setText(null);
         invalidInfo.setText(null);
     }

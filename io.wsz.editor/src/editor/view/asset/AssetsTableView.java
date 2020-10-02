@@ -6,10 +6,10 @@ import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.asset.Asset;
-import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.ResolutionImage;
@@ -23,6 +23,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -179,7 +180,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     private void addItemsToContainable(ItemsStage itemsStage) {
         Coords pos = new Coords(0, 0);
         List<A> createdItems = createItems(pos);
-        for (A item : createdItems) {
+        for (A item : createdItems) { //TODO generic
             if (item instanceof Equipment) {
                 Image img = item.getImage().getFxImage();
                 if (isImageTooBig(item, img)) continue;
@@ -232,37 +233,21 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private void removeContent(List<A> assetsToRemove) {
-        List<String> assetsNames = assetsToRemove.stream()
+        List<String> assetsIds = assetsToRemove.stream()
                 .map(Asset::getAssetId)
                 .collect(Collectors.toList());
-       controller.getObservableLocations().forEach(location -> {
-           List<PosItem> items = location.getItems();
-           List<PosItem> contentToRemove = items.stream()
-                    .filter(p -> {
-                        String name = p.getAssetId();
-                        if (p instanceof Containable) {
-                            Containable c = (Containable) p;
-                            removeItemsFromContainable(assetsNames, c);
-                        }
-                        return assetsNames.contains(name);
-                    })
-                    .collect(Collectors.toList());
-           items.removeAll(contentToRemove);
+        ObservableList<PosItem<?, ?>> observableItems = controller.getCurrentObservableLocation().getItems();
+        controller.getObservableLocations().forEach(location -> {
+           ItemsList itemsList = location.getItemsList();
+           List<PosItem<?,?>> contentToRemove = new ArrayList<>();
+           itemsList.forEach(i -> {
+               for (String assetId : assetsIds) {
+                   i.addItemToListByAssetId(contentToRemove, assetId);
+               }
+           });
+           itemsList.removeAll(contentToRemove);
+           observableItems.removeAll(contentToRemove);
         });
-    }
-
-    private void removeItemsFromContainable(List<String> assetsNames, Containable c) {
-        List<Equipment> equipment = c.getItems();
-        if (equipment == null || equipment.isEmpty()) return;
-        List<Equipment> equipmentToRemove = equipment.stream()
-                .filter(e -> {
-                    if (e instanceof Containable) {
-                        removeItemsFromContainable(assetsNames, (Containable) e);
-                    }
-                    return assetsNames.contains(e.getAssetId());
-                })
-                .collect(Collectors.toList());
-        equipment.removeAll(equipmentToRemove);
     }
 
     protected abstract ItemType getType();

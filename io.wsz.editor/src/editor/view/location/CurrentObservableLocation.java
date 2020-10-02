@@ -1,6 +1,7 @@
 package editor.view.location;
 
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import javafx.beans.property.*;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 public class CurrentObservableLocation {
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
     private final ObservableList<Layer> layers = FXCollections.observableArrayList();
-    private final ObservableList<PosItem> items = FXCollections.observableArrayList();
+    private final ObservableList<PosItem<?,?>> items = FXCollections.observableArrayList();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final DoubleProperty heightProperty = new SimpleDoubleProperty();
     private final StringProperty idProperty = new SimpleStringProperty();
@@ -26,7 +27,7 @@ public class CurrentObservableLocation {
             this.heightProperty.set(location.getHeight());
             this.idProperty.set(location.getId());
             this.items.clear();
-            this.items.addAll(location.getItems());
+            this.items.addAll(location.getItemsList().getMergedList());
             this.layers.clear();
             this.layers.addAll(location.getLayers());
             this.locationProperty.set(location);
@@ -43,7 +44,9 @@ public class CurrentObservableLocation {
     public void saveCurrent() {
         Location current = this.locationProperty.get();
         if (current != null) {
-            current.setItems(new ArrayList<>(items));
+            ItemsList items = new ItemsList(true);
+            items.fillLists(this.items);
+            current.setItemsList(items);
             current.setLayers(new ArrayList<>(layers));
         }
     }
@@ -95,7 +98,7 @@ public class CurrentObservableLocation {
         this.idProperty.set(name);
     }
 
-    public ObservableList<PosItem> getItems() {
+    public ObservableList<PosItem<?,?>> getItems() {
         return items;
     }
 

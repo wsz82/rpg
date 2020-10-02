@@ -12,11 +12,11 @@ import game.view.menu.GameStage;
 import game.view.world.board.GameView;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
@@ -92,26 +92,29 @@ public class GameController extends Controller {
         if (dialogMemento != null) {
             setDialogMemento(dialogMemento);
             setDialog(true);
-            restoreAskingAndAnswering(dialogMemento.getPc(), dialogMemento.getNpc());
+            restoreDialogPcAndNpc(dialogMemento.getPc(), dialogMemento.getNpc());
         }
         return memento;
     }
 
-    private void restoreAskingAndAnswering(Creature asking, PosItem answering) {
+    private void restoreDialogPcAndNpc(Creature pc, PosItem<?,?> npc) {
         List<Location> locations = getLocations();
-        boolean askingSet = false;
-        boolean answeringSet = false;
+        boolean pcSet = false;
+        boolean npcSet = false;
         for (Location l : locations) {
-            for (PosItem pi : l.getItems()) {
-                if (!askingSet && asking.equals(pi)) {
-                    Creature cr = (Creature) pi;
+            ItemsList items = l.getItemsList();
+            for (Creature cr : items.getCreatures()) {
+                if (!pcSet && pc.equals(cr)) {
                     setDialogNpc(cr);
-                    askingSet = true;
-                    continue;
+                    pcSet = true;
+                } else if (!npcSet && npc.equals(cr)) {
+                    setDialogPc(cr);
                 }
-                if (!answeringSet && answering.equals(pi)) {
-                    setAnswering(pi);
-                    answeringSet = true;
+            }
+            for (PosItem<?,?> item : items.getMergedListWithoutCreatures()) {
+                if (!npcSet && npc.equals(item)) {
+                    setDialogPc(item);
+                    npcSet = true;
                 }
             }
         }
@@ -231,7 +234,7 @@ public class GameController extends Controller {
     private void restorePluginReferences(World world, Coords lastPos) {
         restoreStartLocationAndLayer(lastPos);
 
-        List<Asset> assets = world.getAssets();
+        ItemsList assets = world.getAssets();
         List<Location> locations = world.getLocations();
         restoreItemsReferences(assets, locations, world);
     }
@@ -290,7 +293,7 @@ public class GameController extends Controller {
         gameStage.setLoaderViewToCenter(loader);
     }
 
-    public void refreshGame(List<PosItem> sortedItems) {
+    public void refreshGame(List<PosItem<?,?>> sortedItems) {
         if (cursor.hasChanged()) {
             setCursor(cursor.getActiveCursorImage());
         }

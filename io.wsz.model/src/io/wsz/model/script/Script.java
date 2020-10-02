@@ -48,7 +48,7 @@ public class Script implements Externalizable, Executable {
         }
     }
 
-    public void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary) {
+    public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         for (Executable executable : executables) {
             executable.execute(controller, firstAdversary, secondAdversary);
         }

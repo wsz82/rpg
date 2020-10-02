@@ -123,7 +123,7 @@ public class QuestionsCenterView {
 
         scriptArea = new ScriptArea(editorController);
         scriptArea.init();
-        final VBox scriptArea = this.scriptArea.getScriptArea();
+        final VBox scriptArea = this.scriptArea.getScriptContainer();
 
         questionDetails.getChildren().addAll(questionText, requirementsContainer, scriptArea);
     }

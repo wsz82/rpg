@@ -21,7 +21,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
 
     protected final Coords curPos = new Coords();
 
-    protected List<Equipment> sortedEquipment;
+    protected List<Equipment<?,?>> sortedEquipment;
     protected double inventoryWidth;
     protected double scrollWidth;
     protected double yScrollPos;
@@ -63,7 +63,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
 
     protected abstract void drawBackground();
 
-    public abstract List<Equipment> getSortedEquipment();
+    public abstract List<Equipment<?,?>> getSortedEquipment();
 
     @Override
     protected void scrollScrollBar() {
@@ -74,7 +74,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
 
     @Override
     public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords, Coords translated,
-                                     Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
+                                     Equipment<?, ?> dragged, double draggedInitWidth, double draggedInitHeight) {
         Coords local = super.getFixedDraggedPos(mousePos, draggedCoords, translated,
                 dragged, draggedInitWidth, draggedInitHeight);
         Coords resizedImageCorrection =
@@ -130,14 +130,14 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
-    public Equipment lookForEquipment(double x, double y, Coords draggedCoords) {
+    public Equipment<?, ?> lookForEquipment(double x, double y, Coords draggedCoords) {
         Coords currentPos = getCurPos();
         if (x < currentPos.x || x > currentPos.x + getViewWidth()) return null;
         if (y < currentPos.y || y > currentPos.y + getViewHeight()) return null;
         lookedEquipment.clear();
         lookedEquipment.addAll(getSortedEquipment());
         Collections.reverse(lookedEquipment);
-        for (Equipment eq : lookedEquipment) {
+        for (Equipment<?,?> eq : lookedEquipment) {
             double cX = eq.getLeft();
             double cWidth = eq.getImageWidth();
             boolean fitX = x >= cX && x <= cX + cWidth;
@@ -286,7 +286,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
     }
 
     @Override
-    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
+    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment<?, ?> e) {
         if (mousePos.x < viewPos.x) {
             mousePos.x = curPos.x;
         } else {
@@ -349,7 +349,7 @@ public abstract class EquipmentViewElement extends InventoryViewElement {
         return temp1;
     }
 
-    public void setSortedEquipment(List<Equipment> sortedEquipment) {
+    public void setSortedEquipment(List<Equipment<?,?>> sortedEquipment) {
         this.sortedEquipment = sortedEquipment;
     }
 }

@@ -211,7 +211,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         if (inputFileIsEmpty) {
             return;
         }
-        List<Asset> assets = controller.getObservableAssets().getMergedAssets();
+        List<PosItem<?,?>> assets = controller.getObservableAssets().getMergedAssets();
         boolean doesAssetIdAlreadyExist = assets.stream()
                 .anyMatch(a -> a.getAssetId().equals(assetId));
         if (doesAssetIdAlreadyExist) {
@@ -257,7 +257,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
 
     private boolean doesItemIdAlreadyExist(String itemId) {
         return controller.getLocations().stream()
-                .anyMatch(l -> l.getItems().stream().anyMatch(i -> {
+                .anyMatch(l -> l.getItemsList().getMergedList().stream().anyMatch(i -> {
                     if (item == i) return false;
                     String id = i.getItemId();
                     if (id == null) {

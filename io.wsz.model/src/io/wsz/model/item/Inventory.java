@@ -1,13 +1,17 @@
 package io.wsz.model.item;
 
 import io.wsz.model.animation.creature.CreatureAnimation;
+import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class Inventory implements Externalizable {
     private static final long serialVersionUID = 1L;
@@ -16,46 +20,42 @@ public class Inventory implements Externalizable {
 
     private Creature owner;
     private Map<InventoryPlaceType, List<Coords>> inventoryPlaces;
-    private List<Equipment> items;
-    private Map<InventoryPlaceType, Equipment> equippedItems;
+    private EquipmentList equipmentList;
+    private Map<InventoryPlaceType, Equipment<?,?>> equippedItems;
 
-    public Inventory() {
-        this.items = new ArrayList<>(0);
-        this.equippedItems = new HashMap<>(0);
-    }
+    public Inventory() {}
 
-    public Inventory(Creature owner) {
+    public Inventory(Creature owner, EquipmentList equipmentList,
+                     HashMap<InventoryPlaceType, Equipment<?, ?>> equippedItems) {
         this.owner = owner;
-        this.items = new ArrayList<>(0);
-        this.equippedItems = new HashMap<>(0);
+        this.equipmentList = equipmentList;
+        this.equippedItems = equippedItems;
     }
 
-    public boolean tryAdd(Equipment equipment, boolean doMergeCountable) {
+    public boolean tryAdd(Equipment<?,?> equipment, boolean doMergeCountable) {
         if (!fitsInventory(equipment)) {
             return false;
         }
         if (equipment.isCountable() && doMergeCountable) {
-            EquipmentMayCountable countable = (EquipmentMayCountable) getItems().stream()
+            EquipmentMayCountable<?,?> countable = getEquipmentList().getEquipmentMayCountableList().getMergedList().stream()
                     .filter(e -> e.getAssetId().equals(equipment.getAssetId()))
                     .filter(e -> e.isUnitIdentical(equipment))
-                    .findFirst()
-                    .orElse(null);
+                    .findFirst().orElse(null);
             if (countable == null) {
-                items.add(equipment);
+                equipment.addItemToEquipmentList(equipmentList);
             } else {
-                EquipmentMayCountable added = (EquipmentMayCountable) equipment;
-                Integer addedAmount = added.getAmount();
+                Integer addedAmount = equipment.getAmount();
                 Integer alreadyInAmount = countable.getAmount();
                 int sum = alreadyInAmount + addedAmount;
                 countable.setAmount(sum);
             }
         } else {
-            items.add(equipment);
+            equipment.addItemToEquipmentList(equipmentList);
         }
         return true;
     }
 
-    public boolean tryWear(Equipment equipment, double x, double y) {
+    public boolean tryWear(Equipment<?,?> equipment, double x, double y) {
         if (!fitsInventory(equipment)) {
             return false;
         }
@@ -71,15 +71,15 @@ public class Inventory implements Externalizable {
     }
 
     private void takeOff(InventoryPlaceType placeToWear) {
-        Equipment worn = equippedItems.get(placeToWear);
+        Equipment<?,?> worn = equippedItems.get(placeToWear);
         if (worn == null) return;
         equippedItems.remove(placeToWear);
-        items.add(worn);
+        worn.addItemToEquipmentList(equipmentList);
     }
 
-    public boolean tryTakeOff(Equipment toRemove) {
+    public boolean tryTakeOff(Equipment<?,?> toRemove) {
         for (InventoryPlaceType type : equippedItems.keySet()) {
-            Equipment equipment = equippedItems.get(type);
+            Equipment<?,?> equipment = equippedItems.get(type);
             if (equipment.equals(toRemove)) {
                 equippedItems.remove(type);
                 return true;
@@ -115,13 +115,13 @@ public class Inventory implements Externalizable {
         return Geometry.isInsidePolygon(temp, place);
     }
 
-    public boolean fitsInventory(Equipment equipment) {
+    public boolean fitsInventory(Equipment<?,?> equipment) {
         double size = equipment.getSize();
         return getFilledSpace() + size < getMaxSize();
     }
 
-    public void remove(Equipment e) {
-        items.remove(e);
+    public void remove(Equipment<?,?> e) {
+        e.removeItemFromEquipmentList(equipmentList);
     }
 
     public int getMaxSize() {
@@ -133,7 +133,7 @@ public class Inventory implements Externalizable {
     }
 
     public double getFilledSpace() {
-        return getEquippedItemsSize() + getItems().stream()
+        return getEquippedItemsSize() + getEquipmentList().getMergedList().stream()
                 .mapToDouble(Equipment::getSize)
                 .sum();
     }
@@ -145,7 +145,7 @@ public class Inventory implements Externalizable {
     }
 
     public double getActualWeight() {
-        return getEquippedItemsWeight() + getItems().stream()
+        return getEquippedItemsWeight() + getEquipmentList().getMergedList().stream()
                 .mapToDouble(Equipment::getWeight)
                 .sum();
     }
@@ -156,8 +156,12 @@ public class Inventory implements Externalizable {
                 .sum();
     }
 
-    public List<Equipment> getItems() {
-        return items;
+    public EquipmentList getEquipmentList() {
+        return equipmentList;
+    }
+
+    public void setEquipmentList(EquipmentList equipmentList) {
+        this.equipmentList = equipmentList;
     }
 
     public Map<InventoryPlaceType, List<Coords>> getInventoryPlaces() {
@@ -168,11 +172,11 @@ public class Inventory implements Externalizable {
         this.inventoryPlaces = inventoryPlaces;
     }
 
-    public Map<InventoryPlaceType, Equipment> getEquippedItems() {
+    public Map<InventoryPlaceType, Equipment<?,?>> getEquippedItems() {
         return equippedItems;
     }
 
-    public void setEquippedItems(Map<InventoryPlaceType, Equipment> equippedItems) {
+    public void setEquippedItems(Map<InventoryPlaceType, Equipment<?,?>> equippedItems) {
         this.equippedItems = equippedItems;
     }
 
@@ -181,7 +185,7 @@ public class Inventory implements Externalizable {
         return "Inventory{" +
                 "owner=" + owner +
                 ", inventoryPlaces=" + inventoryPlaces +
-                ", items=" + items +
+                ", items=" + equipmentList +
                 ", equippedItems=" + equippedItems +
                 '}';
     }
@@ -192,13 +196,13 @@ public class Inventory implements Externalizable {
         if (!(o instanceof Inventory)) return false;
         Inventory inventory = (Inventory) o;
         return Objects.equals(getInventoryPlaces(), inventory.getInventoryPlaces()) &&
-                Objects.equals(getItems(), inventory.getItems()) &&
+                Objects.equals(getEquipmentList(), inventory.getEquipmentList()) &&
                 Objects.equals(getEquippedItems(), inventory.getEquippedItems());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInventoryPlaces(), getItems(), getEquippedItems());
+        return Objects.hash(getInventoryPlaces(), getEquipmentList(), getEquippedItems());
     }
 
     @Override
@@ -209,7 +213,7 @@ public class Inventory implements Externalizable {
 
         out.writeObject(inventoryPlaces);
 
-        out.writeObject(items);
+        out.writeObject(equipmentList);
 
         out.writeObject(equippedItems);
     }
@@ -222,8 +226,8 @@ public class Inventory implements Externalizable {
 
         inventoryPlaces = (Map<InventoryPlaceType, List<Coords>>) in.readObject();
 
-        items = (List<Equipment>) in.readObject();
+        equipmentList = (EquipmentList) in.readObject();
 
-        equippedItems = (Map<InventoryPlaceType, Equipment>) in.readObject();
+        equippedItems = (Map<InventoryPlaceType, Equipment<?,?>>) in.readObject();
     }
 }

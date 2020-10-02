@@ -52,41 +52,41 @@ public class AssetsStage extends ChildStage {
     private void createTabs() {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        ObservableAssets observableAssets = editorController.getObservableAssets();
+        ObservableItemsList observableItemsList = editorController.getObservableAssets();
 
-        ObservableList<Landscape> landscapes = observableAssets.getLandscapes();
+        ObservableList<Landscape> landscapes = observableItemsList.getLandscapes();
         AssetsTableView<Landscape> landscapeTableView = new LandscapeTableView(this, landscapes, editorCanvas, editorController);
         setUpTab(landscapeTableView, Paths.LANDSCAPES);
 
-        ObservableList<Cover> covers = observableAssets.getCovers();
+        ObservableList<Cover> covers = observableItemsList.getCovers();
         AssetsTableView<Cover> coverTableView = new CoverTableView(this, covers, editorCanvas, editorController);
         setUpTab(coverTableView, Paths.COVERS);
 
-        ObservableList<Creature> creatures = observableAssets.getCreatures();
+        ObservableList<Creature> creatures = observableItemsList.getCreatures();
         AssetsTableView<Creature> creatureTableView = new CreatureTableView(this, creatures, editorCanvas, editorController);
         setUpTab(creatureTableView, Paths.CREATURES);
 
-        ObservableList<Weapon> weapons = observableAssets.getWeapons();
+        ObservableList<Weapon> weapons = observableItemsList.getWeapons();
         AssetsTableView<Weapon> weaponsTableView = new WeaponsTableView(this, weapons, editorCanvas, editorController);
         setUpTab(weaponsTableView, Paths.WEAPONS);
 
-        ObservableList<Container> containers = observableAssets.getContainers();
+        ObservableList<Container> containers = observableItemsList.getContainers();
         AssetsTableView<Container> containerTableView = new ContainerTableView(this, containers, editorCanvas, editorController);
         setUpTab(containerTableView, Paths.CONTAINERS);
 
-        ObservableList<Misc> miscs = observableAssets.getMiscs();
+        ObservableList<Misc> miscs = observableItemsList.getMiscs();
         AssetsTableView<Misc> miscsTableView = new MiscTableView(this, miscs, editorCanvas, editorController);
         setUpTab(miscsTableView, Paths.MISC);
 
-        ObservableList<Teleport> teleports = observableAssets.getTeleports();
+        ObservableList<Teleport> teleports = observableItemsList.getTeleports();
         AssetsTableView<Teleport> teleportTableView = new TeleportTableView(this, teleports, editorCanvas, editorController);
         setUpTab(teleportTableView, Paths.TELEPORTS);
 
-        ObservableList<OutDoor> outDoors = observableAssets.getOutDoors();
+        ObservableList<OutDoor> outDoors = observableItemsList.getOutDoors();
         AssetsTableView<OutDoor> outDoorTableView = new OutDoorTableView(this, outDoors, editorCanvas, editorController);
         setUpTab(outDoorTableView, Paths.OUTDOORS);
 
-        ObservableList<InDoor> inDoors = observableAssets.getInDoors();
+        ObservableList<InDoor> inDoors = observableItemsList.getInDoors();
         AssetsTableView<InDoor> inDoorTableView = new InDoorTableView(this, inDoors, editorCanvas, editorController);
         setUpTab(inDoorTableView, Paths.INDOORS);
 

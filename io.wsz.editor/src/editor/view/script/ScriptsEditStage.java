@@ -84,9 +84,12 @@ public class ScriptsEditStage extends ChildStage {
             if (oldScript != null) {
                 scriptEditArea.saveScript(oldScript);
             }
+            VBox editArea = scriptEditArea.getEditArea();
             if (newScript != null) {
+                editArea.setVisible(true);
                 scriptEditArea.fillArea(newScript);
             } else {
+                editArea.setVisible(false);
                 scriptEditArea.clearArea();
             }
         });

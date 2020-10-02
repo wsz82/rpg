@@ -3,7 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -20,7 +20,7 @@ import static io.wsz.model.sizes.Paths.IDLE;
 public class Teleport extends PosItem<Teleport, AnimationPos> {
     private static final long serialVersionUID = 1L;
 
-    private Animation<Teleport> animation;
+    private Animation<AnimationPos, Teleport> animation;
 
     private TeleportableDelagate teleportableDelagate;
     private AnimationPos animationPos;
@@ -43,6 +43,16 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     @Override
+    public void addItemToList(ItemsList list) {
+        list.getTeleports().add(this);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        list.getTeleports().remove(this);
+    }
+
+    @Override
     protected String getAssetDirName() {
         return Paths.TELEPORTS;
     }
@@ -52,10 +62,15 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         super.restoreReferences(controller, assets, world);
         Coords exit = getExit();
         controller.restoreLocationOfCoords(exit);
+    }
+
+    @Override
+    protected List<Teleport> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getTeleports();
     }
 
     @Override
@@ -102,7 +117,7 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     @Override
-    protected Animation<Teleport> getConcreteAnimation() {
+    protected Animation<AnimationPos, Teleport> getConcreteAnimation() {
         if (animation == null) {
             return new Animation<>(getDir(), IDLE);
         } else {

@@ -37,7 +37,7 @@ public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem
         wearCol.setEditable(true);
         wearCol.setCellFactory(CheckBoxTableCell.forTableColumn(p -> {
             InventoryTableItem item = tableItems.get(p);
-            Equipment equipment = item.getEquipment();
+            Equipment<?,?> equipment = item.getEquipment();
             InventoryPlaceType occupiedPlace = equipment.getOccupiedPlace();
             boolean cannotBeWorn = !creatureAvailablePlaces.contains(occupiedPlace);
             if (cannotBeWorn) {
@@ -49,30 +49,30 @@ public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem
     }
 
     @Override
-    protected InventoryTableItem getNewEquipment(Equipment e) {
+    protected InventoryTableItem getNewEquipment(Equipment<?,?> e) {
         int count = getCount(e);
         return new InventoryTableItem(e, count);
     }
 
     @Override
     protected void save() {
-        Map<InventoryPlaceType, Equipment> equippedItems = containable.getInventory().getEquippedItems();
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = containable.getInventory().getEquippedItems();
         equippedItems.clear();
         super.save();
     }
 
     @Override
-    protected ObservableList<InventoryTableItem> getTableItems(List<Equipment> items) {
+    protected ObservableList<InventoryTableItem> getTableItems(List<Equipment<?,?>> items) {
         tableItems = super.getTableItems(items);
-        Map<InventoryPlaceType, Equipment> equippedItems = containable.getInventory().getEquippedItems();
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = containable.getInventory().getEquippedItems();
         for (InventoryPlaceType placeType : equippedItems.keySet()) {
-            Equipment e = equippedItems.get(placeType);
+            Equipment<?,?> e = equippedItems.get(placeType);
             addEquippedItem(e);
         }
         return tableItems;
     }
 
-    private void addEquippedItem(Equipment e) {
+    private void addEquippedItem(Equipment<?,?> e) {
         InventoryTableItem ti = new InventoryTableItem(e, 1, true);
         tableItems.add(ti);
         if (table != null) {
@@ -81,10 +81,10 @@ public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem
     }
 
     @Override
-    protected List<Equipment> tableItemsToEquipment(ObservableList<InventoryTableItem> items) {
-        List<Equipment> output = new ArrayList<>(0);
+    protected List<Equipment<?,?>> tableItemsToEquipment(ObservableList<InventoryTableItem> items) {
+        List<Equipment<?,?>> output = new ArrayList<>(0);
         for (InventoryTableItem ti : items) {
-            Equipment tiEquipment = ti.getEquipment();
+            Equipment<?,?> tiEquipment = ti.getEquipment();
             int count = ti.getCount();
             boolean isWorn = ti.isWorn();
             if (isWorn) {
@@ -96,9 +96,9 @@ public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem
         return output;
     }
 
-    private void addEquippedItem(List<Equipment> output, int count, Equipment toAdd) {
+    private void addEquippedItem(List<Equipment<?,?>> output, int count, Equipment<?,?> toAdd) {
         InventoryPlaceType occupiedPlace = toAdd.getOccupiedPlace();
-        Map<InventoryPlaceType, Equipment> equippedItems = containable.getInventory().getEquippedItems();
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = containable.getInventory().getEquippedItems();
         if (equippedItems.get(occupiedPlace) != null && doInventoryHasThePlace(occupiedPlace)) {
             addCountableOrSingle(output, toAdd, count);
         } else {

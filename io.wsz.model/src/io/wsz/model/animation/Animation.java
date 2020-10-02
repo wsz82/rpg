@@ -9,7 +9,7 @@ import java.util.*;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class Animation<A extends PosItem<?,?>> {
+public class Animation<A extends AnimationPos, I extends PosItem<I,A>> {
     protected static final FileFilter PNG_FILE_FILTER = f -> f.getName().endsWith(".png");
     protected static final Random RANDOM = new Random();
 
@@ -21,6 +21,7 @@ public class Animation<A extends PosItem<?,?>> {
     protected final Map<String, Map<String, List<File>>> idlesFiles = new HashMap<>(0);
     protected final Map<String, Map<String, List<ResolutionImage>>> idles = new HashMap<>(0);
     protected final String animationDir;
+
     private final String idlesOrEquivalent;
 
     private ResolutionImage basicMain;
@@ -36,7 +37,7 @@ public class Animation<A extends PosItem<?,?>> {
         this.idlesOrEquivalent = idlesOrEquivalent;
     }
 
-    public void play(A item) {
+    public void play(I item) {
         AnimationPos animationPos = item.getAnimationPos();
         ResolutionImage nextIdle = getNextAnimationImage(idles, animationPos, item.getAnimationSpeed());
         if (nextIdle == null) return;

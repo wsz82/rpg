@@ -7,6 +7,7 @@ import io.wsz.model.item.Containable;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.locale.LocaleKeys;
 import io.wsz.model.script.ScriptValidator;
 
@@ -51,8 +52,9 @@ public class GiveToAdversary implements Executable, Externalizable {
     private String amount;
 
     @Override
-    public void execute(Controller controller, PosItem giving, PosItem receiving) { //TODO dropping item when does not fits inventory (Problem: items with collision)
+    public void execute(Controller controller, PosItem<?, ?> giving, PosItem<?, ?> receiving) { //TODO dropping item when does not fits inventory (Problem: items with collision)
         if (giving == null || receiving == null) return;
+        //TODO generic
         boolean receivingOrGivingIsNotContainable = !(receiving instanceof Containable) || !(giving instanceof Containable);
         if (receivingOrGivingIsNotContainable) return;
         Containable givingCo = (Containable) giving;
@@ -73,32 +75,20 @@ public class GiveToAdversary implements Executable, Externalizable {
             receivingCo = temp;
         }
 
-        Equipment equipment = givingCo.getItems().stream()
-                .filter(e -> {
-                    String id = e.getItemId();
-                    if (id != null) {
-                        boolean equals = id.equals(itemOrAssetId);
-                        if (equals) {
-                            return true;
-                        } else {
-                            return areIdsEqual(e);
-                        }
-                    } else {
-                        return areIdsEqual(e);
-                    }
-                })
-                .findFirst().orElse(null);
+        EquipmentList equipmentList = givingCo.getEquipmentList();
+        Equipment<?,?> equipment = equipmentList.getItemByItemOrAssetId(itemOrAssetId);
         if (equipment == null) return;
         equipment.getPos().reset();
 
         int availableAmount = 0;
         for (int i = 0; i < amount; i++) {
-            if (givingCo.getItems().remove(equipment)) {
+            if (equipmentList.contains(equipment)) {
+                equipmentList.remove(equipment);
                 availableAmount++;
             }
         }
         for (int i = 0; i < availableAmount; i++) {
-            receivingCo.getItems().add(equipment);
+            receivingCo.getEquipmentList().add(equipment);
         }
 
         Creature pc = controller.getDialogMemento().getPc();
@@ -112,12 +102,6 @@ public class GiveToAdversary implements Executable, Externalizable {
         message = message + " " + availableAmount + " " + equipment.getName();
         DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
         controller.getDialogMemento().getDialogs().add(di);
-    }
-
-    public boolean areIdsEqual(Equipment e) {
-        String id;
-        id = e.getAssetId();
-        return id.equals(itemOrAssetId);
     }
 
     @Override

@@ -8,6 +8,7 @@ import editor.view.utilities.SafeIntegerStringConverter;
 import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.EquipmentMayCountable;
+import io.wsz.model.item.list.EquipmentList;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -107,7 +108,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
     }
 
     private TableView<I> initTable() {
-        ObservableList<I> items = getTableItems(containable.getItems());
+        ObservableList<I> items = getTableItems(containable.getEquipmentList().getMergedList());
 
         TableView<I> table = new TableView<>(items);
         table.setEditable(true);
@@ -116,7 +117,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         nameCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                Equipment equipment = p.getValue().getEquipment();
+                Equipment<?,?> equipment = p.getValue().getEquipment();
                 if (equipment == null) {
                     return "";
                 } else {
@@ -132,7 +133,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         typeCol.setCellValueFactory(p -> new ObjectBinding<>() {
             @Override
             protected String computeValue() {
-                Equipment equipment = p.getValue().getEquipment();
+                Equipment<?,?> equipment = p.getValue().getEquipment();
                 if (equipment == null) {
                     return "";
                 } else {
@@ -170,15 +171,13 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         contextMenu.getItems().addAll(edit);
         edit.setOnAction(event -> editItem());
         remove.setOnAction(event -> removeItem());
-        table.setOnContextMenuRequested(event -> {
-            contextMenu.show(this, event.getScreenX(), event.getScreenY());
-        });
+        table.setOnContextMenuRequested(e -> contextMenu.show(this, e.getScreenX(), e.getScreenY()));
     }
 
     private void editItem() {
         TableItem selTableItem = table.getSelectionModel().getSelectedItem();
         if (selTableItem == null) return;
-        Equipment selEquipment = selTableItem.getEquipment();
+        Equipment<?,?> selEquipment = selTableItem.getEquipment();
         if (selEquipment == null) return;
         contentEditDelegate.openEditWindow(this, selEquipment, editorCanvas, editorController);
     }
@@ -186,61 +185,60 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
     private void removeItem() {
         TableItem selTableItem = table.getSelectionModel().getSelectedItem();
         if (selTableItem == null) return;
-        Equipment selEquipment = selTableItem.getEquipment();
+        Equipment<?,?> selEquipment = selTableItem.getEquipment();
         if (selEquipment == null) return;
         table.getItems().remove(selTableItem);
     }
 
     protected void save() {
-        List<Equipment> items = containable.getItems();
-        items.clear();
-        List<Equipment> input = tableItemsToEquipment(table.getItems());
-        items.addAll(input);
+        EquipmentList equipmentList = containable.getEquipmentList();
+        equipmentList.clear();
+        List<Equipment<?,?>> output = tableItemsToEquipment(table.getItems());
+        equipmentList.addAll(output);
     }
 
-    protected List<Equipment> tableItemsToEquipment(ObservableList<I> items) {
-        List<Equipment> output = new ArrayList<>(0);
+    protected List<Equipment<?,?>> tableItemsToEquipment(ObservableList<I> items) {
+        List<Equipment<?,?>> output = new ArrayList<>(0);
         for (TableItem ti : items) {
-            Equipment tiEquipment = ti.getEquipment();
+            Equipment<?,?> tiEquipment = ti.getEquipment();
             int count = ti.getCount();
             addCountableOrSingle(output, tiEquipment, count);
         }
         return output;
     }
 
-    protected void addCountableOrSingle(List<Equipment> output, Equipment toClone, int count) {
+    protected void addCountableOrSingle(List<Equipment<?,?>> output, Equipment<?,?> toClone, int count) {
         if (toClone.isCountable()) {
-            EquipmentMayCountable countable = (EquipmentMayCountable) toClone;
-            countable.setAmount(count);
-            output.add(countable);
+            toClone.setAmount(count);
+            output.add(toClone);
         } else {
             for (int i = 0; i < count; i++) {
-                Equipment cloned = toClone.cloneEquipment(false);
+                Equipment<?,?> cloned = toClone.cloneEquipment(false);
                 output.add(cloned);
             }
         }
     }
 
-    protected ObservableList<I> getTableItems(List<Equipment> items) {
+    protected ObservableList<I> getTableItems(List<Equipment<?,?>> items) {
         tableItems = FXCollections.observableArrayList();
-        for (Equipment e : items) {
+        for (Equipment<?,?> e : items) {
             addEquipment(e);
         }
         return tableItems;
     }
 
-    public void addEquipment(Equipment toAdd) {
+    public void addEquipment(Equipment<?,?> toAdd) {
         boolean isInList = tableItems.stream()
                 .anyMatch(t -> t.getEquipment().isUnitIdentical(toAdd));
         if (isInList) {
-            Set<Equipment> alreadyAdded = new HashSet<>(1);
+            Set<Equipment<?,?>> alreadyAdded = new HashSet<>(1);
             for (TableItem ti : tableItems) {
-                Equipment tiEquipment = ti.getEquipment();
+                Equipment<?,?> tiEquipment = ti.getEquipment();
                 if (tiEquipment.isUnitIdentical(toAdd) && isEquipmentNotAddedYet(toAdd, alreadyAdded)) {
                     alreadyAdded.add(toAdd);
                     int count = 1;
                     if (tiEquipment.isCountable()) {
-                        EquipmentMayCountable countable = (EquipmentMayCountable) toAdd;
+                        EquipmentMayCountable<?,?> countable = (EquipmentMayCountable<?,?>) toAdd; //TODO geenric
                         count = countable.getAmount();
                     }
                     ti.setCount(ti.getCount() + count);
@@ -255,16 +253,16 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         }
     }
 
-    private boolean isEquipmentNotAddedYet(Equipment e, Set<Equipment> alreadyAdded) {
+    private boolean isEquipmentNotAddedYet(Equipment<?,?> e, Set<Equipment<?,?>> alreadyAdded) {
         return !alreadyAdded.contains(e);
     }
 
-    protected abstract I getNewEquipment(Equipment e) ;
+    protected abstract I getNewEquipment(Equipment<?,?> e) ;
 
-    protected int getCount(Equipment e) {
+    protected int getCount(Equipment<?,?> e) {
         int count = 1;
         if (e.isCountable()) {
-            EquipmentMayCountable countable = (EquipmentMayCountable) e;
+            EquipmentMayCountable<?,?> countable = (EquipmentMayCountable<?,?>) e;
             count = countable.getAmount();
         }
         return count;

@@ -19,8 +19,8 @@ public class DropViewElement extends EquipmentViewElement {
     private final Coords creaturePos = new Coords();
     private final FoggableDelegate foggableDelegate;
 
-    private List<PosItem> sortedItems;
-    private List<Equipment> droppedEquipment;
+    private List<PosItem<?,?>> sortedItems;
+    private List<Equipment<?,?>> droppedEquipment;
     private double visionWidthDiameter;
     private double visionHeightDiameter;
     private double minCurPosY;
@@ -128,7 +128,7 @@ public class DropViewElement extends EquipmentViewElement {
     @Override
     protected final void drawEquipment() {
         Creature cr = controller.getCreatureToOpenInventory();
-        for (PosItem pi : sortedItems) {
+        for (PosItem<?,?> pi : sortedItems) {
             adjustCoverOpacity(cr, pi);
 
             if (pi == cr) {
@@ -140,8 +140,8 @@ public class DropViewElement extends EquipmentViewElement {
             int meter = Sizes.getMeter();
             double x = corrected.x * meter;
             double y = corrected.y * meter;
-            if (pi instanceof Equipment) {
-                Equipment e = (Equipment) pi;
+            if (pi instanceof Equipment) { //TODO generic
+                Equipment<?,?> e = (Equipment<?,?>) pi;
                 playDropAnimation(e);
             }
             Image img = pi.getImage().getFxImage();
@@ -208,7 +208,7 @@ public class DropViewElement extends EquipmentViewElement {
         drawCreatureBase(x, y, base);
     }
 
-    public void setDroppedEquipment(List<Equipment> droppedEquipment) {
+    public void setDroppedEquipment(List<Equipment<?,?>> droppedEquipment) {
         this.droppedEquipment = droppedEquipment;
     }
 
@@ -220,7 +220,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryRemove(Equipment e, Creature cr) {
+    public boolean tryRemove(Equipment<?, ?> e, Creature cr) {
         if (e.tryTake(cr)) {
             droppedEquipment.remove(e);
             return true;
@@ -229,7 +229,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
+    public boolean tryAdd(Equipment<?, ?> e, Creature cr, double x, double y, boolean doMergeCountable) {
         return e.tryDrop(cr, x, y);
     }
 
@@ -257,7 +257,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
+    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment<?, ?> e) {
         return e.getPos();
     }
 
@@ -268,7 +268,7 @@ public class DropViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public List<Equipment> getSortedEquipment() {
+    public List<Equipment<?, ?>> getSortedEquipment() {
         return droppedEquipment;
     }
 
@@ -320,7 +320,7 @@ public class DropViewElement extends EquipmentViewElement {
         return minCurPosY;
     }
 
-    public void setSortedItems(List<PosItem> sortedItems) {
+    public void setSortedItems(List<PosItem<?,?>> sortedItems) {
         this.sortedItems = sortedItems;
     }
 }

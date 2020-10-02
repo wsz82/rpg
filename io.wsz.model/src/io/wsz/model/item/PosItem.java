@@ -6,6 +6,7 @@ import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.Script;
 import io.wsz.model.sizes.Sizes;
@@ -18,12 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> extends Asset<A> implements Updatable, Interactable, Animable {
+public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> extends Asset<I>
+        implements Updatable, Interactable, Animable<A, I> {
     private static final long serialVersionUID = 1L;
 
     protected final Coords center = new Coords();
@@ -34,7 +33,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     protected boolean isVisible;
     protected boolean isBlocked;
     protected Coords pos;
-    protected A prototype;
+    protected I prototype;
     protected List<Coords> coverLine;
     protected List<List<Coords>> collisionPolygons;
     protected Dialog dialog;
@@ -57,14 +56,14 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.collisionPolygons = new ArrayList<>(0);
     }
 
-    public PosItem(A prototype) {
+    public PosItem(I prototype) {
         this.prototype = prototype;
         this.isVisible = true;
         this.isBlocked = false;
         this.pos = new Coords();
     }
 
-    public PosItem(PosItem<A, B> other, boolean keepId) {
+    public PosItem(I other, boolean keepId) {
         super(other);
         this.prototype = other.prototype;
         if (keepId) {
@@ -98,7 +97,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     private boolean doesItemIdAlreadyExist(String itemId) {
         return getController().getLocations().stream()
-                .anyMatch(l -> l.getItems().stream().anyMatch(i -> {
+                .anyMatch(l -> l.getItemsList().getMergedList().stream().anyMatch(i -> {
                     String id = i.getItemId();
                     if (id == null) {
                         return false;
@@ -148,16 +147,22 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     protected void changeLocation(Location from, Coords exit) {
         Location target = exit.getLocation();
         if (!from.equals(target)) {
-            from.getItemsToRemove().add(this);
-            target.getItemsToAdd().add(this);
+            ItemsList itemsToRemove = from.getItemsToRemove();
+            addItemToList(itemsToRemove);
+            ItemsList itemsToAdd = target.getItemsToAdd();
+            addItemToList(itemsToAdd);
         }
     }
+
+    public abstract void addItemToList(ItemsList list);
+
+    public abstract void removeItemFromList(ItemsList list);
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
         return Geometry.isPointWithinOval(getInteractionPoint(), pos, sizeWidth + 2*range, sizeHeight + 2*range);
     }
 
-    public PosItem getCollision() {
+    public PosItem<?,?> getCollision() {
         return getCollision(getCoordsForCollisionCheck());
     }
 
@@ -165,17 +170,17 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return pos;
     }
 
-    public PosItem getCollision(Coords nextPos) {
+    public PosItem<?,?> getCollision(Coords nextPos) {
         return getCollision(nextPos, pos.getLocation());
     }
 
-    public PosItem getCollision(Location location) {
+    public PosItem<?,?> getCollision(Location location) {
         return getCollision(getCoordsForCollisionCheck(), location);
     }
 
-    public PosItem getCollision(Coords nextPos, Location nextLocation) {
+    public PosItem<?,?> getCollision(Coords nextPos, Location nextLocation) {
         if (nextLocation == null) return null;
-        List<PosItem> items = nextLocation.getItems();
+        List<PosItem<?,?>> items = nextLocation.getItemsList().getMergedList();
         Controller controller = getController();
         return controller.getBoard().getObstacle(nextPos, this, items);
     }
@@ -296,7 +301,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     }
 
     @Override
-    public <M extends Animation<?>> M getAnimation() {
+    public <M extends Animation<A, I>> M getAnimation() {
         M animation;
         if (isThisPrototype()) {
             animation = getConcreteAnimation();
@@ -310,30 +315,31 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return animation;
     }
 
-    protected abstract <M extends Animation<?>> M getConcreteAnimation();
+    protected abstract <M extends Animation<A, I>> M getConcreteAnimation();
 
-    public abstract B getAnimationPos();
+    public abstract A getAnimationPos();
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         restorePrototype(assets);
         controller.restoreLocationOfCoords(pos);
         restoreDialog(world.getDialogs());
     }
 
-    private void restorePrototype(List<Asset> assets) {
-        A serPrototype = getPrototype();
+    private void restorePrototype(ItemsList assets) {
+        I serPrototype = getPrototype();
         if (serPrototype == null) return;
         String prototypeName = serPrototype.getAssetId();
-        Asset asset = assets.stream()
-                .filter(a -> a.getAssetId().equals(prototypeName))
-                .findFirst().orElse(null);
-        A p = (A) asset;
-        if (p == null) {
-            throw new NullPointerException(prototypeName + " reference is not found");
-        }
-        setPrototype(p);
+        getSpecificItemsList(assets).stream()
+                .filter(i -> i.getAssetId().equals(prototypeName))
+                .findFirst().ifPresentOrElse(this::setPrototype, () -> throwNoPrototypeFoundException(prototypeName));
     }
+
+    private void throwNoPrototypeFoundException(String prototypeName) {
+        throw new NullPointerException(prototypeName + " reference is not found");
+    }
+
+    protected abstract List<I> getSpecificItemsList(ItemsList itemsList);
 
     private void restoreDialog(List<Dialog> dialogs) {
         Dialog serDialog = dialog;
@@ -349,7 +355,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         setDialog(dialog);
     }
 
-    public boolean tryAddToLocation(Location location, List<PosItem> locationItems) {
+    public boolean tryAddToLocation(Location location, ItemsList locationItems) {
         boolean itemWillCollide = getCollision(location) != null;
         if (itemWillCollide) return false;
         addToLocation(location, locationItems);
@@ -358,9 +364,9 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
 
     @Override
     public final void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, String newItemId) {
-        A item = getNewItemFromPrototype();
+        I item = getNewItemFromPrototype();
         item.setItemId(newItemId);
-        addNewItemToLocation(toLocation, toLevel, toX, toY, item);
+        item.addToLocation(toLocation, toLevel, toX, toY);
     }
 
     @Override
@@ -380,19 +386,19 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         return 0;
     }
 
-    protected abstract A getNewItemFromPrototype();
+    protected abstract I getNewItemFromPrototype();
 
-    protected void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, A item) {
-        item.setPos(toX, toY, toLevel, toLocation);
-        toLocation.getItemsToAdd().add(item);
+    protected void addToLocation(Location toLocation, int toLevel, double toX, double toY) {
+        setPos(toX, toY, toLevel, toLocation);
+        addItemToList(toLocation.getItemsToAdd());
     }
 
-    public void addToLocation(Location location, List<PosItem> locationItems) {
-        locationItems.add(this);
+    public void addToLocation(Location location, ItemsList locationItems) {
+        addItemToList(locationItems);
         onChangeLocationAction(location);
     }
 
-    public PosItem getItemByAssetId(String lookedId) {
+    public PosItem<?,?> getItemByAssetId(String lookedId) {
         String assetId = this.getAssetId();
         if (assetId != null && assetId.equals(lookedId)) {
             return this;
@@ -401,12 +407,18 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         }
     }
 
-    public PosItem getItemByItemId(String lookedId) {
+    public PosItem<?,?> getItemByItemId(String lookedId) {
         if (this.itemId != null && this.itemId.equals(lookedId)) {
             return this;
         } else {
             return null;
         }
+    }
+
+    public void addItemToListByAssetId(List<PosItem<?,?>> items, String assetId) {
+        PosItem<?, ?> item = getItemByAssetId(assetId);
+        if (item == null) return;
+        items.add(item);
     }
 
     @Override
@@ -438,6 +450,10 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         } else {
             return super.getType();
         }
+    }
+
+    public void addPrototypeToSet(Set<PosItem<?,?>> prototypes) {
+        prototypes.add(getPrototype());
     }
 
     @Override
@@ -577,11 +593,11 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         this.dialog = dialog;
     }
 
-    public A getPrototype() {
+    public I getPrototype() {
         return prototype;
     }
 
-    public void setPrototype(A prototype) {
+    public void setPrototype(I prototype) {
         this.prototype = prototype;
     }
 
@@ -620,7 +636,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
     public final ResolutionImage getInitialImage() {
         if (image == null) {
             File programDir = getController().getProgramDir();
-            Animation animation = getAnimation();
+            Animation<A, I> animation = getAnimation();
             if (animation == null) return null;
             image = animation.getBasicMain(programDir);
         }
@@ -633,7 +649,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
                 Controller controller = getController();
                 if (controller == null) return null;
                 File programDir = controller.getProgramDir();
-                Animation animation = getAnimation();
+                Animation<A, I> animation = getAnimation();
                 if (animation == null) return null;
                 image = animation.getBasicMain(programDir);
                 return image;
@@ -756,7 +772,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         super.readExternal(in);
         long ver = in.readLong();
 
-        prototype = (A) in.readObject();
+        prototype = (I) in.readObject();
 
         itemId = (String) in.readObject();
 
@@ -767,10 +783,7 @@ public abstract class PosItem<A extends PosItem<?,?>, B extends AnimationPos> ex
         isBlocked = in.readBoolean();
 
         Coords pos = (Coords) in.readObject();
-        this.pos.x = pos.x;
-        this.pos.y = pos.y;
-        this.pos.level = pos.level;
-        this.pos.setLocation(pos.getLocation());
+        this.setPos(pos);
 
         coverLine = (List<Coords>) in.readObject();
 

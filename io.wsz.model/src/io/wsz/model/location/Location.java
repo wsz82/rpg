@@ -1,6 +1,6 @@
 package io.wsz.model.location;
 
-import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
@@ -23,9 +23,9 @@ public class Location implements Externalizable {
     private double width;
     private double height;
     private List<Layer> layers;
-    private List<PosItem> items;
-    private List<PosItem> itemsToRemove;
-    private List<PosItem> itemsToAdd;
+    private ItemsList itemsList;
+    private ItemsList itemsToRemove;
+    private ItemsList itemsToAdd;
     private List<List<FogStatusWithImage>> discoveredFog;
 
     public Location() {}
@@ -44,9 +44,9 @@ public class Location implements Externalizable {
 
     private void initLists() {
         this.layers = new ArrayList<>(0);
-        this.items = new ArrayList<>(0);
-        this.itemsToRemove = new ArrayList<>(0);
-        this.itemsToAdd = new ArrayList<>(0);
+        this.itemsList = new ItemsList(true);
+        this.itemsToRemove = new ItemsList(true);
+        this.itemsToAdd = new ItemsList(true);
     }
 
     public void initDiscoveredFog(Fog fog, double halfFogSize) {
@@ -81,6 +81,10 @@ public class Location implements Externalizable {
         }
     }
 
+    public boolean tryRemoveItem(String itemOrAssetId) {
+        return itemsList.removeById(itemOrAssetId);
+    }
+
     public String getId() {
         return id;
     }
@@ -113,21 +117,21 @@ public class Location implements Externalizable {
         this.layers = layers;
     }
 
-    public List<PosItem> getItems() {
-        return items;
+    public ItemsList getItemsList() {
+        return itemsList;
     }
 
-    public void setItems(List<PosItem> items) {
-        this.items = items;
+    public void setItemsList(ItemsList itemsList) {
+        this.itemsList = itemsList;
     }
 
-    public List<PosItem> getItemsToRemove() {
+    public ItemsList getItemsToRemove() {
         return itemsToRemove;
     }
-
-    public List<PosItem> getItemsToAdd() {
+    public ItemsList getItemsToAdd() {
         return itemsToAdd;
     }
+
     public List<List<FogStatusWithImage>> getDiscoveredFog() {
         return discoveredFog;
     }
@@ -162,7 +166,7 @@ public class Location implements Externalizable {
 
         out.writeObject(layers);
 
-        out.writeObject(items);
+        out.writeObject(itemsList);
 
         out.writeObject(itemsToRemove);
 
@@ -183,11 +187,11 @@ public class Location implements Externalizable {
 
         layers = (List<Layer>) in.readObject();
 
-        items = (List<PosItem>) in.readObject();
+        itemsList = (ItemsList) in.readObject();
 
-        itemsToRemove = (List<PosItem>) in.readObject();
+        itemsToRemove = (ItemsList) in.readObject();
 
-        itemsToAdd = (List<PosItem>) in.readObject();
+        itemsToAdd = (ItemsList) in.readObject();
 
         discoveredFog = (List<List<FogStatusWithImage>>) in.readObject();
     }

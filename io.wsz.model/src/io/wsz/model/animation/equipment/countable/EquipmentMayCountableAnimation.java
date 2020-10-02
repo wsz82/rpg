@@ -8,7 +8,8 @@ import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.ResolutionImage;
 
-public class EquipmentMayCountableAnimation<E extends EquipmentMayCountable<?,?>> extends Animation<E> {
+public class EquipmentMayCountableAnimation<E extends EquipmentMayCountable<E, EquipmentAnimationPos>>
+        extends Animation<EquipmentAnimationPos, E> {
 
     public EquipmentMayCountableAnimation(String animationDir, String idlesOrEquivalent) {
         super(animationDir, idlesOrEquivalent);

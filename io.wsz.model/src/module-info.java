@@ -29,6 +29,7 @@ module io.wsz.model {
     exports io.wsz.model.dialog;
     exports io.wsz.model.asset;
     exports io.wsz.model.item;
+    exports io.wsz.model.item.list;
     exports io.wsz.model.layer;
     exports io.wsz.model.locale;
     exports io.wsz.model.location;

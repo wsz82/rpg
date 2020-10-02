@@ -41,7 +41,7 @@ public class ScriptArea {
         return scriptEditArea.createScript();
     }
 
-    public VBox getScriptArea() {
+    public VBox getScriptContainer() {
         return scriptVBox;
     }
 }
