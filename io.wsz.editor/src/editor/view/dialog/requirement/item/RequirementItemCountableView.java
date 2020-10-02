@@ -2,7 +2,6 @@ package editor.view.dialog.requirement.item;
 
 import editor.model.EditorController;
 import io.wsz.model.dialog.Requirements;
-import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.bool.BooleanExpression;
@@ -23,10 +22,7 @@ public class RequirementItemCountableView extends RequirementAssetOrItemCountabl
     protected ObservableList<PosItem<?,?>> getEquipmentAssetsOrItems() {
         ObservableList<PosItem<?,?>> items = FXCollections.observableArrayList();
         List<Location> locations = editorController.getObservableLocations();
-        locations.forEach(l -> l.getItems().stream()
-                .filter(i -> i instanceof Equipment) //TODO specific lists in locations
-                .filter(i -> i.getItemId() != null)
-                .forEach(items::add));
+        locations.forEach(l -> items.addAll(l.getItemsList().getMergedEquipment()));
         return items;
     }
 

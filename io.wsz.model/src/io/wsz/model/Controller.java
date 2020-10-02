@@ -8,6 +8,7 @@ import io.wsz.model.item.Container;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.logger.Logger;
@@ -40,7 +41,7 @@ public class Controller {
     protected Location locationToUpdate;
     protected Creature creatureToOpenInventory;
     protected Container containerToOpen;
-    protected DialogMemento<PosItem<?,?>> dialogMemento;
+    protected DialogMemento dialogMemento;
     protected Properties locale;
 
     public Controller(){}
@@ -61,17 +62,16 @@ public class Controller {
         return pc.deserialize(pluginName);
     }
 
-    public void restoreItemsReferences(List<Asset> assets,
+    public void restoreItemsReferences(ItemsList assets,
                                        List<Location> locations,
                                        World world) {
-        for (Asset a : getAssets()) {
+        assets.forEach(a -> {
             a.restoreReferences(this, assets, world);
             a.setController(this);
-        }
+        });
         for (Location l : locations) {
-            for (PosItem pi : l.getItems()) {
-                pi.restoreReferences(this, assets, world);
-            }
+            ItemsList items = l.getItemsList();
+            items.forEach(i -> i.restoreReferences(this, assets, world));
         }
     }
 
@@ -169,7 +169,7 @@ public class Controller {
         this.dialogMemento.setPc(npc);
     }
 
-    public PosItem getAnswering() {
+    public PosItem<?,?> getDialogNpc() {
         if (dialogMemento == null) {
             return null;
         } else {
@@ -177,7 +177,7 @@ public class Controller {
         }
     }
 
-    public void setAnswering(PosItem answering) {
+    public void setDialogPc(PosItem<?,?> answering) {
         initDialogMementoIfIsNull();
         this.dialogMemento.setNpc(answering);
     }
@@ -216,12 +216,9 @@ public class Controller {
     }
 
     public void reloadInventoryPictures() {
-        List<Asset> assets = getAssets();
-        if (assets == null || assets.isEmpty()) return;
-        assets.stream()
-                .filter(a -> a instanceof Creature)
-                .map(a -> (Creature) a)
-                .forEach(cr -> {
+        ItemsList assets = getAssets();
+        if (assets == null) return;
+        assets.getCreatures().forEach(cr -> {
                     CreatureAnimation anim = cr.getAnimation();
                     anim.clearInventoryPictures();
                 });
@@ -267,7 +264,7 @@ public class Controller {
         return activePlugin.getWorld().getLocations();
     }
 
-    public List<Asset> getAssets() {
+    public ItemsList getAssets() {
         Plugin activePlugin = model.getActivePlugin();
         if (activePlugin == null) return null;
         return activePlugin.getWorld().getAssets();
@@ -284,16 +281,16 @@ public class Controller {
         return world.getVariables().getVariableById(id);
     }
 
-    public Asset getAssetById(String id) {
-        return getAssets().stream()
+    public Asset<?> getAssetById(String id) {
+        return getAssets().getMergedList().stream()
                 .filter(a -> a.getAssetId().equals(id))
                 .findFirst().orElse(null);
     }
 
-    public PosItem getItemByAssetId(String itemId) {
+    public PosItem<?,?> getItemByAssetId(String assetId) {
         for (Location l : getLocations()) {
-            for (PosItem i : l.getItems()) {
-                PosItem item = i.getItemByAssetId(itemId);
+            for (PosItem<?,?> i : l.getItemsList().getMergedList()) {
+                PosItem<?,?> item = i.getItemByAssetId(assetId);
                 if (item != null) {
                     return item;
                 }
@@ -302,18 +299,18 @@ public class Controller {
         return null;
     }
 
-    public PosItem getItemOrAssetById(String id) {
-        PosItem item = getItemByItemId(id);
+    public PosItem<?,?> getItemOrAssetById(String id) {
+        PosItem<?,?> item = getItemByItemId(id);
         if (item == null) {
             item = getItemByAssetId(id);
         }
         return item;
     }
 
-    public PosItem getItemByItemId(String itemId) {
+    public PosItem<?,?> getItemByItemId(String itemId) {
         for (Location l : getLocations()) {
-            for (PosItem i : l.getItems()) {
-                PosItem item = i.getItemByItemId(itemId);
+            for (PosItem<?,?> i : l.getItemsList().getMergedList()) {
+                PosItem<?,?> item = i.getItemByItemId(itemId);
                 if (item != null) {
                     return item;
                 }

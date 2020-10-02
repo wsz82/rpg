@@ -10,7 +10,7 @@ import static io.wsz.model.script.ScriptKeyWords.*;
 
 public interface Executable {
 
-    void execute(Controller controller, PosItem firstAdversary, PosItem secondAdversary);
+    void execute(Controller controller, PosItem<?,?> firstAdversary, PosItem<?,?> secondAdversary);
 
     default void parsePreBlock(String s, ArrayDeque<Executable> executables,
                                ScriptValidator validator, Controller controller) {

@@ -12,7 +12,7 @@ import java.io.File;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class ContainerAnimation extends EquipmentAnimation<Container> {
+public class ContainerAnimation extends EquipmentAnimation<ContainerAnimationPos, Container> {
     private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir, IDLE);
 
     public ContainerAnimation(String animationDir, String idlesOrEquivalent) {

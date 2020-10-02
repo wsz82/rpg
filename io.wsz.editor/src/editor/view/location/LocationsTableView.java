@@ -104,13 +104,13 @@ public class LocationsTableView extends TableView<Location> {
     }
 
     private boolean isNameUnique(String newValue) {
-        return controller.getLocations().stream()
+        return controller.getObservableLocations().stream()
                 .noneMatch(layer -> layer.getId().equals(newValue));
     }
 
     void removeLocations() {
         List<Location> locationsToRemove = this.getSelectionModel().getSelectedItems();
-        List<Location> locations = controller.getLocations();
+        List<Location> locations = controller.getObservableLocations();
         boolean listSizesAreEqual = locations.size() == locationsToRemove.size();
         if (listSizesAreEqual) {
             locationsToRemove = locationsToRemove.stream()

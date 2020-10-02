@@ -101,9 +101,11 @@ public abstract class RequirementAssetOrItemCountableView<A extends Asset<?>> ex
         CountableItem countable = expression.getCountable();
         if (countable == null) return;
         String checkedId = countable.getCheckedId();
-        getEquipmentAssetsOrItems().stream()
-                .filter(a -> getAssetOrItemId(a).equals(checkedId))
-                .findFirst().ifPresent(assetOrItemCB::setValue);
+        if (checkedId != null) {
+            getEquipmentAssetsOrItems().stream()
+                    .filter(a -> getAssetOrItemId(a).equals(checkedId))
+                    .findFirst().ifPresent(assetOrItemCB::setValue);
+        }
         CompareOperator compareOperator = countable.getCompareOperator();
         if (compareOperator != null) {
             operatorCB.setValue(compareOperator);

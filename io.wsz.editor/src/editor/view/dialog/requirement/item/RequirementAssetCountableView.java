@@ -1,8 +1,8 @@
 package editor.view.dialog.requirement.item;
 
 import editor.model.EditorController;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Requirements;
+import io.wsz.model.item.PosItem;
 import io.wsz.model.script.bool.BooleanExpression;
 import io.wsz.model.script.bool.countable.item.BooleanItemVsItem;
 import javafx.collections.ObservableList;
@@ -10,14 +10,14 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RequirementAssetCountableView extends RequirementAssetOrItemCountableView<Asset<?>> {
+public class RequirementAssetCountableView extends RequirementAssetOrItemCountableView<PosItem<?,?>> {
 
     public RequirementAssetCountableView(EditorController editorController) {
         super(editorController);
     }
 
     @Override
-    protected ObservableList<Asset<?>> getEquipmentAssetsOrItems() {
+    protected ObservableList<PosItem<?,?>> getEquipmentAssetsOrItems() {
         return editorController.getObservableAssets().getEquipmentAssets();
     }
 
@@ -42,7 +42,7 @@ public class RequirementAssetCountableView extends RequirementAssetOrItemCountab
     }
 
     @Override
-    protected String getAssetOrItemId(Asset<?> asset) {
-        return asset.getAssetId();
+    protected String getAssetOrItemId(PosItem<?,?> item) {
+        return item.getAssetId();
     }
 }

@@ -179,7 +179,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     private void addItemsToContainable(ItemsStage itemsStage) {
         Coords pos = new Coords(0, 0);
         List<A> createdItems = createItems(pos);
-        for (A item : createdItems) {
+        for (A item : createdItems) { //TODO generic
             if (item instanceof Equipment) {
                 Image img = item.getImage().getFxImage();
                 if (isImageTooBig(item, img)) continue;
@@ -236,11 +236,11 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
                 .map(Asset::getAssetId)
                 .collect(Collectors.toList());
        controller.getObservableLocations().forEach(location -> {
-           List<PosItem> items = location.getItems();
+           List<PosItem<?,?>> items = location.getItemsList().getMergedList();
            List<PosItem> contentToRemove = items.stream()
                     .filter(p -> {
                         String name = p.getAssetId();
-                        if (p instanceof Containable) {
+                        if (p instanceof Containable) {         //TODO generic
                             Containable c = (Containable) p;
                             removeItemsFromContainable(assetsNames, c);
                         }
@@ -252,9 +252,9 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private void removeItemsFromContainable(List<String> assetsNames, Containable c) {
-        List<Equipment> equipment = c.getItems();
-        if (equipment == null || equipment.isEmpty()) return;
-        List<Equipment> equipmentToRemove = equipment.stream()
+        List<Equipment<?,?>> equipment = c.getEquipmentList().getMergedList();
+        if (equipment == null || equipment.isEmpty()) return; //TODO generic
+        List<Equipment<?,?>> equipmentToRemove = equipment.stream()
                 .filter(e -> {
                     if (e instanceof Containable) {
                         removeItemsFromContainable(assetsNames, (Containable) e);

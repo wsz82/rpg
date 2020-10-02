@@ -13,13 +13,13 @@ import java.util.List;
 public abstract class InventoryViewElement extends CanvasView {
     protected final Coords temp1 = new Coords();
     protected final Coords temp2 = new Coords();
-    protected final List<Equipment> lookedEquipment = new ArrayList<>(0);
+    protected final List<Equipment<?,?>> lookedEquipment = new ArrayList<>(0);
     protected final Coords viewPos = new Coords();
 
     protected double viewWidth;
     protected double viewHeight;
     protected boolean isScrollDragged;
-    protected Equipment dragged;
+    protected Equipment<?,?> dragged;
 
     public InventoryViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
         super(canvas, gameController);
@@ -47,14 +47,14 @@ public abstract class InventoryViewElement extends CanvasView {
 
     protected abstract void scrollScrollBar();
 
-    public abstract boolean tryRemove(Equipment e, Creature cr);
+    public abstract boolean tryRemove(Equipment<?,?> e, Creature cr);
 
-    public abstract boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable);
+    public abstract boolean tryAdd(Equipment<?,?> e, Creature cr, double x, double y, boolean doMergeCountable);
 
-    public abstract Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e);
+    public abstract Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment<?,?> e);
 
     public Coords getFixedDraggedPos(Coords mousePos, Coords draggedCoords, Coords translated,
-                                     Equipment dragged, double draggedInitWidth, double draggedInitHeight) {
+                                     Equipment<?,?> dragged, double draggedInitWidth, double draggedInitHeight) {
         return getLocalCoords(translated);
     }
 
@@ -69,7 +69,7 @@ public abstract class InventoryViewElement extends CanvasView {
         return translated;
     }
 
-    public abstract Equipment lookForEquipment(double x, double y, Coords draggedCoords);
+    public abstract Equipment<?,?> lookForEquipment(double x, double y, Coords draggedCoords);
 
     public abstract void scrollUp();
 
@@ -106,7 +106,7 @@ public abstract class InventoryViewElement extends CanvasView {
         return viewPos;
     }
 
-    public void setDragged(Equipment e) {
+    public void setDragged(Equipment<?,?> e) {
         dragged = e;
     }
 

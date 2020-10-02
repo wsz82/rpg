@@ -13,7 +13,7 @@ import java.util.*;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class CreatureAnimation extends Animation<Creature> {
+public class CreatureAnimation extends Animation<CreatureAnimationPos, Creature> {
     private static final int MIN_STOP_WAIT_TIME_SEC = 2;
     private static final int MAX_STOP_WAIT_TIME_SEC = 3;
     private static final List<String> EQUIPPED_ITEMS_NAMES = new ArrayList<>(0);
@@ -45,11 +45,10 @@ public class CreatureAnimation extends Animation<Creature> {
 
     private void resolveEquippedItemsAnimationName(Creature cr, CreatureAnimationPos animationPos) {
         String animationToPlay = BASIC;
-        Map<InventoryPlaceType, Equipment> equippedItems = cr.getInventory().getEquippedItems();
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = cr.getInventory().getEquippedItems();
         if (!equippedItems.isEmpty()) {
             EQUIPPED_ITEMS_NAMES.clear();
-            equippedItems.values().stream()
-                    .forEach(e -> EQUIPPED_ITEMS_NAMES.add(e.getEquipmentType().getId()));
+            equippedItems.values().forEach(e -> EQUIPPED_ITEMS_NAMES.add(e.getEquipmentType().getId()));
             EQUIPPED_ITEMS_NAMES.sort(Comparator.naturalOrder());
             BUILD_ANIMATION_NAME.delete(0, BUILD_ANIMATION_NAME.length());
             for (int i = 0; i < EQUIPPED_ITEMS_NAMES.size(); i++) {

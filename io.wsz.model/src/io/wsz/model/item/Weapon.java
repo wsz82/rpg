@@ -3,12 +3,15 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.countable.EquipmentMayCountableAnimation;
+import io.wsz.model.item.list.EquipmentMayCountableList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 import java.util.Objects;
 
 import static io.wsz.model.sizes.Paths.IDLE;
@@ -42,6 +45,16 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
         this.range = other.range;
         this.speed = other.speed;
         this.equipmentType = other.equipmentType;
+    }
+
+    @Override
+    public void addItemToEquipmentMayCountableList(EquipmentMayCountableList list) {
+        list.getWeapons().add(this);
+    }
+
+    @Override
+    public void removeItemFromEquipmentMayCountableList(EquipmentMayCountableList list) {
+        list.getWeapons().remove(this);
     }
 
     @Override
@@ -123,6 +136,11 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     @Override
     public EquipmentAnimationPos getAnimationPos() {
         return animationPos;
+    }
+
+    @Override
+    protected List<Weapon> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getEquipmentMayCountableList().getWeapons();
     }
 
     @Override

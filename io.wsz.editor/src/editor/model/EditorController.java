@@ -2,7 +2,7 @@ package editor.model;
 
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
-import editor.view.asset.ObservableAssets;
+import editor.view.asset.ObservableItemsList;
 import editor.view.asset.items.ItemsStage;
 import editor.view.layer.CurrentObservableLayer;
 import editor.view.location.CurrentObservableLocation;
@@ -10,12 +10,12 @@ import editor.view.plugin.PluginSettingsStage;
 import editor.view.script.variable.ObservableVariables;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
-import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.plugin.Plugin;
@@ -38,7 +38,7 @@ import java.util.Optional;
 public class EditorController extends Controller {
     private final CurrentObservableLocation currentObservableLocation = new CurrentObservableLocation();
     private final CurrentObservableLayer currentObservableLayer = new CurrentObservableLayer();
-    private final ObservableAssets observableAssets = new ObservableAssets();
+    private final ObservableItemsList observableAssetsList = new ObservableItemsList();
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
@@ -47,7 +47,7 @@ public class EditorController extends Controller {
     private final ObservableList<Script> observableScripts = FXCollections.observableArrayList();
     private final Coords dragPos = new Coords(-1, -1);
 
-    private PosItem activeItem;
+    private PosItem<?,?> activeItem;
     private ItemsStage activeItemsStage;
 
     public EditorController(){}
@@ -123,7 +123,7 @@ public class EditorController extends Controller {
     }
 
     private void clearObservableLists() {
-        observableAssets.clearLists();
+        observableAssetsList.clearLists();
         observableLocations.clear();
         observableEquipmentTypes.clear();
         observableLocations.clear();
@@ -139,7 +139,7 @@ public class EditorController extends Controller {
     }
 
     private void initAssets(World newWorld) {
-        List<Asset> assets = new ArrayList<>(0);
+        ItemsList assets = new ItemsList(true);
         newWorld.setAssets(assets);
     }
 
@@ -227,8 +227,8 @@ public class EditorController extends Controller {
     }
 
     private void loadObservableAssetsToPlugin(World world) {
-        List<Asset> mergedAssets = new ArrayList<>(observableAssets.getMergedAssets());
-        world.setAssets(mergedAssets);
+        ItemsList assetsList = observableAssetsList.createItemsList();
+        world.setAssets(assetsList);
     }
 
     public void loadAndRestorePlugin(PluginMetadata metadata, PluginSettingsStage pss) {
@@ -245,7 +245,7 @@ public class EditorController extends Controller {
         loadPluginToObservableLists(world);
 
         List<Location> locations = world.getLocations();
-        List<Asset> assets = world.getAssets();
+        ItemsList assets = world.getAssets();
         restoreItemsReferences(assets, locations, world);
 
         restoreFirstLocationAndLayer(locations);
@@ -308,8 +308,7 @@ public class EditorController extends Controller {
     }
 
     private void restoreObservableAssets(World world) {
-        List<Asset> assets = world.getAssets();
-        observableAssets.fillLists(assets);
+        observableAssetsList.fillLists(world.getAssets());
     }
 
     private void restoreFirstLocationAndLayer(List<Location> locations) {
@@ -357,11 +356,11 @@ public class EditorController extends Controller {
         this.activeItemsStage = itemsStage;
     }
 
-    public PosItem getActiveItem() {
+    public PosItem<?,?> getActiveItem() {
         return activeItem;
     }
 
-    public void setActiveItem(PosItem activeItem) {
+    public void setActiveItem(PosItem<?,?> activeItem) {
         this.activeItem = activeItem;
     }
 
@@ -385,8 +384,8 @@ public class EditorController extends Controller {
         currentObservableLayer.setLayer(layer);
     }
 
-    public ObservableAssets getObservableAssets() {
-        return observableAssets;
+    public ObservableItemsList getObservableAssets() {
+        return observableAssetsList;
     }
 
     public ObservableList<Location> getObservableLocations() {

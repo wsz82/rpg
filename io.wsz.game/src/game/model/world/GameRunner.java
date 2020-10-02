@@ -13,6 +13,7 @@ import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.dialog.DialogMemento;
 import io.wsz.model.item.*;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.FogStatus;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
@@ -39,10 +40,10 @@ public class GameRunner {
         LATER_RUN_BUFFER.addLast(laterRunner);
     }
 
-    private final List<PosItem> sortedMapItems = new ArrayList<>(0);
-    private final List<Equipment> sortedHoldEquipment = new ArrayList<>(0);
-    private final List<Equipment> sortedContainerEquipment = new ArrayList<>(0);
-    private final List<PosItem> tempItemsToAdd = new ArrayList<>(0);
+    private final List<PosItem<?,?>> sortedMapItems = new ArrayList<>(0);
+    private final List<Equipment<?,?>> sortedHoldEquipment = new ArrayList<>(0);
+    private final List<Equipment<?,?>> sortedContainerEquipment = new ArrayList<>(0);
+    private final ItemsList tempItemsToAdd = new ItemsList(true);
     private final GameController controller;
     private final Set<Location> heroesLocations = new HashSet<>(1);
     private final AtomicBoolean areImagesReloaded = new AtomicBoolean(false);
@@ -177,7 +178,7 @@ public class GameRunner {
 
         for (Location l : heroesLocations) { //TODO update locations of a current locations group
             if (l == null) continue;
-            l.getItems().forEach(PosItem::update);
+            l.getItemsList().forEach(PosItem::update);
         }
 
         updateHoveredHeroBaseAnimation();
@@ -198,7 +199,7 @@ public class GameRunner {
         double viewWidth = containerView.getViewWidth();
         double viewHeight = containerView.getViewHeight();
 
-        List<Equipment> items = containerToOpen.getItems();
+        List<Equipment<?,?>> items = containerToOpen.getEquipmentList().getMergedList();
 
         sortEquipment(curPos, viewWidth, viewHeight, sortedContainerEquipment, items);
     }
@@ -209,7 +210,7 @@ public class GameRunner {
         double viewWidth = holdView.getViewWidth();
         double viewHeight = holdView.getViewHeight();
 
-        List<Equipment> items = controller.getCreatureToOpenInventory().getItems();
+        List<Equipment<?,?>> items = controller.getCreatureToOpenInventory().getEquipmentList().getMergedList();
 
         sortEquipment(curPos, viewWidth, viewHeight, sortedHoldEquipment, items);
     }
@@ -233,7 +234,8 @@ public class GameRunner {
         sortItems(location, curPos.x, curPos.y, screenWidth, screenHeight, sortedMapItems, level);
     }
 
-    protected void sortEquipment(Coords curPos, double viewWidth, double viewHeight, List<Equipment> sorted, List<Equipment> toSort) {
+    protected void sortEquipment(Coords curPos, double viewWidth, double viewHeight,
+                                 List<Equipment<?,?>> sorted, List<Equipment<?,?>> toSort) {
         double left = curPos.x;
         double right = left + viewWidth;
         double top = curPos.y;
@@ -263,12 +265,12 @@ public class GameRunner {
         sortItems(loc, curPos.x, curPos.y, viewWidth, viewHeight, sortedMapItems, cr.getPos().level);
     }
 
-    protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem> items, int level) {
+    protected void sortItems(Location location, double left, double top, double width, double height, List<PosItem<?,?>> items, int level) {
         double right = left + width;
         double bottom = top + height;
 
         items.clear();
-        location.getItems().stream()
+        location.getItemsList().getMergedList().stream()
                 .filter(PosItem::isVisible)
                 .filter(pi -> {
                     double piLeft = pi.getLeft();
@@ -315,7 +317,7 @@ public class GameRunner {
         if (pc == null) {
             return;
         }
-        PosItem npc = controller.getAnswering();
+        PosItem<?,?> npc = controller.getDialogNpc();
         if (npc == null) {
             return;
         }
@@ -330,26 +332,20 @@ public class GameRunner {
     }
 
     private void addItems(Location location) {
-        List<PosItem> itemsToAdd = location.getItemsToAdd();
-
-        if (itemsToAdd.isEmpty()) {
-            return;
-        }
-        List<PosItem> locationItems = location.getItems();
+        ItemsList itemsToAdd = location.getItemsToAdd();
+        ItemsList locationItems = location.getItemsList();
         tempItemsToAdd.clear();
-        for (PosItem item : itemsToAdd) {
-            if (!item.tryAddToLocation(location, locationItems)) continue;
-            tempItemsToAdd.add(item);
-        }
+        itemsToAdd.forEach(i -> {
+            if (i.tryAddToLocation(location, locationItems)) {
+                tempItemsToAdd.add(i);
+            }
+        });
         itemsToAdd.removeAll(tempItemsToAdd);
     }
 
     private void removeItems(Location location) {
-        List<PosItem> itemsToRemove = location.getItemsToRemove();
-        if (itemsToRemove.isEmpty()) {
-            return;
-        }
-        location.getItems().removeAll(itemsToRemove);
+        ItemsList itemsToRemove = location.getItemsToRemove();
+        location.getItemsList().removeAll(itemsToRemove);
         itemsToRemove.clear();
     }
 
@@ -416,8 +412,8 @@ public class GameRunner {
         @Override
         protected String call() throws Exception {
             Location currentLocation = controller.getCurrentLocation();
-            List<PosItem> items = currentLocation.getItems();
-            Set<PosItem> assets = getAssets(items);
+            List<PosItem<?,?>> items = currentLocation.getItemsList().getMergedList();
+            Set<PosItem<?,?>> assets = getAssets(items);
 
             CreatureBase[] bases = CreatureBase.getBases();
             int total = assets.size() + bases.length;
@@ -440,11 +436,11 @@ public class GameRunner {
                 updateProgress(i, total);
             }
 
-            for (PosItem pi : assets) {
+            for (PosItem<?,?> asset : assets) {
                 try {
-                    reloadAssetImages(pi, programDir);
+                    reloadAssetImages(asset, programDir);
                 } catch (Exception e) {
-                    controller.getLogger().logAssetReloadImagesError(pi.getAssetId());
+                    controller.getLogger().logAssetReloadImagesError(asset.getAssetId());
                     continue;
                 }
                 updateProgress(i, total);
@@ -455,39 +451,15 @@ public class GameRunner {
             return "Completed";
         }
 
-        private Set<PosItem> getAssets(List<PosItem> items) {
-            Set<PosItem> prototypes = new HashSet<>();
-            for (PosItem item : items) {
-                PosItem prototype = item.getPrototype();
-                prototypes.add(prototype);
+        private Set<PosItem<?,?>> getAssets(List<PosItem<?,?>> items) {
+            Set<PosItem<?,?>> prototypes = new HashSet<>();
+            for (PosItem<?,?> item : items) {
+                item.addPrototypeToSet(prototypes);
             }
-
-            List<Containable> locationContainers = items.stream()
-                    .filter(pi -> pi instanceof Containable)
-                    .map(pi -> (Containable) pi)
-                    .filter(c -> !c.getItems().isEmpty())
-                    .collect(Collectors.toList());
-            addInnerAssets(prototypes, locationContainers);
             return prototypes;
         }
 
-        private void addInnerAssets(Set<PosItem> prototypes, List<Containable> locationContainers) {
-            for (Containable cons : locationContainers) {
-                List<Equipment> equipment = cons.getItems();
-                Set<PosItem> equipmentAssets = equipment.stream()
-                        .map(pi -> pi.getPrototype())
-                        .collect(Collectors.toSet());
-                prototypes.addAll(equipmentAssets);
-                List<Containable> containables = equipment.stream()
-                        .filter(pi -> pi instanceof Containable)
-                        .map(pi -> (Containable) pi)
-                        .filter(c -> !c.getItems().isEmpty())
-                        .collect(Collectors.toList());
-                addInnerAssets(prototypes, containables);
-            }
-        }
-
-        private void reloadAssetImages(PosItem pi, File programDir) {
+        private void reloadAssetImages(PosItem<?,?> pi, File programDir) {
             pi.getAnimation().initAllAnimations(programDir);
             if (pi instanceof Creature) {
                 Creature cr = (Creature) pi;

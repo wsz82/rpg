@@ -3,19 +3,21 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
 public class Landscape extends PosItem<Landscape, AnimationPos> {
     private static final long serialVersionUID = 1L;
 
-    private Animation<Landscape> animation;
+    private Animation<AnimationPos, Landscape> animation;
 
     private AnimationPos animationPos;
 
@@ -32,12 +34,22 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     }
 
     @Override
+    public void addItemToList(ItemsList list) {
+        list.getLandscapes().add(this);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        list.getLandscapes().remove(this);
+    }
+
+    @Override
     protected String getAssetDirName() {
         return Paths.LANDSCAPES;
     }
 
     @Override
-    protected Animation<Landscape> getConcreteAnimation() {
+    protected Animation<AnimationPos, Landscape> getConcreteAnimation() {
         if (animation == null) {
             return new Animation<>(getDir(), IDLE);
         } else {
@@ -48,6 +60,11 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     @Override
     public AnimationPos getAnimationPos() {
         return animationPos;
+    }
+
+    @Override
+    protected List<Landscape> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getLandscapes();
     }
 
     @Override

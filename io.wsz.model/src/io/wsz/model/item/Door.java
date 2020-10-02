@@ -17,13 +17,13 @@ import java.util.List;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
-public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimationPos> implements Openable {
+public abstract class Door<I extends Door<I>> extends PosItem<I, OpenableAnimationPos> implements Openable {
     private static final long serialVersionUID = 1L;
 
     protected OpenableAnimationPos animationPos;
     protected boolean isOpen;
 
-    private DoorAnimation animation;
+    private DoorAnimation<I> animation;
 
     private OpenableItem openableItem;
 
@@ -149,7 +149,7 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
     @Override
     public void open() {
         isOpen = true;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "open";
         if (collision != null) {
             isOpen = false;
@@ -162,7 +162,7 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
     @Override
     public void close() {
         isOpen = false;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "closed";
         if (collision != null) {
             isOpen = true;
@@ -172,7 +172,7 @@ public abstract class Door<I extends Door<?>> extends PosItem<I, OpenableAnimati
         }
     }
 
-    protected void onOperateActionFailure(PosItem collision, String message) {
+    protected void onOperateActionFailure(PosItem<?,?> collision, String message) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
         getController().getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
     }

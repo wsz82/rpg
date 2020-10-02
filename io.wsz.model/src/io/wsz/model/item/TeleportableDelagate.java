@@ -56,12 +56,12 @@ public class TeleportableDelagate implements Externalizable {
             return false;
         }
         Board board = controller.getBoard();
-        PosItem landscape = board.lookForItem(target.getItems(), exit.x, exit.y, exit.level, LANDSCAPE_TYPE, false);
+        PosItem<?,?> landscape = board.lookForItem(target.getItemsList().getMergedList(), exit.x, exit.y, exit.level, LANDSCAPE_TYPE, false);
         if (landscape == null) {
             isBeingUsed = false;
             return false;
         }
-        PosItem collided = cr.getCollision(exit, target);
+        PosItem<?,?> collided = cr.getCollision(exit, target);
         if (collided != null) {
             isBeingUsed = false;
             return false;

@@ -4,7 +4,8 @@ import io.wsz.model.Controller;
 import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.creature.*;
 import io.wsz.model.animation.cursor.CursorType;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.list.EquipmentList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
@@ -19,10 +20,7 @@ import io.wsz.model.world.World;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static io.wsz.model.location.FogStatus.CLEAR;
 import static io.wsz.model.sizes.Paths.IDLE;
@@ -62,7 +60,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.animationPos = new CreatureAnimationPos();
         this.portraitAnimationPos = new AnimationPos();
         this.baseAnimationPos = new CreatureBaseAnimationPos();
-        this.inventory = new Inventory(this);
+        this.inventory = new Inventory(this, new EquipmentList(true), new HashMap<>(0));
     }
 
     public Creature(Creature prototype) {
@@ -73,8 +71,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.task = new Task(new Coords(-1, -1));
         Task pTasks = prototype.getTask();
         pTasks.cloneTo(this);
-        setInventory(new Inventory(this));
-        getInventory().getItems().addAll(prototype.getInventory().getItems());
+        EquipmentList equipmentList = new EquipmentList(prototype.getInventory().getEquipmentList(), false);
+        this.inventory = new Inventory(this, equipmentList, new HashMap<>(0));
     }
 
     @Override
@@ -225,7 +223,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         return getReversedCenter(difPos.x, difPos.y, difPos.level, difPos.getLocation());
     }
 
-    public void onFirstAction(PosItem pi) {
+    public void onFirstAction(PosItem<?,?> pi) {
         if (pi == null) {
             return;
         }
@@ -239,7 +237,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.task.setDestY(reverseCenterBottomPosY(y));
     }
 
-    private void setItemTask(PosItem e) {
+    private void setItemTask(PosItem<?,?> e) {
         this.task.setFinished(false);
         this.task.setItem(e);
     }
@@ -253,8 +251,8 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         return Geometry.ovalsIntersect(thisCenter, thisSize, pos, width);
     }
 
-    public List<Equipment> getEquipmentWithinRange(Controller controller) {
-        return getController().getBoard().getEquipmentWithinRange(this);
+    public List<Equipment<?,?>> getEquipmentWithinRange(Controller controller) {
+        return controller.getBoard().getEquipmentWithinRange(this);
     }
 
     private void checkTask() {
@@ -300,8 +298,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public double getBottom() {
         double imgHeight = getImageHeight();
-        double imgBottom = pos.y + imgHeight;
-        return imgBottom;
+        return pos.y + imgHeight;
     }
 
     private double getCreatureHalfHeight() {
@@ -319,7 +316,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         if (cr == this) return false;
         Controller controller = getController();
         controller.setDialogNpc(cr);
-        controller.setAnswering(this);
+        controller.setDialogPc(this);
         controller.setPosToCenter(getCenter());
         return true;
     }
@@ -332,6 +329,16 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.pos.y = reversed.y;
         this.pos.level = reversed.level;
         task.clear();
+    }
+
+    @Override
+    public void addItemToList(ItemsList list) {
+        list.getCreatures().add(this);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        list.getCreatures().remove(this);
     }
 
     @Override
@@ -403,15 +410,20 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public List<Equipment> getItems() {
-        return inventory.getItems();
+    public EquipmentList getEquipmentList() {
+        return inventory.getEquipmentList();
     }
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         super.restoreReferences(controller, assets, world);
         restoreCreatureEquippedItemsPlaces(controller, world.getInventoryPlaces());
-        getItems().forEach(e -> e.restoreReferences(controller, assets, world));
+        getEquipmentList().forEach(e -> e.restoreReferences(controller, assets, world));
+    }
+
+    @Override
+    protected List<Creature> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getCreatures();
     }
 
     @Override
@@ -420,16 +432,17 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    protected void addNewItemToLocation(Location toLocation, int toLevel, double toX, double toY, Creature item) {
-        Coords centered = item.getReversedCenter(toX, toY, toLevel, toLocation);
-        item.setPos(centered);
-        toLocation.getItemsToAdd().add(item);
+    protected void addToLocation(Location toLocation, int toLevel, double toX, double toY) {
+        Coords centered = getReversedCenter(toX, toY, toLevel, toLocation);
+        setPos(centered);
+        ItemsList itemsToAdd = toLocation.getItemsToAdd();
+        addItemToList(itemsToAdd);
     }
 
     private void restoreCreatureEquippedItemsPlaces(Controller controller, List<InventoryPlaceType> places) {
         Inventory inventory = getInventory();
-        Map<InventoryPlaceType, Equipment> equippedItems = inventory.getEquippedItems();
-        Map<InventoryPlaceType,Equipment> restored = new HashMap<>(equippedItems.size());
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = inventory.getEquippedItems();
+        Map<InventoryPlaceType,Equipment<?,?>> restored = new HashMap<>(equippedItems.size());
         for (InventoryPlaceType serType : equippedItems.keySet()) {
             InventoryPlaceType typeWithRef = controller.getReferencedPlaceType(places, serType);
             restored.put(typeWithRef, equippedItems.get(serType));
@@ -453,18 +466,23 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public PosItem getItemByAssetId(String lookedId) {
+    public PosItem<?, ?> getItemByAssetId(String lookedId) {
         return getItemByAssetId(this, lookedId);
     }
 
     @Override
-    public PosItem getItemByItemId(String lookedId) {
+    public PosItem<?, ?> getItemByItemId(String lookedId) {
         return getItemByItemId(this, lookedId);
     }
 
     @Override
     protected int getInnerAmountById(String checkedId) {
         return getContainableAmountById(checkedId);
+    }
+
+    @Override
+    public void addPrototypeToSet(Set<PosItem<?,?>> prototypes) {
+        addPrototypesToSet(this, prototypes);
     }
 
     public Task getTask() {
@@ -644,7 +662,7 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         this.strength = strength;
     }
 
-    public void onSecondAction(PosItem pi) {
+    public void onSecondAction(PosItem<?,?> pi) {
         pi.creatureSecondaryInteract(this);
     }
 

@@ -9,7 +9,7 @@ import io.wsz.model.stage.ResolutionImage;
 import java.io.File;
 import java.util.List;
 
-public class PortraitAnimation extends Animation<Creature> {
+public class PortraitAnimation extends Animation<CreatureAnimationPos, Creature> {
 
     public PortraitAnimation(String animationDir, String idlesOrEquivalent) {
         super(animationDir, idlesOrEquivalent);

@@ -1,9 +1,9 @@
 package io.wsz.model.world;
 
-import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.Script;
 import io.wsz.model.script.variable.Variables;
@@ -19,7 +19,7 @@ public class World implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private List<Location> locations;
-    private List<Asset> assets;
+    private ItemsList assets;
     private List<EquipmentType> equipmentTypes;
     private List<InventoryPlaceType> inventoryPlaceTypes;
     private List<Dialog> dialogs;
@@ -36,11 +36,11 @@ public class World implements Externalizable {
         this.locations = locations;
     }
 
-    public List<Asset> getAssets() {
+    public ItemsList getAssets() {
         return assets;
     }
 
-    public void setAssets(List<Asset> assets) {
+    public void setAssets(ItemsList assets) {
         this.assets = assets;
     }
 
@@ -109,7 +109,7 @@ public class World implements Externalizable {
 
         locations = (List<Location>) in.readObject();
 
-        assets = (List<Asset>) in.readObject();
+        assets = (ItemsList) in.readObject();
 
         equipmentTypes = (List<EquipmentType>) in.readObject();
 

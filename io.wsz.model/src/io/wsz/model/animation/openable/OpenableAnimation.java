@@ -9,7 +9,7 @@ import java.util.*;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class OpenableAnimation<O extends PosItem<?,?>> extends Animation<O> {
+public class OpenableAnimation<O extends PosItem<O,OpenableAnimationPos>> extends Animation<OpenableAnimationPos, O> {
     private static final List<String> SEQUENCES_FOR_RANDOM = new ArrayList<>(0);
 
     private final Map<String, Map<String, List<ResolutionImage>>> operating = new HashMap<>(0);

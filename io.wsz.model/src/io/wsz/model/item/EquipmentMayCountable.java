@@ -3,25 +3,23 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.item.list.EquipmentList;
+import io.wsz.model.item.list.EquipmentMayCountableList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Board;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.List;
 import java.util.Objects;
 
-public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>, A extends EquipmentAnimationPos>
+public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,A>, A extends EquipmentAnimationPos>
         extends Equipment<E, A>{
     private static final long serialVersionUID = 1L;
 
-    public static void merge(EquipmentMayCountable from, EquipmentMayCountable to) {
-        to.setAmount(to.getAmount() + from.getAmount());
-    }
-
-    private boolean isCountable;
-    private Integer amount;
+    protected boolean isCountable;
+    protected Integer amount;
 
     public EquipmentMayCountable() {
     }
@@ -34,13 +32,27 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
         super(prototype);
     }
 
-    public EquipmentMayCountable(EquipmentMayCountable<E,A> other, boolean keepId) {
+    public EquipmentMayCountable(E other, boolean keepId) {
         super(other, keepId);
         this.isCountable = other.isCountable;
         this.amount = other.amount;
     }
 
-    public abstract EquipmentMayCountable cloneEquipment(boolean keepId);
+    public abstract E cloneEquipment(boolean keepId);
+
+    @Override
+    public final void addItemToEquipmentList(EquipmentList list) {
+        addItemToEquipmentMayCountableList(list.getEquipmentMayCountableList());
+    }
+
+    @Override
+    public final void removeItemFromEquipmentList(EquipmentList list) {
+        removeItemFromEquipmentMayCountableList(list.getEquipmentMayCountableList());
+    }
+
+    public abstract void addItemToEquipmentMayCountableList(EquipmentMayCountableList list);
+
+    public abstract void removeItemFromEquipmentMayCountableList(EquipmentMayCountableList list);
 
     @Override
     public Double getWeight() {
@@ -102,7 +114,7 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
     }
 
     @Override
-    public void addToLocation(Location location, List<PosItem> locationItems) {
+    public void addToLocation(Location location, ItemsList locationItems) {
         if (isCountable()) {
             drop(pos.x, pos.y, location, getController().getBoard());
         }
@@ -110,10 +122,10 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
     }
 
     @Override
-    protected void drop(double x, double y, Location l, Board board) {
+    protected void drop(double x, double y, Location location, Board board) {
         boolean isToDropAsIndividual = false;
         if (isCountable()) {
-            EquipmentMayCountable countable = getItemInDroppedPlace(x, y, board);
+            EquipmentMayCountable<?,?> countable = getItemInDroppedPlace(location, x, y, board);
             if (countable != null && countable.isCountable() && countable.isUnitIdentical(countable)) {
                 Integer addedAmount = this.getAmount();
                 Integer alreadyInAmount = countable.getAmount();
@@ -126,13 +138,14 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,?>
             isToDropAsIndividual = true;
         }
         if (isToDropAsIndividual) {
-            l.getItems().add(this);
+            addItemToList(location.getItemsList());
             getController().getLogger().logItemAction(getName(), "dropped");
         }
     }
 
-    private EquipmentMayCountable getItemInDroppedPlace(double x, double y, Board board) {
-        return board.lookForMayCountableEquipment(pos.getLocation().getItems(), x, y, pos.level,
+    private EquipmentMayCountable<?,?> getItemInDroppedPlace(Location location, double x, double y, Board board) {
+        return board.lookForMayCountableEquipment(
+                location.getItemsList().getMergedEquipmentMayCountable(), x, y, pos.level,
                 this.getImageWidth(), this.getImageHeight());
     }
 

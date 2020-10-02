@@ -12,8 +12,8 @@ import java.io.File;
 
 import static io.wsz.model.sizes.Paths.*;
 
-public class DoorAnimation extends Animation<Door<?>> {
-    private final OpenableAnimation<?> openableAnimation = new OpenableAnimation<>(animationDir, IDLE);
+public class DoorAnimation<D extends Door<D>> extends Animation<OpenableAnimationPos, D> {
+    private final OpenableAnimation<D> openableAnimation = new OpenableAnimation<>(animationDir, IDLE);
 
     public DoorAnimation(String animationDir, String idlesOrEquivalent) {
         super(animationDir, idlesOrEquivalent);
@@ -26,7 +26,7 @@ public class DoorAnimation extends Animation<Door<?>> {
     }
 
     @Override
-    public void play(Door d) {
+    public void play(D d) {
         OpenableAnimationPos animationPos = d.getAnimationPos();
         if (d.isOpen()) {
             playOpen(animationPos);
@@ -44,11 +44,11 @@ public class DoorAnimation extends Animation<Door<?>> {
         d.setImage(nextFrame);
     }
 
-    private ResolutionImage getIdle(Door d, OpenableAnimationPos animationPos) {
+    private ResolutionImage getIdle(D d, OpenableAnimationPos animationPos) {
         return getNextAnimationImage(idles, animationPos, d.getAnimationSpeed());
     }
 
-    private ResolutionImage getOperating(Door d, OpenableAnimationPos animationPos) {
+    private ResolutionImage getOperating(D d, OpenableAnimationPos animationPos) {
         return openableAnimation.getOperatingImage(d.isOpen(), d.getAnimationSpeed(), animationPos);
     }
 

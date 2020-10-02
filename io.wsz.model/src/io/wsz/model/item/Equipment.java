@@ -3,7 +3,8 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.list.EquipmentList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -18,12 +19,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAnimationPos> extends PosItem<E, B> implements Takeable {
+public abstract class Equipment<E extends Equipment<E, B>, B extends EquipmentAnimationPos> extends PosItem<E, B>
+        implements Takeable {
     private static final long serialVersionUID = 1L;
 
-    public static List<Equipment> cloneEquipmentList(List<Equipment> equipment, boolean keepId) {
-        List<Equipment> clone = new ArrayList<>(equipment.size());
-        for (Equipment e : equipment) {
+    public static <E extends Equipment<E,?>> List<E> cloneEquipmentList(List<E> equipment, boolean keepId) {
+        List<E> clone = new ArrayList<>(equipment.size());
+        for (E e : equipment) {
             clone.add(e.cloneEquipment(keepId));
         }
         return clone;
@@ -44,12 +46,26 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         super(prototype);
     }
 
-    public Equipment(Equipment other, boolean keepId) {
+    public Equipment(E other, boolean keepId) {
         super(other, keepId);
         this.occupiedPlace = other.occupiedPlace;
         this.weight = other.weight;
         this.size = other.size;
     }
+
+    @Override
+    public void addItemToList(ItemsList list) {
+        addItemToEquipmentList(list.getEquipment());
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        removeItemFromEquipmentList(list.getEquipment());
+    }
+
+    public abstract void addItemToEquipmentList(EquipmentList list);
+
+    public abstract void removeItemFromEquipmentList(EquipmentList list);
 
     @Override
     public boolean tryTake(Creature cr) {
@@ -64,14 +80,15 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         Coords toCoords = getInteractionPoint();
         double xTo = toCoords.x;
         double yTo = toCoords.y;
-        PosItem obstacleOnWay = getController().getBoard().getObstacleOnWay(
+        PosItem<?,?> obstacleOnWay = getController().getBoard().getObstacleOnWay(
                 pos.getLocation(), pos.level, xFrom, yFrom, this, xTo, yTo);
 
         if (obstacleOnWay != null) {
             getController().getLogger().logItemCannotBeTakenBecauseIsBehind(getName(), obstacleOnWay.getName());
             return false;
         } else {
-            cr.getPos().getLocation().getItemsToRemove().add(this);
+            ItemsList itemsToRemove = cr.getPos().getLocation().getItemsToRemove();
+            addItemToList(itemsToRemove);
             getController().getLogger().logItemAction(getName(), "taken");
             return true;
         }
@@ -90,11 +107,11 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
         pos.setLocation(l);
         boolean outOfLocation = x < 0 || y < 0
                 || x > l.getWidth() || y > l.getHeight();
-        PosItem obstacle = null;
+        PosItem<?,?> obstacle = null;
         if (!outOfLocation) {
             obstacle = getCollision();
         }
-        PosItem obstacleOnWay = null;
+        PosItem<?,?> obstacleOnWay = null;
         Board board = getController().getBoard();
         if (obstacle == null) {
             Coords crCenter = cr.getCenter();
@@ -127,7 +144,7 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     }
 
     protected void drop(double x, double y, Location l, Board board) {
-        l.getItemsToAdd().add(this);
+        addItemToList(l.getItemsToAdd());
         getController().getLogger().logItemAction(getName(), "dropped");
     }
 
@@ -152,14 +169,14 @@ public abstract class Equipment<E extends Equipment<?, ?>, B extends EquipmentAn
     @Override
     public abstract B getAnimationPos();
 
-    public abstract Equipment cloneEquipment(boolean keepId);
+    public abstract E cloneEquipment(boolean keepId);
 
     public boolean isCountable() {
         return false;
     }
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         super.restoreReferences(controller, assets, world);
         restoreEquipmentType(world.getEquipmentTypes());
         restoreOccupiedPlace(controller, world.getInventoryPlaces());

@@ -18,7 +18,6 @@ import javafx.util.StringConverter;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private static final String TITLE = "OutDoor asset";
@@ -80,10 +79,7 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
 
     private void setConnectionCBitems(Location exitLocation) {
         if (exitLocation == null) return;
-        List<OutDoor> outDoors = exitLocation.getItems().stream()
-                .filter(i -> i instanceof OutDoor)
-                .map(i -> (OutDoor) i)
-                .collect(Collectors.toList());
+        List<OutDoor> outDoors = exitLocation.getItemsList().getOutDoors();
         ObservableList<OutDoor> outDoorsObservable = FXCollections.observableArrayList(outDoors);
         connectionCB.setItems(outDoorsObservable);
         outDoorsObservable.add(null);

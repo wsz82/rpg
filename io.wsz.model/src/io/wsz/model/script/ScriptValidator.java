@@ -113,7 +113,7 @@ public class ScriptValidator {
         }
     }
 
-    public void validateNewItemId(String id) { //TODO read also ids in scripts (include dialogs scripts)
+    public void validateNewItemId(String id) { //TODO read also ids in scripts (include dialogs scripts) (if itemId will be unique)
         if (controller.getItemByItemId(id) != null || controller.getItemByAssetId(id) != null) {
             setNewItemIdInvalid(id);
         }

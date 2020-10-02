@@ -1,7 +1,10 @@
 package io.wsz.model.item;
 
 import io.wsz.model.Controller;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
+
+import java.util.List;
 
 public class InDoor extends Door<InDoor> {
     private static final long serialVersionUID = 1L;
@@ -18,6 +21,16 @@ public class InDoor extends Door<InDoor> {
     }
 
     @Override
+    public void addItemToList(ItemsList list) {
+        list.getInDoors().add(this);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        list.getInDoors().remove(this);
+    }
+
+    @Override
     protected String getAssetDirName() {
         return Paths.INDOORS;
     }
@@ -25,6 +38,11 @@ public class InDoor extends Door<InDoor> {
     @Override
     public boolean creaturePrimaryInteract(Creature cr) {
         return creatureSecondaryInteract(cr);
+    }
+
+    @Override
+    protected List<InDoor> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getInDoors();
     }
 
     @Override

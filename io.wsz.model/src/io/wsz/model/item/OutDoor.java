@@ -3,7 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.animation.openable.OpenableAnimationType;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
@@ -38,6 +38,16 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     @Override
+    public void addItemToList(ItemsList list) {
+        list.getOutDoors().add(this);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        list.getOutDoors().remove(this);
+    }
+
+    @Override
     protected String getAssetDirName() {
         return Paths.OUTDOORS;
     }
@@ -47,11 +57,16 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         super.restoreReferences(controller, assets, world);
         Coords exit = getExit();
         controller.restoreLocationOfCoords(exit);
         restoreOutDoorConnection(controller);
+    }
+
+    @Override
+    protected List<OutDoor> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getOutDoors();
     }
 
     @Override
@@ -66,9 +81,7 @@ public class OutDoor extends Door<OutDoor> {
         Coords pos = serConnection.getPos();
         controller.restoreLocationOfCoords(pos);
         Location location = pos.getLocation();
-        Optional<OutDoor> optConnection = location.getItems().stream()
-                .filter(o -> o instanceof OutDoor)
-                .map(o -> (OutDoor) o)
+        Optional<OutDoor> optConnection = location.getItemsList().getOutDoors().stream()
                 .filter(o -> o.getAssetId().equals(name))
                 .filter(o -> o.getPos().equals(pos))
                 .findFirst();
@@ -149,7 +162,7 @@ public class OutDoor extends Door<OutDoor> {
     @Override
     public void open() {
         isOpen = true;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "open";
         if (collision != null) {
             isOpen = false;
@@ -161,7 +174,7 @@ public class OutDoor extends Door<OutDoor> {
                 return;
             }
             connection.setOpen(true);
-            PosItem connectionCollision = connection.getCollision();
+            PosItem<?,?> connectionCollision = connection.getCollision();
             if (connectionCollision != null) {
                 isOpen = false;
                 connection.setOpen(false);
@@ -175,7 +188,7 @@ public class OutDoor extends Door<OutDoor> {
     @Override
     public void close() {
         isOpen = false;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "closed";
         if (collision != null) {
             isOpen = true;
@@ -187,7 +200,7 @@ public class OutDoor extends Door<OutDoor> {
                 return;
             }
             connection.setOpen(false);
-            PosItem connectionCollision = connection.getCollision();
+            PosItem<?,?> connectionCollision = connection.getCollision();
             if (connectionCollision != null) {
                 isOpen = true;
                 connection.setOpen(true);
@@ -198,7 +211,7 @@ public class OutDoor extends Door<OutDoor> {
         }
     }
 
-    private void onOperateConnectionActionFailure(PosItem connectionCollision, String message) {
+    private void onOperateConnectionActionFailure(PosItem<?,?> connectionCollision, String message) {
         animationPos.setOpenableAnimationType(OpenableAnimationType.IDLE);
         getController().getLogger().logItemCannotBeActionBecauseIsBlockedBehind(getName(), message, connectionCollision.getName());
     }

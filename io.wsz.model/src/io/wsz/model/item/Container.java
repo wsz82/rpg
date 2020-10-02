@@ -5,7 +5,8 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
 import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
-import io.wsz.model.asset.Asset;
+import io.wsz.model.item.list.EquipmentList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -16,8 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
@@ -28,37 +29,50 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
 
     private ContainerAnimationPos animationPos;
     private OpenableItem openableItem;
-    private final List<Equipment> items;
+    private EquipmentList equipmentList;
     private Double nettoWeight;
     private Integer nettoSize;
     private boolean isOpen;
 
     public Container() {
-        this.items = new ArrayList<>(0);
+    }
+
+    @Override
+    public void removeItemFromList(ItemsList list) {
+        removeItemFromEquipmentList(list.getEquipment());
     }
 
     public Container(Controller controller) {
         super(ItemType.CONTAINER, controller);
         this.animationPos = new ContainerAnimationPos();
         this.openableItem = new OpenableItem();
-        this.items = new ArrayList<>(0);
+        this.equipmentList = new EquipmentList(true);
     }
 
     public Container(Container prototype) {
         super(prototype);
         this.animationPos = new ContainerAnimationPos();
-        this.items = new ArrayList<>(0);
-        getItems().addAll(prototype.getItems());
+        this.equipmentList = new EquipmentList(prototype.getEquipmentList(), false);
         setOpen(prototype.isOpen());
     }
 
     public Container(Container other, boolean keepId) {
         super(other, keepId);
         this.animationPos = new ContainerAnimationPos(other.animationPos);
-        this.items = Equipment.cloneEquipmentList(other.items, keepId);
+        this.equipmentList = new EquipmentList(other.equipmentList, keepId);
         this.nettoWeight = other.weight;
         this.nettoSize = other.nettoSize;
         this.isOpen = other.isOpen;
+    }
+
+    @Override
+    public void addItemToEquipmentList(EquipmentList list) {
+        list.getContainers().add(this);
+    }
+
+    @Override
+    public void removeItemFromEquipmentList(EquipmentList equipment) {
+        equipment.getContainers().remove(this);
     }
 
     @Override
@@ -66,32 +80,31 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         return Paths.CONTAINERS;
     }
 
-    public boolean tryAdd(Equipment equipment, boolean doMergeCountable) { //TODO addable delegate for this and inventory
+    public boolean tryAdd(Equipment<?,?> equipment, boolean doMergeCountable) { //TODO addable delegate for this and inventory
         if (!fitsContainer(equipment)) {
             return false;
         }
         if (equipment.isCountable() && doMergeCountable) {
-            EquipmentMayCountable countable = (EquipmentMayCountable) getItems().stream()
+            EquipmentMayCountable<?,?> countable = getEquipmentList().getEquipmentMayCountableList().getMergedList().stream()
                     .filter(e -> e.getAssetId().equals(equipment.getAssetId()))
                     .filter(e -> e.isUnitIdentical(equipment))
                     .findFirst()
                     .orElse(null);
             if (countable == null) {
-                items.add(equipment);
+                equipment.addItemToEquipmentList(this.equipmentList);
             } else {
-                EquipmentMayCountable added = (EquipmentMayCountable) equipment;
-                Integer addedAmount = added.getAmount();
+                Integer addedAmount = equipment.getAmount();
                 Integer alreadyInAmount = countable.getAmount();
                 int sum = alreadyInAmount + addedAmount;
                 countable.setAmount(sum);
             }
         } else {
-            items.add(equipment);
+            equipment.addItemToEquipmentList(this.equipmentList);
         }
         return true;
     }
 
-    private boolean fitsContainer(Equipment equipment) {
+    private boolean fitsContainer(Equipment<?,?> equipment) {
         double size = equipment.getSize();
         return getFilledSpace() + size < getMaxSize();
     }
@@ -100,8 +113,8 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         return getSize() - getNettoSize();
     }
 
-    public void remove(Equipment e) {
-        items.remove(e);
+    public void remove(Equipment<?,?> e) {
+        removeItemFromEquipmentList(equipmentList);
         setWeight(getWeight() - e.getWeight());
     }
 
@@ -127,15 +140,20 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     public double getFilledSpace() {
-        return getItems().stream()
+        return getEquipmentList().getMergedList().stream()
                 .mapToDouble(Equipment::getSize)
                 .sum();
     }
 
     @Override
-    public void restoreReferences(Controller controller, List<Asset> assets, World world) {
+    public void restoreReferences(Controller controller, ItemsList assets, World world) {
         super.restoreReferences(controller, assets, world);
-        getItems().forEach(e -> e.restoreReferences(controller, assets, world));
+        getEquipmentList().forEach(e -> e.restoreReferences(controller, assets, world));
+    }
+
+    @Override
+    protected List<Container> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getEquipment().getContainers();
     }
 
     @Override
@@ -155,12 +173,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public PosItem getItemByAssetId(String lookedId) {
+    public PosItem<?,?> getItemByAssetId(String lookedId) {
         return getItemByAssetId(this, lookedId);
     }
 
     @Override
-    public PosItem getItemByItemId(String lookedId) {
+    public PosItem<?,?> getItemByItemId(String lookedId) {
         return getItemByItemId(this, lookedId);
     }
 
@@ -212,8 +230,8 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     private double getItemsWeight() {
-        if (getItems() == null) return 0;
-        return getItems().stream()
+        if (getEquipmentList() == null) return 0;
+        return getEquipmentList().getMergedList().stream()
                 .mapToDouble(Equipment::getWeight)
                 .sum();
     }
@@ -250,6 +268,11 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         return animation.getOpenableAnimation().getBasicMainOpen(programDir);
     }
 
+    @Override
+    public void addPrototypeToSet(Set<PosItem<?,?>> prototypes) {
+        addPrototypesToSet(this, prototypes);
+    }
+
     public boolean isOpen() {
         return isOpen;
     }
@@ -280,8 +303,8 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public List<Equipment> getItems() {
-        return items;
+    public EquipmentList getEquipmentList() {
+        return equipmentList;
     }
 
     @Override
@@ -319,7 +342,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     @Override
     public void open() {
         isOpen = true;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "open";
         if (collision != null) {
             isOpen = false;
@@ -332,7 +355,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     @Override
     public void close() {
         isOpen = false;
-        PosItem collision = getCollision();
+        PosItem<?,?> collision = getCollision();
         String message = "closed";
         if (collision != null) {
             isOpen = true;
@@ -342,7 +365,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         }
     }
 
-    private void onOperateActionFailure(PosItem collision, String message) {
+    private void onOperateActionFailure(PosItem<?,?> collision, String message) {
         animationPos.getOpenableAnimationPos().setOpenableAnimationType(OpenableAnimationType.IDLE);
         getController().getLogger().logItemCannotBeActionBecauseCollides(getName(), message, collision.getName());
     }
@@ -373,7 +396,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
 
         out.writeObject(animationPos);
 
-        out.writeObject(items);
+        out.writeObject(equipmentList);
 
         out.writeObject(nettoWeight);
 
@@ -395,8 +418,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
             animation = new ContainerAnimation(getDir(), IDLE);
         }
 
-        List<Equipment> serItems = (List<Equipment>) in.readObject();
-        items.addAll(serItems);
+        equipmentList = (EquipmentList) in.readObject();
 
         nettoWeight = (Double) in.readObject();
 

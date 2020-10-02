@@ -74,14 +74,14 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public boolean tryRemove(Equipment e, Creature cr) {
+    public boolean tryRemove(Equipment<?, ?> e, Creature cr) {
         getSortedEquipment().remove(e);
         controller.getLogger().logItemRemoved(e.getName(), container.getName());
         return true;
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
+    public boolean tryAdd(Equipment<?, ?> e, Creature cr, double x, double y, boolean doMergeCountable) {
         if (!container.tryAdd(e, doMergeCountable)) {
             controller.getLogger().logItemDoesNotFit(e.getName(), container.getName());
             return false;
@@ -93,7 +93,7 @@ public class ContainerViewElement extends EquipmentViewElement {
     }
 
     @Override
-    public List<Equipment> getSortedEquipment() {
-        return container.getItems();
+    public List<Equipment<?, ?>> getSortedEquipment() {
+        return sortedEquipment;
     }
 }

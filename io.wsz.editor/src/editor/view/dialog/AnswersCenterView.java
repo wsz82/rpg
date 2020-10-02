@@ -73,9 +73,9 @@ public class AnswersCenterView {
 
         scriptArea = new ScriptArea(editorController);
         scriptArea.init();
-        final VBox scriptArea = this.scriptArea.getScriptArea();
+        final VBox scriptContainer = scriptArea.getScriptContainer();
 
-        answerDetails.getChildren().addAll(answerTextArea, requirementsContainer, scriptArea);
+        answerDetails.getChildren().addAll(answerTextArea, requirementsContainer, scriptContainer);
     }
 
     private void setUpAnswerTextArea() {

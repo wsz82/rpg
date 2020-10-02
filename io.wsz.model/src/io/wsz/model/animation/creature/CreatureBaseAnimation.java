@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static io.wsz.model.sizes.Paths.ACTION;
 
-public class CreatureBaseAnimation extends Animation<Creature> {
+public class CreatureBaseAnimation extends Animation<CreatureAnimationPos, Creature> {
 
     private final Map<String, Map<String, List<ResolutionImage>>> actions = new HashMap<>(0);
 

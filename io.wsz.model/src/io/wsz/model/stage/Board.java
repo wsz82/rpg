@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 
 public class Board {
     private final Controller controller;
-    private final GraphSorter<PosItem> posItemGraphSorter = new GraphSorter<>();
-    private final GraphSorter<Equipment> equipmentGraphSorter = new GraphSorter<>();
+    private final GraphSorter<PosItem<?,?>> posItemGraphSorter = new GraphSorter<>();
+    private final GraphSorter<Equipment<?,?>> equipmentGraphSorter = new GraphSorter<>();
     private final Coords curPos = new Coords(0, 0);
 
-    private final List<PosItem> allItems = new ArrayList<>(0);
-    private final List<PosItem> items = new ArrayList<>(0);
-    private final List<Equipment> equipment = new ArrayList<>(0);
-    private final List<Equipment> equipmentResult = new ArrayList<>(0);
+    private final List<PosItem<?,?>> allItems = new ArrayList<>(0);
+    private final List<PosItem<?,?>> items = new ArrayList<>(0);
+    private final List<Equipment<?,?>> equipment = new ArrayList<>(0);
+    private final List<Equipment<?,?>> equipmentResult = new ArrayList<>(0);
     private final List<Teleport> teleports = new ArrayList<>(0);
     private final List<Creature> creatures = new ArrayList<>(0);
     private final List<Coords> way = Collections.unmodifiableList(List.of(new Coords(), new Coords()));
@@ -71,19 +71,18 @@ public class Board {
         }
     }
 
-    public <A extends PosItem> EquipmentMayCountable lookForMayCountableEquipment(List<A> items, double x, double y,
-                                                                                  int lookedLevel,
-                                                                                  double horTolerance, double verTolerance) {
-        return (EquipmentMayCountable) lookForItem(items, x, y, lookedLevel, horTolerance, verTolerance,
+    public <A extends PosItem<?,?>> EquipmentMayCountable<?,?> lookForMayCountableEquipment(
+            List<A> items, double x, double y, int lookedLevel, double horTolerance, double verTolerance) {
+        return (EquipmentMayCountable<?,?>) lookForItem(items, x, y, lookedLevel, horTolerance, verTolerance,
                 ItemType.EQUIPMENT_MAY_COUNTABLE_TYPES, false);
     }
 
-    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel, ItemType[] types,
+    public <A extends PosItem<?,?>> PosItem<?,?> lookForItem(List<A> items, double x, double y, int lookedLevel, ItemType[] types,
                                                    boolean includeLevelsBelow) {
         return lookForItem(items, x, y, lookedLevel, 0, 0, types, includeLevelsBelow);
     }
 
-    public <A extends PosItem> PosItem lookForItem(List<A> items, double x, double y, int lookedLevel,
+    public <A extends PosItem<?,?>> PosItem<?,?> lookForItem(List<A> items, double x, double y, int lookedLevel,
                                                    double horTolerance,
                                                    double verTolerance,
                                                    ItemType[] types, boolean includeLevelsBelow) {
@@ -159,22 +158,17 @@ public class Board {
 
     public List<Creature> getControlledCreatures(Location location) {
         creatures.clear();
-        location.getItems().stream()
-                .filter(pi -> pi instanceof Creature)
-                .filter(pi -> {
-                    Creature cr = (Creature) pi;
-                    return cr.getControl().equals(CreatureControl.CONTROL);
-                })
-                .map(pi -> (Creature) pi)
+        location.getItemsList().getCreatures().stream()
+                .filter(c -> c.getControl().equals(CreatureControl.CONTROL))
                 .collect(Collectors.toCollection(() -> creatures));
         return creatures;
     }
 
-    public PosItem getObstacle(Coords nextPos, PosItem item, List<PosItem> items) {
+    public PosItem<?,?> getObstacle(Coords nextPos, PosItem<?,?> item, List<PosItem<?,?>> items) {
         return getObstacle(nextPos, item, allTypes, items);
     }
 
-    public <A extends PosItem> PosItem getObstacle(Coords nextPos, PosItem colliding, ItemType[] types, List<A> items) {
+    public <A extends PosItem<?,?>> PosItem<?,?> getObstacle(Coords nextPos, PosItem<?,?> colliding, ItemType[] types, List<A> items) {
         if (items == null || items.isEmpty()) return null;
         this.items.clear();
         items.stream()
@@ -202,16 +196,17 @@ public class Board {
         double top = colliding.getCollisionTop(iPolygons, nextPos);
         double bottom = colliding.getCollisionBottom(iPolygons, nextPos);
 
-        for (PosItem obstacle : this.items) {
-            PosItem collision = getObstacle(nextPos, colliding, iPolygons, left, right, top, bottom, obstacle);
+        for (PosItem<?,?> obstacle : this.items) {
+            PosItem<?,?> collision = getObstacle(nextPos, colliding, iPolygons, left, right, top, bottom, obstacle);
             if (collision != null) return collision;
         }
         return null;
     }
 
-    private PosItem getObstacle(Coords nextPos, PosItem colliding, List<List<Coords>> iPolygons,
-                                double left, double right, double top, double bottom, PosItem obstacle) {
+    private PosItem<?,?> getObstacle(Coords nextPos, PosItem<?,?> colliding, List<List<Coords>> iPolygons,
+                                double left, double right, double top, double bottom, PosItem<?,?> obstacle) {
         if (obstacle == colliding) return null;
+        //TODO generic
         boolean isDoorAgainstLandscapeChecked = colliding instanceof Door && obstacle instanceof Landscape;
         boolean isLandscapeAgainstDoorChecked = colliding instanceof Landscape && obstacle instanceof Door;
         boolean isDoorAgainstCoverChecked = colliding instanceof Door && obstacle instanceof Cover;
@@ -221,11 +216,10 @@ public class Board {
                 || isDoorAgainstCoverChecked || isCoverAgainstDoorChecked
                 || isLandscapeAgainstLandscapeChecked) return null;
         List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
-        PosItem collision = getCollision(left, right, top, bottom, nextPos, colliding, iPolygons, obstacle, oPolygons);
-        return collision;
+        return getCollision(left, right, top, bottom, nextPos, colliding, iPolygons, obstacle, oPolygons);
     }
 
-    public PosItem getObstacle(Coords nextPos, Creature colliding, PosItem obstacle) {
+    public PosItem<?,?> getObstacle(Coords nextPos, Creature colliding, PosItem<?,?> obstacle) {
         if (obstacle == colliding) return null;
         List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
         if (getCreatureObstacleCollision(nextPos, colliding, oPolygons, obstacle)) {
@@ -235,7 +229,7 @@ public class Board {
         }
     }
 
-    public PosItem getObstacleOnWay(Location location, int level, double fromX, double fromY, PosItem i, double toX, double toY) {
+    public PosItem<?,?> getObstacleOnWay(Location location, int level, double fromX, double fromY, PosItem<?,?> i, double toX, double toY) {
         Coords from = way.get(0);
         from.x = fromX;
         from.y = fromY;
@@ -249,7 +243,7 @@ public class Board {
         double bottom = Math.max(fromY, toY);
 
         items.clear();
-        location.getItems().stream()
+        location.getItemsList().getMergedList().stream()
                 .filter(PosItem::isVisible)
                 .filter(o -> {
                     List<List<Coords>> actualCollisionPolygons = o.getActualCollisionPolygons();
@@ -264,7 +258,7 @@ public class Board {
                 .filter(pi -> pi.getPos().level == level)
                 .collect(Collectors.toCollection(() -> items));
 
-        for (PosItem o : items) {
+        for (PosItem<?,?> o : items) {
             if (o == i) continue;
             List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
             if (oPolygons.isEmpty()) continue;
@@ -276,12 +270,10 @@ public class Board {
         return null;
     }
 
-    public Teleport getTeleport(Coords nextPos, PosItem i, Location l) {
+    public Teleport getTeleport(Coords nextPos, PosItem<?,?> i, Location l) {
         teleports.clear();
-        l.getItems().stream()
+        l.getItemsList().getTeleports().stream()
                 .filter(PosItem::isVisible)
-                .filter(pi -> pi instanceof Teleport)
-                .map(pi -> (Teleport) pi)
                 .filter(pi -> pi.getActualCollisionPolygons() != null)
                 .filter(pi -> {
                     int level = i.getPos().level;
@@ -306,7 +298,7 @@ public class Board {
         return null;
     }
 
-    private <A extends PosItem> A getCollision(double left, double right, double top, double bottom, Coords nextPos, PosItem i,
+    private <A extends PosItem<?,?>> A getCollision(double left, double right, double top, double bottom, Coords nextPos, PosItem i,
                                  List<List<Coords>> iPolygons, A o, List<List<Coords>> oPolygons) {
         if (oPolygons.isEmpty() && !(o instanceof Creature)) return null;
         double oLeft = o.getCollisionLeft(oPolygons);
@@ -341,7 +333,8 @@ public class Board {
         return null;
     }
 
-    private boolean getObstacleObstacleCollision(PosItem i, Coords nextPos, List iPolygons, PosItem o, Coords oPos, List oPolygons) {
+    private boolean getObstacleObstacleCollision(PosItem<?,?> i, Coords nextPos, List<List<Coords>> iPolygons,
+                                                 PosItem<?,?> o, Coords oPos, List<List<Coords>> oPolygons) {
         boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
             controller.getLogger().logItemCollides(i.getName(), o.getName());
@@ -349,7 +342,7 @@ public class Board {
         return collides;
     }
 
-    private boolean getWayCollision(Coords oPos, List oPolygons) {
+    private boolean getWayCollision(Coords oPos, List<List<Coords>> oPolygons) {
         boolean collides = Geometry.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
         if (collides) {
             controller.getLogger().logWayCollision();
@@ -365,7 +358,7 @@ public class Board {
         return collides;
     }
 
-    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem i) {
+    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem<?,?> i) {
         for (List<Coords> polygon : iPolygons) {
             List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
             Geometry.translateCoords(lostRef, nextPos.x, nextPos.y);
@@ -379,7 +372,7 @@ public class Board {
         return false;
     }
 
-    public boolean getCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem o) {
+    public boolean getCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem<?,?> o) {
         for (List<Coords> polygon : oPolygons) {
             List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
             Coords oPos = o.getPos();
@@ -394,25 +387,22 @@ public class Board {
         return false;
     }
 
-    public List<Equipment> getEquipmentWithinRange(Creature cr) {
+    public List<Equipment<?,?>> getEquipmentWithinRange(Creature cr) {
         equipmentResult.clear();
-        items.clear();
-        Location location = cr.getPos().getLocation();
-        items.addAll(location.getItems());
         equipment.clear();
-        items.stream()
+        Location location = cr.getPos().getLocation();
+        equipment.addAll(location.getItemsList().getMergedEquipment());
+        equipment.stream()
                 .filter(PosItem::isVisible)
                 .filter(pi -> pi.getPos().level == cr.getPos().level)
-                .filter(pi -> pi instanceof Equipment)
-                .map(pi -> (Equipment) pi)
-                .collect(Collectors.toCollection(() -> equipment));
-        if (equipment.isEmpty()) return equipmentResult;
+                .collect(Collectors.toCollection(() -> equipmentResult));
+        if (equipmentResult.isEmpty()) return equipmentResult;
 
         double range = cr.getRange();
         double width = cr.getSize().getWidth() + 2*range;
         double height = cr.getSize().getHeight() + 2*range;
         Coords point = cr.getCenter();
-        for (Equipment e : equipment) {
+        for (Equipment<?,?> e : equipment) {
             Coords center = e.getImageCenter();
             if (Geometry.isPointWithinOval(point, center, width, height)) {
                 equipmentResult.add(e);
@@ -424,22 +414,15 @@ public class Board {
 
     public List<Creature> getControllableCreatures(Location location) {
         creatures.clear();
-        location.getItems().stream()
-                .filter(pi -> pi instanceof Creature)
-                .map(pi -> (Creature) pi)
-                .filter(pi -> {
-                    Creature cr = pi;
-                    return cr.getControl().equals(CreatureControl.CONTROLLABLE);
-                })
+        location.getItemsList().getCreatures().stream()
+                .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE))
                 .collect(Collectors.toCollection(() -> creatures));
         return creatures;
     }
 
     public List<Creature> getControlledAndControllableCreatures(Location location) {
         creatures.clear();
-        location.getItems().stream()
-                .filter(pi -> pi instanceof Creature)
-                .map(pi -> (Creature) pi)
+        location.getItemsList().getCreatures().stream()
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
                             || c.getControl().equals(CreatureControl.CONTROL))
                 .collect(Collectors.toCollection(() -> creatures));
@@ -467,9 +450,7 @@ public class Board {
         double finalRight = right;
         double finalTop = top;
         double finalBottom = bottom;
-        location.getItems().stream()
-                .filter(pi -> pi instanceof Creature)
-                .map(pi -> (Creature) pi)
+        location.getItemsList().getCreatures().stream()
                 .filter(c -> c.getControl().equals(CreatureControl.CONTROLLABLE)
                         || c.getControl().equals(CreatureControl.CONTROL))
                 .filter(c -> {
@@ -483,11 +464,11 @@ public class Board {
         return creatures;
     }
 
-    public void sortPosItems(List<PosItem> items) {
+    public void sortPosItems(List<PosItem<?,?>> items) {
         posItemGraphSorter.sortItems(items);
     }
 
-    public void sortEquipment(List<Equipment> items) {
+    public void sortEquipment(List<Equipment<?,?>> items) {
         equipmentGraphSorter.sortItems(items);
     }
 }

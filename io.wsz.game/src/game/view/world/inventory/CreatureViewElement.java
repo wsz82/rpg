@@ -43,9 +43,9 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     private void drawEquippedItems(int meter, int width, int height, CreatureAnimation animation) {
-        Map<InventoryPlaceType, Equipment> equippedItems = drawnCreature.getInventory().getEquippedItems();
+        Map<InventoryPlaceType, Equipment<?,?>> equippedItems = drawnCreature.getInventory().getEquippedItems();
         for (InventoryPlaceType type : equippedItems.keySet()) {
-            Equipment equipment = equippedItems.get(type);
+            Equipment<?,?> equipment = equippedItems.get(type);
             if (equipment == null) continue;
             String equipmentTypeName = equipment.getEquipmentType().getId();
             ResolutionImage creatureInventoryImage = animation.getCreatureInventoryImage(equipmentTypeName, width, height);
@@ -62,7 +62,7 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     @Override
-    public boolean tryRemove(Equipment toRemove, Creature cr) {
+    public boolean tryRemove(Equipment<?, ?> toRemove, Creature cr) {
         Inventory inventory = cr.getInventory();
         if (inventory.tryTakeOff(toRemove)) {
             controller.getLogger().logItemUnequipped(toRemove.getName(), toRemove.getOccupiedPlace().getId());
@@ -74,7 +74,7 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     @Override
-    public boolean tryAdd(Equipment e, Creature cr, double x, double y, boolean doMergeCountable) {
+    public boolean tryAdd(Equipment<?, ?> e, Creature cr, double x, double y, boolean doMergeCountable) {
         if (cr.getInventory().tryWear(e, x, y)) {
             controller.getLogger().logItemEquipped(e.getName(), e.getOccupiedPlace().getId());
             return true;
@@ -85,12 +85,12 @@ public class CreatureViewElement extends InventoryViewElement {
     }
 
     @Override
-    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment e) {
+    public Coords getExtremePos(Coords mousePos, Coords draggedCoords, Equipment<?, ?> e) {
         return null;
     }
 
     @Override
-    public Equipment lookForEquipment(double x, double y, Coords draggedCoords) {
+    public Equipment<?, ?> lookForEquipment(double x, double y, Coords draggedCoords) {
         Map<InventoryPlaceType, List<Coords>> inventoryPlaces = drawnCreature.getInventoryPlaces();
         for (InventoryPlaceType type : inventoryPlaces.keySet()) {
             List<Coords> place = inventoryPlaces.get(type);

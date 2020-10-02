@@ -35,7 +35,7 @@ public class EditorCanvas extends Canvas {
 
     private EventHandler<KeyEvent> arrowsEvent;
     private ContentTableView contentTableView;
-    private PosItem draggedItem;
+    private PosItem<?,?> draggedItem;
 
     public EditorCanvas(Stage stage, EditorController controller, Pane parent, Pointer pointer){
         this.stage = stage;
@@ -59,7 +59,7 @@ public class EditorCanvas extends Canvas {
         double canvasHeight = getHeight();
         double bottom = top + canvasHeight/ meter;
 
-        List<PosItem> items = controller.getCurrentObservableLocation().getItems();
+        List<PosItem<?,?>> items = controller.getCurrentObservableLocation().getItems();
         items = items.stream()
                 .filter(PosItem::isVisible)
                 .filter(pi -> {
@@ -76,7 +76,7 @@ public class EditorCanvas extends Canvas {
         controller.getBoard().sortPosItems(items);
 
         boolean activeContentMarked = false;
-        for (PosItem pi : items) {
+        for (PosItem<?,?> pi : items) {
             double itemsOpacity = EditorToolBar.getItemsOpacity();
             if (itemsOpacity != 1) {
                 if (EditorToolBar.isLayerOpacity()) {
@@ -162,7 +162,7 @@ public class EditorCanvas extends Canvas {
         }
     }
 
-    private void drawActiveContentRectangle(GraphicsContext gc, PosItem pi) {
+    private void drawActiveContentRectangle(GraphicsContext gc, PosItem<?,?> pi) {
         Coords translated = pi.getPos().clonePos();
         translated.subtract(curPos);
         double width = pi.getImage().getWidth();
@@ -192,7 +192,7 @@ public class EditorCanvas extends Canvas {
                     || e.getCode() == KeyCode.UP
                     || e.getCode() == KeyCode.RIGHT
                     || e.getCode() == KeyCode.LEFT) {
-                PosItem active = controller.getActiveItem();
+                PosItem<?,?> active = controller.getActiveItem();
                 if (active != null) {
                     moveContent(e.getCode(), active);
                     contentTableView.refresh();
@@ -214,7 +214,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void selectActiveItem(MouseEvent e) {
-        PosItem selectedItem = null;
+        PosItem<?,?> selectedItem = null;
         MouseButton button = e.getButton();
         boolean isPrimaryButton = button.equals(MouseButton.PRIMARY);
         boolean isSecondaryButton = button.equals(MouseButton.SECONDARY);
@@ -255,7 +255,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void hookUpItemsPermutationEvents() {
-        ListChangeListener<? super PosItem> locationListener = c -> {
+        ListChangeListener<? super PosItem<?,?>> locationListener = c -> {
             if (!c.next()) {
                 return;
             }
@@ -272,7 +272,7 @@ public class EditorCanvas extends Canvas {
                 e.consume();
                 double xPos = e.getX() / meter;
                 double yPos = e.getY() / meter;
-                PosItem selectedItem = getItemAtPos(xPos, yPos);
+                PosItem<?,?> selectedItem = getItemAtPos(xPos, yPos);
                 if (selectedItem == null || selectedItem.isBlocked()) {
                     return;
                 }
@@ -321,7 +321,7 @@ public class EditorCanvas extends Canvas {
         });
     }
 
-    private PosItem getItemAtPos(double xPos, double yPos) {
+    private PosItem<?,?> getItemAtPos(double xPos, double yPos) {
         int level = controller.getCurrentObservableLayer().getLevel();
         CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
         Location location = currentObservableLocation.getLocation();
@@ -331,7 +331,7 @@ public class EditorCanvas extends Canvas {
         double x = translated.x;
         double y = translated.y;
         ItemType[] types = ItemType.values();
-        List<PosItem> items = currentObservableLocation.getItems();
+        List<PosItem<?,?>> items = currentObservableLocation.getItems();
         return controller.getBoard().lookForItem(items, x, y, level, types, true);
     }
 
@@ -377,7 +377,7 @@ public class EditorCanvas extends Canvas {
         addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, progressScreenDrag);
     }
 
-    private void openContextMenu(PosItem pi, MouseEvent e) {
+    private void openContextMenu(PosItem<?,?> pi, MouseEvent e) {
         final MenuItem edit = new MenuItem("Edit item");
         edit.setOnAction(event -> edit(pi));
         final MenuItem remove = new MenuItem("Remove");
@@ -394,7 +394,7 @@ public class EditorCanvas extends Canvas {
         });
     }
 
-    private void edit(PosItem pi) {
+    private void edit(PosItem<?,?> pi) {
         contentTableView.openEditWindow(stage, pi);
     }
 
@@ -403,16 +403,8 @@ public class EditorCanvas extends Canvas {
         double locHeight = controller.getCurrentObservableLocation().getHeight() * Sizes.getMeter();
         double maxWidth = parent.getWidth();
         double maxHeight = parent.getHeight();
-        if (locWidth >= maxWidth) {
-            setWidth(maxWidth);
-        } else {
-            setWidth(locWidth);
-        }
-        if (locHeight >= maxHeight) {
-            setHeight(maxHeight);
-        } else {
-            setHeight(locHeight);
-        }
+        setWidth(Math.min(locWidth, maxWidth));
+        setHeight(Math.min(locHeight, maxHeight));
     }
 
     private void clear(GraphicsContext gc) {
@@ -420,7 +412,7 @@ public class EditorCanvas extends Canvas {
         gc.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void moveContent(KeyCode keyCode, PosItem pi){
+    private void moveContent(KeyCode keyCode, PosItem<?,?> pi){
         Coords pos = pi.getPos();
         updatePos(keyCode, pos);
     }
@@ -435,7 +427,7 @@ public class EditorCanvas extends Canvas {
         }
     }
 
-    private void moveToPointer(PosItem pi) {
+    private void moveToPointer(PosItem<?,?> pi) {
         Coords pos = pi.getPos();
         Coords newPos = pointer.getMark();
         pos.x = newPos.x;
@@ -449,12 +441,12 @@ public class EditorCanvas extends Canvas {
         refresh();
     }
 
-    private void setInvisible(PosItem pi) {
+    private void setInvisible(PosItem<?,?> pi) {
         pi.setVisible(false);
         refresh();
     }
 
-    private void removeItem(PosItem pi) {
+    private void removeItem(PosItem<?,?> pi) {
         controller.getCurrentObservableLocation().getItems().remove(pi);
         refresh();
     }

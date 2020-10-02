@@ -3,11 +3,14 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.countable.EquipmentMayCountableAnimation;
+import io.wsz.model.item.list.EquipmentMayCountableList;
+import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 
 import static io.wsz.model.sizes.Paths.IDLE;
 
@@ -37,6 +40,16 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     }
 
     @Override
+    public void addItemToEquipmentMayCountableList(EquipmentMayCountableList list) {
+        list.getMiscs().add(this);
+    }
+
+    @Override
+    public void removeItemFromEquipmentMayCountableList(EquipmentMayCountableList list) {
+        list.getMiscs().remove(this);
+    }
+
+    @Override
     public Misc cloneEquipment(boolean keepId) {
         return new Misc(this, keepId);
     }
@@ -53,6 +66,11 @@ public class Misc extends EquipmentMayCountable<Misc, EquipmentAnimationPos> {
     @Override
     public EquipmentAnimationPos getAnimationPos() {
         return animationPos;
+    }
+
+    @Override
+    protected List<Misc> getSpecificItemsList(ItemsList itemsList) {
+        return itemsList.getEquipmentMayCountableList().getMiscs();
     }
 
     @Override
