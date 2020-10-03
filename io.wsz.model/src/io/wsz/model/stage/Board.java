@@ -173,19 +173,9 @@ public class Board {
         this.items.clear();
         items.stream()
                 .filter(PosItem::isVisible)
-                .filter(pi -> {
-                    if (types == this.allTypes) return true;
-                    ItemType piType = pi.getType();
-                    for (ItemType type : types) {
-                        if (type == piType) return true;
-                    }
-                    return false;
-                })
+                .filter(pi -> checkIfSuitTypes(types, pi))
                 .filter(pi -> pi.checkIfCanCollide())
-                .filter(pi -> {
-                    int level = nextPos.level;
-                    return pi.getPos().level == level;
-                })
+                .filter(pi -> pi.getPos().level == nextPos.level)
                 .collect(Collectors.toCollection(() -> this.items));
         if (this.items.isEmpty()) return null;
         List<List<Coords>> iPolygons = colliding.getActualCollisionPolygons();
@@ -201,6 +191,15 @@ public class Board {
             if (collision != null) return collision;
         }
         return null;
+    }
+
+    protected <A extends PosItem<?,?>> boolean checkIfSuitTypes(ItemType[] types, A pi) {
+        if (types == this.allTypes) return true;
+        ItemType piType = pi.getType();
+        for (ItemType type : types) {
+            if (type == piType) return true;
+        }
+        return false;
     }
 
     private PosItem<?,?> getObstacle(Coords nextPos, PosItem<?,?> colliding, List<List<Coords>> iPolygons,
@@ -299,35 +298,35 @@ public class Board {
     }
 
     private <A extends PosItem<?,?>> A getCollision(double left, double right, double top, double bottom, Coords nextPos,
-                                                    PosItem<?,?> i, List<List<Coords>> iPolygons, A o, List<List<Coords>> oPolygons) {
-        if (oPolygons.isEmpty() && !(o instanceof Creature)) return null;
-        double oLeft = o.getCollisionLeft(oPolygons);
-        double oRight = o.getCollisionRight(oPolygons);
+                                                    PosItem<?,?> colliding, List<List<Coords>> iPolygons, A obstacle, List<List<Coords>> oPolygons) {
+        if (oPolygons.isEmpty() && !(obstacle instanceof Creature)) return null;
+        double oLeft = obstacle.getCollisionLeft(oPolygons);
+        double oRight = obstacle.getCollisionRight(oPolygons);
         if (right < oLeft || left > oRight) return null;
 
-        double oTop = o.getCollisionTop(oPolygons);
-        double oBottom = o.getCollisionBottom(oPolygons);
+        double oTop = obstacle.getCollisionTop(oPolygons);
+        double oBottom = obstacle.getCollisionBottom(oPolygons);
         if (bottom < oTop || top > oBottom) return null;
 
-        if (i instanceof Creature && !(o instanceof Creature)) {
+        if (colliding instanceof Creature && !(obstacle instanceof Creature)) {
 
-            Creature cr = (Creature) i;
-            if (calculateIfCreatureObstacleCollision(nextPos, cr, oPolygons, o)) return o;
+            Creature cr = (Creature) colliding;
+            if (calculateIfCreatureObstacleCollision(nextPos, cr, oPolygons, obstacle)) return obstacle;
 
-        } else if (o instanceof Creature && !(i instanceof Creature)) {
+        } else if (obstacle instanceof Creature && !(colliding instanceof Creature)) {
 
-            Creature crO = (Creature) o;
-            if (calculateIfObstacleCreatureCollision(nextPos, crO, iPolygons, i)) return o;
+            Creature crO = (Creature) obstacle;
+            if (calculateIfObstacleCreatureCollision(nextPos, crO, iPolygons, colliding)) return obstacle;
 
-        } else if (o instanceof Creature) {
+        } else if (obstacle instanceof Creature) {
 
-            Creature cr = (Creature) i;
-            Creature crO = (Creature) o;
-            if (calculateIfCreatureCreatureCollision(nextPos, cr, crO)) return o;
+            Creature cr = (Creature) colliding;
+            Creature crO = (Creature) obstacle;
+            if (calculateIfCreatureCreatureCollision(nextPos, cr, crO)) return obstacle;
 
         } else {
 
-            if (calculateIfObstacleObstacleCollision(i, nextPos, iPolygons, o, o.getPos(), oPolygons)) return o;
+            if (calculateIfObstacleObstacleCollision(colliding, nextPos, iPolygons, obstacle, obstacle.getPos(), oPolygons)) return obstacle;
 
         }
         return null;
