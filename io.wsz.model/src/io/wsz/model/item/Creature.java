@@ -17,6 +17,7 @@ import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
 import io.wsz.model.world.World;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -489,6 +490,12 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public void addPrototypeToSet(Set<PosItem<?,?>> prototypes) {
         addPrototypesToSet(this, prototypes);
+    }
+
+    @Override
+    public void initAnimations(File programDir) {
+        super.initAnimations(programDir);
+        getPortraitAnimation().initAllAnimations(programDir);
     }
 
     public Task getTask() {

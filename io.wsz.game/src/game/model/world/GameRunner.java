@@ -460,11 +460,7 @@ public class GameRunner {
         }
 
         private void reloadAssetImages(PosItem<?,?> pi, File programDir) {
-            pi.getAnimation().initAllAnimations(programDir);
-            if (pi instanceof Creature) { //TODO generic
-                Creature cr = (Creature) pi;
-                cr.getPortraitAnimation().initAllAnimations(programDir);
-            }
+            pi.initAnimations(programDir);
         }
     }
 }

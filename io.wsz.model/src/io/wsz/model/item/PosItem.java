@@ -421,6 +421,10 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
         items.add(item);
     }
 
+    public void initAnimations(File programDir) {
+        getAnimation().initAllAnimations(programDir);
+    }
+
     @Override
     public String getAssetId() {
         if (prototype != null) {
