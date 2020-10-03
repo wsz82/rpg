@@ -114,8 +114,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     public void remove(Equipment<?,?> e) {
-        removeItemFromEquipmentList(equipmentList);
-        setWeight(getWeight() - e.getWeight());
+        e.removeItemFromEquipmentList(equipmentList);
     }
 
     public void searchContainer(Creature cr) {

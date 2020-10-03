@@ -2,6 +2,8 @@ package game.view.world.inventory;
 
 import game.model.GameController;
 import game.view.world.FoggableDelegate;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
@@ -284,6 +286,22 @@ public class DropViewElement extends EquipmentViewElement {
             curPos.y = y * ((maxCurPosY - minCurPosY) / viewHeight) + minCurPosY;
         }
     }
+
+    @Override
+    public void updateCurAnimation(InventoryViewElement lastCheckedView, EquipmentAnimationPos animationPos) {
+        if (lastCheckedView != null) {
+            lastCheckedView.resetAnimationPosForInventoryToDropTransition(animationPos);
+        }
+        animationPos.setCurAnimation(EquipmentAnimationType.DROP);
+    }
+
+    @Override
+    protected void resetAnimationPosForDropToInventoryTransition(EquipmentAnimationPos animationPos) {
+        animationPos.setNextFrameUpdate(0);
+    }
+
+    @Override
+    protected void resetAnimationPosForInventoryToDropTransition(EquipmentAnimationPos animationPos) {}
 
     public void setVisionWidthDiameter(double visionWidthDiameter) {
         this.visionWidthDiameter = visionWidthDiameter;

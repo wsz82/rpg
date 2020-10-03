@@ -75,7 +75,7 @@ public class ContainerViewElement extends EquipmentViewElement {
 
     @Override
     public boolean tryRemove(Equipment<?, ?> e, Creature cr) {
-        getSortedEquipment().remove(e);
+        container.remove(e);
         controller.getLogger().logItemRemoved(e.getName(), container.getName());
         return true;
     }

@@ -3,7 +3,6 @@ package game.view.world.inventory;
 import game.model.GameController;
 import game.model.setting.KeyAction;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
-import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.*;
 import io.wsz.model.item.movement.InventoryCountableMover;
@@ -428,21 +427,13 @@ public class InventoryView {
     }
 
     private void playDraggedAnimation(Coords mousePos) {
-        InventoryViewElement ev = getView(mousePos.x, mousePos.y);
+        InventoryViewElement element = getView(mousePos.x, mousePos.y);
         Equipment dragged = controller.getDragged();
         EquipmentAnimationPos animationPos = dragged.getAnimationPos();
-        if (ev instanceof DropViewElement) { //TODO generic
-            if (!(lastCheckedView instanceof DropViewElement)) {
-                animationPos.setNextFrameUpdate(0);
-            }
-            animationPos.setCurAnimation(EquipmentAnimationType.DROP);
-        } else {
-            if (lastCheckedView instanceof DropViewElement) {
-                animationPos.setNextFrameUpdate(0);
-            }
-            animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
+        if (element != null) {
+            element.updateCurAnimation(lastCheckedView, animationPos);
         }
-        lastCheckedView = ev;
+        lastCheckedView = element;
         dragged.getAnimation().play(dragged);
     }
 

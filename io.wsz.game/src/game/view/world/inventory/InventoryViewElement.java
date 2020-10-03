@@ -2,6 +2,8 @@ package game.view.world.inventory;
 
 import game.model.GameController;
 import game.view.world.CanvasView;
+import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.stage.Coords;
@@ -78,6 +80,19 @@ public abstract class InventoryViewElement extends CanvasView {
     public abstract boolean tryStartDragScroll(double x, double y);
 
     public void setMovedToHeroEquipmentPos(Coords pos) {
+    }
+
+    public void updateCurAnimation(InventoryViewElement lastCheckedView, EquipmentAnimationPos animationPos) {
+        if (lastCheckedView != null) {
+            lastCheckedView.resetAnimationPosForDropToInventoryTransition(animationPos);
+        }
+        animationPos.setCurAnimation(EquipmentAnimationType.INVENTORY);
+    }
+
+    protected void resetAnimationPosForDropToInventoryTransition(EquipmentAnimationPos animationPos) {}
+
+    protected void resetAnimationPosForInventoryToDropTransition(EquipmentAnimationPos animationPos) {
+        animationPos.setNextFrameUpdate(0);
     }
 
     protected double getScrollSpeed() {
