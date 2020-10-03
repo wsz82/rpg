@@ -498,6 +498,11 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
         getPortraitAnimation().initAllAnimations(programDir);
     }
 
+    @Override
+    public boolean checkIfCanCollide() {
+        return true;
+    }
+
     public Task getTask() {
         return task;
     }

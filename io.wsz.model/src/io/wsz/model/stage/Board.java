@@ -117,7 +117,7 @@ public class Board {
         int pixelX = (int) (x * meter);
         int pixelY = (int) (y * meter);
 
-        for (PosItem item : this.items) {
+        for (PosItem<?,?> item : this.items) {
             Coords pos = item.getPos();
             int iX = (int) (pos.x * meter);
             ResolutionImage image = item.getImage();
@@ -181,7 +181,7 @@ public class Board {
                     }
                     return false;
                 })
-                .filter(pi -> pi.getActualCollisionPolygons() != null || pi instanceof Creature)
+                .filter(pi -> pi.checkIfCanCollide())
                 .filter(pi -> {
                     int level = nextPos.level;
                     return pi.getPos().level == level;
@@ -222,7 +222,7 @@ public class Board {
     public PosItem<?,?> getObstacle(Coords nextPos, Creature colliding, PosItem<?,?> obstacle) {
         if (obstacle == colliding) return null;
         List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
-        if (getCreatureObstacleCollision(nextPos, colliding, oPolygons, obstacle)) {
+        if (calculateIfCreatureObstacleCollision(nextPos, colliding, oPolygons, obstacle)) {
             return obstacle;
         } else {
             return null;
@@ -262,7 +262,7 @@ public class Board {
             if (o == i) continue;
             List<List<Coords>> oPolygons = o.getActualCollisionPolygons();
             if (oPolygons.isEmpty()) continue;
-            boolean obstacle = getWayCollision(o.getPos(), oPolygons);
+            boolean obstacle = isWayCollision(o.getPos(), oPolygons);
             if (obstacle) {
                 return o;
             }
@@ -298,8 +298,8 @@ public class Board {
         return null;
     }
 
-    private <A extends PosItem<?,?>> A getCollision(double left, double right, double top, double bottom, Coords nextPos, PosItem i,
-                                 List<List<Coords>> iPolygons, A o, List<List<Coords>> oPolygons) {
+    private <A extends PosItem<?,?>> A getCollision(double left, double right, double top, double bottom, Coords nextPos,
+                                                    PosItem<?,?> i, List<List<Coords>> iPolygons, A o, List<List<Coords>> oPolygons) {
         if (oPolygons.isEmpty() && !(o instanceof Creature)) return null;
         double oLeft = o.getCollisionLeft(oPolygons);
         double oRight = o.getCollisionRight(oPolygons);
@@ -312,29 +312,29 @@ public class Board {
         if (i instanceof Creature && !(o instanceof Creature)) {
 
             Creature cr = (Creature) i;
-            if (getCreatureObstacleCollision(nextPos, cr, oPolygons, o)) return o;
+            if (calculateIfCreatureObstacleCollision(nextPos, cr, oPolygons, o)) return o;
 
         } else if (o instanceof Creature && !(i instanceof Creature)) {
 
             Creature crO = (Creature) o;
-            if (getObstacleCreatureCollision(nextPos, crO, iPolygons, i)) return o;
+            if (calculateIfObstacleCreatureCollision(nextPos, crO, iPolygons, i)) return o;
 
         } else if (o instanceof Creature) {
 
             Creature cr = (Creature) i;
             Creature crO = (Creature) o;
-            if (getCreatureCreatureCollision(nextPos, cr, crO)) return o;
+            if (calculateIfCreatureCreatureCollision(nextPos, cr, crO)) return o;
 
         } else {
 
-            if (getObstacleObstacleCollision(i, nextPos, iPolygons, o, o.getPos(), oPolygons)) return o;
+            if (calculateIfObstacleObstacleCollision(i, nextPos, iPolygons, o, o.getPos(), oPolygons)) return o;
 
         }
         return null;
     }
 
-    private boolean getObstacleObstacleCollision(PosItem<?,?> i, Coords nextPos, List<List<Coords>> iPolygons,
-                                                 PosItem<?,?> o, Coords oPos, List<List<Coords>> oPolygons) {
+    private boolean calculateIfObstacleObstacleCollision(PosItem<?,?> i, Coords nextPos, List<List<Coords>> iPolygons,
+                                                         PosItem<?,?> o, Coords oPos, List<List<Coords>> oPolygons) {
         boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
         if (collides) {
             controller.getLogger().logItemCollides(i.getName(), o.getName());
@@ -342,23 +342,7 @@ public class Board {
         return collides;
     }
 
-    private boolean getWayCollision(Coords oPos, List<List<Coords>> oPolygons) {
-        boolean collides = Geometry.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
-        if (collides) {
-            controller.getLogger().logWayCollision();
-        }
-        return collides;
-    }
-
-    private boolean getCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
-        boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
-        if (collides) {
-            controller.getLogger().logItemCollides(cr.getName(), crO.getName());
-        }
-        return collides;
-    }
-
-    public boolean getObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem<?,?> i) {
+    public boolean calculateIfObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem<?,?> i) {
         for (List<Coords> polygon : iPolygons) {
             List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
             Geometry.translateCoords(lostRef, nextPos.x, nextPos.y);
@@ -372,7 +356,15 @@ public class Board {
         return false;
     }
 
-    public boolean getCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem<?,?> o) {
+    private boolean calculateIfCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
+        boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
+        if (collides) {
+            controller.getLogger().logItemCollides(cr.getName(), crO.getName());
+        }
+        return collides;
+    }
+
+    public boolean calculateIfCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem<?,?> o) {
         for (List<Coords> polygon : oPolygons) {
             List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
             Coords oPos = o.getPos();
@@ -385,6 +377,14 @@ public class Board {
             }
         }
         return false;
+    }
+
+    private boolean isWayCollision(Coords oPos, List<List<Coords>> oPolygons) {
+        boolean collides = Geometry.polygonsIntersect(0, 0, listOfWay, oPos, oPolygons);
+        if (collides) {
+            controller.getLogger().logWayCollision();
+        }
+        return collides;
     }
 
     public List<Equipment<?,?>> getEquipmentWithinRange(Creature cr) {

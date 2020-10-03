@@ -468,6 +468,11 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
         return super.getPath();
     }
 
+    public boolean checkIfCanCollide() {
+        List<List<Coords>> actualCollisionPolygons = getActualCollisionPolygons();
+        return actualCollisionPolygons != null && !actualCollisionPolygons.isEmpty();
+    }
+
     public String getItemId() {
         return itemId;
     }
