@@ -6,6 +6,8 @@ import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Container;
 import io.wsz.model.item.*;
+import io.wsz.model.item.movement.InventoryCountableMover;
+import io.wsz.model.item.movement.InventoryEquipmentMover;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.event.EventHandler;
@@ -227,23 +229,28 @@ public class InventoryView {
         Creature hoveredHero = controller.getHoveredHero();
         Creature cr = controller.getCreatureToOpenInventory();
 
-        boolean mayBeCountable = dragged instanceof EquipmentMayCountable;
+
         boolean isMany = false;
         int amount = 1;
-        EquipmentMayCountable<?,?> countable = null;
-        if (mayBeCountable) {
-            countable = (EquipmentMayCountable<?,?>) dragged; //TODO generic
-            boolean isCountable = countable.isCountable();
-            amount = countable.getAmount();
-            isMany = isCountable && amount != 1;
+        boolean isCountable = dragged.isCountable();
+        if (isCountable) {
+            amount = dragged.getAmount();
+            isMany = amount != 1;
         }
 
         if (isMany) {
-            controller.setDragged(null);
-            moveCountableEquipment(mouseX, mouseY, hoveredHero, cr, countable, amount);
+            int finalAmount = amount;
+            InventoryCountableMover countableMover = c -> {
+                controller.setDragged(null);
+                moveCountableEquipment(mouseX, mouseY, hoveredHero, cr, c, finalAmount);
+            };
+            dragged.moveEquipment(null, countableMover);
         } else {
-            resolveDraggedDestination(mouseX, mouseY, hoveredHero, cr, dragged);
-            controller.setDragged(null);
+            InventoryEquipmentMover equipmentMover = e -> {
+                resolveDraggedDestination(mouseX, mouseY, hoveredHero, cr, e);
+                controller.setDragged(null);
+            };
+            dragged.moveEquipment(equipmentMover, null);
         }
     }
 

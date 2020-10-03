@@ -5,6 +5,8 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
+import io.wsz.model.item.movement.InventoryCountableMover;
+import io.wsz.model.item.movement.InventoryEquipmentMover;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -210,6 +212,23 @@ public abstract class Equipment<E extends Equipment<E, B>, B extends EquipmentAn
         pick.setShowAmount(false);
         cursorSetter.set(pick);
     }
+
+    public void moveEquipment(InventoryEquipmentMover equipmentMover, InventoryCountableMover countableMover) {
+        boolean isMany = false;
+        int amount = 1;
+        if (isCountable()) {
+            amount = getAmount();
+            isMany = amount != 1;
+        }
+
+        if (isMany) {
+            moveCountableEquipment(countableMover);
+        } else {
+            equipmentMover.move(this);
+        }
+    }
+
+    protected void moveCountableEquipment(InventoryCountableMover countableMover) {}
 
     public void setAmount(Integer count) {}
 

@@ -6,6 +6,7 @@ import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.EquipmentMayCountableList;
 import io.wsz.model.item.list.ItemsList;
+import io.wsz.model.item.movement.InventoryCountableMover;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Board;
 
@@ -147,6 +148,11 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,A>
         return board.lookForMayCountableEquipment(
                 location.getItemsList().getMergedEquipmentMayCountable(), x, y, pos.level,
                 this.getImageWidth(), this.getImageHeight());
+    }
+
+    @Override
+    protected void moveCountableEquipment(InventoryCountableMover countableMover) {
+        countableMover.move(this);
     }
 
     public void setCountable(boolean isCountable) {
