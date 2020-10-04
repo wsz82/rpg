@@ -12,6 +12,7 @@ import io.wsz.model.script.Script;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.PolygonsGetter;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.world.World;
 
@@ -471,6 +472,104 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
     public boolean checkIfCanCollide() {
         List<List<Coords>> actualCollisionPolygons = getActualCollisionPolygons();
         return actualCollisionPolygons != null && !actualCollisionPolygons.isEmpty();
+    }
+
+    public <P extends PosItem<?, ?>> P findCollision(Coords nextPos, List<P> items, PolygonsGetter<P> obstaclePolygonsGetter) {
+        List<List<Coords>> collisionPolygons = getActualCollisionPolygons();
+        if (!collisionPolygons.isEmpty()) {
+            double left = getCollisionLeft(collisionPolygons);
+            double right = getCollisionRight(collisionPolygons);
+            double top = getCollisionTop(collisionPolygons);
+            double bottom = getCollisionBottom(collisionPolygons);
+
+            return findCollisionWithItems(collisionPolygons, nextPos, items, left, right, top, bottom, obstaclePolygonsGetter);
+        }
+        return null;
+    }
+
+    protected final <P extends PosItem<?, ?>> P findCollisionWithItems(List<List<Coords>> collisionPolygons, Coords nextPos,
+                                                                       List<P> items,
+                                                                       double left, double right, double top, double bottom,
+                                                                       PolygonsGetter<P> obstaclePolygonsGetter) {
+        for (P obstacle : items) {
+            if (obstacle == this) continue;
+            P collision = null;
+            boolean itemsTypesCanCollide = !ifItemTypeCannotCollide(obstacle);
+            if (itemsTypesCanCollide) {
+                collision = findCollisionWith(nextPos, collisionPolygons, left, right, top, bottom,
+                        obstacle, obstaclePolygonsGetter);
+            }
+
+            if (collision != null) return collision;
+        }
+        return null;
+    }
+
+    protected  <P extends PosItem<?, ?>> boolean ifItemTypeCannotCollide(P obstacle) {
+        return false;
+    }
+
+    protected boolean ifItemTypeCannotCollideWithDoor() {
+        return false;
+    }
+
+    protected boolean ifItemTypeCannotCollideWithLandscape() {
+        return false;
+    }
+
+    protected boolean ifItemTypeCannotCollideWithCover() {
+        return false;
+    }
+
+    private <P extends PosItem<?, ?>> P findCollisionWith(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                                          double left, double right, double top, double bottom,
+                                                          P obstacle, PolygonsGetter<P> obstaclePolygonsGetter) {
+        List<List<Coords>> obstaclePolygons = obstaclePolygonsGetter.get(obstacle);
+        if (obstacle.ifCollisionsDoNotOverlap(left, right, top, bottom, obstaclePolygons)) return null;
+
+        if (calculateIfCollides(nextPos, collisionPolygons, obstacle, obstaclePolygons)) {
+            getController().getLogger().logItemCollides(getName(), obstacle.getName());
+            return obstacle;
+        } else {
+            return null;
+        }
+    }
+
+    protected boolean ifCollisionsDoNotOverlap(double left, double right, double top, double bottom,
+                                               List<List<Coords>> obstaclePolygons) {
+        if (obstaclePolygons.isEmpty()) return true;
+        double oLeft = getCollisionLeft(obstaclePolygons);
+        double oRight = getCollisionRight(obstaclePolygons);
+        if (right < oLeft || left > oRight) return true;
+
+        double oTop = getCollisionTop(obstaclePolygons);
+        double oBottom = getCollisionBottom(obstaclePolygons);
+        return bottom < oTop || top > oBottom;
+    }
+
+    protected boolean calculateIfCollides(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                          PosItem<?,?> obstacle, List<List<Coords>> obstaclePolygons) {
+        return obstacle.calculateIfCollidesWithPosItem(nextPos, collisionPolygons, obstaclePolygons);
+    }
+
+    protected boolean calculateIfCollidesWithPosItem(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                                     List<List<Coords>> obstaclePolygons) {
+        return Geometry.polygonsIntersect(nextPos.x, nextPos.y, collisionPolygons, getPos(), obstaclePolygons);
+    }
+
+    protected boolean calculateIfCollidesWithCreature(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                                      Creature creature, List<List<Coords>> obstaclePolygons) {
+        for (List<Coords> polygon : obstaclePolygons) {
+            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
+            Coords oPos = getPos();
+            Geometry.translateCoords(lostRef, oPos.x, oPos.y);
+
+            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(nextPos, creature.getSize(), lostRef);
+            if (ovalIntersectsPolygon) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getItemId() {

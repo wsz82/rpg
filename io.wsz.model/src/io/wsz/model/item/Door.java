@@ -198,6 +198,26 @@ public abstract class Door<I extends Door<I>> extends PosItem<I, OpenableAnimati
     }
 
     @Override
+    protected <P extends PosItem<?, ?>> boolean ifItemTypeCannotCollide(P obstacle) {
+        return obstacle.ifItemTypeCannotCollideWithDoor();
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithLandscape() {
+        return true;
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithDoor() {
+        return false;
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithCover() {
+        return true;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);

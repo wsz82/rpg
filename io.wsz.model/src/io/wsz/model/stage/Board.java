@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Board {
+    private static final PolygonsGetter<PosItem<?, ?>> actualCollisionPolygonsGetter = PosItem::getActualCollisionPolygons;
+    private static final PolygonsGetter<Teleport> teleportPolygonsGetter = Teleport::getTeleportCollisionPolygons;
+
     private final Controller controller;
     private final GraphSorter<PosItem<?,?>> posItemGraphSorter = new GraphSorter<>();
     private final GraphSorter<Equipment<?,?>> equipmentGraphSorter = new GraphSorter<>();
@@ -178,19 +181,7 @@ public class Board {
                 .filter(pi -> pi.getPos().level == nextPos.level)
                 .collect(Collectors.toCollection(() -> this.items));
         if (this.items.isEmpty()) return null;
-        List<List<Coords>> iPolygons = colliding.getActualCollisionPolygons();
-        if (iPolygons.isEmpty() && !(colliding instanceof Creature)) return null;
-
-        double left = colliding.getCollisionLeft(iPolygons, nextPos);
-        double right = colliding.getCollisionRight(iPolygons, nextPos);
-        double top = colliding.getCollisionTop(iPolygons, nextPos);
-        double bottom = colliding.getCollisionBottom(iPolygons, nextPos);
-
-        for (PosItem<?,?> obstacle : this.items) {
-            PosItem<?,?> collision = getObstacle(nextPos, colliding, iPolygons, left, right, top, bottom, obstacle);
-            if (collision != null) return collision;
-        }
-        return null;
+        return colliding.findCollision(nextPos, this.items, actualCollisionPolygonsGetter);
     }
 
     protected <A extends PosItem<?,?>> boolean checkIfSuitTypes(ItemType[] types, A pi) {
@@ -200,32 +191,6 @@ public class Board {
             if (type == piType) return true;
         }
         return false;
-    }
-
-    private PosItem<?,?> getObstacle(Coords nextPos, PosItem<?,?> colliding, List<List<Coords>> iPolygons,
-                                double left, double right, double top, double bottom, PosItem<?,?> obstacle) {
-        if (obstacle == colliding) return null;
-        //TODO generic
-        boolean isDoorAgainstLandscapeChecked = colliding instanceof Door && obstacle instanceof Landscape;
-        boolean isLandscapeAgainstDoorChecked = colliding instanceof Landscape && obstacle instanceof Door;
-        boolean isDoorAgainstCoverChecked = colliding instanceof Door && obstacle instanceof Cover;
-        boolean isCoverAgainstDoorChecked = colliding instanceof Cover && obstacle instanceof Door;
-        boolean isLandscapeAgainstLandscapeChecked = colliding instanceof Landscape && obstacle instanceof Landscape;
-        if (isDoorAgainstLandscapeChecked || isLandscapeAgainstDoorChecked
-                || isDoorAgainstCoverChecked || isCoverAgainstDoorChecked
-                || isLandscapeAgainstLandscapeChecked) return null;
-        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
-        return getCollision(left, right, top, bottom, nextPos, colliding, iPolygons, obstacle, oPolygons);
-    }
-
-    public PosItem<?,?> getObstacle(Coords nextPos, Creature colliding, PosItem<?,?> obstacle) {
-        if (obstacle == colliding) return null;
-        List<List<Coords>> oPolygons = obstacle.getActualCollisionPolygons();
-        if (calculateIfCreatureObstacleCollision(nextPos, colliding, oPolygons, obstacle)) {
-            return obstacle;
-        } else {
-            return null;
-        }
     }
 
     public PosItem<?,?> getObstacleOnWay(Location location, int level, double fromX, double fromY, PosItem<?,?> i, double toX, double toY) {
@@ -269,113 +234,18 @@ public class Board {
         return null;
     }
 
-    public Teleport getTeleport(Coords nextPos, PosItem<?,?> i, Location l) {
+    public Teleport getTeleport(Coords nextPos, PosItem<?,?> colliding, Location location) {
         teleports.clear();
-        l.getItemsList().getTeleports().stream()
+        location.getItemsList().getTeleports().stream()
                 .filter(PosItem::isVisible)
-                .filter(pi -> pi.getActualCollisionPolygons() != null)
+                .filter(pi -> pi.getTeleportCollisionPolygons() != null)
                 .filter(pi -> {
-                    int level = i.getPos().level;
+                    int level = colliding.getPos().level;
                     return pi.getPos().level == level;
                 })
                 .collect(Collectors.toCollection(() -> teleports));
         if (teleports.isEmpty()) return null;
-        List<List<Coords>> iPolygons = i.getActualCollisionPolygons();
-        if (iPolygons.isEmpty() && !(i instanceof Creature)) return null;
-
-        double left = i.getCollisionLeft(iPolygons, nextPos);
-        double right = i.getCollisionRight(iPolygons, nextPos);
-        double top = i.getCollisionTop(iPolygons, nextPos);
-        double bottom = i.getCollisionBottom(iPolygons, nextPos);
-
-        for (Teleport t : teleports) {
-            if (t == i) continue;
-            List<List<Coords>> oPolygons = t.getTeleportCollisionPolygons();
-            Teleport collision = getCollision(left, right, top, bottom, nextPos, i, iPolygons, t, oPolygons);
-            if (collision != null) return collision;
-        }
-        return null;
-    }
-
-    private <A extends PosItem<?,?>> A getCollision(double left, double right, double top, double bottom, Coords nextPos,
-                                                    PosItem<?,?> colliding, List<List<Coords>> iPolygons, A obstacle, List<List<Coords>> oPolygons) {
-        if (oPolygons.isEmpty() && !(obstacle instanceof Creature)) return null;
-        double oLeft = obstacle.getCollisionLeft(oPolygons);
-        double oRight = obstacle.getCollisionRight(oPolygons);
-        if (right < oLeft || left > oRight) return null;
-
-        double oTop = obstacle.getCollisionTop(oPolygons);
-        double oBottom = obstacle.getCollisionBottom(oPolygons);
-        if (bottom < oTop || top > oBottom) return null;
-
-        if (colliding instanceof Creature && !(obstacle instanceof Creature)) {
-
-            Creature cr = (Creature) colliding;
-            if (calculateIfCreatureObstacleCollision(nextPos, cr, oPolygons, obstacle)) return obstacle;
-
-        } else if (obstacle instanceof Creature && !(colliding instanceof Creature)) {
-
-            Creature crO = (Creature) obstacle;
-            if (calculateIfObstacleCreatureCollision(nextPos, crO, iPolygons, colliding)) return obstacle;
-
-        } else if (obstacle instanceof Creature) {
-
-            Creature cr = (Creature) colliding;
-            Creature crO = (Creature) obstacle;
-            if (calculateIfCreatureCreatureCollision(nextPos, cr, crO)) return obstacle;
-
-        } else {
-
-            if (calculateIfObstacleObstacleCollision(colliding, nextPos, iPolygons, obstacle, obstacle.getPos(), oPolygons)) return obstacle;
-
-        }
-        return null;
-    }
-
-    private boolean calculateIfObstacleObstacleCollision(PosItem<?,?> i, Coords nextPos, List<List<Coords>> iPolygons,
-                                                         PosItem<?,?> o, Coords oPos, List<List<Coords>> oPolygons) {
-        boolean collides = Geometry.polygonsIntersect(nextPos.x, nextPos.y, iPolygons, oPos, oPolygons);
-        if (collides) {
-            controller.getLogger().logItemCollides(i.getName(), o.getName());
-        }
-        return collides;
-    }
-
-    public boolean calculateIfObstacleCreatureCollision(Coords nextPos, Creature cr, List<List<Coords>> iPolygons, PosItem<?,?> i) {
-        for (List<Coords> polygon : iPolygons) {
-            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
-            Geometry.translateCoords(lostRef, nextPos.x, nextPos.y);
-
-            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(cr.getCenter(), cr.getSize(), lostRef);
-            if (ovalIntersectsPolygon) {
-                controller.getLogger().logItemCollides(i.getName(), cr.getName());
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean calculateIfCreatureCreatureCollision(Coords nextPos, Creature cr, Creature crO) {
-        boolean collides = Geometry.ovalsIntersect(nextPos, cr.getSize(), crO.getCenter(), crO.getSize());
-        if (collides) {
-            controller.getLogger().logItemCollides(cr.getName(), crO.getName());
-        }
-        return collides;
-    }
-
-    public boolean calculateIfCreatureObstacleCollision(Coords nextPos, Creature cr, List<List<Coords>> oPolygons, PosItem<?,?> o) {
-        for (List<Coords> polygon : oPolygons) {
-            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
-            Coords oPos = o.getPos();
-            Geometry.translateCoords(lostRef, oPos.x, oPos.y);
-
-            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(nextPos, cr.getSize(), lostRef);
-            if (ovalIntersectsPolygon) {
-                controller.getLogger().logItemCollides(cr.getName(), o.getName());
-                return true;
-            }
-        }
-        return false;
+        return colliding.findCollision(nextPos, teleports, teleportPolygonsGetter);
     }
 
     private boolean isWayCollision(Coords oPos, List<List<Coords>> oPolygons) {

@@ -12,6 +12,7 @@ import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
+import io.wsz.model.stage.PolygonsGetter;
 import io.wsz.model.stage.ResolutionImage;
 import io.wsz.model.textures.CreatureBase;
 import io.wsz.model.textures.Fog;
@@ -88,6 +89,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public double getCollisionLeft(List<List<Coords>> cp, Coords nextPos) {
+        return getCollisionLeft(nextPos);
+    }
+
+    public double getCollisionLeft() {
+        return getCollisionLeft(getCenter());
+    }
+
+    public double getCollisionLeft(Coords nextPos) {
         double halfWidth = getSize().getWidth() / 2;
         return nextPos.x - halfWidth;
     }
@@ -99,6 +108,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public double getCollisionRight(List<List<Coords>> cp, Coords nextPos) {
+        return getCollisionRight(nextPos);
+    }
+
+    public double getCollisionRight() {
+        return getCollisionRight(getCenter());
+    }
+
+    public double getCollisionRight(Coords nextPos) {
         double halfWidth = getSize().getWidth() / 2;
         return nextPos.x + halfWidth;
     }
@@ -110,6 +127,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public double getCollisionTop(List<List<Coords>> cp, Coords nextPos) {
+        return getCollisionTop(nextPos);
+    }
+
+    public double getCollisionTop() {
+        return getCollisionTop(getCenter());
+    }
+
+    public double getCollisionTop(Coords nextPos) {
         double halfHeight = getSize().getHeight() / 2;
         return nextPos.y - halfHeight;
     }
@@ -121,6 +146,14 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
 
     @Override
     public double getCollisionBottom(List<List<Coords>> cp, Coords nextPos) {
+        return getCollisionBottom(nextPos);
+    }
+
+    public double getCollisionBottom() {
+        return getCollisionBottom(getCenter());
+    }
+
+    public double getCollisionBottom(Coords nextPos) {
         double halfHeight = getSize().getHeight() / 2;
         return nextPos.y + halfHeight;
     }
@@ -501,6 +534,55 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     @Override
     public boolean checkIfCanCollide() {
         return true;
+    }
+
+    @Override
+    public <P extends PosItem<?, ?>> P findCollision(Coords nextPos, List<P> items, PolygonsGetter<P> obstaclePolygonsGetter) {
+        double left = getCollisionLeft(nextPos);
+        double right = getCollisionRight(nextPos);
+        double top = getCollisionTop(nextPos);
+        double bottom = getCollisionBottom(nextPos);
+
+        return findCollisionWithItems(null, nextPos, items, left, right, top, bottom, obstaclePolygonsGetter);
+    }
+
+    @Override
+    protected boolean ifCollisionsDoNotOverlap(double left, double right, double top, double bottom,
+                                               List<List<Coords>> obstaclePolygons) {
+        double oLeft = getCollisionLeft();
+        double oRight = getCollisionRight();
+        if (right < oLeft || left > oRight) return true;
+
+        double oTop = getCollisionTop();
+        double oBottom = getCollisionBottom();
+        return bottom < oTop || top > oBottom;
+    }
+
+    @Override
+    protected boolean calculateIfCollides(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                          PosItem<?, ?> obstacle, List<List<Coords>> obstaclePolygons) {
+        return obstacle.calculateIfCollidesWithCreature(nextPos, collisionPolygons, this, obstaclePolygons);
+    }
+
+    @Override
+    protected boolean calculateIfCollidesWithPosItem(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                                     List<List<Coords>> obstaclePolygons) {
+        for (List<Coords> polygon : collisionPolygons) {
+            List<Coords> lostRef = Geometry.looseCoordsReferences1(polygon);
+            Geometry.translateCoords(lostRef, nextPos.x, nextPos.y);
+
+            boolean ovalIntersectsPolygon = Geometry.ovalIntersectsPolygon(getCenter(), getSize(), lostRef);
+            if (ovalIntersectsPolygon) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean calculateIfCollidesWithCreature(Coords nextPos, List<List<Coords>> collisionPolygons,
+                                                      Creature creature, List<List<Coords>> obstaclePolygons) {
+        return Geometry.ovalsIntersect(nextPos, creature.getSize(), getCenter(), getSize());
     }
 
     public Task getTask() {

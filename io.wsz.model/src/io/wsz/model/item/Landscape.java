@@ -73,6 +73,26 @@ public class Landscape extends PosItem<Landscape, AnimationPos> {
     }
 
     @Override
+    protected <P extends PosItem<?, ?>> boolean ifItemTypeCannotCollide(P obstacle) {
+        return obstacle.ifItemTypeCannotCollideWithLandscape();
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithLandscape() {
+        return true;
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithDoor() {
+        return true;
+    }
+
+    @Override
+    protected boolean ifItemTypeCannotCollideWithCover() {
+        return true;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeLong(Sizes.VERSION);
