@@ -2,6 +2,7 @@ package editor.view.asset.coords;
 
 import editor.view.stage.ChildStage;
 import editor.view.utilities.DoubleField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
@@ -28,7 +29,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,25 +176,14 @@ public abstract class CoordsShapeEditStage<A extends PosItem<?,?>> extends Child
     private void setUpCoordsCB() {
         coordsCBBox.setSpacing(5);
         coordsCBBox.setPrefWidth(100);
-        coordsCB.setConverter(new StringConverter<>() {
+        coordsCB.setConverter(new ToStringConverter<>(coordsCB) {
             @Override
             public String toString(Coords point) {
                 if (point == null) {
                     return "";
                 } else {
-                    return point.toShortString();
+                    return point.toXYString();
                 }
-            }
-
-            @Override
-            public Coords fromString(String string) {
-                Coords parsed = Coords.parseShortCoords(string);
-                for (Coords point : coordsList) {
-                    if (point.equals(parsed)) {
-                        return point;
-                    }
-                }
-                return null;
             }
         });
     }

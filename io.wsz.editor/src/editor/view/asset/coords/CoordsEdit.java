@@ -4,6 +4,7 @@ import editor.model.EditorController;
 import editor.view.stage.EditorCanvas;
 import editor.view.utilities.DoubleField;
 import editor.view.utilities.IntegerField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Board;
@@ -16,7 +17,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 
 import java.util.Optional;
 
@@ -79,21 +79,13 @@ public class CoordsEdit {
     }
 
     private void setUpLocationChoice(ChoiceBox<Location> locationChoice) {
-        locationChoice.setConverter(new StringConverter<>() {
+        locationChoice.setConverter(new ToStringConverter<>(locationChoice) {
             @Override
             public String toString(Location l) {
                 if (l == null) {
                     return "";
                 }
                 return l.getId();
-            }
-
-            @Override
-            public Location fromString(String s) {
-                if (s == null || s.isEmpty()) {
-                    return null;
-                }
-                return getLocation(s);
             }
         });
         ObservableList<Location> original = controller.getObservableLocations();

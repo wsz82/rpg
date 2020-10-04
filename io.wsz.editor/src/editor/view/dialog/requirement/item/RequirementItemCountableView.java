@@ -10,7 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RequirementItemCountableView extends RequirementAssetOrItemCountableView<PosItem<?,?>> {
 
@@ -20,10 +22,14 @@ public class RequirementItemCountableView extends RequirementAssetOrItemCountabl
 
     @Override
     protected ObservableList<PosItem<?,?>> getEquipmentAssetsOrItems() {
-        ObservableList<PosItem<?,?>> items = FXCollections.observableArrayList();
         List<Location> locations = editorController.getObservableLocations();
-        locations.forEach(l -> items.addAll(l.getItemsList().getMergedEquipment()));
-        return items;
+        Set<PosItem<?,?>> itemSet = new HashSet<>(0);
+        locations.forEach(l -> l.getItemsList().getEquipment().forEach(e -> {
+            if (e.getItemId() != null) {
+                itemSet.add(e);
+            }
+        }));
+        return FXCollections.observableArrayList(itemSet);
     }
 
     protected void addExpressionToPChas(Requirements output, BooleanItemVsItem expression) {

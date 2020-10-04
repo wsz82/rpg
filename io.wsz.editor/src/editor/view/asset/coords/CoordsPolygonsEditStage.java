@@ -1,5 +1,6 @@
 package editor.view.asset.coords;
 
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -14,11 +15,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CoordsPolygonsEditStage<A extends PosItem<?,?>> extends CoordsShapeEditStage<A> {
@@ -120,20 +119,11 @@ public class CoordsPolygonsEditStage<A extends PosItem<?,?>> extends CoordsShape
 
     private void setUpPolygonsCB() {
         polygonsCB.setPrefWidth(100);
-        polygonsCB.setConverter(new StringConverter<>() {
+        polygonsCB.setConverter(new ToStringConverter<>(polygonsCB) {
             @Override
             public String toString(List<Coords> p) {
                 Coords first = p.get(0);
-                return first.toShortString();
-            }
-
-            @Override
-            public List<Coords> fromString(String string) {
-                Coords pos = Coords.parseShortCoords(string);
-                Optional<List<Coords>> optPolygon = polygons.stream()
-                        .filter(l -> l.get(0).equals(pos))
-                        .findFirst();
-                return optPolygon.orElse(null);
+                return first.toXYString();
             }
         });
 

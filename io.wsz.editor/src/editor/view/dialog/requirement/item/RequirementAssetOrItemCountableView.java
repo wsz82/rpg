@@ -4,6 +4,7 @@ import editor.model.EditorController;
 import editor.view.dialog.requirement.DualTextFieldChoiceBox;
 import editor.view.dialog.requirement.SpecificRequirement;
 import editor.view.utilities.IntegerField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Requirements;
 import io.wsz.model.script.CompareOperator;
@@ -13,7 +14,6 @@ import io.wsz.model.script.bool.countable.item.CountableItem;
 import io.wsz.model.script.variable.VariableInteger;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
-import javafx.util.StringConverter;
 
 public abstract class RequirementAssetOrItemCountableView<A extends Asset<?>> extends SpecificRequirement<BooleanItemVsItem> {
     private final ChoiceBox<A> assetOrItemCB = new ChoiceBox<>();
@@ -43,15 +43,10 @@ public abstract class RequirementAssetOrItemCountableView<A extends Asset<?>> ex
     }
 
     private void setUpAssetOrItemCBconverter() {
-        assetOrItemCB.setConverter(new StringConverter<>() {
+        assetOrItemCB.setConverter(new ToStringConverter<>(assetOrItemCB) {
             @Override
             public String toString(A item) {
                 return getAssetOrItemId(item);
-            }
-
-            @Override
-            public A fromString(String string) {
-                return assetOrItemCB.getValue();
             }
         });
     }

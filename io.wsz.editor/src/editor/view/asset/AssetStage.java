@@ -5,6 +5,7 @@ import editor.view.asset.coords.*;
 import editor.view.stage.ChildStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.utilities.DoubleField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.PosItem;
@@ -22,11 +23,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
     protected final EditorCanvas editorCanvas;
@@ -153,7 +152,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         ObservableList<Dialog> dialogsWithNull = FXCollections.observableArrayList(dialogs);
         dialogsWithNull.add(null);
         dialogsCB.setItems(dialogsWithNull);
-        dialogsCB.setConverter(new StringConverter<>() {
+        dialogsCB.setConverter(new ToStringConverter<>(dialogsCB) {
             @Override
             public String toString(Dialog dialog) {
                 if (dialog == null) {
@@ -161,14 +160,6 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
                 } else {
                     return dialog.getID();
                 }
-            }
-
-            @Override
-            public Dialog fromString(String name) {
-                Optional<Dialog> optDialog = controller.getObservableDialogs().stream()
-                        .filter(t -> t.getID().equals(name))
-                        .findFirst();
-                return optDialog.orElse(null);
             }
         });
     }

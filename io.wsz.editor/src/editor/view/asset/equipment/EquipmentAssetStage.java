@@ -4,6 +4,7 @@ import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.stage.EditorCanvas;
 import editor.view.utilities.DoubleField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.EquipmentType;
 import io.wsz.model.item.InventoryPlaceType;
@@ -14,9 +15,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
-
-import java.util.Optional;
 
 public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends AssetStage<A> {
     protected final ChoiceBox<InventoryPlaceType> occupiedPlaceCB = new ChoiceBox<>();
@@ -77,19 +75,11 @@ public abstract class EquipmentAssetStage<A extends Equipment<?,?>> extends Asse
         ObservableList<EquipmentType> equipmentTypesWithNull = FXCollections.observableArrayList(equipmentTypes);
         equipmentTypesWithNull.add(null);
         typeCB.setItems(equipmentTypesWithNull);
-        typeCB.setConverter(new StringConverter<>() {
+        typeCB.setConverter(new ToStringConverter<>(typeCB) {
             @Override
             public String toString(EquipmentType equipmentType) {
                 if (equipmentType == null) return null;
                 return equipmentType.getId();
-            }
-
-            @Override
-            public EquipmentType fromString(String name) {
-                Optional<EquipmentType> optType = controller.getObservableEquipmentTypes().stream()
-                        .filter(t -> t.getId().equals(name))
-                        .findFirst();
-                return optType.orElse(null);
             }
         });
     }

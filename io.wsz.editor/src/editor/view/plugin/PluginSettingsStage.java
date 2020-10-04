@@ -4,6 +4,7 @@ import editor.model.EditorController;
 import editor.view.stage.ChildStage;
 import editor.view.utilities.DoubleField;
 import editor.view.utilities.IntegerField;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.location.Location;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -18,8 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-
-import java.util.Optional;
 
 public class PluginSettingsStage extends ChildStage {
     private final String TITLE = "Plugin settings";
@@ -70,24 +69,13 @@ public class PluginSettingsStage extends ChildStage {
         v.getChildren().addAll(ifStartingLocation, location, pos);
         root.getChildren().add(v);
 
-        locationChoice.setConverter(new StringConverter<>() {
+        locationChoice.setConverter(new ToStringConverter<>(locationChoice) {
             @Override
             public String toString(Location l) {
                 if (l == null) {
                     return "";
                 }
                 return l.getId();
-            }
-
-            @Override
-            public Location fromString(String s) {
-                if (s == null) {
-                    return null;
-                }
-                if (s.isEmpty()) {
-                    return null;
-                }
-                return getLocation(s);
             }
         });
         locationChoice.setItems(editorController.getObservableLocations());
@@ -128,13 +116,6 @@ public class PluginSettingsStage extends ChildStage {
             }
         };
         Bindings.bindBidirectional(inputLayer.textProperty(), startLevel, stringIntegerConverter);
-    }
-
-    private Location getLocation(String s) {
-        Optional<Location> optLocation = editorController.getObservableLocations().stream()
-                .filter(l -> l.getId().equals(s))
-                .findFirst();
-        return optLocation.orElse(null);
     }
 
     public void open(){

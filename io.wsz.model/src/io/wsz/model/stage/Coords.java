@@ -116,16 +116,29 @@ public class Coords implements Externalizable {
         this.location = location;
     }
 
-    public String toShortString() {
+    public String toXYString() {
         return "x:" + x + "y:" + y;
+    }
+
+    public String toShortString() {
+        double shortX = getTwoDecimalPlacesValue(x);
+        double shortY = getTwoDecimalPlacesValue(y);
+        return toString(shortX, shortY);
+    }
+
+    public double getTwoDecimalPlacesValue(double x) {
+        return (int) (x * 100) / 100.0;
     }
 
     @Override
     public String toString() {
-        String locationName;
+        return toString(x, y);
+    }
+
+    private String toString(double x, double y) {
         String end = "x:" + x + "y:" + y + "level:" + level;
         if (location != null) {
-            locationName = location.getId();
+            String locationName = location.getId();
             return "location:" + locationName + end;
         } else {
             return end;

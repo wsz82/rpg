@@ -2,6 +2,7 @@ package editor.view.asset.creature.inventory.place;
 
 import editor.model.EditorController;
 import editor.view.asset.coords.CoordsShapeEditStage;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.InventoryPlaceType;
 import io.wsz.model.stage.Coords;
@@ -15,12 +16,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
@@ -106,7 +105,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
         }
         placeCBVBox.getChildren().add(1, placeCB);
         placeCB.setPrefWidth(100);
-        placeCB.setConverter(new StringConverter<>() {
+        placeCB.setConverter(new ToStringConverter<>(placeCB) {
             @Override
             public String toString(List<Coords> place) {
                 InventoryPlaceType type = getInventoryPlaceType(place);
@@ -115,11 +114,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
                 } else {
                     return type.getId();
                 }
-            }
-
-            @Override
-            public List<Coords> fromString(String s) {
-                return getPlace(s);
             }
         });
 
@@ -133,7 +127,7 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
     }
 
     private void setUpTypesCB() {
-        typesCB.setConverter(new StringConverter<>() {
+        typesCB.setConverter(new ToStringConverter<>(typesCB) {
             @Override
             public String toString(InventoryPlaceType type) {
                 if (type == null) {
@@ -141,12 +135,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
                 } else {
                     return type.getId();
                 }
-            }
-
-            @Override
-            public InventoryPlaceType fromString(String s) {
-                Optional<InventoryPlaceType> optType = getOptionalInventoryPlaceType(s);
-                return optType.orElse(null);
             }
         });
 
@@ -166,13 +154,6 @@ public class InventoryPlaceEditStage extends CoordsShapeEditStage<Creature> {
             inventoryPlaces.put(selectedType, place);
             setUpPlaceCB();
         });
-    }
-
-    private Optional<InventoryPlaceType> getOptionalInventoryPlaceType(String s) {
-        Optional<InventoryPlaceType> optType = types.stream()
-                .filter(t -> t.getId().equals(s))
-                .findFirst();
-        return optType;
     }
 
     private List<Coords> getPlace(String name) {

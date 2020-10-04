@@ -4,7 +4,7 @@ import editor.model.EditorController;
 import editor.view.asset.AssetStage;
 import editor.view.asset.coords.CoordsEdit;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.Controller;
+import editor.view.utilities.ToStringConverter;
 import io.wsz.model.item.OutDoor;
 import io.wsz.model.location.Location;
 import io.wsz.model.stage.Coords;
@@ -14,10 +14,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 import java.util.List;
-import java.util.Optional;
 
 public class OutDoorAssetStage extends AssetStage<OutDoor> {
     private static final String TITLE = "OutDoor asset";
@@ -58,21 +56,13 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
     }
 
     private void setUpConnectionCB() {
-        connectionCB.setConverter(new StringConverter<>() {
+        connectionCB.setConverter(new ToStringConverter<>(connectionCB) {
             @Override
             public String toString(OutDoor o) {
                 if (o == null) {
                     return "";
                 }
-                return o.getAssetId() + "|" + o.getPos().toString();
-            }
-
-            @Override
-            public OutDoor fromString(String s) {
-                if (s == null || s.isEmpty()) {
-                    return null;
-                }
-                return getConnection(s, controller);
+                return o.getAssetId() + "|" + o.getPos().toShortString();
             }
         });
     }
@@ -83,25 +73,6 @@ public class OutDoorAssetStage extends AssetStage<OutDoor> {
         ObservableList<OutDoor> outDoorsObservable = FXCollections.observableArrayList(outDoors);
         connectionCB.setItems(outDoorsObservable);
         outDoorsObservable.add(null);
-    }
-
-    private OutDoor getConnection(String s, Controller controller) {
-        String[] nameAndPos = s.split("/|");
-        String name = "";
-        String posText = "";
-        if (nameAndPos.length > 0) {
-            name = nameAndPos[0];
-        }
-        if (nameAndPos.length > 1) {
-            posText = nameAndPos[1];
-        }
-        String outDoorName = name;
-        Coords pos = Coords.parseCoords(posText, controller);
-        Optional<OutDoor> optConnection = connectionCB.getItems().stream()
-                .filter(o -> o.getAssetId().equals(outDoorName))
-                .filter(o -> o.getPos().equals(pos))
-                .findFirst();
-        return optConnection.orElse(null);
     }
 
     @Override
