@@ -96,7 +96,9 @@ public class AddNew implements Executable, Externalizable {
     }
 
     private String assetId;
+    private Asset<?> prototype;
     private String locationId;
+    private Location location;
     private String level;
     private String posX;
     private String posY;
@@ -104,15 +106,20 @@ public class AddNew implements Executable, Externalizable {
 
     @Override
     public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
-        Asset<?> prototype = controller.getAssetById(assetId);
+        if (prototype == null) {
+            prototype = controller.getAssetById(assetId);
+        }
         if (prototype == null) return;
-        Location toLocation = controller.getLocations().stream()
-                .filter(l -> l.getId().equals(locationId))
-                .findFirst().orElse(null);
+        if (location == null) {
+            location = controller.getLocations().stream()
+                    .filter(l -> l.getId().equals(locationId))
+                    .findFirst().orElse(null);
+        }
+        if (location == null) return;
         int toLevel = Integer.parseInt(level);
         double toX = Double.parseDouble(posX);
         double toY = Double.parseDouble(posY);
-        prototype.addNewItemToLocation(toLocation, toLevel, toX, toY, newItemId);
+        prototype.addNewItemToLocation(location, toLevel, toX, toY, newItemId);
     }
 
     public String getAssetId() {

@@ -64,7 +64,7 @@ public class If implements Executable, Externalizable {
         return null;
     }
 
-    private static BooleanExpression parseCreatureHas(Controller controller, boolean negate, String condition,
+    private static BooleanExpression<?> parseCreatureHas(Controller controller, boolean negate, String condition,
                                                       ScriptValidator validator) {
         int nextIndex = condition.indexOf(QUOTE);
         if (nextIndex != -1) {
@@ -138,7 +138,7 @@ public class If implements Executable, Externalizable {
         return null;
     }
 
-    private static BooleanExpression parseGlobal(Controller controller, boolean negate, String condition,
+    private static BooleanExpression<?> parseGlobal(Controller controller, boolean negate, String condition,
                                                  ScriptValidator validator) {
         CompareOperator compareOperator = getCompareOperator(condition);
         int nextIndex;
@@ -238,7 +238,7 @@ public class If implements Executable, Externalizable {
 
     private final ArrayDeque<Executable> executables = new ArrayDeque<>();
     private boolean negate;
-    private BooleanExpression expression;
+    private BooleanExpression<?> expression;
 
     @Override
     public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
@@ -260,7 +260,7 @@ public class If implements Executable, Externalizable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         negate = in.readBoolean();
-        expression = (BooleanExpression) in.readObject();
+        expression = (BooleanExpression<?>) in.readObject();
         ArrayDeque<Executable> executables = (ArrayDeque<Executable>) in.readObject();
         this.executables.addAll(executables);
     }
