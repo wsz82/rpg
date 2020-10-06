@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Container;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -68,12 +67,7 @@ public class ContainerTableView extends EquipmentTableView<Container> {
     }
 
     @Override
-    protected void removeAssetFromList(List assetsToRemove) {
+    protected void removeAssetFromList(List<Container> assetsToRemove) {
         controller.getObservableAssets().getContainers().removeAll(assetsToRemove);
-    }
-
-    @Override
-    protected ItemType getType() {
-        return ItemType.CONTAINER;
     }
 }

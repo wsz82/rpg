@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -53,8 +52,4 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
         controller.getObservableAssets().getInDoors().removeAll(assetsToRemove);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.INDOOR;
-    }
 }

@@ -3,7 +3,6 @@ package editor.view.asset.equipment.countable.misc;
 import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Misc;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
@@ -53,8 +52,4 @@ public class MiscTableView extends EquipmentTableView<Misc> {
         controller.getObservableAssets().getMiscs().removeAll(assetsToRemove);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.MISC;
-    }
 }

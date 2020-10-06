@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
@@ -54,8 +53,4 @@ public class CoverTableView extends AssetsTableView<Cover> {
         controller.getObservableAssets().getCovers().removeAll(assetsToRemove);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.COVER;
-    }
 }

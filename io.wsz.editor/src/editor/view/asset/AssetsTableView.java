@@ -7,7 +7,6 @@ import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.item.Equipment;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.PosItem;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Sizes;
@@ -249,8 +248,6 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
            observableItems.removeAll(contentToRemove);
         });
     }
-
-    protected abstract ItemType getType();
 
     public void setPointer(Pointer p) {
         pointer = p;

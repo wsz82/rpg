@@ -4,7 +4,6 @@ import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
@@ -81,8 +80,4 @@ public class CreatureTableView extends AssetsTableView<Creature> {
         controller.getObservableAssets().getCreatures().removeAll(assetsToRemove);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.CREATURE;
-    }
 }

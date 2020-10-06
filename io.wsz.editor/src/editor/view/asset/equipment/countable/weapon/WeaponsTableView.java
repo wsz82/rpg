@@ -3,7 +3,6 @@ package editor.view.asset.equipment.countable.weapon;
 import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;
 import editor.view.stage.EditorCanvas;
-import io.wsz.model.item.ItemType;
 import io.wsz.model.item.Weapon;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
@@ -93,8 +92,4 @@ public class WeaponsTableView extends EquipmentTableView<Weapon> {
         controller.getObservableAssets().getWeapons().removeAll(assetsToRemove);
     }
 
-    @Override
-    protected ItemType getType() {
-        return ItemType.WEAPON;
-    }
 }
