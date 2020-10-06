@@ -8,6 +8,7 @@ import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.FogStatusWithImage;
 import io.wsz.model.location.Location;
+import io.wsz.model.script.command.ItemMover;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -583,6 +584,16 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     protected boolean calculateIfCollidesWithCreature(Coords nextPos, List<List<Coords>> collisionPolygons,
                                                       Creature creature, List<List<Coords>> obstaclePolygons) {
         return Geometry.ovalsIntersect(nextPos, creature.getSize(), getCenter(), getSize());
+    }
+
+    @Override
+    public <P extends PosItem<?, ?>> void moveItemTo(P receiving, ItemMover itemMover) {
+        receiving.receiveItemFrom(itemMover, this);
+    }
+
+    @Override
+    protected void receiveItemFrom(ItemMover itemMover, Containable giving) {
+        itemMover.moveBetween(giving, this);
     }
 
     public Task getTask() {

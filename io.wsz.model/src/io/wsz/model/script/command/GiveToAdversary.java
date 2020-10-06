@@ -52,56 +52,53 @@ public class GiveToAdversary implements Executable, Externalizable {
     private String amount;
 
     @Override
-    public void execute(Controller controller, PosItem<?, ?> giving, PosItem<?, ?> receiving) { //TODO dropping item when does not fits inventory (Problem: items with collision)
-        if (giving == null || receiving == null) return;
-        //TODO generic
-        boolean receivingOrGivingIsNotContainable = !(receiving instanceof Containable) || !(giving instanceof Containable);
-        if (receivingOrGivingIsNotContainable) return;
-        Containable givingCo = (Containable) giving;
-        Containable receivingCo = (Containable) receiving;
-
-        int amount;
-        try {
-            amount = Integer.parseInt(this.amount);
-        } catch (NumberFormatException e) {
-            System.out.println(this.amount + " must be int");
-            e.printStackTrace();
-            return;
-        }
-        if (amount < 0) {
-            amount = -amount;
-            Containable temp = givingCo;
-            givingCo = receivingCo;
-            receivingCo = temp;
-        }
-
-        EquipmentList equipmentList = givingCo.getEquipmentList();
-        Equipment<?,?> equipment = equipmentList.getItemByItemOrAssetId(itemOrAssetId);
-        if (equipment == null) return;
-        equipment.getPos().reset();
-
-        int availableAmount = 0;
-        for (int i = 0; i < amount; i++) {
-            if (equipmentList.contains(equipment)) {
-                equipmentList.remove(equipment);
-                availableAmount++;
+    public void execute(Controller controller, PosItem<?, ?> giver, PosItem<?, ?> receiver) { //TODO dropping item when does not fits inventory (Problem: items with collision)
+        if (giver == null || receiver == null) return;
+        ItemMover itemMover = (concreteGiver, concreteReceiver) -> {
+            int amount;
+            try {
+                amount = Integer.parseInt(this.amount);
+            } catch (NumberFormatException e) {
+                System.out.println(this.amount + " must be int");
+                e.printStackTrace();
+                return;
             }
-        }
-        for (int i = 0; i < availableAmount; i++) {
-            receivingCo.getEquipmentList().add(equipment);
-        }
+            if (amount < 0) {
+                amount = -amount;
+                Containable temp = concreteGiver;
+                concreteGiver = concreteReceiver;
+                concreteReceiver = temp;
+            }
 
-        Creature pc = controller.getDialogMemento().getPc();
-        String message;
-        Properties locale = controller.getLocale();
-        if (givingCo == pc) {
-            message = locale.getProperty(LocaleKeys.RETURNED);
-        } else {
-            message = locale.getProperty(LocaleKeys.RECEIVED);
-        }
-        message = message + " " + availableAmount + " " + equipment.getName();
-        DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
-        controller.getDialogMemento().getDialogs().add(di);
+            EquipmentList equipmentList = concreteGiver.getEquipmentList();
+            Equipment<?,?> equipment = equipmentList.getItemByItemOrAssetId(itemOrAssetId);
+            if (equipment == null) return;
+            equipment.getPos().reset();
+
+            int availableAmount = 0;
+            for (int i = 0; i < amount; i++) {
+                if (equipmentList.contains(equipment)) {
+                    equipmentList.remove(equipment);
+                    availableAmount++;
+                }
+            }
+            for (int i = 0; i < availableAmount; i++) {
+                concreteReceiver.getEquipmentList().add(equipment);
+            }
+
+            Creature pc = controller.getDialogMemento().getPc();
+            String message;
+            Properties locale = controller.getLocale();
+            if (concreteGiver == pc) {
+                message = locale.getProperty(LocaleKeys.RETURNED);
+            } else {
+                message = locale.getProperty(LocaleKeys.RECEIVED);
+            }
+            message = message + " " + availableAmount + " " + equipment.getName();
+            DialogItem di = new DialogItem(SpeakerMark.INFO, "", message);
+            controller.getDialogMemento().getDialogs().add(di);
+        };
+        giver.moveItemTo(receiver, itemMover);
     }
 
     @Override

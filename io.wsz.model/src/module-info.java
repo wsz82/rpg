@@ -23,6 +23,7 @@ module io.wsz.model {
     exports io.wsz.model.script.bool.equals.variable;
     exports io.wsz.model.script.bool.has;
     exports io.wsz.model.script.bool.has.item;
+    exports io.wsz.model.script.command;
     exports io.wsz.model.script.variable;
     exports io.wsz.model.sizes;
     exports io.wsz.model.textures;

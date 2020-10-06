@@ -7,6 +7,7 @@ import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
+import io.wsz.model.script.command.ItemMover;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -278,6 +279,17 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
         addPrototypesToSet(this, prototypes);
     }
 
+    @Override
+    public <P extends PosItem<?, ?>> void moveItemTo(P receiving, ItemMover itemMover) {
+        receiving.receiveItemFrom(itemMover, this);
+    }
+
+    @Override
+    protected void receiveItemFrom(ItemMover itemMover, Containable giving) {
+        itemMover.moveBetween(giving, this);
+    }
+
+    @Override
     public boolean isOpen() {
         return isOpen;
     }

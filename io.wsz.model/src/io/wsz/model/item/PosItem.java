@@ -9,6 +9,7 @@ import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.Script;
+import io.wsz.model.script.command.ItemMover;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
@@ -424,6 +425,14 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
 
     public void initAnimations(File programDir) {
         getAnimation().initAllAnimations(programDir);
+    }
+
+    public <P extends PosItem<?, ?>> void moveItemTo(P receiving, ItemMover itemMover) {
+        getController().getLogger().logCannotGive(getName());
+    }
+
+    protected void receiveItemFrom(ItemMover itemMover, Containable giving) {
+        getController().getLogger().logCannotReceive(getName());
     }
 
     @Override

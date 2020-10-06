@@ -120,4 +120,12 @@ public class Logger {
     public void logWayCollision() {
         System.out.println("Way collision");
     }
+
+    public void logCannotGive(String name) {
+        System.out.println(name + " is not containable");
+    }
+
+    public void logCannotReceive(String name) {
+        logCannotGive(name);
+    }
 }
