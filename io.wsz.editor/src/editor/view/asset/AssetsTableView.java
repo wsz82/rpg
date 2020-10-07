@@ -221,13 +221,13 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
 
     protected abstract void removeAssetFromList(List<A> assetsToRemove);
 
-    protected void clonePrototypePos(Coords rawPos, A p, A w) {
+    protected void clonePrototypePos(Coords rawPos, A prototype, A item) {
         Coords pos = rawPos.clonePos();
         if (!pos.is0()) {
-            double height = p.getImage().getHeight() / Sizes.getMeter();
+            double height = prototype.getImage().getHeight() / Sizes.getMeter();
             pos.y = pos.y - height;
         }
-        w.setPos(pos);
+        item.setPos(pos);
     }
 
     private void removeContent(List<A> assetsToRemove) {
