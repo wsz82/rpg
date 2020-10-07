@@ -1,4 +1,4 @@
-package game.view.world;
+package game.view.world.canvas;
 
 import game.model.GameController;
 import game.model.textures.Cursor;
@@ -53,13 +53,13 @@ public abstract class CanvasView {
         };
     }
 
-    protected void adjustCoverOpacity(Creature cr, PosItem pi) {
+    protected void adjustCoverOpacity(Creature cr, PosItem<?,?> pi) {
         visibleControllables.clear();
         visibleControllables.add(cr);
         adjustCoverOpacity(visibleControllables, pi);
     }
 
-    protected void adjustCoverOpacity(List<Creature> visibleControllables, PosItem pi) {
+    protected void adjustCoverOpacity(List<Creature> visibleControllables, PosItem<?,?> pi) {
         if (pi.getActualCoverLine().isEmpty()) return;
         for (Creature cr : visibleControllables) {
             if (pi.getPos().level != cr.getPos().level) {
@@ -132,12 +132,12 @@ public abstract class CanvasView {
         gc.drawImage(img, x, y);
     }
 
-    protected void setDropAnimationPos(Equipment e) {
+    protected void setDropAnimationPos(Equipment<?,?> e) {
         EquipmentAnimationPos animationPos = e.getAnimationPos();
         animationPos.setCurAnimation(EquipmentAnimationType.DROP);
     }
 
-    protected <A extends PosItem> void setAppropriateCursor(Creature selected, Coords pos,
+    protected <A extends PosItem<?,?>> void setAppropriateCursor(Creature selected, Coords pos,
                                                             double minX, double minY,
                                                             double maxX, double maxY,
                                                             List<A> items) {
@@ -145,7 +145,7 @@ public abstract class CanvasView {
             return;
         }
         Cursor cursor = controller.getCursor();
-        PosItem item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
+        PosItem<?,?> item = board.lookForItem(items, pos.x, pos.y, pos.level, CURSOR_TYPES, false);
 
         if (selected == null) {
             cursor.setCursor(CursorType.MAIN);

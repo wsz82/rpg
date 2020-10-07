@@ -7,6 +7,7 @@ import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.Equipment;
 import io.wsz.model.item.PosItem;
+import io.wsz.model.item.draw.ItemsDrawer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
@@ -20,6 +21,7 @@ import java.util.List;
 public class DropViewElement extends EquipmentViewElement {
     private final Coords creaturePos = new Coords();
     private final FoggableDelegate foggableDelegate;
+    private final ItemsDrawer drawer;
 
     private List<PosItem<?,?>> sortedItems;
     private List<Equipment<?,?>> droppedEquipment;
@@ -35,6 +37,12 @@ public class DropViewElement extends EquipmentViewElement {
     public DropViewElement(Canvas canvas, GameController gameController, Coords mousePos) {
         super(canvas, gameController, mousePos);
         this.foggableDelegate = new FoggableDelegate(gameController, canvas, curPos, viewPos);
+        this.drawer = new ItemsDrawer();
+        initDrawer();
+    }
+
+    private void initDrawer() {
+        drawer.setEquipmentDrawer(this::playDropAnimation);
     }
 
     @Override
@@ -130,23 +138,20 @@ public class DropViewElement extends EquipmentViewElement {
     @Override
     protected final void drawEquipment() {
         Creature cr = controller.getCreatureToOpenInventory();
-        for (PosItem<?,?> pi : sortedItems) {
-            adjustCoverOpacity(cr, pi);
+        for (PosItem<?,?> item : sortedItems) {
+            adjustCoverOpacity(cr, item);
 
-            if (pi == cr) {
+            if (item == cr) {
                 drawCreatureBase(cr);
             }
 
-            Coords pos = pi.getPos();
+            Coords pos = item.getPos();
             Coords corrected = currentPosCorrection(pos);
             int meter = Sizes.getMeter();
             double x = corrected.x * meter;
             double y = corrected.y * meter;
-            if (pi instanceof Equipment) { //TODO generic
-                Equipment<?,?> e = (Equipment<?,?>) pi;
-                playDropAnimation(e);
-            }
-            Image img = pi.getImage().getFxImage();
+            item.draw(drawer);
+            Image img = item.getImage().getFxImage();
             double viewX = viewPos.x * meter;
             double viewY = viewPos.y * meter;
             double viewWidth = this.viewWidth * meter;

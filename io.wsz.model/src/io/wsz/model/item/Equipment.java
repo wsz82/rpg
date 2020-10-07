@@ -3,6 +3,8 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
+import io.wsz.model.item.draw.Drawer;
+import io.wsz.model.item.draw.ItemsDrawer;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.item.movement.InventoryCountableMover;
@@ -235,6 +237,13 @@ public abstract class Equipment<E extends Equipment<E, B>, B extends EquipmentAn
     @Override
     public Equipment<?,?> pickEquipment() {
         return this;
+    }
+
+    @Override
+    public void draw(ItemsDrawer drawer) {
+        Drawer<Equipment<?, ?>> equipmentDrawer = drawer.getEquipmentDrawer();
+        if (equipmentDrawer == null) return;
+        equipmentDrawer.draw(this);
     }
 
     public InventoryPlaceType getIndividualOccupiedPlace() {

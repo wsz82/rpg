@@ -5,13 +5,17 @@ import game.model.setting.KeyAction;
 import game.model.setting.Settings;
 import game.model.textures.Cursor;
 import game.model.world.GameRunner;
-import game.view.world.CanvasView;
 import game.view.world.FoggableDelegate;
+import game.view.world.canvas.CanvasView;
 import game.view.world.dialog.DialogView;
 import game.view.world.inventory.InventoryView;
 import io.wsz.model.animation.creature.CreatureBaseAnimationType;
 import io.wsz.model.animation.cursor.CursorType;
-import io.wsz.model.item.*;
+import io.wsz.model.item.Creature;
+import io.wsz.model.item.CreatureControl;
+import io.wsz.model.item.ItemType;
+import io.wsz.model.item.PosItem;
+import io.wsz.model.item.draw.ItemsDrawer;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
@@ -54,6 +58,7 @@ public class GameView extends CanvasView {
     private final BarView barView;
     private final Coords curPos;
     private final FoggableDelegate foggableDelegate;
+    private final ItemsDrawer drawer;
 
     private long nextAvailableClickTime;
     private EventHandler<MouseEvent> clickEvent;
@@ -71,9 +76,16 @@ public class GameView extends CanvasView {
         mousePos = new Coords();
         curPos = controller.getCurPos();
         foggableDelegate = new FoggableDelegate(gameController, canvas, curPos);
+        this.drawer = new ItemsDrawer();
+        initDrawer();
         hookUpEvents();
         defineRemovableEvents();
         hookUpRemovableEvents();
+    }
+
+    private void initDrawer() {
+        drawer.setCreatureDrawer(this::drawCreatureBase);
+        drawer.setEquipmentDrawer(this::setDropAnimationPos);
     }
 
     public void refresh(List<PosItem<?,?>> sortedItems) {
@@ -154,25 +166,19 @@ public class GameView extends CanvasView {
     }
 
     private void drawItems(List<PosItem<?,?>> sortedItems, List<Creature> heroes) {
-        for (PosItem<?,?> pi : sortedItems) {
+        for (PosItem<?,?> item : sortedItems) {
             if (heroes != null) {
-                adjustCoverOpacity(heroes, pi);
+                adjustCoverOpacity(heroes, item);
             }
 
-            Coords pos = pi.getPos();
+            Coords pos = item.getPos();
             Coords translatedPos = translateCoordsToScreenCoords(pos);
             int meter = Sizes.getMeter();
             double x = translatedPos.x * meter;
             double y = translatedPos.y * meter;
 
-            if (pi instanceof Creature) { //TODO generic
-                Creature cr = (Creature) pi;
-                drawCreatureBase(cr);
-            } else if (pi instanceof Equipment) {
-                Equipment<?,?> e = (Equipment<?,?>) pi;
-                setDropAnimationPos(e);
-            }
-            Image img = pi.getImage().getFxImage();
+            item.draw(drawer);
+            Image img = item.getImage().getFxImage();
 
             cutImageAndDraw(x, y, img, 0, 0, canvas.getWidth(), canvas.getHeight());
 

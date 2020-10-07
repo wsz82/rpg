@@ -1,7 +1,7 @@
 package game.view.world.inventory;
 
 import game.model.GameController;
-import game.view.world.CanvasView;
+import game.view.world.canvas.CanvasView;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.EquipmentAnimationType;
 import io.wsz.model.item.Creature;

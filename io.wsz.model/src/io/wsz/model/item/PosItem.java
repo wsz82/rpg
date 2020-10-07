@@ -6,6 +6,7 @@ import io.wsz.model.animation.AnimationPos;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
+import io.wsz.model.item.draw.ItemsDrawer;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.Script;
@@ -584,6 +585,8 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
         }
         return false;
     }
+
+    public void draw(ItemsDrawer drawer) {}
 
     public String getItemId() {
         return itemId;
