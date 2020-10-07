@@ -435,6 +435,10 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
         getController().getLogger().logCannotReceive(getName());
     }
 
+    public Equipment<?,?> pickEquipment() {
+        return null;
+    }
+
     @Override
     public String getAssetId() {
         if (prototype != null) {

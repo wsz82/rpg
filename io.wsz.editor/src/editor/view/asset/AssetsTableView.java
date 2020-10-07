@@ -176,16 +176,15 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         }
     }
 
-    private void addItemsToContainable(ItemsStage itemsStage) {
+    private void addItemsToContainable(ItemsStage<?,?> itemsStage) {
         Coords pos = new Coords(0, 0);
         List<A> createdItems = createItems(pos);
-        for (A item : createdItems) { //TODO generic
-            if (item instanceof Equipment) {
-                Image img = item.getImage().getFxImage();
-                if (isImageTooBig(item, img)) continue;
-                Equipment e = (Equipment) item;
-                itemsStage.addEquipment(e);
-            }
+        for (A item : createdItems) {
+            Image img = item.getImage().getFxImage();
+            if (isImageTooBig(item, img)) continue;
+            Equipment<?, ?> equipment = item.pickEquipment();
+            if (equipment == null) continue;
+            itemsStage.addItem(equipment);
         }
     }
 

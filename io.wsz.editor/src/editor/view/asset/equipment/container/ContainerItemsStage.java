@@ -15,8 +15,8 @@ public class ContainerItemsStage extends ItemsStage<Container, TableItem> {
     }
 
     @Override
-    protected TableItem getNewEquipment(Equipment e) {
-        int count = getCount(e);
-        return new TableItem(e, count);
+    protected TableItem getNewEquipment(Equipment<?,?> equipment) {
+        int count = equipment.getAmount();
+        return new TableItem(equipment, count);
     }
 }

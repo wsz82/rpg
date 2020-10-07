@@ -232,6 +232,11 @@ public abstract class Equipment<E extends Equipment<E, B>, B extends EquipmentAn
 
     public void setAmount(Integer count) {}
 
+    @Override
+    public Equipment<?,?> pickEquipment() {
+        return this;
+    }
+
     public InventoryPlaceType getIndividualOccupiedPlace() {
         return occupiedPlace;
     }

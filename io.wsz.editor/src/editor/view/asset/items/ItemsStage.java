@@ -7,7 +7,6 @@ import editor.view.stage.EditorCanvas;
 import editor.view.utilities.SafeIntegerStringConverter;
 import io.wsz.model.item.Containable;
 import io.wsz.model.item.Equipment;
-import io.wsz.model.item.EquipmentMayCountable;
 import io.wsz.model.item.list.EquipmentList;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -222,12 +221,12 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
     protected ObservableList<I> getTableItems(List<Equipment<?,?>> items) {
         tableItems = FXCollections.observableArrayList();
         for (Equipment<?,?> e : items) {
-            addEquipment(e);
+            addItem(e);
         }
         return tableItems;
     }
 
-    public void addEquipment(Equipment<?,?> toAdd) {
+    public void addItem(Equipment<?,?> toAdd) {
         boolean isInList = tableItems.stream()
                 .anyMatch(t -> t.getEquipment().isUnitIdentical(toAdd));
         if (isInList) {
@@ -236,11 +235,7 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
                 Equipment<?,?> tiEquipment = ti.getEquipment();
                 if (tiEquipment.isUnitIdentical(toAdd) && isEquipmentNotAddedYet(toAdd, alreadyAdded)) {
                     alreadyAdded.add(toAdd);
-                    int count = 1;
-                    if (tiEquipment.isCountable()) {
-                        EquipmentMayCountable<?,?> countable = (EquipmentMayCountable<?,?>) toAdd; //TODO geenric
-                        count = countable.getAmount();
-                    }
+                    int count = toAdd.getAmount();
                     ti.setCount(ti.getCount() + count);
                 }
             }
@@ -253,18 +248,9 @@ public abstract class ItemsStage<C extends Containable, I extends TableItem> ext
         }
     }
 
-    private boolean isEquipmentNotAddedYet(Equipment<?,?> e, Set<Equipment<?,?>> alreadyAdded) {
-        return !alreadyAdded.contains(e);
+    private boolean isEquipmentNotAddedYet(Equipment<?,?> equipment, Set<Equipment<?,?>> items) {
+        return !items.contains(equipment);
     }
 
-    protected abstract I getNewEquipment(Equipment<?,?> e) ;
-
-    protected int getCount(Equipment<?,?> e) {
-        int count = 1;
-        if (e.isCountable()) {
-            EquipmentMayCountable<?,?> countable = (EquipmentMayCountable<?,?>) e;
-            count = countable.getAmount();
-        }
-        return count;
-    }
+    protected abstract I getNewEquipment(Equipment<?,?> item) ;
 }

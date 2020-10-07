@@ -10,11 +10,11 @@ import java.util.Objects;
 public class InventoryTableItem extends TableItem {
     private final BooleanProperty isWorn = new SimpleBooleanProperty(false, "isWorn");
 
-    public InventoryTableItem(Equipment equipment, int count) {
+    public InventoryTableItem(Equipment<?,?> equipment, int count) {
         super(equipment, count);
     }
 
-    public InventoryTableItem(Equipment equipment, int count, boolean isWorn) {
+    public InventoryTableItem(Equipment<?,?> equipment, int count, boolean isWorn) {
         super(equipment, count);
         this.isWorn.setValue(isWorn);
     }

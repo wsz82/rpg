@@ -5,15 +5,15 @@ import io.wsz.model.item.Equipment;
 import java.util.Objects;
 
 public class TableItem {
-    private final Equipment equipment;
+    private final Equipment<?,?> equipment;
     private int count;
 
-    public TableItem(Equipment equipment, int count) {
+    public TableItem(Equipment<?,?> equipment, int count) {
         this.equipment = equipment;
         this.count = count;
     }
 
-    public Equipment getEquipment() {
+    public Equipment<?,?> getEquipment() {
         return equipment;
     }
 

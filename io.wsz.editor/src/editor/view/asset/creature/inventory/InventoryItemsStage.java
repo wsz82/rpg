@@ -49,9 +49,9 @@ public class InventoryItemsStage extends ItemsStage<Creature, InventoryTableItem
     }
 
     @Override
-    protected InventoryTableItem getNewEquipment(Equipment<?,?> e) {
-        int count = getCount(e);
-        return new InventoryTableItem(e, count);
+    protected InventoryTableItem getNewEquipment(Equipment<?,?> equipment) {
+        int count = equipment.getAmount();
+        return new InventoryTableItem(equipment, count);
     }
 
     @Override
