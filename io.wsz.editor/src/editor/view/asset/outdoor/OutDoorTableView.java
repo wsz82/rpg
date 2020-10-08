@@ -2,6 +2,7 @@ package editor.view.asset.outdoor;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.OutDoor;
 import io.wsz.model.stage.Coords;
@@ -67,6 +68,11 @@ public class OutDoorTableView extends AssetsTableView<OutDoor> {
     @Override
     protected void removeAssetFromList(List<OutDoor> assetsToRemove) {
         controller.getObservableAssets().getOutDoors().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<OutDoor> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getOutDoors();
     }
 
 }

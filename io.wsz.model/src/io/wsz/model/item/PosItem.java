@@ -7,6 +7,7 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.draw.ItemsDrawer;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.Script;
@@ -150,16 +151,16 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
     protected void changeLocation(Location from, Coords exit) {
         Location target = exit.getLocation();
         if (!from.equals(target)) {
-            ItemsList itemsToRemove = from.getItemsToRemove();
+            AbstractItemsList itemsToRemove = from.getItemsToRemove();
             addItemToList(itemsToRemove);
-            ItemsList itemsToAdd = target.getItemsToAdd();
+            AbstractItemsList itemsToAdd = target.getItemsToAdd();
             addItemToList(itemsToAdd);
         }
     }
 
-    public abstract void addItemToList(ItemsList list);
+    public abstract void addItemToList(AbstractItemsList list);
 
-    public abstract void removeItemFromList(ItemsList list);
+    public abstract void removeItemFromList(AbstractItemsList list);
 
     public boolean withinRange(Coords pos, double range, double sizeWidth, double sizeHeight) {
         return Geometry.isPointWithinOval(getInteractionPoint(), pos, sizeWidth + 2*range, sizeHeight + 2*range);

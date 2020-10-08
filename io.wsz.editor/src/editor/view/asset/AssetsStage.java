@@ -8,6 +8,7 @@ import editor.view.asset.equipment.countable.misc.MiscTableView;
 import editor.view.asset.equipment.countable.weapon.WeaponsTableView;
 import editor.view.asset.indoor.InDoorTableView;
 import editor.view.asset.landscape.LandscapeTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.asset.outdoor.OutDoorTableView;
 import editor.view.asset.teleport.TeleportTableView;
 import editor.view.content.ContentTableView;

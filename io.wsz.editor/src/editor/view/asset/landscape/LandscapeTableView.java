@@ -2,6 +2,7 @@ package editor.view.asset.landscape;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Landscape;
 import io.wsz.model.stage.Coords;
@@ -50,6 +51,11 @@ public class LandscapeTableView extends AssetsTableView<Landscape> {
     @Override
     protected void removeAssetFromList(List<Landscape> assetsToRemove) {
         controller.getObservableAssets().getLandscapes().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<Landscape> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getLandscapes();
     }
 
 }

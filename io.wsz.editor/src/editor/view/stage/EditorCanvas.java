@@ -10,6 +10,7 @@ import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import io.wsz.model.stage.Geometry;
 import io.wsz.model.stage.ResolutionImage;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
@@ -59,7 +60,7 @@ public class EditorCanvas extends Canvas {
         double canvasHeight = getHeight();
         double bottom = top + canvasHeight/ meter;
 
-        List<PosItem<?,?>> items = controller.getCurrentObservableLocation().getItems();
+        List<PosItem<?,?>> items = controller.getCurrentObservableLocation().getItemsList().getMergedList();
         items = items.stream()
                 .filter(PosItem::isVisible)
                 .filter(pi -> {
@@ -259,10 +260,13 @@ public class EditorCanvas extends Canvas {
             if (!c.next()) {
                 return;
             }
+            //TODO correct performance
+            List<PosItem<?, ?>> mergedList = controller.getCurrentObservableLocation().getItemsList().getMergedList();
+            contentTableView.setItems(FXCollections.observableArrayList(mergedList));
             refresh();
         };
         CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
-        currentObservableLocation.getItems().addListener(locationListener);
+        currentObservableLocation.getItemsList().addListener(locationListener);
     }
 
     private void hookUpItemDragEvents() {
@@ -331,7 +335,7 @@ public class EditorCanvas extends Canvas {
         double x = translated.x;
         double y = translated.y;
         ItemType[] types = ItemType.values();
-        List<PosItem<?,?>> items = currentObservableLocation.getItems();
+        List<PosItem<?,?>> items = currentObservableLocation.getItemsList().getMergedList();
         return controller.getBoard().lookForItem(items, x, y, level, types, true);
     }
 
@@ -447,7 +451,7 @@ public class EditorCanvas extends Canvas {
     }
 
     private void removeItem(PosItem<?,?> pi) {
-        controller.getCurrentObservableLocation().getItems().remove(pi);
+        controller.getCurrentObservableLocation().getItemsList().remove(pi);
         refresh();
     }
 

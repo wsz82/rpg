@@ -5,6 +5,8 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.container.ContainerAnimation;
 import io.wsz.model.animation.equipment.container.ContainerAnimationPos;
 import io.wsz.model.animation.openable.OpenableAnimationType;
+import io.wsz.model.item.list.AbstractEquipmentList;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.script.command.ItemMover;
@@ -39,7 +41,7 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public void removeItemFromList(ItemsList list) {
+    public void removeItemFromList(AbstractItemsList list) {
         removeItemFromEquipmentList(list.getEquipment());
     }
 
@@ -67,12 +69,12 @@ public class Container extends Equipment<Container, ContainerAnimationPos> imple
     }
 
     @Override
-    public void addItemToEquipmentList(EquipmentList list) {
+    public void addItemToEquipmentList(AbstractEquipmentList list) {
         list.getContainers().add(this);
     }
 
     @Override
-    public void removeItemFromEquipmentList(EquipmentList equipment) {
+    public void removeItemFromEquipmentList(AbstractEquipmentList equipment) {
         equipment.getContainers().remove(this);
     }
 

@@ -1,6 +1,6 @@
 package editor.view.location;
 
-import io.wsz.model.item.PosItem;
+import editor.view.asset.lists.ObservableItemsList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.layer.Layer;
 import io.wsz.model.location.Location;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class CurrentObservableLocation {
     private final ObjectProperty<Location> locationProperty = new SimpleObjectProperty<>();
     private final ObservableList<Layer> layers = FXCollections.observableArrayList();
-    private final ObservableList<PosItem<?,?>> items = FXCollections.observableArrayList();
+    private final ObservableItemsList itemsList = new ObservableItemsList(true);
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final DoubleProperty heightProperty = new SimpleDoubleProperty();
     private final StringProperty idProperty = new SimpleStringProperty();
@@ -26,8 +26,8 @@ public class CurrentObservableLocation {
             this.widthProperty.set(location.getWidth());
             this.heightProperty.set(location.getHeight());
             this.idProperty.set(location.getId());
-            this.items.clear();
-            this.items.addAll(location.getItemsList().getMergedList());
+            this.itemsList.clear();
+            this.itemsList.addAll(location.getItemsList().getMergedList());
             this.layers.clear();
             this.layers.addAll(location.getLayers());
             this.locationProperty.set(location);
@@ -36,7 +36,7 @@ public class CurrentObservableLocation {
             this.heightProperty.set(0);
             this.idProperty.set(null);
             this.layers.clear();
-            this.items.clear();
+            this.itemsList.clear();
             this.locationProperty.set(null);
         }
     }
@@ -45,7 +45,7 @@ public class CurrentObservableLocation {
         Location current = this.locationProperty.get();
         if (current != null) {
             ItemsList items = new ItemsList(true);
-            items.fillLists(this.items);
+            items.fillWith(this.itemsList);
             current.setItemsList(items);
             current.setLayers(new ArrayList<>(layers));
         }
@@ -98,8 +98,8 @@ public class CurrentObservableLocation {
         this.idProperty.set(name);
     }
 
-    public ObservableList<PosItem<?,?>> getItems() {
-        return items;
+    public ObservableItemsList getItemsList() {
+        return itemsList;
     }
 
     public ObservableList<Layer> getLayers() {

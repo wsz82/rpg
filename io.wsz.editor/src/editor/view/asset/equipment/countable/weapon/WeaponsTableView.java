@@ -2,6 +2,7 @@ package editor.view.asset.equipment.countable.weapon;
 
 import editor.model.EditorController;
 import editor.view.asset.equipment.EquipmentTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Weapon;
 import io.wsz.model.stage.Coords;
@@ -92,4 +93,8 @@ public class WeaponsTableView extends EquipmentTableView<Weapon> {
         controller.getObservableAssets().getWeapons().removeAll(assetsToRemove);
     }
 
+    @Override
+    protected List<Weapon> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getWeapons();
+    }
 }

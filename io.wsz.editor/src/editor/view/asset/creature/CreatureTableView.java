@@ -2,6 +2,7 @@ package editor.view.asset.creature;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Creature;
 import io.wsz.model.stage.Coords;
@@ -78,6 +79,11 @@ public class CreatureTableView extends AssetsTableView<Creature> {
     @Override
     protected void removeAssetFromList(List<Creature> assetsToRemove) {
         controller.getObservableAssets().getCreatures().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<Creature> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getCreatures();
     }
 
 }

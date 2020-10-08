@@ -2,6 +2,7 @@ package editor.view.asset.teleport;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Teleport;
 import io.wsz.model.location.Location;
@@ -95,6 +96,11 @@ public class TeleportTableView extends AssetsTableView<Teleport> {
     @Override
     protected void removeAssetFromList(List<Teleport> assetsToRemove) {
         controller.getObservableAssets().getTeleports().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<Teleport> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getTeleports();
     }
 
 }

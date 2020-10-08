@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.Animation;
 import io.wsz.model.animation.AnimationPos;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
@@ -43,12 +44,12 @@ public class Teleport extends PosItem<Teleport, AnimationPos> {
     }
 
     @Override
-    public void addItemToList(ItemsList list) {
+    public void addItemToList(AbstractItemsList list) {
         list.getTeleports().add(this);
     }
 
     @Override
-    public void removeItemFromList(ItemsList list) {
+    public void removeItemFromList(AbstractItemsList list) {
         list.getTeleports().remove(this);
     }
 

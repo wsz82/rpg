@@ -5,7 +5,8 @@ import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.item.draw.Drawer;
 import io.wsz.model.item.draw.ItemsDrawer;
-import io.wsz.model.item.list.EquipmentList;
+import io.wsz.model.item.list.AbstractEquipmentList;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.item.movement.InventoryCountableMover;
 import io.wsz.model.item.movement.InventoryEquipmentMover;
@@ -58,18 +59,18 @@ public abstract class Equipment<E extends Equipment<E, B>, B extends EquipmentAn
     }
 
     @Override
-    public void addItemToList(ItemsList list) {
+    public void addItemToList(AbstractItemsList list) {
         addItemToEquipmentList(list.getEquipment());
     }
 
     @Override
-    public void removeItemFromList(ItemsList list) {
+    public void removeItemFromList(AbstractItemsList list) {
         removeItemFromEquipmentList(list.getEquipment());
     }
 
-    public abstract void addItemToEquipmentList(EquipmentList list);
+    public abstract void addItemToEquipmentList(AbstractEquipmentList list);
 
-    public abstract void removeItemFromEquipmentList(EquipmentList list);
+    public abstract void removeItemFromEquipmentList(AbstractEquipmentList list);
 
     @Override
     public boolean tryTake(Creature cr) {

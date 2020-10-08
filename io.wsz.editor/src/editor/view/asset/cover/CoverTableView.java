@@ -2,6 +2,7 @@ package editor.view.asset.cover;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.Cover;
 import io.wsz.model.stage.Coords;
@@ -51,6 +52,11 @@ public class CoverTableView extends AssetsTableView<Cover> {
     @Override
     protected void removeAssetFromList(List<Cover> assetsToRemove) {
         controller.getObservableAssets().getCovers().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<Cover> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getCovers();
     }
 
 }

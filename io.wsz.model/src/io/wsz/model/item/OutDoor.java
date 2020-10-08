@@ -3,6 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.door.DoorAnimation;
 import io.wsz.model.animation.openable.OpenableAnimationType;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Paths;
@@ -38,12 +39,12 @@ public class OutDoor extends Door<OutDoor> {
     }
 
     @Override
-    public void addItemToList(ItemsList list) {
+    public void addItemToList(AbstractItemsList list) {
         list.getOutDoors().add(this);
     }
 
     @Override
-    public void removeItemFromList(ItemsList list) {
+    public void removeItemFromList(AbstractItemsList list) {
         list.getOutDoors().remove(this);
     }
 

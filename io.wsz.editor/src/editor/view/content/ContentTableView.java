@@ -14,6 +14,7 @@ import io.wsz.model.location.Location;
 import io.wsz.model.sizes.Sizes;
 import io.wsz.model.stage.Coords;
 import javafx.beans.binding.ObjectBinding;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -49,7 +50,8 @@ public class ContentTableView extends TableView<PosItem<?,?>> {
 
     public void initTable() {
         CurrentObservableLocation currentObservableLocation = controller.getCurrentObservableLocation();
-        ObservableList<PosItem<?,?>> items = currentObservableLocation.getItems();
+        List<PosItem<?, ?>> mergedList = currentObservableLocation.getItemsList().getMergedList();
+        ObservableList<PosItem<?,?>> items = FXCollections.observableArrayList(mergedList);
         setItems(items);
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -170,12 +172,12 @@ public class ContentTableView extends TableView<PosItem<?,?>> {
 
     void removeContents() {
         ObservableList<PosItem<?,?>> itemsToRemove = getSelectionModel().getSelectedItems();
-        controller.getCurrentObservableLocation().getItems().removeAll(itemsToRemove);
+        controller.getCurrentObservableLocation().getItemsList().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {
         List<PosItem<?,?>> itemsToChange = getSelectionModel().getSelectedItems();
-        for (PosItem pi : itemsToChange) {
+        for (PosItem<?,?> pi : itemsToChange) {
             pi.setVisible(!pi.isVisible());
         }
     }

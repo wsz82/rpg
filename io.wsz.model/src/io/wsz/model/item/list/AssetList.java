@@ -2,13 +2,12 @@ package io.wsz.model.item.list;
 
 import io.wsz.model.item.PosItem;
 
-import java.io.Externalizable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class AssetList<A extends PosItem<?, ?>> implements Externalizable {
-    private static final long serialVersionUID = -8566605384307998319L;
+public abstract class AssetList<A extends PosItem<?, ?>> {
+    private static final long serialVersionUID = -8566605384307998319L; //TODO remove
 
     public abstract void add(A item);
 

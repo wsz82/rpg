@@ -2,8 +2,8 @@ package editor.model;
 
 import editor.model.settings.SettingsCaretaker;
 import editor.model.settings.SettingsMemento;
-import editor.view.asset.ObservableItemsList;
 import editor.view.asset.items.ItemsStage;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.layer.CurrentObservableLayer;
 import editor.view.location.CurrentObservableLocation;
 import editor.view.plugin.PluginSettingsStage;
@@ -38,7 +38,7 @@ import java.util.Optional;
 public class EditorController extends Controller {
     private final CurrentObservableLocation currentObservableLocation = new CurrentObservableLocation();
     private final CurrentObservableLayer currentObservableLayer = new CurrentObservableLayer();
-    private final ObservableItemsList observableAssetsList = new ObservableItemsList();
+    private final ObservableItemsList observableAssetsList = new ObservableItemsList(true);
     private final ObservableList<Location> observableLocations = FXCollections.observableArrayList();
     private final ObservableList<EquipmentType> observableEquipmentTypes = FXCollections.observableArrayList();
     private final ObservableList<InventoryPlaceType> observableInventoryPlaceTypes = FXCollections.observableArrayList();
@@ -123,7 +123,7 @@ public class EditorController extends Controller {
     }
 
     private void clearObservableLists() {
-        observableAssetsList.clearLists();
+        observableAssetsList.clear();
         observableLocations.clear();
         observableEquipmentTypes.clear();
         observableLocations.clear();
@@ -308,7 +308,7 @@ public class EditorController extends Controller {
     }
 
     private void restoreObservableAssets(World world) {
-        observableAssetsList.fillLists(world.getAssets());
+        observableAssetsList.fillWith(world.getAssets());
     }
 
     private void restoreFirstLocationAndLayer(List<Location> locations) {

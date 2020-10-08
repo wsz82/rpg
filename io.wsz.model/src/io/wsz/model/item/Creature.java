@@ -6,6 +6,7 @@ import io.wsz.model.animation.creature.*;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.item.draw.Drawer;
 import io.wsz.model.item.draw.ItemsDrawer;
+import io.wsz.model.item.list.AbstractItemsList;
 import io.wsz.model.item.list.EquipmentList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.location.FogStatusWithImage;
@@ -369,12 +370,12 @@ public class Creature extends PosItem<Creature, CreatureAnimationPos> implements
     }
 
     @Override
-    public void addItemToList(ItemsList list) {
+    public void addItemToList(AbstractItemsList list) {
         list.getCreatures().add(this);
     }
 
     @Override
-    public void removeItemFromList(ItemsList list) {
+    public void removeItemFromList(AbstractItemsList list) {
         list.getCreatures().remove(this);
     }
 

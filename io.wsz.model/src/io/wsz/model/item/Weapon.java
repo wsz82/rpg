@@ -3,7 +3,7 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
 import io.wsz.model.animation.equipment.countable.EquipmentMayCountableAnimation;
-import io.wsz.model.item.list.EquipmentMayCountableList;
+import io.wsz.model.item.list.AbstractEquipmentMayCountableList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.sizes.Paths;
 import io.wsz.model.sizes.Sizes;
@@ -48,12 +48,12 @@ public class Weapon extends EquipmentMayCountable<Weapon, EquipmentAnimationPos>
     }
 
     @Override
-    public void addItemToEquipmentMayCountableList(EquipmentMayCountableList list) {
+    public void addItemToEquipmentMayCountableList(AbstractEquipmentMayCountableList list) {
         list.getWeapons().add(this);
     }
 
     @Override
-    public void removeItemFromEquipmentMayCountableList(EquipmentMayCountableList list) {
+    public void removeItemFromEquipmentMayCountableList(AbstractEquipmentMayCountableList list) {
         list.getWeapons().remove(this);
     }
 

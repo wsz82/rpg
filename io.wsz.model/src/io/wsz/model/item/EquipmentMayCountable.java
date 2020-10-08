@@ -3,8 +3,8 @@ package io.wsz.model.item;
 import io.wsz.model.Controller;
 import io.wsz.model.animation.cursor.CursorType;
 import io.wsz.model.animation.equipment.EquipmentAnimationPos;
-import io.wsz.model.item.list.EquipmentList;
-import io.wsz.model.item.list.EquipmentMayCountableList;
+import io.wsz.model.item.list.AbstractEquipmentList;
+import io.wsz.model.item.list.AbstractEquipmentMayCountableList;
 import io.wsz.model.item.list.ItemsList;
 import io.wsz.model.item.movement.InventoryCountableMover;
 import io.wsz.model.location.Location;
@@ -42,18 +42,18 @@ public abstract class EquipmentMayCountable<E extends EquipmentMayCountable<E,A>
     public abstract E cloneEquipment(boolean keepId);
 
     @Override
-    public final void addItemToEquipmentList(EquipmentList list) {
+    public final void addItemToEquipmentList(AbstractEquipmentList list) {
         addItemToEquipmentMayCountableList(list.getEquipmentMayCountableList());
     }
 
     @Override
-    public final void removeItemFromEquipmentList(EquipmentList list) {
+    public final void removeItemFromEquipmentList(AbstractEquipmentList list) {
         removeItemFromEquipmentMayCountableList(list.getEquipmentMayCountableList());
     }
 
-    public abstract void addItemToEquipmentMayCountableList(EquipmentMayCountableList list);
+    public abstract void addItemToEquipmentMayCountableList(AbstractEquipmentMayCountableList list);
 
-    public abstract void removeItemFromEquipmentMayCountableList(EquipmentMayCountableList list);
+    public abstract void removeItemFromEquipmentMayCountableList(AbstractEquipmentMayCountableList list);
 
     @Override
     public Double getWeight() {

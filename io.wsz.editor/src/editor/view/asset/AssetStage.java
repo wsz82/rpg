@@ -202,7 +202,7 @@ public abstract class AssetStage<A extends PosItem<?,?>> extends ChildStage {
         if (inputFileIsEmpty) {
             return;
         }
-        List<PosItem<?,?>> assets = controller.getObservableAssets().getMergedAssets();
+        List<PosItem<?,?>> assets = controller.getObservableAssets().getMergedList();
         boolean doesAssetIdAlreadyExist = assets.stream()
                 .anyMatch(a -> a.getAssetId().equals(assetId));
         if (doesAssetIdAlreadyExist) {

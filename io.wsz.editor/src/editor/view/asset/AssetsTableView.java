@@ -2,6 +2,7 @@ package editor.view.asset;
 
 import editor.model.EditorController;
 import editor.view.asset.items.ItemsStage;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.content.ContentTableView;
 import editor.view.stage.EditorCanvas;
 import editor.view.stage.Pointer;
@@ -142,7 +143,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
     }
 
     private boolean assetIdIsNotUnique(String newValue) {
-        return controller.getObservableAssets().getMergedAssets().stream()
+        return controller.getObservableAssets().getMergedList().stream()
                 .anyMatch(p -> p.getAssetId().equals(newValue));
     }
 
@@ -172,7 +173,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         for (A item : createdItems) {
             Image img = item.getImage().getFxImage();
             if (isImageTooBig(item, img)) continue;
-            controller.getCurrentObservableLocation().getItems().add(item);
+            controller.getCurrentObservableLocation().getItemsList().add(item);
         }
     }
 
@@ -234,7 +235,7 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
         List<String> assetsIds = assetsToRemove.stream()
                 .map(Asset::getAssetId)
                 .collect(Collectors.toList());
-        ObservableList<PosItem<?, ?>> observableItems = controller.getCurrentObservableLocation().getItems();
+        List<A> observableItems = getConcreteObservableItems(controller.getCurrentObservableLocation().getItemsList());
         controller.getObservableLocations().forEach(location -> {
            ItemsList itemsList = location.getItemsList();
            List<PosItem<?,?>> contentToRemove = new ArrayList<>();
@@ -247,6 +248,8 @@ public abstract class AssetsTableView<A extends PosItem<?,?>> extends TableView<
            observableItems.removeAll(contentToRemove);
         });
     }
+
+    protected abstract List<A> getConcreteObservableItems(ObservableItemsList itemsList);
 
     public void setPointer(Pointer p) {
         pointer = p;

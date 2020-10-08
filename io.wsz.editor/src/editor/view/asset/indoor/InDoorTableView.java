@@ -2,6 +2,7 @@ package editor.view.asset.indoor;
 
 import editor.model.EditorController;
 import editor.view.asset.AssetsTableView;
+import editor.view.asset.lists.ObservableItemsList;
 import editor.view.stage.EditorCanvas;
 import io.wsz.model.item.InDoor;
 import io.wsz.model.stage.Coords;
@@ -50,6 +51,11 @@ public class InDoorTableView extends AssetsTableView<InDoor> {
     @Override
     protected void removeAssetFromList(List<InDoor> assetsToRemove) {
         controller.getObservableAssets().getInDoors().removeAll(assetsToRemove);
+    }
+
+    @Override
+    protected List<InDoor> getConcreteObservableItems(ObservableItemsList itemsList) {
+        return itemsList.getInDoors();
     }
 
 }

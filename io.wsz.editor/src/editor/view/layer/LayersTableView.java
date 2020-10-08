@@ -102,15 +102,6 @@ class LayersTableView extends TableView<Layer> {
         TableColumn<Layer, CheckBox> visibleCol = new TableColumn<>("Visibility");
         visibleCol.setEditable(true);
         visibleCol.setCellValueFactory(new CheckBoxCallback<>(visibleGetter, visibleSetter));
-//        visibleCol.setCellValueFactory(p -> {
-//            Layer newLayer = p.getValue();
-//            int level = newLayer.getLevel();
-//            boolean visible = newLayer.isVisible();
-//            updateItemsVisibility(level, visible);
-//            contentTableView.refresh();
-//            editorCanvas.refresh();
-//            return newLayer.getVisibleProperty();
-//        });
 
         ObservableList<TableColumn<Layer, ?>> columns = this.getColumns();
         columns.add(0, levelCol);
@@ -125,7 +116,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void updateItemsLevel(int newLevel, Integer oldLevel) {
-        for (PosItem pi : controller.getCurrentObservableLocation().getItems()) {
+        for (PosItem<?,?> pi : controller.getCurrentObservableLocation().getItemsList().getMergedList()) {
             Coords pos = pi.getPos();
             if (pos.level == oldLevel) {
                 pos.level = newLevel;
@@ -134,7 +125,7 @@ class LayersTableView extends TableView<Layer> {
     }
 
     private void updateItemsVisibility(int level, boolean visible) {
-        for (PosItem pi : controller.getCurrentObservableLocation().getItems()) {
+        for (PosItem<?,?> pi : controller.getCurrentObservableLocation().getItemsList().getMergedList()) {
             if (pi.getPos().level == level) {
                 pi.setVisible(visible);
             }
@@ -166,12 +157,12 @@ class LayersTableView extends TableView<Layer> {
 
     private void removeContentsFromLayers(List<Layer> layersToRemove) {
         List<Integer> levelsToRemove = layersToRemove.stream()
-                .map(l -> l.getLevel())
+                .map(Layer::getLevel)
                 .collect(Collectors.toList());
-        List<PosItem> itemsToRemove = controller.getCurrentObservableLocation().getItems().stream()
+        List<PosItem<?,?>> itemsToRemove = controller.getCurrentObservableLocation().getItemsList().getMergedList().stream()
                 .filter(pi -> levelsToRemove.contains(pi.getPos().level))
                 .collect(Collectors.toList());
-        controller.getCurrentObservableLocation().getItems().removeAll(itemsToRemove);
+        controller.getCurrentObservableLocation().getItemsList().removeAll(itemsToRemove);
     }
 
     public void changeVisibility() {
