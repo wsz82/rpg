@@ -76,28 +76,28 @@ public class EditorCanvas extends Canvas {
         controller.getBoard().sortPosItems(items);
 
         boolean activeContentMarked = false;
-        for (PosItem<?,?> pi : items) {
+        for (PosItem<?,?> item : items) {
             double itemsOpacity = EditorToolBar.getItemsOpacity();
             if (itemsOpacity != 1) {
                 if (EditorToolBar.isLayerOpacity()) {
                     int level = controller.getCurrentObservableLayer().getLevel();
-                    if (pi.getPos().level == level) {
+                    if (item.getPos().level == level) {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 } else {
-                    if (pi == controller.getActiveItem()) {
+                    if (item == controller.getActiveItem()) {
                         gc.setGlobalAlpha(itemsOpacity);
                     }
                 }
             }
 
-            Coords pos = pi.getPos();
+            Coords pos = item.getPos();
             Coords translated = pos.clonePos();
             translated.subtract(curPos);
             double x = (translated.x * meter);
             double y = (translated.y * meter);
 
-            ResolutionImage resolutionImage = pi.getImage();
+            ResolutionImage resolutionImage = item.getImage();
             if (resolutionImage == null) continue;
             double width = resolutionImage.getWidth();
             double height = resolutionImage.getHeight();
@@ -136,9 +136,9 @@ public class EditorCanvas extends Canvas {
             gc.drawImage(img, startX, startY, width, height, destX, destY, width, height);
 
             if (!activeContentMarked
-                    && pi.equals(controller.getActiveItem())) {
+                    && item.equals(controller.getActiveItem())) {
                 activeContentMarked = true;
-                drawActiveContentRectangle(gc, pi);
+                drawActiveContentRectangle(gc, item);
             }
 
             gc.setGlobalAlpha(1);
