@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class AssetList<A extends PosItem<?, ?>> {
-    private static final long serialVersionUID = -8566605384307998319L; //TODO remove
-
     public abstract void add(A item);
 
     public void addAll(AssetList<A> list) {
