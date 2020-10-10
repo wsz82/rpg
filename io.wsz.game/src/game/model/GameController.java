@@ -259,11 +259,11 @@ public class GameController extends Controller {
 
     private void restoreStartLocationAndLayer(Coords startPos) {
         restoreLocationOfCoords(startPos);
-        Location first = startPos.getLocation();
-        model.setCurrentLocation(first);
+        Location startLocation = startPos.getLocation();
+        model.setCurrentLocation(startLocation);
 
         int serLevel = startPos.level;
-        Optional<Layer> optLayer = first.getLayers().stream()
+        Optional<Layer> optLayer = startLocation.getLayers().stream()
                 .filter(l -> l.getLevel() == serLevel)
                 .findFirst();
         Layer startLayer = optLayer.orElse(null);
@@ -274,19 +274,13 @@ public class GameController extends Controller {
     }
 
     public void initLoadedGameSettings(SaveMemento memento) {
-        Coords curPos = getCurPos();
         Coords loadedPos = memento.getLastPos();
-        curPos.x = loadedPos.x;
-        curPos.y = loadedPos.y;
+        setCurPos(loadedPos);
     }
 
     public void initNewGameSettings() {
         Plugin p = getActivePlugin();
-        double startX = p.getStartPos().x;
-        double startY = p.getStartPos().y;
-        Coords curPos = getPosToCenter();
-        curPos.x = startX;
-        curPos.y = startY;
+        setCurPos(p.getStartPos());
     }
 
     public void showLoaderView(Task<String> loader) {

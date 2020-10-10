@@ -53,6 +53,7 @@ public class If implements Executable, Externalizable {
                 ifCommand.expression = parseGlobal(controller, negate, condition, validator);
             } else if (condition.startsWith(QUOTE)) {
                 condition = condition.replaceFirst(QUOTE, "");
+                //TODO containerHas
                 ifCommand.expression = parseCreatureHas(controller, negate, condition, validator);
             } else {
                 validator.setSyntaxInvalid(condition);
