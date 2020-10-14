@@ -10,50 +10,62 @@ import static io.wsz.model.script.ScriptKeyWords.*;
 
 public interface Executable {
 
-    void execute(Controller controller, PosItem<?,?> firstAdversary, PosItem<?,?> secondAdversary);
+    boolean tryExecute(Controller controller, PosItem<?,?> firstAdversary, PosItem<?,?> secondAdversary);
 
-    default void parsePreBlock(String s, ArrayDeque<Executable> executables,
+    default void parsePreBlock(String all, ArrayDeque<Executable> executables,
                                ScriptValidator validator, Controller controller) {
-        if (s.isEmpty()) {
+        if (all.isEmpty()) {
             return;
         }
-        int indexOfBlockOpen = s.indexOf(BLOCK_OPEN);
-        if (indexOfBlockOpen != -1) {
-            String preBlock = s.substring(0, indexOfBlockOpen);
-            String blockOpen = s.substring(indexOfBlockOpen + 1);
-            parseBlocks(preBlock, blockOpen, executables, validator, controller);
-        } else {
-            parseBlocks(s, "", executables, validator, controller);
-        }
-    }
-
-    default void parseBlocks(String preBlock, String blockOpen, ArrayDeque<Executable> executables,
-                             ScriptValidator validator, Controller controller) {
-
-        int nextBlockClose = blockOpen.indexOf(BLOCK_CLOSE);
-        nextBlockClose = getBlockCloseIndex(blockOpen, nextBlockClose);
-        String nextPreBlock = "";
-        String afterBlock = "";
-        if (nextBlockClose != -1) {
-            nextPreBlock = blockOpen.substring(0, nextBlockClose);
-            afterBlock = blockOpen.substring(nextBlockClose);
-            while (!afterBlock.isEmpty() && afterBlock.charAt(0) == CHAR_BLOCK_CLOSE) {
-                afterBlock = afterBlock.replaceFirst(BLOCK_CLOSE, "");
+        int indexOfBlockOpen = all.indexOf(BLOCK_OPEN);
+        if (all.startsWith(ELSE)) {
+            int length = all.length();
+            try {
+                all = all.substring(indexOfBlockOpen + 1, length - 1);
+            } catch (Exception e) {
+                validator.setSyntaxInvalid(all);
+                e.printStackTrace();
             }
+            indexOfBlockOpen = all.indexOf(BLOCK_OPEN);
         }
+        String preBlock = "";
+        String nextPreBlock = "";
+        String tempAfterBlock = "";
 
-        parseExecutables(preBlock, executables, validator, controller, nextPreBlock);
-        parsePreBlock(afterBlock, executables, validator, controller);
+        if (indexOfBlockOpen != -1) {
+            preBlock = all.substring(0, indexOfBlockOpen);
+            String blockOpen = all.substring(indexOfBlockOpen);
+
+            int nextBlockClose = getBlockCloseIndex(blockOpen);
+            if (nextBlockClose != -1) {
+                nextPreBlock = removeBlockOpenings(blockOpen.substring(1, nextBlockClose));
+                tempAfterBlock = removeBlockOpenings(blockOpen.substring(nextBlockClose));
+            }
+        } else {
+            preBlock = all;
+        }
+        String[] afterBlock = new String[]{tempAfterBlock};
+        parseExecutables(preBlock, nextPreBlock, afterBlock, executables, validator, controller);
+        parsePreBlock(afterBlock[0], executables, validator, controller);
     }
 
-    private void parseExecutables(String preBlock, ArrayDeque<Executable> executables, ScriptValidator validator,
-                                  Controller controller, String nextPreBlock) {
+    private String removeBlockOpenings(String substring) {
+        String tempAfterBlock;
+        tempAfterBlock = substring;
+        while (!tempAfterBlock.isEmpty() && tempAfterBlock.charAt(0) == CHAR_BLOCK_CLOSE) {
+            tempAfterBlock = tempAfterBlock.replaceFirst(BLOCK_CLOSE, "");
+        }
+        return tempAfterBlock;
+    }
+
+    private void parseExecutables(String preBlock, String nextPreBlock, String[] afterBlock,
+                                  ArrayDeque<Executable> executables, ScriptValidator validator, Controller controller) {
         String[] commandsToParse = preBlock.split(COMMAND_END);
 
         for (String commandToParse : commandsToParse) {
             Executable executable = null;
             if (commandToParse.startsWith(IF)) {
-                executable = If.parseIf(controller, commandToParse, nextPreBlock, validator);
+                executable = If.parseIf(controller, commandToParse, nextPreBlock, afterBlock, validator);
             } else if (commandToParse.startsWith(GLOBAL + DOT)) {
                 executable = GlobalVariableSet.parseCommand(commandToParse, validator);
             } else if (commandToParse.startsWith(GIVE_TO_ADVERSARY)) {
@@ -74,11 +86,15 @@ public interface Executable {
         }
     }
 
+    default int getBlockCloseIndex(String blockOpen) {
+        return getBlockCloseIndex(blockOpen, blockOpen.indexOf(BLOCK_CLOSE));
+    }
+
     private int getBlockCloseIndex(String blockOpen, int nextBlockClose) {
         if (nextBlockClose == -1) {
             return nextBlockClose;
         }
-        String codeToNextBlockClose = blockOpen.substring(0, nextBlockClose);
+        String codeToNextBlockClose = blockOpen.substring(0, nextBlockClose + 1);
         int openings = 0;
         int closings = 0;
         for (int i = 0; i < codeToNextBlockClose.length(); i++) {

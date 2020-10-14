@@ -10,6 +10,7 @@ import editor.view.plugin.PluginSettingsStage;
 import editor.view.script.variable.ObservableVariables;
 import io.wsz.model.Controller;
 import io.wsz.model.Model;
+import io.wsz.model.asset.Asset;
 import io.wsz.model.dialog.Dialog;
 import io.wsz.model.item.Creature;
 import io.wsz.model.item.EquipmentType;
@@ -382,6 +383,25 @@ public class EditorController extends Controller {
     public void setCurrentLayer(Layer layer) {
         super.setCurrentLayer(layer);
         currentObservableLayer.setLayer(layer);
+    }
+
+    @Override
+    public Asset<?> getAssetById(String id) {
+        return observableAssetsList.getMergedList().stream()
+                .filter(a -> a.getAssetId().equals(id))
+                .findFirst().orElse(null);
+    }
+
+    @Override
+    public Variable<?> getGlobalVariableById(String id) {
+        return observableGlobals.getVariableById(id);
+    }
+
+    @Override
+    public Script getScriptById(String id) {
+        return observableScripts.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst().orElse(null);
     }
 
     public ObservableItemsList getObservableAssets() {

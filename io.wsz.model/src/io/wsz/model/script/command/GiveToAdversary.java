@@ -52,8 +52,8 @@ public class GiveToAdversary implements Executable, Externalizable {
     private String amount;
 
     @Override
-    public void execute(Controller controller, PosItem<?, ?> giver, PosItem<?, ?> receiver) { //TODO dropping item when does not fits inventory (Problem: items with collision)
-        if (giver == null || receiver == null) return;
+    public boolean tryExecute(Controller controller, PosItem<?, ?> giver, PosItem<?, ?> receiver) { //TODO dropping item when does not fits inventory (Problem: items with collision)
+        if (giver == null || receiver == null) return false;
         ItemMover itemMover = (concreteGiver, concreteReceiver) -> {
             int amount;
             try {
@@ -99,6 +99,7 @@ public class GiveToAdversary implements Executable, Externalizable {
             controller.getDialogMemento().getDialogs().add(di);
         };
         giver.moveItemTo(receiver, itemMover);
+        return true;
     }
 
     @Override

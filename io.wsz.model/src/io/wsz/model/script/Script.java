@@ -48,10 +48,11 @@ public class Script implements Externalizable, Executable {
         }
     }
 
-    public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
+    public boolean tryExecute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         for (Executable executable : executables) {
-            executable.execute(controller, firstAdversary, secondAdversary);
+            executable.tryExecute(controller, firstAdversary, secondAdversary);
         }
+        return true;
     }
 
     public String getValidatorMessage() {

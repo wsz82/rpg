@@ -35,12 +35,13 @@ public class Remove implements Executable, Externalizable {
     private String itemOrAssetId;
 
     @Override
-    public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
+    public boolean tryExecute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         boolean willBeRemoved = controller.getCurrentLocation().tryRemoveItem(itemOrAssetId);
-        if (willBeRemoved) return;
+        if (willBeRemoved) return false;
         for (Location l : controller.getLocations()) {
             if (l.tryRemoveItem(itemOrAssetId)) break;
         }
+        return true;
     }
 
     public String getItemOrAssetId() {

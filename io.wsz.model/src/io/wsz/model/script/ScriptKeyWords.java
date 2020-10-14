@@ -24,4 +24,6 @@ public class ScriptKeyWords {
     public static final String REMOVE = "remove";
     public static final String RUN = "run";
     public static final String IF = "if";
+    public static final String ELSE = "else";
+    public static final String ELSE_IF = "elseif";
 }

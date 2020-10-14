@@ -6,7 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-public class Variables implements Externalizable {
+public class Variables extends AbstractVariables implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private List<VariableString> strings;
@@ -14,20 +14,7 @@ public class Variables implements Externalizable {
     private List<VariableInteger> integers;
     private List<VariableDecimal> decimals;
 
-    public Variable<?> getVariableById(String id) {
-        Variable<?> global = getGlobal(id, strings);
-        if (global == null) global = getGlobal(id, booleans);
-        if (global == null) global = getGlobal(id, integers);
-        if (global == null) global = getGlobal(id, decimals);
-        return global;
-    }
-
-    public <A extends Variable<?>> A getGlobal(String id, List<A> globals) {
-        return globals.stream()
-                .filter(g -> g.getId().equals(id))
-                .findFirst().orElse(null);
-    }
-
+    @Override
     public List<VariableString> getStrings() {
         return strings;
     }
@@ -36,6 +23,7 @@ public class Variables implements Externalizable {
         this.strings = strings;
     }
 
+    @Override
     public List<VariableBoolean> getBooleans() {
         return booleans;
     }
@@ -44,6 +32,7 @@ public class Variables implements Externalizable {
         this.booleans = booleans;
     }
 
+    @Override
     public List<VariableInteger> getIntegers() {
         return integers;
     }
@@ -52,6 +41,7 @@ public class Variables implements Externalizable {
         this.integers = integers;
     }
 
+    @Override
     public List<VariableDecimal> getDecimals() {
         return decimals;
     }

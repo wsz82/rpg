@@ -41,12 +41,13 @@ public class GlobalVariableSet implements Executable, Externalizable {
     private String value;
 
     @Override
-    public void execute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
+    public boolean tryExecute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         if (globalVar == null) {
             globalVar = controller.getGlobalVariableById(globalVarId);
         }
-        if (globalVar == null) return;
+        if (globalVar == null) return false;
         globalVar.setValue(value);
+        return true;
     }
 
     @Override

@@ -8,29 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ObservableVariables {
+public class ObservableVariables extends AbstractVariables {
     private final ObservableList<VariableString> strings = FXCollections.observableArrayList();
     private final ObservableList<VariableBoolean> booleans = FXCollections.observableArrayList();
     private final ObservableList<VariableInteger> integers = FXCollections.observableArrayList();
     private final ObservableList<VariableDecimal> decimals = FXCollections.observableArrayList();
 
     public ObservableVariables() {
-    }
-
-    public ObservableList<VariableString> getStrings() {
-        return strings;
-    }
-
-    public ObservableList<VariableBoolean> getBooleans() {
-        return booleans;
-    }
-
-    public ObservableList<VariableInteger> getIntegers() {
-        return integers;
-    }
-
-    public ObservableList<VariableDecimal> getDecimals() {
-        return decimals;
     }
 
     public void clear() {
@@ -101,5 +85,25 @@ public class ObservableVariables {
         merged.addAll(integers);
         merged.addAll(decimals);
         return merged;
+    }
+
+    @Override
+    public ObservableList<VariableString> getStrings() {
+        return strings;
+    }
+
+    @Override
+    public ObservableList<VariableBoolean> getBooleans() {
+        return booleans;
+    }
+
+    @Override
+    public ObservableList<VariableInteger> getIntegers() {
+        return integers;
+    }
+
+    @Override
+    public ObservableList<VariableDecimal> getDecimals() {
+        return decimals;
     }
 }

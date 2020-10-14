@@ -8,6 +8,7 @@ import io.wsz.model.item.PosItem;
 import io.wsz.model.location.Location;
 import io.wsz.model.script.command.Executable;
 import io.wsz.model.script.variable.Variable;
+import io.wsz.model.script.variable.VariableType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +51,11 @@ public class ScriptValidator {
         if (global == null) {
             setGlobalVariableInvalid(globalVarID);
         } else {
-            Object variableValue = global.getValue();
-            if (variableValue instanceof Boolean) {
-                validateBoolean(value);
-            } else if (variableValue instanceof Integer) {
-                validateInteger(value);
-            } else if (variableValue instanceof Double) {
-                validateDecimal(value);
+            VariableType type = global.getType();
+            switch (type) {
+                case BOOLEAN -> validateBoolean(value);
+                case INTEGER -> validateInteger(value);
+                case DECIMAL -> validateDecimal(value);
             }
         }
     }
@@ -66,8 +65,7 @@ public class ScriptValidator {
         if (global == null) {
             setGlobalVariableInvalid(id);
         } else {
-            Object variableValue = global.getValue();
-            if (!(variableValue instanceof Boolean)) {
+            if (global.getType() != VariableType.BOOLEAN) {
                 setGlobalBooleanVariableInvalid(id);
             }
         }

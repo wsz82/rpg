@@ -154,7 +154,7 @@ public class DialogView {
         addDialogItem(npc, greeting.getText());
         Script answerScript = greeting.getBeginScript();
         if (answerScript != null) {
-            answerScript.execute(controller, npc, pc);
+            answerScript.tryExecute(controller, npc, pc);
         }
         dialogMemento.setLastAnswer(greeting);
     }
@@ -262,7 +262,7 @@ public class DialogView {
         Script questionScript = activeQuestion.getBeginScript();
         Controller controller = this.controller;
         if (questionScript != null) {
-            questionScript.execute(controller, pc, dialogMemento.getNpc());
+            questionScript.tryExecute(controller, pc, dialogMemento.getNpc());
         }
 
         PosItem npc = dialogMemento.getNpc();
@@ -274,7 +274,7 @@ public class DialogView {
             addDialogItem(npc, answer.getText());
             Script answerScript = answer.getBeginScript();
             if (answerScript != null) {
-                answerScript.execute(controller, npc, pc);
+                answerScript.tryExecute(controller, npc, pc);
             }
         }
         dialogMemento.setLastAnswer(answer);

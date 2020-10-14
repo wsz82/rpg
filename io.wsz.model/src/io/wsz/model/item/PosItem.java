@@ -294,7 +294,7 @@ public abstract class PosItem<I extends PosItem<I, A>, A extends AnimationPos> e
 
     private void runScript() {
         if (script != null) {
-            script.execute(getController(), null, null);
+            script.tryExecute(getController(), null, null);
         }
     }
 
