@@ -27,41 +27,81 @@ import java.io.ObjectOutput;
 
 import static io.wsz.model.script.ScriptKeyWords.*;
 
-public class IfCondition implements Externalizable {
+public class IfCondition implements ConditionDividable, Externalizable {
     private static final long serialVersionUID = 1L;
 
     public static IfCondition parseIfCondition(String anIf, String condition, Controller controller, ScriptValidator validator) {
         IfCondition ifCondition = new IfCondition();
 
         condition = condition.replaceFirst(anIf, "");
-        String toRemove = "";
         if (condition.startsWith(NEGATE)) {
-            ifCondition.setNegate(true);
-            toRemove = NEGATE;
+            ifCondition.negate = true;
+            condition = condition.substring(1);
         }
-        condition = condition.replaceFirst(toRemove + REGEX_BRACKET_OPEN, "");
-        int nextIndex = condition.lastIndexOf(BRACKET_CLOSE);
-
-        if (nextIndex != -1) {
-            validator.validateShouldNotBeEmpty(condition);
-            String globalDot = GLOBAL + DOT;
-            boolean negate = ifCondition.isNegate();
-
-            if (condition.startsWith(globalDot)) {
-                condition = condition.replaceFirst(globalDot, "");
-                ifCondition.setExpression(parseGlobal(controller, negate, condition, validator));
-            } else if (condition.startsWith(QUOTE)) {
-                condition = condition.replaceFirst(QUOTE, "");
-                //TODO containerHas
-                ifCondition.setExpression(parseCreatureHas(controller, negate, condition, validator));
-            } else {
-                validator.setSyntaxInvalid(condition);
+        String andOrIfCondition = "";
+        if (condition.startsWith(BRACKET_OPEN)) {
+            int indexOfClosingBracket = ifCondition.getDivisionCloseIndex(condition);
+            if (indexOfClosingBracket != -1) {
+                String innerCondition = condition.substring(1, indexOfClosingBracket);
+                ifCondition.innerCondition = IfCondition.parseIfCondition("", innerCondition, controller, validator);
+                andOrIfCondition = condition.substring(indexOfClosingBracket + 1);
             }
-            return ifCondition;
+        } else {
+            int andIndex = condition.indexOf(AND);
+            int orIndex = condition.indexOf(OR);
+            int beginOfFollowingIndex = Math.min(andIndex, orIndex);
+            if (andIndex == -1) beginOfFollowingIndex = orIndex;
+            if (orIndex == -1) beginOfFollowingIndex = andIndex;
+            int indexOfNextCondition = condition.indexOf(BRACKET_OPEN);
+            boolean conditionContainsOperator = beginOfFollowingIndex != -1 &&
+                    (indexOfNextCondition == -1 || beginOfFollowingIndex < indexOfNextCondition);
+            if (conditionContainsOperator) {
+                andOrIfCondition = condition.substring(beginOfFollowingIndex);
+                condition = condition.substring(0, beginOfFollowingIndex);
+            }
+            ifCondition.expression = parseExpression(condition, ifCondition, controller, validator);
         }
+        setUpAndOrIfCondition(ifCondition, andOrIfCondition, controller, validator);
+        return ifCondition;
+    }
 
-        validator.setSyntaxInvalid(condition);
-        return null;
+    private static void setUpAndOrIfCondition(IfCondition ifCondition, String followingCondition,
+                                              Controller controller, ScriptValidator validator) {
+        if (followingCondition.isEmpty()) return;
+        String operatorToRemove = "";
+        BooleanOperator operator = null;
+        if (followingCondition.startsWith(AND)) {
+            operator = BooleanOperator.AND;
+            operatorToRemove = AND;
+        } else if (followingCondition.startsWith(OR)) {
+            operator = BooleanOperator.OR;
+            operatorToRemove = OR;
+        }
+        if (operator != null) {
+            ifCondition.operator = operator;
+            followingCondition = followingCondition.replaceFirst(operatorToRemove, "");
+            ifCondition.andOrIfCondition = IfCondition.parseIfCondition("", followingCondition, controller, validator);
+        }
+    }
+
+    private static BooleanExpression<?> parseExpression(String condition, IfCondition ifCondition,
+                                                        Controller controller, ScriptValidator validator) {
+        validator.validateShouldNotBeEmpty(condition);
+        String globalDot = GLOBAL + DOT;
+        boolean negate = ifCondition.isNegate();
+
+        BooleanExpression<?> expression = null;
+        if (condition.startsWith(globalDot)) {
+            condition = condition.replaceFirst(globalDot, "");
+            expression = parseGlobal(controller, negate, condition, validator);
+        } else if (condition.startsWith(QUOTE)) {
+            condition = condition.replaceFirst(QUOTE, "");
+            //TODO containerHas
+            expression = parseCreatureHas(controller, negate, condition, validator);
+        } else {
+            validator.setSyntaxInvalid(condition);
+        }
+        return expression;
     }
 
     private static BooleanExpression<?> parseCreatureHas(Controller controller, boolean negate, String condition,
@@ -82,7 +122,7 @@ public class IfCondition implements Externalizable {
                         String inventoryPlaceId = condition.substring(0, nextIndex);
                         validator.validateInventoryPlaceId(inventoryPlaceId);
                         condition = condition.
-                                replaceFirst(inventoryPlaceId + QUOTE+ REGEX_BRACKET_CLOSE + REGEX_BRACKET_CLOSE, "");
+                                replaceFirst(inventoryPlaceId + QUOTE + REGEX_BRACKET_CLOSE, "");
                         validator.validateIsEmpty(condition);
                         Not not = null;
                         if (negate) {
@@ -112,7 +152,7 @@ public class IfCondition implements Externalizable {
                                 String amount = condition.substring(0, nextIndex);
                                 validator.validateInteger(amount);
                                 condition = condition.
-                                        replaceFirst(amount + REGEX_BRACKET_CLOSE + REGEX_BRACKET_CLOSE, "");
+                                        replaceFirst(amount + REGEX_BRACKET_CLOSE, "");
                                 validator.validateIsEmpty(condition);
 
                                 if (negate) {
@@ -143,68 +183,60 @@ public class IfCondition implements Externalizable {
         CompareOperator compareOperator = getCompareOperator(condition);
         int nextIndex;
         if (compareOperator == null) {
-            nextIndex = condition.indexOf(BRACKET_CLOSE);
-            if (nextIndex != -1) {
-                String globalId = condition.substring(0, nextIndex);
-                validator.validateGlobalVariableHasBooleanValue(globalId);
-                condition = condition.replaceFirst(globalId, "");
-                condition = condition.replace(BRACKET_CLOSE, "");
-                validator.validateIsEmpty(condition);
-                EqualsOperator equalsOperator;
-                if (negate) {
-                    equalsOperator = EqualsOperator.EQUAL;
-                } else {
-                    equalsOperator = EqualsOperator.NOT_EQUAL;
-                }
-                EqualableTrueFalse equalable = new EqualableTrueFalse(null, equalsOperator, true);
-                return new BooleanTrueFalseGlobalVariable(globalId, equalable);
+            String globalId = condition;
+            validator.validateGlobalVariableHasBooleanValue(globalId);
+            condition = condition.replaceFirst(globalId, "");
+            validator.validateIsEmpty(condition);
+            EqualsOperator equalsOperator;
+            if (negate) {
+                equalsOperator = EqualsOperator.EQUAL;
+            } else {
+                equalsOperator = EqualsOperator.NOT_EQUAL;
             }
+            EqualableTrueFalse equalable = new EqualableTrueFalse(null, equalsOperator, true);
+            return new BooleanTrueFalseGlobalVariable(globalId, equalable);
         } else {
             String operatorString = compareOperator.toString();
             nextIndex = condition.indexOf(operatorString);
             if (nextIndex != -1) {
                 String globalId = condition.substring(0, nextIndex);
                 condition = condition.replaceFirst(globalId + operatorString, "");
-                nextIndex = condition.indexOf(BRACKET_CLOSE);
 
-                if (nextIndex != -1) {
-                    String amount = condition.substring(0, nextIndex);
-                    validator.validateGlobalVariable(globalId, amount);
-                    condition = condition.replaceFirst(amount, "");
-                    condition = condition.replace(BRACKET_CLOSE, "");
-                    validator.validateIsEmpty(condition);
+                String amount = condition;
+                validator.validateGlobalVariable(globalId, amount);
+                condition = condition.replaceFirst(amount, "");
+                validator.validateIsEmpty(condition);
 
-                    Variable<?> variable = controller.getGlobalVariableById(globalId);
-                    if (variable != null) {
-                        Object value = variable.getValue();
-                        if (value instanceof Integer) {
-                            //todo comapirng to global
-                            CountableIntegerVariable countable = new CountableIntegerVariable(null, compareOperator, (int) value);
-                            return new BooleanIntegerGlobalVariable(globalId, countable);
-                        } else if (value instanceof Double) {
-                            //todo comapirng to global
-                            CountableDecimalVariable countable = new CountableDecimalVariable(null, compareOperator, (double) value);
-                            return new BooleanDecimalGlobalVariable(globalId, countable);
-                        } else if (value instanceof String) {
-                            String compareString = compareOperator.toString();
-                            EqualsOperator equalsOperator = getEqualsOperator(compareString);
-                            validator.validateEqualsOperator(equalsOperator, compareString);
-                            switch (equalsOperator) {
-                                case EQUAL -> {
-                                    if (negate) {
-                                        equalsOperator = EqualsOperator.NOT_EQUAL;
-                                    }
-                                }
-                                case NOT_EQUAL -> {
-                                    if (negate) {
-                                        equalsOperator = EqualsOperator.EQUAL;
-                                    }
+                Variable<?> variable = controller.getGlobalVariableById(globalId);
+                if (variable != null) {
+                    Object value = variable.getValue();
+                    if (value instanceof Integer) {
+                        //todo comapirng to global
+                        CountableIntegerVariable countable = new CountableIntegerVariable(null, compareOperator, (int) value);
+                        return new BooleanIntegerGlobalVariable(globalId, countable);
+                    } else if (value instanceof Double) {
+                        //todo comapirng to global
+                        CountableDecimalVariable countable = new CountableDecimalVariable(null, compareOperator, (double) value);
+                        return new BooleanDecimalGlobalVariable(globalId, countable);
+                    } else if (value instanceof String) {
+                        String compareString = compareOperator.toString();
+                        EqualsOperator equalsOperator = getEqualsOperator(compareString);
+                        validator.validateEqualsOperator(equalsOperator, compareString);
+                        switch (equalsOperator) {
+                            case EQUAL -> {
+                                if (negate) {
+                                    equalsOperator = EqualsOperator.NOT_EQUAL;
                                 }
                             }
-                            //todo comapirng to global
-                            EqualableStringVariable equalable = new EqualableStringVariable(null, equalsOperator, amount);
-                            return new BooleanStringVariableEquals(globalId, equalable);
+                            case NOT_EQUAL -> {
+                                if (negate) {
+                                    equalsOperator = EqualsOperator.EQUAL;
+                                }
+                            }
                         }
+                        //todo comapirng to global
+                        EqualableStringVariable equalable = new EqualableStringVariable(null, equalsOperator, amount);
+                        return new BooleanStringVariableEquals(globalId, equalable);
                     }
                 }
             }
@@ -237,38 +269,67 @@ public class IfCondition implements Externalizable {
     }
 
     private boolean negate;
-    private BooleanExpression<?> expression; //TODO many expressions with AND, OR
+    private BooleanExpression<?> expression;
+    private IfCondition innerCondition;
+    private BooleanOperator operator;
+    private IfCondition andOrIfCondition;
 
     public boolean isTrue(Controller controller) {
-        expression.setUpVariables(controller, null);
-        return expression.isTrue();
+        boolean isTrue = false;
+        if (expression != null) {
+            expression.setUpVariables(controller, null);
+            isTrue = expression.isTrue();
+        } else if (innerCondition != null) {
+            isTrue = innerCondition.isTrue(controller);
+        }
+        if (operator != null && andOrIfCondition != null) {
+            switch (operator) {
+                case AND -> isTrue = isTrue && andOrIfCondition.isTrue(controller);
+                case OR -> isTrue = isTrue || andOrIfCondition.isTrue(controller);
+            }
+        }
+        if (negate) {
+            return !isTrue;
+        } else {
+            return isTrue;
+        }
     }
 
     public boolean isNegate() {
         return negate;
     }
 
-    public void setNegate(boolean negate) {
-        this.negate = negate;
-    }
-
     public BooleanExpression<?> getExpression() {
         return expression;
     }
 
-    public void setExpression(BooleanExpression<?> expression) {
-        this.expression = expression;
+    public IfCondition getInnerCondition() {
+        return innerCondition;
+    }
+
+    public BooleanOperator getOperator() {
+        return operator;
+    }
+
+    public IfCondition getAndOrIfCondition() {
+        return andOrIfCondition;
     }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeBoolean(negate);
         out.writeObject(expression);
+        out.writeObject(innerCondition);
+        out.writeObject(operator);
+        out.writeObject(andOrIfCondition);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         negate = in.readBoolean();
         expression = (BooleanExpression<?>) in.readObject();
+        innerCondition = (IfCondition) in.readObject();
+        operator = (BooleanOperator) in.readObject();
+        andOrIfCondition = (IfCondition) in.readObject();
     }
 }

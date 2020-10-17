@@ -8,7 +8,7 @@ import java.util.ArrayDeque;
 
 import static io.wsz.model.script.ScriptKeyWords.*;
 
-public interface Executable {
+public interface Executable extends BlockDividable {
 
     boolean tryExecute(Controller controller, PosItem<?,?> firstAdversary, PosItem<?,?> secondAdversary);
 
@@ -36,7 +36,7 @@ public interface Executable {
             preBlock = all.substring(0, indexOfBlockOpen);
             String blockOpen = all.substring(indexOfBlockOpen);
 
-            int nextBlockClose = getBlockCloseIndex(blockOpen);
+            int nextBlockClose = getDivisionCloseIndex(blockOpen);
             if (nextBlockClose != -1) {
                 nextPreBlock = removeBlockOpenings(blockOpen.substring(1, nextBlockClose));
                 tempAfterBlock = removeBlockOpenings(blockOpen.substring(nextBlockClose));
@@ -83,33 +83,6 @@ public interface Executable {
             if (executable != null) {
                 executables.add(executable);
             }
-        }
-    }
-
-    default int getBlockCloseIndex(String blockOpen) {
-        return getBlockCloseIndex(blockOpen, blockOpen.indexOf(BLOCK_CLOSE));
-    }
-
-    private int getBlockCloseIndex(String blockOpen, int nextBlockClose) {
-        if (nextBlockClose == -1) {
-            return nextBlockClose;
-        }
-        String codeToNextBlockClose = blockOpen.substring(0, nextBlockClose + 1);
-        int openings = 0;
-        int closings = 0;
-        for (int i = 0; i < codeToNextBlockClose.length(); i++) {
-            if (codeToNextBlockClose.charAt(i) == CHAR_BLOCK_OPEN) {
-                openings++;
-            } else if (codeToNextBlockClose.charAt(i) == CHAR_BLOCK_CLOSE) {
-                closings++;
-            }
-        }
-
-        if (openings == closings) {
-            return nextBlockClose;
-        } else {
-            nextBlockClose = blockOpen.indexOf(BLOCK_CLOSE, nextBlockClose + 1);
-            return getBlockCloseIndex(blockOpen, nextBlockClose);
         }
     }
 

@@ -48,6 +48,7 @@ public class Script implements Externalizable, Executable {
         }
     }
 
+    @Override
     public boolean tryExecute(Controller controller, PosItem<?, ?> firstAdversary, PosItem<?, ?> secondAdversary) {
         for (Executable executable : executables) {
             executable.tryExecute(controller, firstAdversary, secondAdversary);

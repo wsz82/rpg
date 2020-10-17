@@ -4,6 +4,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Variables extends AbstractVariables implements Externalizable {
@@ -13,6 +14,17 @@ public class Variables extends AbstractVariables implements Externalizable {
     private List<VariableBoolean> booleans;
     private List<VariableInteger> integers;
     private List<VariableDecimal> decimals;
+
+    public Variables() {
+    }
+
+    public Variables(boolean initLists) {
+        if (!initLists) return;
+        strings = new ArrayList<>(0);
+        booleans = new ArrayList<>(0);
+        integers = new ArrayList<>(0);
+        decimals = new ArrayList<>(0);
+    }
 
     @Override
     public List<VariableString> getStrings() {

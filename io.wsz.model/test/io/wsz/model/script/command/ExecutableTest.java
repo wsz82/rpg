@@ -10,7 +10,7 @@ class ExecutableTest {
     void getBlockCloseIndex1() {
         If instruction = new If();
         String blockOpen = "if(boo){x}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(blockOpen.length() - 1, closeIndex);
     }
 
@@ -18,7 +18,7 @@ class ExecutableTest {
     void getBlockCloseIndex2() {
         If instruction = new If();
         String blockOpen = "if(boo){x; if(foo){y}}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(blockOpen.length() - 1, closeIndex);
     }
 
@@ -26,7 +26,7 @@ class ExecutableTest {
     void getBlockCloseIndex3() {
         If instruction = new If();
         String blockOpen = "if(foo){y}}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(blockOpen.length() - 2, closeIndex);
     }
 
@@ -34,7 +34,7 @@ class ExecutableTest {
     void getBlockCloseIndex4() {
         If instruciton = new If();
         String blockOpen = "if(foo){y}elseif(boo){z}}";
-        int closeIndex = instruciton.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruciton.getDivisionCloseIndex(blockOpen);
         assertEquals(9, closeIndex);
     }
 
@@ -42,7 +42,7 @@ class ExecutableTest {
     void getBlockCloseIndex5() {
         If instruction = new If();
         String blockOpen = "{}}}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(1, closeIndex);
     }
 
@@ -50,7 +50,7 @@ class ExecutableTest {
     void getBlockCloseIndex6() {
         If instruction = new If();
         String blockOpen = "{{}}}}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(3, closeIndex);
     }
 
@@ -58,7 +58,7 @@ class ExecutableTest {
     void getBlockCloseIndex7() {
         If instruction = new If();
         String blockOpen = "{{{}}}}";
-        int closeIndex = instruction.getBlockCloseIndex(blockOpen);
+        int closeIndex = instruction.getDivisionCloseIndex(blockOpen);
         assertEquals(5, closeIndex);
     }
 }

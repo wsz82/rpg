@@ -35,6 +35,11 @@ public abstract class BooleanObjectExpression<O> extends BooleanExpression<O> im
     }
 
     @Override
+    public String toString() {
+        return checkingId;
+    }
+
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(checkingId);
     }

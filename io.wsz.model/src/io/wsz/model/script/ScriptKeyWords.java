@@ -12,10 +12,12 @@ public class ScriptKeyWords {
     public static final char CHAR_BLOCK_CLOSE = '}';
     public static final String REGEX_BRACKET_OPEN = "\\(";
     public static final String BRACKET_OPEN = "(";
+    public static final char CHAR_BRACKET_OPEN = '(';
     public static final String REGEX_BRACKET_CLOSE = "\\)";
     public static final String BRACKET_CLOSE = ")";
+    public static final char CHAR_BRACKET_CLOSE = ')';
     public static final String QUOTE = "\"";
-    public static final String GLOBAL = "global";
+    public static final String GLOBAL = "G";
     public static final String HAS = "has";
     public static final String ITEM = "Item";
     public static final String INVENTORY_PLACE = "InventoryPlace";
@@ -26,4 +28,6 @@ public class ScriptKeyWords {
     public static final String IF = "if";
     public static final String ELSE = "else";
     public static final String ELSE_IF = "elseif";
+    public static final String AND = "AND";
+    public static final String OR = "OR";
 }

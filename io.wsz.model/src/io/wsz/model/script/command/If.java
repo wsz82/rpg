@@ -47,7 +47,7 @@ public class If implements Executable, Externalizable {
             }
             validator.validateShouldNotBeEmpty(nextIfCondition);
 
-            int nextBlockClose = ifCommand.getBlockCloseIndex(tempAfterBlock);
+            int nextBlockClose = ifCommand.getDivisionCloseIndex(tempAfterBlock);
             String elseBlock = "";
             if (nextBlockClose != -1) {
                 elseBlock = tempAfterBlock.substring(0, nextBlockClose + 1);
